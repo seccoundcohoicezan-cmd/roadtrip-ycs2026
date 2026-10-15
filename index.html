@@ -12,11 +12,12 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Youth Character Summit 2026">
   <meta property="og:title" content="Youth Character Summit 2026 — Karakter Kuat. Langkah ke Bali.">
-  <meta property="og:description" content="150 delegasi pelajar se-Indonesia, 7 destinasi, satu perjalanan karakter ke Bali. Gabung YCS Squad dan dukung gerakannya.">
+  <meta property="og:description" content="150 delegasi pelajar se-Indonesia, 7 destinasi, satu perjalanan karakter ke Bali. Buat twibbon dan dukung gerakannya.">
   <meta property="og:image" content="https://events.stekom.ac.id/api/media/2736/view">
   <meta property="og:url" content="https://events.stekom.ac.id/ycs2026">
   <meta name="twitter:card" content="summary_large_image">
 
+  <link rel="preload" as="image" href="assets/img/ycs-delegasi-danau-800.webp" imagesrcset="assets/img/ycs-delegasi-danau-800.webp 800w, assets/img/ycs-delegasi-danau-1600.webp 1600w" imagesizes="(min-width: 64rem) 34rem, 90vw">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
@@ -237,6 +238,7 @@
     .link-arrow:hover { text-decoration: underline; }
 
     .card {
+      transition: transform 300ms var(--ease), box-shadow 300ms var(--ease);
       background: var(--surface);
       border: 1px solid var(--line);
       border-radius: var(--radius-lg);
@@ -322,6 +324,7 @@
     /* ============ Hero ============ */
     .hero {
       position: relative; isolation: isolate; overflow: hidden;
+      padding-bottom: calc(var(--space-8) + 2rem);
       background:
         radial-gradient(60rem 30rem at 85% -10%, rgb(255 201 60 / .18), transparent 60%),
         linear-gradient(160deg, var(--teal-700) 0%, var(--teal-900) 70%);
@@ -353,22 +356,59 @@
     .hero__lead { margin-top: var(--space-5); max-width: 34rem; font-size: clamp(1rem, .4vw + .9rem, 1.125rem); color: #E4F2F2; }
     .hero__lead strong { color: var(--yellow-300); }
 
-    .hero__media { position: relative; }
-    .hero__photo {
-      position: relative; border-radius: 2rem 2rem 2rem .5rem; overflow: hidden;
-      box-shadow: var(--shadow-lg); border: 4px solid rgb(255 255 255 / .9);
-      transform: rotate(1.5deg);
-      aspect-ratio: 4 / 3;
-      background: linear-gradient(135deg, var(--teal-600), var(--yellow-400));
+    .hero__media { position: relative; padding-bottom: clamp(3rem, 9vw, 5rem); }
+
+    /* Polaroid: kartu foto miring dengan selotip, dipakai di hero & galeri */
+    .polaroid {
+      --tilt: 0deg;
+      position: relative; background: #fff; padding: .5rem .5rem 0; border-radius: .375rem;
+      box-shadow: var(--shadow-lg); transform: rotate(var(--tilt));
+      transition: transform 300ms var(--ease), box-shadow 300ms var(--ease);
     }
-    .hero__photo img { width: 100%; height: 100%; object-fit: cover; }
-    .hero__photo-inset {
-      position: absolute; left: -.75rem; bottom: -1.5rem; width: 38%;
-      border-radius: 1rem; overflow: hidden; border: 4px solid #fff; box-shadow: var(--shadow-lg);
-      transform: rotate(-5deg); aspect-ratio: 3 / 2;
-      background: var(--teal-900);
+    .polaroid img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: .125rem; background: var(--teal-100); }
+    .polaroid figcaption, .polaroid .polaroid__cap {
+      display: block; padding: .375rem .25rem .5rem; text-align: center;
+      font-family: var(--font-brush); font-size: clamp(.875rem, .5vw + .7rem, 1.0625rem); color: var(--teal-900); line-height: 1.25;
     }
-    .hero__photo-inset img { width: 100%; height: 100%; object-fit: cover; }
+    .polaroid::before {
+      content: ""; position: absolute; top: -.75rem; left: 50%; width: 5.5rem; height: 1.5rem;
+      translate: -50% 0; rotate: -4deg; background: rgb(255 216 107 / .75); border-radius: 2px;
+      box-shadow: 0 1px 2px rgb(0 0 0 / .08);
+    }
+    .polaroid:hover { transform: rotate(0deg) scale(1.03); box-shadow: 0 30px 50px -18px rgb(8 44 51 / .45); z-index: 3; }
+
+    .hero__photo { --tilt: 2deg; width: 88%; margin-left: auto; padding-bottom: .5rem; }
+    .hero__photo img { aspect-ratio: 5 / 4; }
+    .hero__pol-a, .hero__pol-b { position: absolute; bottom: 0; width: 42%; z-index: 1; }
+    .hero__pol-a { --tilt: -7deg; left: 0; }
+    .hero__pol-b { --tilt: 6deg; right: 4%; width: 36%; bottom: -1rem; }
+    .hero__pol-a::before, .hero__pol-b::before { width: 3.5rem; height: 1.125rem; }
+
+    /* Doodle dekoratif */
+    .doodle { position: absolute; pointer-events: none; color: var(--yellow-400); }
+    .doodle--float { animation: floaty 5s ease-in-out infinite; }
+    .doodle--spin { animation: spin-slow 14s linear infinite; }
+    @keyframes floaty { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-8px) rotate(4deg); } }
+    @keyframes spin-slow { to { transform: rotate(360deg); } }
+    .hero__doodle-star { width: 2.5rem; left: 2%; top: 8%; }
+    .hero__doodle-arrow { width: 5rem; left: -1rem; top: 46%; color: #fff; transform: rotate(-12deg); display: none; }
+    .hero__doodle-spark { width: 1.75rem; right: 2%; bottom: 40%; color: var(--orange-400); }
+    @media (min-width: 64rem) { .hero__doodle-arrow { display: block; } }
+
+    /* Gelombang pemisah section */
+    .wave { position: absolute; left: 0; width: 100%; height: clamp(1.75rem, 4vw, 4rem); color: var(--bg); pointer-events: none; }
+    .wave path { fill: currentColor; }
+    .wave--bottom { bottom: -1px; }
+    .wave--top { top: -1px; transform: scaleY(-1); }
+    .memories-wave { color: var(--sand-100); }
+    :root[data-theme="dark"] .memories-wave { color: #0A262C; }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .memories-wave { color: #0A262C; } }
+
+    /* Coretan stabilo di bawah kata */
+    .scribble {
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'%3E%3Cpath d='M2 8c40-6 80-6 120-3s60 2 76-2' fill='none' stroke='%23FFC93C' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E") left 100% / 100% .5em no-repeat;
+      padding-bottom: .15em;
+    }
     .hero__date-note {
       position: absolute; z-index: 2; right: .5rem; top: -.5rem;
       font-family: var(--font-brush); font-size: clamp(1.125rem, 1vw + .9rem, 1.5rem); line-height: 1.15;
@@ -422,7 +462,7 @@
       .keydates li + li { border-left: 1px solid var(--line); padding-left: var(--space-3); }
     }
     @media (min-width: 64rem) {
-      .hero { padding-block: var(--space-7) var(--space-9); }
+      .hero { padding-block: var(--space-7) calc(var(--space-9) + 2rem); }
       .hero__grid {
         grid-template-columns: 1.08fr 1fr; gap: var(--space-6) var(--space-7);
         grid-template-areas: "text media" "count cta";
@@ -512,6 +552,7 @@
     /* ============ Twibbon ============ */
     .twibbon {
       position: relative; isolation: isolate; overflow: hidden;
+      padding-block: calc(var(--space-7) + 2.5rem);
       background: linear-gradient(170deg, var(--teal-800), var(--teal-950));
       color: #fff;
     }
@@ -671,7 +712,8 @@
 
     .delegates { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr)); gap: var(--space-3); margin-top: var(--space-4); }
     .delegate { text-align: center; padding: var(--space-3) var(--space-2); border-radius: var(--radius); border: 1px solid var(--line); background: var(--surface); transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
-    .delegate:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+    .delegate:hover { transform: translateY(-3px) rotate(-1.5deg); box-shadow: var(--shadow); }
+    .delegate:nth-child(even):hover { transform: translateY(-3px) rotate(1.5deg); }
     .avatar {
       display: grid; place-items: center; width: 3.5rem; height: 3.5rem; margin-inline: auto;
       border-radius: 50%; font-weight: 800; font-size: 1.125rem; color: #fff;
@@ -691,10 +733,18 @@
     .result-count { font-size: .8125rem; color: var(--text-muted); margin-top: var(--space-3); }
 
     /* ============ Squad ============ */
-    .squad-grid { display: grid; gap: var(--space-5); }
-    @media (min-width: 64rem) { .squad-grid { grid-template-columns: 1.35fr 1fr; } }
+    .community-grid { display: grid; gap: var(--space-5); grid-template-areas: "photo" "follow"; }
+    .squad-photo { grid-area: photo; }
+    .squad-form-card { grid-area: form; }
+    .follow-card { grid-area: follow; }
+    @media (min-width: 48rem) and (max-width: 63.99rem) { .squad-photo { aspect-ratio: 16 / 7; } }
+    @media (min-width: 64rem) {
+      .community-grid { grid-template-columns: 1fr 1fr; grid-template-areas: "photo follow"; }
+    }
 
     .squad-form-card { padding: var(--space-5); position: relative; overflow: hidden; }
+    .squad-form-card::after { content: ""; position: absolute; right: -2.5rem; top: -2.5rem; width: 7rem; height: 7rem; border-radius: 50%; background: var(--yellow-100); z-index: 0; }
+    .squad-form-card > * { position: relative; z-index: 1; }
     .squad-form-card__head { display: flex; gap: var(--space-3); align-items: center; }
     .squad-form-card__icon { display: grid; place-items: center; width: 3rem; height: 3rem; border-radius: 50%; background: var(--yellow-100); color: var(--orange-600); flex: none; }
     .squad-form-card__icon svg { width: 1.5rem; height: 1.5rem; }
@@ -733,6 +783,69 @@
     .social-row { display: flex; flex-wrap: wrap; gap: var(--space-2); }
     .btn--social { --btn-bg: rgb(255 255 255 / .08); --btn-fg: #fff; border-color: rgb(255 255 255 / .55); }
     .btn--social:hover { --btn-bg: #fff; --btn-fg: var(--teal-900); }
+
+    /* ============ Jejak perjalanan ============ */
+    .memories {
+      position: relative; padding-block: var(--space-7) var(--space-8);
+      background:
+        radial-gradient(circle at 1px 1px, rgb(14 90 102 / .12) 1px, transparent 0) 0 0 / 22px 22px,
+        var(--sand-100);
+      overflow: hidden;
+    }
+    :root[data-theme="dark"] .memories { background: radial-gradient(circle at 1px 1px, rgb(255 255 255 / .06) 1px, transparent 0) 0 0 / 22px 22px, #0A262C; }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .memories { background: radial-gradient(circle at 1px 1px, rgb(255 255 255 / .06) 1px, transparent 0) 0 0 / 22px 22px, #0A262C; } }
+    .memories__head { display: grid; gap: var(--space-3); max-width: 44rem; }
+    .memories__title { font-size: clamp(1.75rem, 2.4vw + 1rem, 2.75rem); font-weight: 800; line-height: 1.15; }
+    .memories__title .brush { color: var(--cta); font-size: 1.1em; }
+    :root[data-theme="dark"] .memories__title .brush { color: var(--orange-400); }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .memories__title .brush { color: var(--orange-400); } }
+    .memories__doodle { width: 3rem; right: 6%; top: 2.5rem; color: var(--orange-400); display: none; }
+    @media (min-width: 48rem) { .memories__doodle { display: block; } }
+
+    .stats { list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-3); margin-top: var(--space-5); }
+    .stat {
+      --tilt: 0deg;
+      padding: var(--space-3) var(--space-4); border-radius: var(--radius); background: var(--surface); border: 2px solid var(--teal-700);
+      box-shadow: 4px 4px 0 var(--teal-700); transform: rotate(var(--tilt));
+      transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+    }
+    .stat:hover { transform: rotate(0) translate(-2px, -2px); box-shadow: 6px 6px 0 var(--teal-700); }
+    .stat:nth-child(1) { --tilt: -1.5deg; }
+    .stat:nth-child(2) { --tilt: 1deg; background: var(--yellow-100); }
+    .stat:nth-child(3) { --tilt: -.5deg; }
+    .stat:nth-child(4) { --tilt: 1.5deg; background: var(--teal-50); }
+    .stat strong { display: block; font-size: clamp(1.5rem, 2vw + 1rem, 2.25rem); font-weight: 800; line-height: 1.1; color: var(--teal-900); }
+    .stat span { font-size: .875rem; font-weight: 600; color: var(--ink-muted); }
+    @media (min-width: 48rem) { .stats { grid-template-columns: repeat(4, 1fr); } }
+
+    .marquee { position: relative; margin-top: var(--space-6); overflow-x: auto; scroll-snap-type: x mandatory; padding-block: var(--space-4) var(--space-5); }
+    .marquee.is-animated { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
+    .marquee__track { list-style: none; display: flex; gap: var(--space-5); width: max-content; padding-inline: var(--space-4); }
+    .marquee.is-animated .marquee__track { animation: marquee 70s linear infinite; }
+    .marquee.is-animated:hover .marquee__track,
+    .marquee.is-animated:focus-within .marquee__track,
+    .marquee.is-paused .marquee__track { animation-play-state: paused; }
+    @keyframes marquee { to { transform: translateX(-50%); } }
+    .marquee__track > li { scroll-snap-align: center; flex: none; width: clamp(14rem, 26vw, 19rem); }
+    .marquee__track > li:nth-child(odd) .polaroid { --tilt: -2.5deg; }
+    .marquee__track > li:nth-child(even) .polaroid { --tilt: 2deg; margin-top: 1.25rem; }
+    .marquee__track > li:nth-child(3n) .polaroid { --tilt: 3.5deg; }
+    .marquee__controls { display: flex; justify-content: center; margin-top: var(--space-2); }
+    .marquee__controls[hidden] { display: none; }
+
+    /* Foto di panel Squad & follow */
+    .squad-photo {
+      position: relative; margin: 0; border-radius: var(--radius-lg); overflow: hidden; min-height: 14rem;
+      box-shadow: var(--shadow-lg); background: var(--teal-800);
+    }
+    .squad-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 30% 35%; position: absolute; inset: 0; }
+    .squad-photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 45%, rgb(8 44 51 / .75)); }
+    .squad-photo figcaption {
+      position: absolute; z-index: 1; left: var(--space-4); bottom: var(--space-4); right: var(--space-4);
+      font-family: var(--font-brush); color: #fff; font-size: clamp(1.5rem, 1.5vw + 1rem, 2.125rem); line-height: 1.1; transform: rotate(-4deg);
+    }
+    .squad-photo figcaption span { color: var(--yellow-400); }
+    .follow-card__photo { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; opacity: .32; mix-blend-mode: luminosity; }
 
     /* ============ FAQ ============ */
     .faq-grid { display: grid; gap: var(--space-5); }
@@ -779,7 +892,7 @@
       transition: transform 300ms var(--ease);
     }
     .action-bar.is-hidden { transform: translateY(110%); }
-    .action-bar__inner { display: grid; grid-template-columns: 1fr 1.3fr 1fr; gap: var(--space-2); align-items: stretch; }
+    .action-bar__inner { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); align-items: stretch; }
     .action-bar__btn {
       display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .125rem;
       min-height: 3.25rem; padding: .375rem .5rem; border-radius: var(--radius);
@@ -799,7 +912,7 @@
       body { padding-bottom: 6.5rem; }
       .action-bar { left: 50%; right: auto; bottom: var(--space-4); width: min(100% - 2rem, 56rem); translate: -50% 0; border-radius: var(--radius-lg); border: 1px solid var(--line); padding: var(--space-2); }
       .action-bar.is-hidden { transform: translateY(calc(100% + 2rem)); }
-      .action-bar__inner { grid-template-columns: 1fr 1.25fr 1fr auto; }
+      .action-bar__inner { grid-template-columns: 1fr 1fr auto; }
       .action-bar__btn { flex-direction: row; gap: var(--space-3); text-align: left; justify-content: flex-start; padding: .5rem 1rem; font-size: .9375rem; }
       .action-bar__btn small { display: block; }
       .action-bar__btn span { display: grid; }
@@ -824,6 +937,7 @@
       html { scroll-behavior: auto; }
       *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
       .js .reveal { opacity: 1; transform: none; }
+      .doodle--float, .doodle--spin { animation: none; }
     }
   </style>
 </head>
@@ -851,6 +965,10 @@
     <symbol id="i-alert" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5m0 3.5v.01"/></g></symbol>
     <symbol id="i-plus" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" d="M12 5v14M5 12h14"/></symbol>
     <symbol id="i-chevron-down" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="d-star" viewBox="0 0 40 40"><path fill="currentColor" d="M20 2c1.6 9 4.2 13.5 18 18-13.8 4.5-16.4 9-18 18-1.6-9-4.2-13.5-18-18 13.8-4.5 16.4-9 18-18Z"/></symbol>
+    <symbol id="d-arrow" viewBox="0 0 100 60"><g fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 50c18-30 46-40 70-30 8 3 12 9 10 14-3 6-14 4-14-4 0-10 14-18 26-16"/><path d="m86 6 10 8-11 6"/></g></symbol>
+    <symbol id="d-spark" viewBox="0 0 40 40"><g fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><path d="M20 3v10M20 27v10M3 20h10M27 20h10M8 8l6 6M26 26l6 6M8 32l6-6M26 14l6-6"/></g></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path fill="currentColor" d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></symbol>
     <symbol id="i-whatsapp" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.2-.2-.5-.3Z"/></symbol>
   </svg>
 
@@ -878,7 +996,6 @@
           <li><a class="nav__link" href="#road-to-bali">Road to Bali</a></li>
           <li><a class="nav__link" href="#leaderboard">Leaderboard</a></li>
           <li><a class="nav__link" href="#delegasi">Delegasi</a></li>
-          <li><a class="nav__link" href="#squad">Gabung Squad</a></li>
         </ul>
       </nav>
 
@@ -908,7 +1025,6 @@
           <li><a href="#road-to-bali">Road to Bali</a></li>
           <li><a href="#leaderboard">Leaderboard</a></li>
           <li><a href="#delegasi">Delegasi</a></li>
-          <li><a href="#squad">Gabung Squad</a></li>
         </ul>
         <div class="mobile-nav__socials">
           <a class="icon-btn" href="https://www.instagram.com/universitasstekom" target="_blank" rel="noopener" aria-label="Instagram (tab baru)"><svg aria-hidden="true"><use href="#i-instagram"/></svg></a>
@@ -943,20 +1059,26 @@
 
         <div class="hero__media">
           <p class="hero__date-note" aria-hidden="true">Bali<br>23 Des 2026<br>– 2 Jan 2027</p>
-          <figure class="hero__photo">
-            <img src="https://events.stekom.ac.id/api/media/43621/view" width="736" height="528"
-                 alt="Pura Ulun Danu Beratan di tepi Danau Beratan, Bedugul, salah satu destinasi YCS 2026" fetchpriority="high">
+          <figure class="polaroid hero__photo">
+            <img src="assets/img/ycs-delegasi-danau-800.webp" srcset="assets/img/ycs-delegasi-danau-800.webp 800w, assets/img/ycs-delegasi-danau-1600.webp 1600w" sizes="(min-width: 64rem) 34rem, 90vw" width="1600" height="1066" alt="Enam pelajar berpose ceria di dermaga tepi danau Bali saat perjalanan Duta Teladan STEKOM" fetchpriority="high">
           </figure>
-          <figure class="hero__photo-inset">
-            <img src="https://events.stekom.ac.id/api/media/43622/view" width="1536" height="1024"
-                 alt="Kembang api malam Tahun Baru di Garuda Wisnu Kencana" loading="lazy">
+          <figure class="polaroid hero__pol-a">
+            <img src="assets/img/ycs-busana-bali-800.webp" srcset="assets/img/ycs-busana-bali-800.webp 800w, assets/img/ycs-busana-bali-1600.webp 1600w" sizes="(min-width: 64rem) 15rem, 40vw" width="1600" height="1066" alt="Tiga pelajar berbusana adat Bali duduk di tangga pura" loading="lazy" decoding="async">
+            <figcaption>Belajar budaya</figcaption>
           </figure>
+          <figure class="polaroid hero__pol-b">
+            <img src="assets/img/ycs-main-air-800.webp" srcset="assets/img/ycs-main-air-800.webp 800w, assets/img/ycs-main-air-1600.webp 1600w" sizes="(min-width: 64rem) 13rem, 34vw" width="1600" height="1066" alt="Rombongan pelajar berpelampung tertawa di air laut" loading="lazy" decoding="async">
+            <figcaption>Seru bareng!</figcaption>
+          </figure>
+          <svg class="doodle doodle--spin hero__doodle-star" aria-hidden="true"><use href="#d-star"/></svg>
+          <svg class="doodle hero__doodle-arrow" aria-hidden="true"><use href="#d-arrow"/></svg>
+          <svg class="doodle doodle--float hero__doodle-spark" aria-hidden="true"><use href="#d-spark"/></svg>
         </div>
 
         <div class="hero__cta-wrap">
-          <a class="btn btn--cta btn--hero" href="#squad">
+          <a class="btn btn--cta btn--hero" href="#twibbon">
             <span class="btn__icon"><svg aria-hidden="true"><use href="#i-users"/></svg></span>
-            <span>Gabung YCS Squad<small>Jadi bagian dari gerakan ini!</small></span>
+            <span>Buat Twibbon<small>Dukung gerakan YCS 2026!</small></span>
             <svg class="btn__arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
           </a>
           <p class="hero__script" aria-hidden="true">Bersama kita bisa!</p>
@@ -982,7 +1104,7 @@
           <ul class="keydates">
             <li>
               <svg aria-hidden="true"><use href="#i-calendar"/></svg>
-              <div><span>Pendaftaran ditutup</span><strong>31 Okt 2026</strong></div>
+              <div><span>Dukung gerakan YCS</span><strong>Buat &amp; bagikan twibbon</strong></div>
             </li>
             <li>
               <svg aria-hidden="true"><use href="#i-megaphone"/></svg>
@@ -994,10 +1116,11 @@
             </li>
           </ul>
           <p class="countdown-card__foot">
-            Belum daftar jadi delegasi? <a href="https://events.stekom.ac.id/ycs2026/daftar">Daftar gratis sebelum 31 Oktober</a>.
+            Dukung YCS 2026 dengan <a href="#twibbon">membuat dan membagikan twibbon</a>.
           </p>
         </div>
       </div>
+      <svg class="wave wave--bottom" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true"><path d="M0 46C180 78 360 10 560 30s380 50 560 26 240-46 320-34V80H0Z"/></svg>
     </section>
 
     <!-- ========== LIVE ========== -->
@@ -1044,8 +1167,7 @@
         <div class="video-card reveal" id="roadtrip">
           <a class="video-card__link" href="https://www.youtube.com/watch?v=unCD3pcd0FA" target="_blank" rel="noopener"
              data-yt="unCD3pcd0FA" aria-label="Putar video: Keseruan Wisata Edukasi 11 hari di Bali bersama siswa-siswi SMA, SMK, MA se-Indonesia">
-            <img src="https://events.stekom.ac.id/api/media/43620/view" width="1448" height="1086" loading="lazy"
-                 alt="">
+            <img src="assets/img/ycs-kayak-800.webp" srcset="assets/img/ycs-kayak-800.webp 800w, assets/img/ycs-kayak-1600.webp 1600w" sizes="(min-width: 64rem) 36rem, 100vw" width="1600" height="1066" alt="" loading="lazy" decoding="async">
             <span class="video-card__shade" aria-hidden="true"></span>
             <span class="video-card__body">
               <span class="video-card__title" aria-hidden="true">Roadtrip<br>Bali</span>
@@ -1060,13 +1182,49 @@
       </div>
     </section>
 
+    <!-- ========== JEJAK PERJALANAN ========== -->
+    <section class="memories" id="jejak" aria-labelledby="mem-title">
+      <svg class="doodle doodle--float memories__doodle" aria-hidden="true"><use href="#d-star"/></svg>
+      <div class="container">
+        <div class="memories__head reveal">
+          <p class="eyebrow" style="color:var(--primary)">Jejak perjalanan sebelumnya</p>
+          <h2 class="memories__title" id="mem-title">Begini serunya <span class="brush scribble">ke Bali</span> bareng STEKOM</h2>
+          <p class="muted">Dokumentasi Kunjungan Duta Teladan Universitas STEKOM ke Bali, 24 Desember 2025 – 3 Januari 2026. Tahun ini giliranmu!</p>
+        </div>
+        <ul class="stats reveal">
+          <li class="stat"><strong>11 hari</strong><span>perjalanan edukatif</span></li>
+          <li class="stat"><strong>7</strong><span>destinasi di Jawa Timur &amp; Bali</span></li>
+          <li class="stat"><strong>150</strong><span>delegasi pelajar terpilih</span></li>
+          <li class="stat"><strong>100%</strong><span>gratis untuk delegasi</span></li>
+        </ul>
+      </div>
+      <div class="marquee" id="marquee" role="region" aria-label="Galeri foto perjalanan, bisa digeser" tabindex="0">
+        <ul class="marquee__track">
+          <li><figure class="polaroid"><img src="assets/img/ycs-rombongan-banner-800.webp" srcset="assets/img/ycs-rombongan-banner-800.webp 800w, assets/img/ycs-rombongan-banner-1600.webp 1600w" sizes="(min-width: 64rem) 19rem, 60vw" width="1600" height="1066" alt="Rombongan Duta Teladan STEKOM berfoto bersama spanduk program di taman air Bali" loading="lazy" decoding="async"><figcaption>Satu rombongan, satu cerita</figcaption></figure></li>
+          <li><figure class="polaroid"><img src="assets/img/ycs-kayak-800.webp" srcset="assets/img/ycs-kayak-800.webp 800w, assets/img/ycs-kayak-1600.webp 1600w" sizes="(min-width: 64rem) 19rem, 60vw" width="1600" height="1066" alt="Tiga pelajar mendayung kayak di teluk dengan kapal layar di belakang" loading="lazy" decoding="async"><figcaption>Kayak di teluk</figcaption></figure></li>
+          <li><figure class="polaroid"><img src="assets/img/ycs-busana-bali-800.webp" srcset="assets/img/ycs-busana-bali-800.webp 800w, assets/img/ycs-busana-bali-1600.webp 1600w" sizes="(min-width: 64rem) 19rem, 60vw" width="1600" height="1066" alt="Tiga pelajar berbusana adat Bali di tangga pura" loading="lazy" decoding="async"><figcaption>Belajar budaya Bali</figcaption></figure></li>
+          <li><figure class="polaroid"><img src="assets/img/ycs-squad-danau-800.webp" srcset="assets/img/ycs-squad-danau-800.webp 800w, assets/img/ycs-squad-danau-1600.webp 1600w" sizes="(min-width: 64rem) 19rem, 60vw" width="1600" height="1066" alt="Empat pelajar putri berpose di dermaga tepi danau" loading="lazy" decoding="async"><figcaption>Teman baru se-Indonesia</figcaption></figure></li>
+          <li><figure class="polaroid"><img src="assets/img/ycs-gwk-800.webp" srcset="assets/img/ycs-gwk-800.webp 800w, assets/img/ycs-gwk-1600.webp 1536w" sizes="(min-width: 64rem) 19rem, 60vw" width="1536" height="1024" alt="Rombongan pelajar berfoto di depan patung Garuda Wisnu Kencana" loading="lazy" decoding="async"><figcaption>Sampai di GWK!</figcaption></figure></li>
+          <li><figure class="polaroid"><img src="assets/img/ycs-main-air-800.webp" srcset="assets/img/ycs-main-air-800.webp 800w, assets/img/ycs-main-air-1600.webp 1600w" sizes="(min-width: 64rem) 19rem, 60vw" width="1600" height="1066" alt="Pelajar berpelampung bermain air di pantai" loading="lazy" decoding="async"><figcaption>Main air sampai puas</figcaption></figure></li>
+          <li><figure class="polaroid"><img src="assets/img/ycs-kumpul-rombongan-800.webp" srcset="assets/img/ycs-kumpul-rombongan-800.webp 800w, assets/img/ycs-kumpul-rombongan-1600.webp 1600w" sizes="(min-width: 64rem) 19rem, 60vw" width="1600" height="1066" alt="Rombongan pelajar berpose dengan properti foto sebelum berangkat" loading="lazy" decoding="async"><figcaption>Siap berangkat!</figcaption></figure></li>
+          <li><figure class="polaroid"><img src="assets/img/ycs-tirta-gangga-800.webp" srcset="assets/img/ycs-tirta-gangga-800.webp 800w, assets/img/ycs-tirta-gangga-1600.webp 1600w" sizes="(min-width: 64rem) 19rem, 60vw" width="1600" height="1066" alt="Rombongan pelajar di taman air dengan kolam dan pura" loading="lazy" decoding="async"><figcaption>Taman air & pura</figcaption></figure></li>
+        </ul>
+      </div>
+      <div class="marquee__controls" hidden>
+        <button class="btn btn--ghost btn--sm" type="button" id="marquee-toggle" aria-pressed="false" aria-controls="marquee">
+          <svg aria-hidden="true"><use href="#i-pause"/></svg><span>Jeda galeri</span>
+        </button>
+      </div>
+    </section>
+
     <!-- ========== TWIBBON ========== -->
     <section class="section twibbon" id="twibbon" aria-labelledby="twibbon-title">
+      <svg class="wave memories-wave wave--top" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true"><path d="M0 46C180 78 360 10 560 30s380 50 560 26 240-46 320-34V80H0Z"/></svg>
       <div class="container twibbon__grid">
         <div class="reveal">
           <span class="badge badge--brand">Twibbon</span>
-          <h2 class="twibbon__title" id="twibbon-title">Buat &amp; Bagikan Twibbon</h2>
-          <p class="twibbon__lead">Tunjukkan dukunganmu untuk YCS 2026 dengan foto terbaikmu. Semua diproses di perangkatmu sendiri — fotomu tidak diunggah ke server.</p>
+          <h2 class="twibbon__title" id="twibbon-title">Buat &amp; Bagikan <span class="scribble">Twibbon</span></h2>
+          <p class="twibbon__lead">Tunjukkan dukunganmu untuk YCS 2026 dengan foto terbaikmu. Foto diproses di perangkatmu dan tidak diunggah. Nama, sekolah, dan email disimpan oleh panitia saat twibbon dibuat.</p>
 
           <div class="seg" role="radiogroup" aria-label="Pilih bingkai twibbon">
             <button class="seg__btn" type="button" role="radio" aria-checked="true" data-frame="delegasi">Delegasi</button>
@@ -1124,28 +1282,48 @@
             <li class="tw-step" data-step="3">
               <span class="tw-step__num" aria-hidden="true">3</span>
               <div>
-                <h3>Isi nama &amp; kota</h3>
+                <h3>Isi identitasmu</h3>
                 <p>Tampilkan identitasmu di bingkai.</p>
                 <div class="tw-step__ctrl">
                   <div class="field">
                     <label for="tw-name">Nama</label>
-                    <input class="input" id="tw-name" maxlength="28" autocomplete="name" placeholder="Contoh: Budi Santoso">
+                    <input class="input" id="tw-name" required minlength="2" maxlength="60" aria-describedby="tw-name-error" autocomplete="name" placeholder="Contoh: Budi Santoso"><p class="field__error" id="tw-name-error"></p>
                   </div>
                   <div class="field">
-                    <label for="tw-city">Kota / sekolah</label>
-                    <input class="input" id="tw-city" maxlength="32" placeholder="Contoh: Semarang">
+                    <label for="tw-city">Sekolah</label>
+                    <input class="input" id="tw-city" required minlength="2" maxlength="100" placeholder="Contoh: SMAN 1 Semarang" aria-describedby="tw-city-error"><p class="field__error" id="tw-city-error"></p>
                   </div>
+                  <div class="field">
+                    <label for="tw-email">Email</label>
+                    <input class="input" type="email" id="tw-email" autocomplete="email" required maxlength="254" placeholder="nama@email.com" aria-describedby="tw-email-hint tw-email-error">
+                    <p class="field__hint" id="tw-email-hint">Untuk informasi YCS. Email tidak tampil di twibbon.</p>
+                    <p class="field__error" id="tw-email-error"></p>
+                  </div>
+                  <div class="field">
+                    <a class="btn btn--primary" id="tw-channel" href="https://whatsapp.com/channel/0029Vb5vVIaId7nEqecJ1I1G" target="_blank" rel="noopener">Buka &amp; join saluran WhatsApp</a>
+                    <label class="check"><input type="checkbox" id="tw-channel-check" disabled><span id="tw-channel-state" role="status">Belum membuka saluran.</span></label>
+                    <p class="field__hint">Setelah tautan dibuka, syarat otomatis tercentang. Tekan Ikuti di WhatsApp untuk bergabung.</p>
+                    <p class="field__error" id="tw-channel-error"></p>
+                  </div>
+                  <label class="check" for="tw-consent">
+                    <input type="checkbox" id="tw-consent" required aria-describedby="tw-consent-error">
+                    <span>Saya setuju nama, sekolah, dan email disimpan oleh panitia sesuai <a href="#privasi">Kebijakan Privasi</a>.</span>
+                  </label>
+                  <p class="field__error" id="tw-consent-error"></p>
+                  <div hidden><label for="tw-website">Website</label><input id="tw-website" tabindex="-1" autocomplete="off"></div>
                 </div>
               </div>
             </li>
             <li class="tw-step" data-step="4">
               <span class="tw-step__num" aria-hidden="true">4</span>
               <div>
-                <h3>Unduh &amp; bagikan</h3>
+                <h3>Buat, unduh &amp; bagikan</h3>
+                <p>Data disimpan ke panitia saat twibbon dibuat. Foto tetap di perangkatmu.</p>
+                <p id="tw-status" role="status" aria-live="polite"></p>
                 <p>Unggah ke Instagram/TikTok dan tag akun resmi YCS.</p>
                 <div class="tw-step__ctrl tw-actions">
                   <button class="btn btn--cta" type="button" id="tw-download" disabled>
-                    <svg aria-hidden="true"><use href="#i-download"/></svg>Unduh PNG
+                    <svg aria-hidden="true"><use href="#i-download"/></svg>Buat &amp; unduh PNG
                   </button>
                   <button class="btn btn--primary" type="button" id="tw-share" hidden disabled>
                     <svg aria-hidden="true"><use href="#i-share"/></svg>Bagikan
@@ -1156,6 +1334,7 @@
           </ol>
         </div>
       </div>
+      <svg class="wave wave--bottom" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true"><path d="M0 46C180 78 360 10 560 30s380 50 560 26 240-46 320-34V80H0Z"/></svg>
     </section>
 
     <!-- ========== ROAD TO BALI / LEADERBOARD / DELEGATES ========== -->
@@ -1287,77 +1466,14 @@
     </section>
 
     <!-- ========== SQUAD ========== -->
-    <section class="section" id="squad" aria-labelledby="squad-title" style="padding-top:0">
-      <div class="container squad-grid">
-        <div class="card squad-form-card reveal">
-          <div class="squad-form-card__head">
-            <span class="squad-form-card__icon"><svg aria-hidden="true"><use href="#i-users"/></svg></span>
-            <div>
-              <h2 class="sec-title" id="squad-title">Gabung YCS Squad</h2>
-              <p class="sec-sub">Isi data dirimu dan jadilah bagian dari perubahan.</p>
-            </div>
-          </div>
-          <ul class="squad-perks">
-            <li><svg aria-hidden="true"><use href="#i-check"/></svg>Info live &amp; pengumuman duluan</li>
-            <li><svg aria-hidden="true"><use href="#i-check"/></svg>Twibbon khusus Squad</li>
-            <li><svg aria-hidden="true"><use href="#i-check"/></svg>Gratis</li>
-          </ul>
-
-          <form id="squad-form" novalidate>
-            <div class="form-grid">
-              <div class="field">
-                <label for="sq-name">Nama lengkap <span class="req" aria-hidden="true">*</span></label>
-                <input class="input" id="sq-name" name="name" autocomplete="name" required minlength="3" maxlength="60" placeholder="Contoh: Budi Santoso" aria-describedby="sq-name-err">
-                <p class="field__error" id="sq-name-err"></p>
-              </div>
-              <div class="field">
-                <label for="sq-city">Kota <span class="req" aria-hidden="true">*</span></label>
-                <select class="select" id="sq-city" name="city" required aria-describedby="sq-city-err">
-                  <option value="">Pilih kota</option>
-                  <option>Semarang</option><option>Grobogan</option><option>Kendal</option><option>Pekalongan</option>
-                  <option>Jepara</option><option>Kudus</option><option>Solo / Surakarta</option><option>Sukoharjo</option>
-                  <option>Tegal</option><option>Yogyakarta</option><option>Surabaya</option><option>Tuban</option>
-                  <option>Jakarta</option><option>Bandung</option><option>Denpasar</option><option>Kota lainnya</option>
-                </select>
-                <p class="field__error" id="sq-city-err"></p>
-              </div>
-              <div class="field span-2">
-                <label for="sq-contact">Email atau nomor WhatsApp <span class="req" aria-hidden="true">*</span></label>
-                <input class="input" id="sq-contact" name="contact" autocomplete="email" inputmode="email" required placeholder="contoh@email.com atau 0812xxxxxxx" aria-describedby="sq-contact-hint sq-contact-err">
-                <p class="field__hint" id="sq-contact-hint">Kami hanya memakainya untuk info YCS 2026.</p>
-                <p class="field__error" id="sq-contact-err"></p>
-              </div>
-              <div class="field span-2">
-                <label class="check" for="sq-consent">
-                  <input type="checkbox" id="sq-consent" name="consent" required aria-describedby="sq-consent-err">
-                  <span>Saya menyetujui pemrosesan data pribadi sesuai <a href="#privasi">Kebijakan Privasi YCS 2026</a>.</span>
-                </label>
-                <p class="field__error" id="sq-consent-err"></p>
-              </div>
-              <div class="span-2">
-                <div class="alert alert--error" id="sq-error" role="alert" hidden>
-                  <svg aria-hidden="true"><use href="#i-alert"/></svg>
-                  <span>Pendaftaran belum terkirim karena gangguan koneksi. Periksa internetmu lalu coba lagi.</span>
-                </div>
-              </div>
-              <div class="span-2">
-                <button class="btn btn--cta btn--block" type="submit" id="sq-submit">
-                  <span data-label>Kirim Pendaftaran</span>
-                  <svg aria-hidden="true" data-icon><use href="#i-arrow"/></svg>
-                </button>
-              </div>
-            </div>
-          </form>
-
-          <div class="success-state" id="sq-success" hidden tabindex="-1">
-            <span class="success-state__badge"><svg aria-hidden="true"><use href="#i-check"/></svg></span>
-            <h3>Selamat datang di YCS Squad, <span data-name></span>!</h3>
-            <p class="muted">Pendaftaranmu sudah kami terima. Info live dan pengumuman berikutnya akan dikirim ke kontakmu.</p>
-            <a class="btn btn--primary" href="#twibbon" data-squad-twibbon><svg aria-hidden="true"><use href="#i-image"/></svg>Buat twibbon YCS Squad</a>
-          </div>
-        </div>
-
+    <section class="section" id="komunitas" aria-labelledby="follow-title" style="padding-top:0">
+      <div class="container community-grid">
+        <figure class="squad-photo reveal">
+          <img src="assets/img/ycs-squad-danau-800.webp" srcset="assets/img/ycs-squad-danau-800.webp 800w, assets/img/ycs-squad-danau-1600.webp 1600w" sizes="(min-width: 64rem) 20rem, 100vw" width="1600" height="1066" alt="Empat pelajar putri tersenyum di dermaga danau saat perjalanan ke Bali" loading="lazy" decoding="async">
+          <figcaption>Bergabung <span>yuk!</span></figcaption>
+        </figure>
         <aside class="follow-card reveal" aria-labelledby="follow-title">
+          <img src="assets/img/ycs-kayak-800.webp" srcset="assets/img/ycs-kayak-800.webp 800w, assets/img/ycs-kayak-1600.webp 1600w" sizes="(min-width: 64rem) 24rem, 100vw" width="1600" height="1066" alt="" loading="lazy" decoding="async" class="follow-card__photo">
           <svg class="follow-card__art" viewBox="0 0 200 220" aria-hidden="true">
             <path d="M40 220V120l20-30 20 30v100Z" fill="#082C33" opacity=".7"/>
             <path d="M95 220V70l25-50 25 50v150Z" fill="#082C33" opacity=".85"/>
@@ -1382,7 +1498,7 @@
       <div class="container faq-grid">
         <div class="reveal">
           <p class="eyebrow" style="color:var(--primary)">Masih bingung?</p>
-          <h2 class="sec-title" id="faq-title" style="margin-top:.5rem">Pertanyaan yang sering diajukan</h2>
+          <h2 class="sec-title" id="faq-title" style="margin-top:.5rem">Pertanyaan yang <span class="scribble">sering diajukan</span></h2>
           <p class="sec-sub" style="max-width:34rem">YCS 2026 adalah program pengembangan karakter untuk pelajar SMA/SMK/MA: kegiatan edukatif, kepemimpinan, kreativitas, dan bakti sosial bersama teman-teman disabilitas.</p>
           <h3 style="margin-top:1.5rem;font-size:1rem">Syarat delegasi</h3>
           <ul class="reqs">
@@ -1402,7 +1518,7 @@
           </details>
           <details class="faq">
             <summary>Apa itu YCS Squad?<svg aria-hidden="true"><use href="#i-plus"/></svg></summary>
-            <p class="faq__body">YCS Squad adalah komunitas pendukung: teman, guru, keluarga, dan siapa pun yang ingin ikut menyebarkan semangat YCS 2026. Anggota Squad mendapat info live lebih dulu dan bingkai twibbon khusus. Bergabung dengan Squad tidak sama dengan mendaftar sebagai delegasi.</p>
+            <p class="faq__body">YCS Squad adalah komunitas pendukung: teman, guru, keluarga, dan siapa pun yang ingin ikut menyebarkan semangat YCS 2026. Anggota Squad mendapat info live lebih dulu dan bingkai twibbon khusus. Untuk mendukung gerakan ini, cukup buat twibbon dan bergabung ke saluran WhatsApp resmi.</p>
           </details>
           <details class="faq">
             <summary>Apa saja beasiswanya?<svg aria-hidden="true"><use href="#i-plus"/></svg></summary>
@@ -1445,7 +1561,7 @@
       <div class="footer-legal">
         <details id="privasi">
           <summary>Kebijakan Privasi singkat YCS 2026</summary>
-          <p>Data pendaftaran YCS Squad (nama, kota, email/WhatsApp) hanya dipakai panitia Universitas STEKOM untuk mengirim informasi seputar Youth Character Summit 2026 dan tidak dijual ke pihak lain. Foto twibbon diproses di perangkatmu dan tidak dikirim ke server. Untuk menghapus datamu, hubungi CS di WhatsApp 0878-4877-5292.</p>
+          <p>Data pembuat twibbon (nama, sekolah, email) hanya dipakai panitia Universitas STEKOM untuk mengirim informasi seputar Youth Character Summit 2026 dan tidak dijual ke pihak lain. Foto twibbon diproses di perangkatmu dan tidak dikirim ke server. Untuk menghapus datamu, hubungi CS di WhatsApp 0878-4877-5292.</p>
         </details>
         <p>© 2026 Universitas STEKOM · Youth Character Summit. Bersama untuk Indonesia yang lebih baik.</p>
       </div>
@@ -1458,10 +1574,6 @@
       <a class="action-bar__btn action-bar__btn--tw" href="#twibbon">
         <svg aria-hidden="true"><use href="#i-image"/></svg>
         <span>Twibbon<small>Yuk buat sekarang!</small></span>
-      </a>
-      <a class="action-bar__btn action-bar__btn--squad" href="#squad">
-        <svg aria-hidden="true"><use href="#i-users"/></svg>
-        <span>Gabung YCS Squad<small>Jadi bagian dari gerakan!</small></span>
       </a>
       <a class="action-bar__btn action-bar__btn--live" href="#live">
         <svg aria-hidden="true"><use href="#i-play"/></svg>
@@ -1483,10 +1595,9 @@
        KONFIGURASI — ubah di sini.
        ========================================================== */
     const CONFIG = {
-      // true = tampilkan label "Data contoh" & simulasikan pengiriman form.
+      // Data contoh hanya untuk statistik dan delegasi; pencatatan twibbon memakai backend asli.
       demo: true,
-      // TODO(backend): endpoint pendaftaran YCS Squad (POST JSON {name, city, contact, consent}).
-      squadEndpoint: null, // contoh: 'https://events.stekom.ac.id/api/public/events/ycs2026/squad'
+      twibbonEndpoint: '/api/twibbon',
       // TODO(backend): endpoint progres Road to Bali (GET → {current, target}).
       roadEndpoint: null,
       road: { current: 75000, target: 100000, milestones: [10000, 25000, 50000, 75000, 100000] },
@@ -1851,87 +1962,6 @@
     $('#dl-reset').addEventListener('click', () => { dl.search.value = ''; dl.city.value = ''; dl.shown = CONFIG.delegatesPageSize; renderDelegates(); dl.search.focus(); });
     loadDelegates();
 
-    /* ---------- Form YCS Squad ---------- */
-    const form = $('#squad-form');
-    const fields = {
-      name: { el: $('#sq-name'), err: $('#sq-name-err'), check: (v) => !v.trim() ? 'Nama wajib diisi.' : v.trim().length < 3 ? 'Nama minimal 3 huruf.' : /\d/.test(v) ? 'Nama tidak boleh berisi angka.' : '' },
-      city: { el: $('#sq-city'), err: $('#sq-city-err'), check: (v) => v ? '' : 'Pilih kotamu.' },
-      contact: {
-        el: $('#sq-contact'), err: $('#sq-contact-err'),
-        check: (v) => {
-          v = v.trim();
-          if (!v) return 'Isi email atau nomor WhatsApp-mu.';
-          if (v.includes('@')) return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) ? '' : 'Format email belum benar. Contoh: nama@email.com';
-          const digits = v.replace(/[\s-]/g, '');
-          return /^(\+62|62|0)8\d{7,12}$/.test(digits) ? '' : 'Nomor WhatsApp belum valid. Contoh: 081234567890';
-        },
-      },
-      consent: { el: $('#sq-consent'), err: $('#sq-consent-err'), check: (_, el) => el.checked ? '' : 'Centang persetujuan untuk melanjutkan.' },
-    };
-    const validate = (key) => {
-      const f = fields[key];
-      const msg = f.check(f.el.value, f.el);
-      f.err.textContent = msg;
-      f.el.setAttribute('aria-invalid', msg ? 'true' : 'false');
-      return !msg;
-    };
-    Object.keys(fields).forEach((k) => {
-      const f = fields[k];
-      f.el.addEventListener('blur', () => { if (f.el.value || f.el.type === 'checkbox') validate(k); });
-      f.el.addEventListener(f.el.type === 'checkbox' || f.el.tagName === 'SELECT' ? 'change' : 'input', () => {
-        if (f.el.getAttribute('aria-invalid') === 'true') validate(k);
-      });
-    });
-
-    const submitBtn = $('#sq-submit');
-    const errBox = $('#sq-error');
-    function setLoading(on) {
-      submitBtn.disabled = on;
-      submitBtn.setAttribute('aria-busy', String(on));
-      $('[data-label]', submitBtn).textContent = on ? 'Mengirim…' : 'Kirim Pendaftaran';
-      const icon = $('[data-icon]', submitBtn);
-      if (on) { icon.hidden = true; submitBtn.insertAdjacentHTML('afterbegin', '<span class="spinner" aria-hidden="true"></span>'); }
-      else { icon.hidden = false; $('.spinner', submitBtn)?.remove(); }
-    }
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      errBox.hidden = true;
-      const invalid = Object.keys(fields).filter((k) => !validate(k));
-      if (invalid.length) { fields[invalid[0]].el.focus(); return; }
-
-      const payload = {
-        name: fields.name.el.value.trim(),
-        city: fields.city.el.value,
-        contact: fields.contact.el.value.trim(),
-        consent: true,
-        source: 'landing-ycs2026-v0',
-      };
-      setLoading(true);
-      try {
-        if (CONFIG.squadEndpoint) {
-          const r = await fetch(CONFIG.squadEndpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-            body: JSON.stringify(payload),
-          });
-          if (!r.ok) throw new Error('HTTP ' + r.status);
-        } else {
-          // Mode demo: belum ada backend, simulasikan jeda jaringan.
-          await new Promise((res) => setTimeout(res, 1100));
-        }
-        const ok = $('#sq-success');
-        $('[data-name]', ok).textContent = payload.name.split(' ')[0];
-        form.hidden = true;
-        ok.hidden = false;
-        ok.focus();
-      } catch (err) {
-        errBox.hidden = false;
-      } finally {
-        setLoading(false);
-      }
-    });
-
     /* ---------- Twibbon ---------- */
     const tw = {
       canvas: $('#tw-canvas'), file: $('#tw-file'), fileErr: $('#tw-file-error'), zoom: $('#tw-zoom'),
@@ -2042,7 +2072,7 @@
       ctx.fillStyle = '#FFFFFF';
       if (name) { fitText(name, 760, 46, 800, '"Plus Jakarta Sans", sans-serif'); ctx.fillText(name, 72, 1000); }
       if (city) {
-        ctx.font = '600 30px "Plus Jakarta Sans", sans-serif';
+        fitText(city, 580, 30, 600, '"Plus Jakarta Sans", sans-serif');
         ctx.fillStyle = '#FFD86B';
         ctx.fillText(city, 72, name ? 1042 : 1010);
       }
@@ -2089,7 +2119,7 @@
     }));
     $('[data-reset]').addEventListener('click', () => { tw.scale = 1; tw.ox = 0; tw.oy = 0; tw.zoom.value = 1; draw(); });
     [tw.name, tw.city].forEach((el) => el.addEventListener('input', () => {
-      setStepDone(3, !!(tw.name.value.trim() || tw.city.value.trim()));
+      setStepDone(3, !!(tw.name.value.trim() && tw.city.value.trim()));
       draw();
     }));
 
@@ -2134,13 +2164,70 @@
       });
     });
     frameBtns[1].tabIndex = -1;
-    $('[data-squad-twibbon]').addEventListener('click', () => setFrame(frameBtns[1]));
+
 
     const fileName = () => `twibbon-ycs2026-${(tw.name.value.trim() || tw.frame).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}.png`;
     const toBlob = () => new Promise((res) => tw.canvas.toBlob(res, 'image/png'));
 
+    let channelClicked = false, saving = false;
+    const saved = new Set(), attempts = new Map();
+    const status = $('#tw-status');
+    $('#tw-channel').addEventListener('click', () => {
+      channelClicked = true;
+      $('#tw-channel-check').checked = true;
+      $('#tw-channel-state').textContent = '✓ Syarat tercentang: tautan saluran telah dibuka.';
+      $('#tw-channel-error').textContent = '';
+    });
+    function validateTwibbon() {
+      const values = [
+        ['tw-name', tw.name.value.trim().length >= 2, 'Isi nama minimal 2 karakter.'],
+        ['tw-city', tw.city.value.trim().length >= 2, 'Isi nama sekolah minimal 2 karakter.'],
+        ['tw-email', /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test($('#tw-email').value.trim()), 'Isi email yang valid, contoh: nama@email.com.'],
+        ['tw-channel', channelClicked, 'Buka tautan saluran WhatsApp terlebih dahulu.'],
+        ['tw-consent', $('#tw-consent').checked, 'Centang persetujuan penyimpanan data.']
+      ];
+      let first;
+      values.forEach(([id, valid, message]) => {
+        $('#' + id + '-error').textContent = valid ? '' : message;
+        $('#' + id).setAttribute('aria-invalid', String(!valid));
+        if (!valid && !first) first = $('#' + id);
+      });
+      if (first) first.focus();
+      return !first && !!tw.img;
+    }
+    async function saveTwibbon() {
+      if (saving || !validateTwibbon()) return false;
+      const data = {name: tw.name.value.trim(), school: tw.city.value.trim(), email: $('#tw-email').value.trim(), frame: tw.frame, consent: true, channelClicked: true, website: $('#tw-website').value};
+      const key = JSON.stringify(data);
+      if (saved.has(key)) return true;
+      if (!attempts.has(key)) attempts.set(key, crypto.randomUUID());
+      saving = true;
+      const identityControls = [tw.name, tw.city, $('#tw-email'), $('#tw-consent'), tw.file, ...frameBtns];
+      identityControls.forEach(el => { el.disabled = true; });
+      tw.dl.disabled = tw.share.disabled = true;
+      tw.dl.setAttribute('aria-busy', 'true');
+      status.textContent = 'Menyimpan data dan menyiapkan twibbon…';
+      try {
+        const response = await fetch(CONFIG.twibbonEndpoint, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({...data, requestId: attempts.get(key)}), signal: AbortSignal.timeout(25000)});
+        const result = await response.json();
+        if (!response.ok || result.ok !== true || result.requestId !== attempts.get(key)) throw new Error(result.error || 'connection');
+        saved.add(key);
+        status.textContent = 'Data berhasil disimpan. Twibbon siap diunduh dan dibagikan.';
+        return true;
+      } catch (err) {
+        status.textContent = err.message === 'rate_limit' ? 'Terlalu banyak pembuatan. Coba lagi satu jam mendatang.' : 'Data belum berhasil disimpan. Periksa koneksi lalu tekan buat kembali. Percobaan ulang tidak menggandakan data.';
+        return false;
+      } finally {
+        saving = false;
+        identityControls.forEach(el => { el.disabled = false; });
+        tw.dl.disabled = tw.share.disabled = !tw.img;
+        tw.dl.setAttribute('aria-busy', 'false');
+      }
+    }
     tw.dl.addEventListener('click', async () => {
+      if (!await saveTwibbon()) return;
       const blob = await toBlob();
+      if (!blob) { status.textContent = 'Gambar gagal dibuat. Silakan coba kembali.'; return; }
       const url = URL.createObjectURL(blob);
       const a = Object.assign(document.createElement('a'), { href: url, download: fileName() });
       document.body.append(a); a.click(); a.remove();
@@ -2152,6 +2239,7 @@
     if (navigator.canShare && navigator.canShare({ files: [new File([''], 'x.png', { type: 'image/png' })] })) {
       tw.share.hidden = false;
       tw.share.addEventListener('click', async () => {
+        if (!await saveTwibbon()) return;
         try {
           const file = new File([await toBlob()], fileName(), { type: 'image/png' });
           await navigator.share({ files: [file], title: 'Twibbon YCS 2026', text: 'Aku siap mendukung Youth Character Summit 2026! #YCS2026' });
@@ -2169,6 +2257,29 @@
         document.fonts.load('400 66px "Permanent Marker"'),
         document.fonts.load('800 46px "Plus Jakarta Sans"'),
       ]).then(draw, draw);
+    }
+
+    /* ---------- Galeri berjalan ---------- */
+    const marquee = $('#marquee');
+    if (!reduceMotion) {
+      const track = $('.marquee__track', marquee);
+      // Gandakan isi agar animasi -50% berulang tanpa jeda; salinan disembunyikan dari pembaca layar.
+      [...track.children].forEach((li) => {
+        const c = li.cloneNode(true);
+        c.setAttribute('aria-hidden', 'true');
+        c.dataset.clone = '';
+        track.append(c);
+      });
+      marquee.classList.add('is-animated');
+      const ctl = $('.marquee__controls');
+      const btn = $('#marquee-toggle');
+      ctl.hidden = false;
+      btn.addEventListener('click', () => {
+        const paused = marquee.classList.toggle('is-paused');
+        btn.setAttribute('aria-pressed', String(paused));
+        $('span', btn).textContent = paused ? 'Lanjutkan galeri' : 'Jeda galeri';
+        $('use', btn).setAttribute('href', paused ? '#i-play' : '#i-pause');
+      });
     }
 
     /* ---------- Action bar ---------- */
