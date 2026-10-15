@@ -32,7 +32,15 @@ Isi nama, sekolah, email, buka saluran WhatsApp, setujui penyimpanan data, lalu 
 Proyek: https://script.google.com/home/projects/1aQQU59hgP9ytYaboeVX1n3OYt_sdth9utSYDM9zcujeJUxdcEPPIMnJ4/edit
 Sheet: https://docs.google.com/spreadsheets/d/1SKSCKrg_Laux39Xdu1_99tIv_NsgiJcASi27mnVe5ME/edit
 
-Kode sudah disinkronkan dan deployment v1 dibuat. Uji anonim saat implementasi mendapat HTTP 403 dari Google: akses publik belum terverifikasi. Pemilik perlu membuka Apps Script → Deploy → Kelola deployment, memastikan jalankan sebagai Saya dan akses Siapa saja, lalu menyelesaikan otorisasi Google. Jika kebijakan Workspace melarang anonim, administrator perlu mengizinkannya. Jika membuat deployment baru, ubah URL di `api/twibbon.js` atau set `YCS_APPS_SCRIPT_URL` di Vercel. Panduan resmi: https://developers.google.com/apps-script/guides/web
+### Membangun sheet & mengaktifkan endpoint (sekali saja)
+
+Buka Apps Script dengan akun pemilik, pilih fungsi `siapkanSheet` di toolbar, klik **Jalankan**, lalu izinkan akses Google. Fungsi ini:
+
+- membuat/merapikan tab `Twibbon YCS 2026` (header berwarna, kolom beku, filter, lebar kolom, format waktu, header terlindungi);
+- membuat tab `Rekap` berisi total twibbon, email unik, sekolah unik, jumlah hari ini, per bingkai, 30 sekolah teratas dan jumlah per hari (rumus otomatis);
+- menambah menu **YCS 2026 → Siapkan / rapikan sheet** di spreadsheet.
+
+Sebelum izin ini diberikan, endpoint Web App menjawab HTTP 403 untuk pengunjung. Deployment yang dipakai `api/twibbon.js` sudah memakai versi terbaru; jika membuat deployment baru, ubah URL di `api/twibbon.js` atau set `YCS_APPS_SCRIPT_URL` di Vercel. Panduan resmi: https://developers.google.com/apps-script/guides/web
 
 Setelah aktif, lakukan satu uji nyata dengan data panitia, pastikan baris muncul dan unduh PNG berhasil. Jangan nyatakan integrasi aktif sebelum uji ini berhasil. Percobaan ulang pada halaman yang sama memakai ID yang sama sehingga respons hilang tidak menggandakan baris. Unduh ulang tanpa mengubah identitas/bingkai tidak menambah baris.
 
