@@ -326,10 +326,28 @@
       position: relative; isolation: isolate; overflow: hidden;
       padding-bottom: calc(var(--space-8) + 2rem);
       background:
-        radial-gradient(60rem 30rem at 85% -10%, rgb(255 201 60 / .18), transparent 60%),
-        linear-gradient(160deg, var(--teal-700) 0%, var(--teal-900) 70%);
+        url("assets/svg/hero-scene.svg") center bottom / max(100%, 62rem) auto no-repeat,
+        url("assets/svg/pattern-kawung-light.svg") 0 0 / 4rem 4rem repeat,
+        radial-gradient(60rem 30rem at 85% -10%, rgb(255 201 60 / .22), transparent 60%),
+        linear-gradient(160deg, var(--teal-600) 0%, var(--teal-800) 45%, var(--teal-900) 80%);
       color: #fff;
-      padding-block: var(--space-6) var(--space-8);
+      padding-block: var(--space-6) calc(var(--space-9) + 4rem);
+    }
+    /* Stiker ilustrasi dekoratif (aria-hidden), dipakai di banyak section */
+    .sticker { position: absolute; z-index: 0; pointer-events: none; user-select: none; height: auto; filter: drop-shadow(0 6px 10px rgb(8 44 51 / .22)); }
+    .sticker--float { animation: floaty 6s ease-in-out infinite; }
+    .sticker--sway { animation: sway 7s ease-in-out infinite; transform-origin: 50% 0; }
+    @keyframes sway { 0%, 100% { rotate: -6deg; } 50% { rotate: 6deg; } }
+    .hero .sticker--kite { width: clamp(3.25rem, 7vw, 5.5rem); right: 4%; top: 1.5rem; }
+    .hero .sticker--canang { width: clamp(3rem, 6vw, 5rem); left: 46%; bottom: 3.5rem; rotate: -8deg; }
+    .hero .sticker--stamp { width: clamp(4.5rem, 9vw, 7.5rem); right: 3%; bottom: 5rem; opacity: .95; }
+    .hero .sticker--fr1 { width: 2.75rem; left: 47%; top: 52%; }
+    .hero .sticker--fr2 { width: 1.75rem; left: 40%; top: 9%; }
+    .hero__grid { position: relative; z-index: 1; }
+    @media (max-width: 47.99rem) {
+      .hero .sticker--canang, .hero .sticker--fr1, .hero .sticker--fr2 { display: none; }
+      .hero .sticker--stamp { bottom: 1.5rem; right: 2%; }
+      .hero .sticker--kite { top: .5rem; right: 3%; }
     }
     .hero__strokes { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
     .hero__strokes svg { position: absolute; }
@@ -344,7 +362,10 @@
     .hero__media { grid-area: media; }
     .hero__cta-wrap { grid-area: cta; }
     .countdown-card { grid-area: count; }
-    .hero__eyebrow { color: var(--yellow-300); }
+    .hero__eyebrow {
+      display: inline-block; color: var(--teal-950); padding: .5rem 1.25rem .5rem 1rem;
+      background: url("assets/svg/brush-yellow.svg") center / 100% 100% no-repeat; transform: rotate(-2deg);
+    }
     .hero__title {
       margin-top: var(--space-3);
       font-family: var(--font-brush); font-weight: 400;
@@ -471,6 +492,45 @@
       .hero__cta-wrap { align-self: start; justify-items: center; margin-top: var(--space-5); }
     }
 
+    /* ============ Latar bermotif section ============ */
+    .deco-bg { position: relative; isolation: isolate; overflow: hidden; }
+    .deco-bg > .container { position: relative; z-index: 1; }
+    #live { background: url("assets/svg/pattern-kawung.svg") 0 0 / 4rem 4rem repeat; }
+    #live .sticker--leaf { width: clamp(7rem, 14vw, 12rem); left: -2.5rem; top: -1rem; rotate: 20deg; opacity: .9; }
+    #live .sticker--van { width: clamp(5.5rem, 10vw, 9rem); right: 2%; bottom: .75rem; }
+    #road .sticker--ticket { width: clamp(8rem, 16vw, 13rem); right: 2%; top: .5rem; rotate: 6deg; }
+    #road .sticker--surf { width: clamp(2rem, 3.5vw, 3rem); left: 1%; bottom: 10%; rotate: -14deg; }
+    #komunitas .sticker--penjor { width: clamp(4rem, 7vw, 6rem); right: 0; top: -2rem; }
+    #faq { background: linear-gradient(180deg, transparent, rgb(255 201 60 / .10)); }
+    #faq .sticker--gate { width: clamp(5rem, 9vw, 8rem); left: 2%; bottom: 1.5rem; }
+    #faq .sticker--leaf { width: clamp(6rem, 12vw, 10rem); right: -2.5rem; top: 1rem; rotate: -160deg; opacity: .85; }
+    #harapan .sticker--fr { width: 3rem; right: 6%; top: 1.5rem; }
+    @media (max-width: 47.99rem) {
+      #live .sticker--van, #road .sticker--ticket, #faq .sticker--gate, #komunitas .sticker--penjor { display: none; }
+      #live .sticker--leaf { width: 5.5rem; left: -2rem; }
+      #faq .sticker--leaf { width: 5rem; right: -1.5rem; }
+    }
+    :root[data-theme="dark"] #live { background-image: url("assets/svg/pattern-kawung-light.svg"); }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) #live { background-image: url("assets/svg/pattern-kawung-light.svg"); } }
+
+    /* Teaser Satu Kata untuk Indonesia */
+    .harapan-card {
+      display: grid; gap: var(--space-5); align-items: center; padding: var(--space-6);
+      border-radius: var(--radius-lg); color: #fff; position: relative; overflow: hidden;
+      background: url("assets/svg/pattern-kawung-light.svg") 0 0 / 4rem 4rem, linear-gradient(135deg, #9B0D23, #C8102E 55%, #E0571F);
+      box-shadow: var(--shadow-lg);
+    }
+    .harapan-card h2 { font-size: clamp(1.75rem, 2.5vw + 1rem, 2.75rem); font-weight: 800; line-height: 1.1; }
+    .harapan-card h2 span { font-family: var(--font-brush); font-weight: 400; color: #FFD86B; }
+    .harapan-card p { color: #FFE9EC; max-width: 34rem; margin-top: var(--space-2); }
+    .harapan-words { display: flex; flex-wrap: wrap; gap: .375rem .75rem; align-items: baseline; justify-content: center; font-weight: 800; line-height: 1; }
+    .harapan-words span:nth-child(3n) { color: #FFD86B; }
+    .harapan-words span:nth-child(3n+1) { color: #fff; }
+    .harapan-words span:nth-child(3n+2) { color: #FFC2CB; }
+    .btn--light { background: #fff; color: #9B0D23; }
+    .btn--light:hover { background: #FFF3CC; }
+    @media (min-width: 48rem) { .harapan-card { grid-template-columns: 1.1fr 1fr; padding: var(--space-7); } }
+
     /* ============ Section heading ============ */
     .sec-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-4); }
     .sec-title { font-size: clamp(1.375rem, 1.2vw + 1rem, 1.75rem); font-weight: 800; color: var(--text); display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
@@ -553,9 +613,17 @@
     .twibbon {
       position: relative; isolation: isolate; overflow: hidden;
       padding-block: calc(var(--space-7) + 2.5rem);
-      background: linear-gradient(170deg, var(--teal-800), var(--teal-950));
+      background:
+        url("assets/svg/pattern-kawung-light.svg") 0 0 / 4rem 4rem repeat,
+        linear-gradient(170deg, var(--teal-800), var(--teal-950));
       color: #fff;
     }
+    .twibbon .sticker--leaf1 { width: clamp(7rem, 15vw, 13rem); left: -3rem; bottom: 2rem; rotate: 35deg; }
+    .twibbon .sticker--leaf2 { width: clamp(6rem, 12vw, 10rem); right: -2.5rem; top: 2.5rem; rotate: -150deg; }
+    .twibbon .sticker--kite { width: clamp(3rem, 5vw, 4.5rem); left: 44%; top: 2.5rem; }
+    .twibbon .sticker--fr { width: 2.5rem; left: 4%; top: 30%; }
+    .twibbon > .container { position: relative; z-index: 1; }
+    @media (max-width: 47.99rem) { .twibbon .sticker--kite { left: auto; right: 4%; top: 1.25rem; } .twibbon .sticker--leaf1 { display: none; } }
     .twibbon::before {
       content: ""; position: absolute; inset: auto -10% -30% -10%; height: 60%; z-index: -1;
       background: radial-gradient(closest-side, rgb(255 201 60 / .22), transparent);
@@ -606,12 +674,53 @@
     .range-row label { font-size: .875rem; font-weight: 700; min-width: 3.5rem; }
     .nudge { display: flex; gap: var(--space-2); flex-wrap: wrap; }
 
-    .tw-actions { display: grid; gap: var(--space-2); grid-template-columns: 1fr; }
-    @media (min-width: 30rem) { .tw-actions { grid-template-columns: 1fr 1fr; } }
+    .tw-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+    .tw-actions .btn { flex: 1 1 12rem; }
+    .tw-fields { display: grid; gap: var(--space-3); }
+    @media (min-width: 36rem) { .tw-fields { grid-template-columns: 1fr 1fr; } .tw-fields .field--wide { grid-column: 1 / -1; } }
+
+    /* Kartu syarat: klik saluran = centang otomatis (gaya "unlock") */
+    .req-card { display: grid; gap: var(--space-3); padding: var(--space-3); border-radius: var(--radius); border: 2px dashed var(--line); background: var(--surface-soft); }
+    .unlock {
+      display: grid; grid-template-columns: auto 1fr auto; gap: var(--space-3); align-items: center;
+      min-height: 4.5rem; padding: var(--space-3) var(--space-4); border-radius: var(--radius);
+      background: var(--surface); border: 2px solid #25D366; color: var(--text); text-decoration: none;
+      box-shadow: 0 6px 16px -10px rgb(21 128 61 / .6);
+      transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease), background-color var(--dur) var(--ease);
+    }
+    .unlock:hover { transform: translateY(-2px); box-shadow: 0 12px 22px -12px rgb(21 128 61 / .7); }
+    .unlock:active { transform: translateY(0); }
+    .unlock__icon { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 50%; background: #25D366; color: #fff; }
+    .unlock__icon svg { width: 1.5rem; height: 1.5rem; }
+    .unlock__eyebrow { display: block; font-size: .75rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--text-muted); }
+    .unlock__title { display: block; font-size: 1rem; font-weight: 800; }
+    .unlock__state { display: block; font-size: .8125rem; color: #166534; font-weight: 600; }
+    .unlock__check {
+      display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: .5rem;
+      border: 2px solid var(--line); background: var(--surface); color: transparent;
+      transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+    }
+    .unlock__check svg { width: 1.125rem; height: 1.125rem; }
+    .unlock.is-done { background: var(--success-bg); border-style: solid; }
+    .unlock.is-done .unlock__check { background: var(--success); border-color: var(--success); color: #fff; animation: pop 300ms var(--ease); }
+    .unlock.is-done .unlock__state { color: var(--success); }
+    @keyframes pop { 50% { transform: scale(1.25); } }
+    .req-card .check { padding-inline: var(--space-1); }
+    @media (max-width: 35.99rem) {
+      /* Di HP, isi langkah memakai lebar penuh; nomor tetap di samping judul */
+      .tw-step { display: block; position: relative; }
+      .tw-step__num { position: absolute; left: var(--space-4); top: var(--space-4); }
+      .tw-step h3, .tw-step h3 + p { padding-left: 2.75rem; }
+      .unlock { padding: var(--space-3); gap: var(--space-2); }
+    }
+
+    .tw-result { display: grid; gap: var(--space-3); margin-top: var(--space-3); padding: var(--space-3); border-radius: var(--radius); background: var(--surface-soft); }
+    .tw-result[hidden] { display: none; }
+    .tw-result img { width: min(100%, 16rem); border-radius: var(--radius-sm); box-shadow: var(--shadow); -webkit-touch-callout: default; }
+    .tw-result p { font-size: .8125rem; }
 
     @media (min-width: 64rem) {
-      .twibbon__grid { grid-template-columns: 1fr 1.15fr; gap: var(--space-7); }
-      .tw-steps { grid-template-columns: 1fr 1fr; }
+      .twibbon__grid { grid-template-columns: 1fr 1.1fr; gap: var(--space-7); }
     }
 
     /* ============ Forms (shared) ============ */
@@ -866,7 +975,11 @@
     .reqs svg { width: 1.25rem; height: 1.25rem; color: var(--success); flex: none; margin-top: .125rem; }
 
     /* ============ Footer ============ */
-    .site-footer { background: var(--teal-950); color: #CDE3E4; padding-block: var(--space-6); }
+    .site-footer { position: relative; margin-top: max(9.7vw, 5.8rem); background: var(--teal-950); color: #CDE3E4; padding-block: var(--space-6); }
+    .site-footer::before {
+      content: ""; position: absolute; left: 0; right: 0; bottom: calc(100% - 1px); height: max(9.7vw, 5.8rem);
+      background: url("assets/svg/footer-skyline.svg") center bottom / max(100%, 60rem) auto no-repeat; pointer-events: none;
+    }
     .site-footer a { color: #fff; }
     .footer-grid { display: grid; gap: var(--space-5); align-items: center; }
     .footer-brand { display: inline-flex; align-items: center; gap: var(--space-3); color: #fff; text-decoration: none; }
@@ -992,7 +1105,7 @@
         <ul class="nav__list">
           <li><a class="nav__link" href="#beranda">Beranda</a></li>
           <li><a class="nav__link" href="#live">Live</a></li>
-          <li><a class="nav__link" href="#twibbon">Twibbon</a></li>
+          <li><a class="nav__link" href="#twibbon">Twibbon</a></li><li><a class="nav__link" href="#harapan">Harapan</a></li>
           <li><a class="nav__link" href="#road-to-bali">Road to Bali</a></li>
           <li><a class="nav__link" href="#leaderboard">Leaderboard</a></li>
           <li><a class="nav__link" href="#delegasi">Delegasi</a></li>
@@ -1021,7 +1134,7 @@
         <ul>
           <li><a href="#beranda">Beranda</a></li>
           <li><a href="#live">Live</a></li>
-          <li><a href="#twibbon">Twibbon</a></li>
+          <li><a href="#twibbon">Twibbon</a></li><li><a href="#harapan">Harapan</a></li>
           <li><a href="#road-to-bali">Road to Bali</a></li>
           <li><a href="#leaderboard">Leaderboard</a></li>
           <li><a href="#delegasi">Delegasi</a></li>
@@ -1042,6 +1155,11 @@
       <div class="hero__strokes" aria-hidden="true">
         <svg class="hero__stroke-1" viewBox="0 0 400 160"><path d="M10 120C80 40 200 10 390 30" fill="none" stroke="#FFC93C" stroke-width="34" stroke-linecap="round" opacity=".9"/></svg>
         <svg class="hero__stroke-2" viewBox="0 0 400 160"><path d="M10 130C120 90 260 120 390 20" fill="none" stroke="#FFC93C" stroke-width="26" stroke-linecap="round" opacity=".75"/></svg>
+        <img class="sticker sticker--kite sticker--sway" src="assets/svg/kite.svg" alt="" width="200" height="300">
+        <img class="sticker sticker--canang sticker--float" src="assets/svg/canang.svg" alt="" width="200" height="200">
+        <img class="sticker sticker--stamp" src="assets/svg/stamp.svg" alt="" width="200" height="200">
+        <img class="sticker sticker--fr1 sticker--float" src="assets/svg/frangipani.svg" alt="" width="120" height="120">
+        <img class="sticker sticker--fr2" src="assets/svg/frangipani.svg" alt="" width="120" height="120">
       </div>
 
       <div class="container hero__grid">
@@ -1124,7 +1242,8 @@
     </section>
 
     <!-- ========== LIVE ========== -->
-    <section class="section" id="live" aria-labelledby="live-title">
+    <section class="section deco-bg" id="live" aria-labelledby="live-title">
+      <img class="sticker sticker--leaf" src="assets/svg/palm-leaf.svg" alt="" width="220" height="300" loading="lazy">
       <div class="container live-grid">
         <div class="card live-card reveal">
           <div class="sec-head">
@@ -1220,6 +1339,10 @@
     <!-- ========== TWIBBON ========== -->
     <section class="section twibbon" id="twibbon" aria-labelledby="twibbon-title">
       <svg class="wave memories-wave wave--top" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true"><path d="M0 46C180 78 360 10 560 30s380 50 560 26 240-46 320-34V80H0Z"/></svg>
+      <img class="sticker sticker--leaf1" src="assets/svg/palm-leaf-teal.svg" alt="" width="220" height="300" loading="lazy">
+      <img class="sticker sticker--leaf2" src="assets/svg/palm-leaf.svg" alt="" width="220" height="300" loading="lazy">
+      <img class="sticker sticker--kite sticker--sway" src="assets/svg/kite.svg" alt="" width="200" height="300" loading="lazy">
+      <img class="sticker sticker--fr sticker--float" src="assets/svg/frangipani.svg" alt="" width="120" height="120" loading="lazy">
       <div class="container twibbon__grid">
         <div class="reveal">
           <span class="badge badge--brand">Twibbon</span>
@@ -1285,31 +1408,39 @@
                 <h3>Isi identitasmu</h3>
                 <p>Tampilkan identitasmu di bingkai.</p>
                 <div class="tw-step__ctrl">
-                  <div class="field">
-                    <label for="tw-name">Nama</label>
-                    <input class="input" id="tw-name" required minlength="2" maxlength="60" aria-describedby="tw-name-error" autocomplete="name" placeholder="Contoh: Budi Santoso"><p class="field__error" id="tw-name-error"></p>
+                  <div class="tw-fields">
+                    <div class="field">
+                      <label for="tw-name">Nama</label>
+                      <input class="input" id="tw-name" required minlength="2" maxlength="60" aria-describedby="tw-name-error" autocomplete="name" placeholder="Contoh: Budi Santoso"><p class="field__error" id="tw-name-error"></p>
+                    </div>
+                    <div class="field">
+                      <label for="tw-city">Sekolah</label>
+                      <input class="input" id="tw-city" required minlength="2" maxlength="100" placeholder="Contoh: SMAN 1 Semarang" aria-describedby="tw-city-error"><p class="field__error" id="tw-city-error"></p>
+                    </div>
+                    <div class="field field--wide">
+                      <label for="tw-email">Email</label>
+                      <input class="input" type="email" id="tw-email" autocomplete="email" inputmode="email" required maxlength="254" placeholder="nama@email.com" aria-describedby="tw-email-hint tw-email-error">
+                      <p class="field__hint" id="tw-email-hint">Untuk informasi YCS. Email tidak tampil di twibbon.</p>
+                      <p class="field__error" id="tw-email-error"></p>
+                    </div>
                   </div>
-                  <div class="field">
-                    <label for="tw-city">Sekolah</label>
-                    <input class="input" id="tw-city" required minlength="2" maxlength="100" placeholder="Contoh: SMAN 1 Semarang" aria-describedby="tw-city-error"><p class="field__error" id="tw-city-error"></p>
-                  </div>
-                  <div class="field">
-                    <label for="tw-email">Email</label>
-                    <input class="input" type="email" id="tw-email" autocomplete="email" required maxlength="254" placeholder="nama@email.com" aria-describedby="tw-email-hint tw-email-error">
-                    <p class="field__hint" id="tw-email-hint">Untuk informasi YCS. Email tidak tampil di twibbon.</p>
-                    <p class="field__error" id="tw-email-error"></p>
-                  </div>
-                  <div class="field">
-                    <a class="btn btn--primary" id="tw-channel" href="https://whatsapp.com/channel/0029Vb5vVIaId7nEqecJ1I1G" target="_blank" rel="noopener">Buka &amp; join saluran WhatsApp</a>
-                    <label class="check"><input type="checkbox" id="tw-channel-check" disabled><span id="tw-channel-state" role="status">Belum membuka saluran.</span></label>
-                    <p class="field__hint">Setelah tautan dibuka, syarat otomatis tercentang. Tekan Ikuti di WhatsApp untuk bergabung.</p>
+                  <div class="req-card">
+                    <a class="unlock" id="tw-channel" href="https://whatsapp.com/channel/0029Vb5vVIaId7nEqecJ1I1G" target="_blank" rel="noopener" aria-describedby="tw-channel-state tw-channel-error">
+                      <span class="unlock__icon" aria-hidden="true"><svg><use href="#i-whatsapp"/></svg></span>
+                      <span>
+                        <span class="unlock__eyebrow">Syarat wajib</span>
+                        <span class="unlock__title">Ikuti Saluran WhatsApp YCS</span>
+                        <span class="unlock__state" id="tw-channel-state" role="status">Ketuk kartu ini, syarat langsung tercentang</span>
+                      </span>
+                      <span class="unlock__check" aria-hidden="true"><svg><use href="#i-check"/></svg></span>
+                    </a>
                     <p class="field__error" id="tw-channel-error"></p>
+                    <label class="check" for="tw-consent">
+                      <input type="checkbox" id="tw-consent" required aria-describedby="tw-consent-error">
+                      <span>Saya setuju nama, sekolah, dan email disimpan oleh panitia sesuai <a href="#privasi">Kebijakan Privasi</a>.</span>
+                    </label>
+                    <p class="field__error" id="tw-consent-error"></p>
                   </div>
-                  <label class="check" for="tw-consent">
-                    <input type="checkbox" id="tw-consent" required aria-describedby="tw-consent-error">
-                    <span>Saya setuju nama, sekolah, dan email disimpan oleh panitia sesuai <a href="#privasi">Kebijakan Privasi</a>.</span>
-                  </label>
-                  <p class="field__error" id="tw-consent-error"></p>
                   <div hidden><label for="tw-website">Website</label><input id="tw-website" tabindex="-1" autocomplete="off"></div>
                 </div>
               </div>
@@ -1318,7 +1449,7 @@
               <span class="tw-step__num" aria-hidden="true">4</span>
               <div>
                 <h3>Buat, unduh &amp; bagikan</h3>
-                <p>Data disimpan ke panitia saat twibbon dibuat. Foto tetap di perangkatmu.</p>
+                <p>Twibbon langsung terunduh dan data terkirim ke panitia. Foto tetap di perangkatmu.</p>
                 <p id="tw-status" role="status" aria-live="polite"></p>
                 <p>Unggah ke Instagram/TikTok dan tag akun resmi YCS.</p>
                 <div class="tw-step__ctrl tw-actions">
@@ -1329,6 +1460,11 @@
                     <svg aria-hidden="true"><use href="#i-share"/></svg>Bagikan
                   </button>
                 </div>
+                <div class="tw-result" id="tw-result" hidden>
+                  <img id="tw-result-img" alt="Twibbon hasil buatanmu" width="1080" height="1080">
+                  <p>Unduhan tidak mulai? Di browser dalam aplikasi (WhatsApp, Instagram, TikTok) <strong>tekan lama gambar di atas</strong>, lalu pilih <em>Simpan gambar</em>. Atau buka halaman ini di Chrome/Safari.</p>
+                  <a class="btn btn--soft btn--sm" id="tw-result-link" href="#twibbon" download>Unduh lagi</a>
+                </div>
               </div>
             </li>
           </ol>
@@ -1338,7 +1474,9 @@
     </section>
 
     <!-- ========== ROAD TO BALI / LEADERBOARD / DELEGATES ========== -->
-    <section class="section" aria-label="Road to Bali, leaderboard, dan delegasi">
+    <section class="section deco-bg" id="road" aria-label="Road to Bali, leaderboard, dan delegasi">
+      <img class="sticker sticker--ticket" src="assets/svg/ticket.svg" alt="" width="300" height="150" loading="lazy">
+      <img class="sticker sticker--surf" src="assets/svg/surfboard.svg" alt="" width="120" height="300" loading="lazy">
       <div class="container trio">
 
         <!-- Road to Bali -->
@@ -1466,7 +1604,8 @@
     </section>
 
     <!-- ========== SQUAD ========== -->
-    <section class="section" id="komunitas" aria-labelledby="follow-title" style="padding-top:0">
+    <section class="section deco-bg" id="komunitas" aria-labelledby="follow-title" style="padding-top:0">
+      <img class="sticker sticker--penjor sticker--sway" src="assets/svg/penjor.svg" alt="" width="200" height="320" loading="lazy">
       <div class="container community-grid">
         <figure class="squad-photo reveal">
           <img src="assets/img/ycs-squad-danau-800.webp" srcset="assets/img/ycs-squad-danau-800.webp 800w, assets/img/ycs-squad-danau-1600.webp 1600w" sizes="(min-width: 64rem) 20rem, 100vw" width="1600" height="1066" alt="Empat pelajar putri tersenyum di dermaga danau saat perjalanan ke Bali" loading="lazy" decoding="async">
@@ -1494,7 +1633,24 @@
     </section>
 
     <!-- ========== FAQ ========== -->
-    <section class="section" id="faq" aria-labelledby="faq-title" style="padding-top:0">
+    <section class="section deco-bg" id="harapan" aria-labelledby="harapan-title" style="padding-top:0">
+      <div class="container">
+        <div class="harapan-card reveal">
+          <div>
+            <span class="badge" style="background:#FFD86B;color:#5B0A16">Baru</span>
+            <h2 id="harapan-title" style="margin-top:.75rem">Satu Kata <span>untuk Indonesia</span></h2>
+            <p>Tulis satu kata harapanmu. Semua kata dari peserta dirangkai jadi satu karya besar bertuliskan <strong>YOUTH CHARACTER SUMMIT 2026</strong> dan ditayangkan di layar acara.</p>
+            <a class="btn btn--light" href="harapan/" style="margin-top:1.25rem">Kirim kata harapanku <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          </div>
+          <p class="harapan-words" aria-hidden="true">
+            <span style="font-size:2.6rem">maju</span><span style="font-size:1.4rem">jujur</span><span style="font-size:2rem">damai</span><span style="font-size:1rem">peduli</span><span style="font-size:1.7rem">bersatu</span><span style="font-size:1.2rem">berani</span><span style="font-size:2.2rem">hebat</span><span style="font-size:1rem">adil</span><span style="font-size:1.5rem">cerdas</span><span style="font-size:1.1rem">toleran</span><span style="font-size:1.9rem">sejahtera</span><span style="font-size:1.2rem">mandiri</span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section deco-bg" id="faq" aria-labelledby="faq-title" style="padding-top:0">
+      <img class="sticker sticker--leaf" src="assets/svg/palm-leaf-teal.svg" alt="" width="220" height="300" loading="lazy">
       <div class="container faq-grid">
         <div class="reveal">
           <p class="eyebrow" style="color:var(--primary)">Masih bingung?</p>
@@ -1669,7 +1825,7 @@
 
     /* ---------- Scrollspy ---------- */
     const navLinks = $$('.nav__link, .mobile-nav a');
-    const spyIds = ['beranda', 'live', 'twibbon', 'road-to-bali', 'leaderboard', 'delegasi', 'squad'];
+    const spyIds = ['beranda', 'live', 'twibbon', 'harapan', 'road-to-bali', 'leaderboard', 'delegasi', 'squad'];
     const spyTargets = spyIds.map((id) => document.getElementById(id)).filter(Boolean);
     const setCurrent = (id) => navLinks.forEach((a) => {
       if (a.getAttribute('href') === '#' + id) a.setAttribute('aria-current', 'true');
@@ -1999,6 +2155,19 @@
       ctx.restore();
     }
 
+    function sparkle(x, y, r, color) {
+      ctx.save(); ctx.translate(x, y); ctx.fillStyle = color; ctx.beginPath();
+      for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4, rr = i % 2 ? r * .28 : r; ctx.lineTo(Math.cos(a) * rr, Math.sin(a) * rr); }
+      ctx.closePath(); ctx.fill(); ctx.restore();
+    }
+    function kite(x, y, k) {
+      ctx.save(); ctx.translate(x, y); ctx.scale(k, k); ctx.rotate(.18);
+      ctx.fillStyle = '#FB923C'; ctx.beginPath(); ctx.moveTo(0, -80); ctx.lineTo(68, 0); ctx.lineTo(0, 88); ctx.lineTo(-68, 0); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#EA580C'; ctx.beginPath(); ctx.moveTo(0, -80); ctx.lineTo(0, 88); ctx.lineTo(-68, 0); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#FFC93C'; ctx.beginPath(); ctx.moveTo(0, -40); ctx.lineTo(38, 0); ctx.lineTo(0, 48); ctx.lineTo(-38, 0); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(0, 88); ctx.bezierCurveTo(-20, 130, 30, 150, 0, 200); ctx.stroke();
+      ctx.restore();
+    }
     function draw() {
       const f = FRAMES[tw.frame];
       ctx.clearRect(0, 0, S, S);
@@ -2050,6 +2219,8 @@
       ctx.lineTo(S, S); ctx.lineTo(0, S); ctx.closePath(); ctx.fill();
 
 
+      sparkle(150, 210, 26, '#FFC93C'); sparkle(930, 200, 18, '#FFFFFF'); sparkle(1000, 640, 22, '#FFC93C');
+      kite(1000, 180, .55);
       flower(980, 790, 46, '#FFFFFF');
       flower(905, 850, 30, '#FB923C');
       flower(1010, 900, 26, '#FFD86B');
@@ -2174,10 +2345,17 @@
     const status = $('#tw-status');
     $('#tw-channel').addEventListener('click', () => {
       channelClicked = true;
-      $('#tw-channel-check').checked = true;
-      $('#tw-channel-state').textContent = '✓ Syarat tercentang: tautan saluran telah dibuka.';
+      $('#tw-channel').classList.add('is-done');
+      $('#tw-channel').setAttribute('aria-invalid', 'false');
+      $('#tw-channel-state').textContent = 'Syarat terpenuhi: saluran sudah dibuka. Jangan lupa tekan Ikuti.';
       $('#tw-channel-error').textContent = '';
+      sessionStorage.setItem('ycs_tw_channel', '1');
     });
+    if (sessionStorage.getItem('ycs_tw_channel')) {
+      channelClicked = true;
+      $('#tw-channel').classList.add('is-done');
+      $('#tw-channel-state').textContent = 'Syarat terpenuhi: saluran sudah dibuka.';
+    }
     function validateTwibbon() {
       const values = [
         ['tw-name', tw.name.value.trim().length >= 2, 'Isi nama minimal 2 karakter.'],
@@ -2192,57 +2370,79 @@
         $('#' + id).setAttribute('aria-invalid', String(!valid));
         if (!valid && !first) first = $('#' + id);
       });
+      if (!tw.img) { tw.fileErr.textContent = 'Unggah fotomu dulu di langkah 1.'; if (!first) first = tw.file; }
       if (first) first.focus();
-      return !first && !!tw.img;
+      return !first;
     }
-    async function saveTwibbon() {
-      if (saving || !validateTwibbon()) return false;
-      const data = {name: tw.name.value.trim(), school: tw.city.value.trim(), email: $('#tw-email').value.trim(), frame: tw.frame, consent: true, channelClicked: true, website: $('#tw-website').value};
-      const key = JSON.stringify(data);
-      if (saved.has(key)) return true;
-      if (!attempts.has(key)) attempts.set(key, crypto.randomUUID());
-      saving = true;
-      const identityControls = [tw.name, tw.city, $('#tw-email'), $('#tw-consent'), tw.file, ...frameBtns];
-      identityControls.forEach(el => { el.disabled = true; });
-      tw.dl.disabled = tw.share.disabled = true;
-      tw.dl.setAttribute('aria-busy', 'true');
-      status.textContent = 'Menyimpan data dan menyiapkan twibbon…';
-      try {
-        const response = await fetch(CONFIG.twibbonEndpoint, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({...data, requestId: attempts.get(key)}), signal: AbortSignal.timeout(25000)});
-        const result = await response.json();
-        if (!response.ok || result.ok !== true || result.requestId !== attempts.get(key)) throw new Error(result.error || 'connection');
-        saved.add(key);
-        status.textContent = 'Data berhasil disimpan. Twibbon siap diunduh dan dibagikan.';
-        return true;
-      } catch (err) {
-        status.textContent = err.message === 'rate_limit' ? 'Terlalu banyak pembuatan. Coba lagi satu jam mendatang.' : 'Data belum berhasil disimpan. Periksa koneksi lalu tekan buat kembali. Percobaan ulang tidak menggandakan data.';
-        return false;
-      } finally {
-        saving = false;
-        identityControls.forEach(el => { el.disabled = false; });
-        tw.dl.disabled = tw.share.disabled = !tw.img;
-        tw.dl.setAttribute('aria-busy', 'false');
+    // Data dikirim di latar belakang; unduhan TIDAK menunggu server. Bila gagal (offline/server sibuk),
+    // kiriman disimpan di antrean lokal dan dicoba ulang otomatis (requestId sama → tidak dobel di Sheet).
+    const QUEUE_KEY = 'ycs_tw_queue';
+    const readQueue = () => { try { return JSON.parse(localStorage.getItem(QUEUE_KEY)) || []; } catch (_) { return []; } };
+    const writeQueue = (q) => { try { q.length ? localStorage.setItem(QUEUE_KEY, JSON.stringify(q.slice(-10))) : localStorage.removeItem(QUEUE_KEY); } catch (_) { /* penyimpanan penuh/diblokir */ } };
+    async function postTwibbon(payload) {
+      const response = await fetch(CONFIG.twibbonEndpoint, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload), signal: AbortSignal.timeout(25000)});
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || result.ok !== true || result.requestId !== payload.requestId) throw new Error(result.error || 'connection');
+    }
+    async function flushQueue() {
+      for (const item of readQueue()) {
+        try { await postTwibbon(item); writeQueue(readQueue().filter((x) => x.requestId !== item.requestId)); }
+        catch (err) { if (err.message === 'validation') writeQueue(readQueue().filter((x) => x.requestId !== item.requestId)); else break; }
       }
     }
+    window.addEventListener('online', flushQueue);
+    setTimeout(flushQueue, 3000);
+
+    async function saveTwibbon() {
+      const data = {name: tw.name.value.trim(), school: tw.city.value.trim(), email: $('#tw-email').value.trim(), frame: tw.frame, consent: true, channelClicked: true, website: $('#tw-website').value};
+      const key = JSON.stringify(data);
+      if (saved.has(key) || saving) return;
+      if (!attempts.has(key)) attempts.set(key, crypto.randomUUID());
+      const payload = {...data, requestId: attempts.get(key)};
+      saving = true;
+      status.textContent = 'Twibbon siap. Mengirim data ke panitia…';
+      try {
+        await postTwibbon(payload);
+        saved.add(key);
+        status.textContent = 'Data tersimpan. Terima kasih sudah mendukung YCS 2026!';
+      } catch (err) {
+        if (err.message === 'rate_limit') { status.textContent = 'Twibbon tetap bisa dipakai, tapi email ini sudah terlalu sering dikirim. Coba lagi satu jam lagi.'; return; }
+        writeQueue([...readQueue().filter((x) => x.requestId !== payload.requestId), payload]);
+        status.textContent = 'Twibbon sudah jadi. Data belum terkirim karena koneksi; akan dikirim ulang otomatis.';
+      } finally { saving = false; }
+    }
+
+    let resultUrl = null;
+    function showResult(blob) {
+      if (resultUrl) URL.revokeObjectURL(resultUrl);
+      resultUrl = URL.createObjectURL(blob);
+      $('#tw-result-img').src = resultUrl;
+      Object.assign($('#tw-result-link'), { href: resultUrl, download: fileName() });
+      $('#tw-result').hidden = false;
+    }
     tw.dl.addEventListener('click', async () => {
-      if (!await saveTwibbon()) return;
-      const blob = await toBlob();
+      if (!validateTwibbon()) return;
+      tw.dl.setAttribute('aria-busy', 'true');
+      const blob = await toBlob().catch(() => null);
+      tw.dl.setAttribute('aria-busy', 'false');
       if (!blob) { status.textContent = 'Gambar gagal dibuat. Silakan coba kembali.'; return; }
-      const url = URL.createObjectURL(blob);
-      const a = Object.assign(document.createElement('a'), { href: url, download: fileName() });
+      showResult(blob);
+      const a = Object.assign(document.createElement('a'), { href: resultUrl, download: fileName() });
       document.body.append(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
       setStepDone(4, true);
       toast('Twibbon diunduh! Jangan lupa tag akun resmi YCS saat membagikannya.');
+      saveTwibbon();
     });
 
     if (navigator.canShare && navigator.canShare({ files: [new File([''], 'x.png', { type: 'image/png' })] })) {
       tw.share.hidden = false;
       tw.share.addEventListener('click', async () => {
-        if (!await saveTwibbon()) return;
+        if (!validateTwibbon()) return;
         try {
-          const file = new File([await toBlob()], fileName(), { type: 'image/png' });
-          await navigator.share({ files: [file], title: 'Twibbon YCS 2026', text: 'Aku siap mendukung Youth Character Summit 2026! #YCS2026' });
+          const blob = await toBlob();
+          showResult(blob);
+          saveTwibbon();
+          await navigator.share({ files: [new File([blob], fileName(), { type: 'image/png' })], title: 'Twibbon YCS 2026', text: 'Aku siap mendukung Youth Character Summit 2026! #YCS2026' });
           setStepDone(4, true);
         } catch (e) {
           if (e.name !== 'AbortError') toast('Gagal membagikan. Unduh PNG lalu bagikan manual, ya.');
