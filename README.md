@@ -7,7 +7,13 @@ Landing page **Youth Character Summit 2026**. Seluruh halaman ada di satu file s
 ```
 index.html        # HTML + CSS + JS dalam satu file
 assets/img/       # foto dokumentasi (WebP, versi 800px & 1600px)
+assets/svg/       # ilustrasi & stiker Bali (hasil tools/gen-assets.py)
+tools/            # generator aset SVG
 ```
+
+## Aset ilustrasi
+
+Semua SVG di `assets/svg/` digambar oleh `tools/gen-assets.py` (bebas hak cipta): scene hero (sawah, Gunung Agung, candi bentar, meru, penjor, kelapa), pola kawung, stiker layangan, kamboja, canang, cap "Road to Bali", tiket, van, papan selancar, sapuan kuas, dan skyline footer. Ubah warna/bentuk di skrip lalu jalankan `python3 tools/gen-assets.py`.
 
 ## Mengubah konten
 
