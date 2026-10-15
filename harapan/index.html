@@ -1,0 +1,1089 @@
+<!doctype html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Satu Kata untuk Indonesia — Word Cloud Harapan YCS 2026</title>
+  <meta name="description" content="Kirim satu kata harapanmu untuk Indonesia. Semua kata bergabung menjadi awan kata berbentuk YOUTH CHARACTER SUMMIT 2026.">
+  <meta name="theme-color" content="#C8102E">
+  <meta name="color-scheme" content="light dark">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Youth Character Summit 2026">
+  <meta property="og:title" content="Satu Kata untuk Indonesia — YCS 2026">
+  <meta property="og:description" content="Satu kata harapanmu, bersama ribuan kata lain, membentuk tulisan YOUTH CHARACTER SUMMIT 2026.">
+  <meta property="og:url" content="https://roadtrip-ycs2026.vercel.app/harapan/">
+  <meta name="twitter:card" content="summary">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+  <script>
+    // Tema dipasang sebelum render agar tidak berkedip
+    (function () {
+      var p = new URLSearchParams(location.search);
+      var t = localStorage.getItem('ycs-harapan:tema');
+      if (p.get('display') === '1') t = 'dark';
+      else if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <style>
+    :root {
+      --red: #C8102E; --red-hover: #A50D26; --gold: #F2B705; --gold-ink: #7A5600; --navy: #0B2545;
+      --ok: #1F7A4D; --warn: #8A5A00; --err: #B00020;
+      --bg: #FFF9EF; --surface: #FFFFFF; --text: #0B2545; --muted: #4A5872; --border: #EADFC8;
+      --stage-bg: #FFFDF8; --chip: #FFF0C2;
+      --font-head: 'Montserrat', 'Arial Black', system-ui, sans-serif;
+      --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --s1: .25rem; --s2: .5rem; --s3: .75rem; --s4: 1rem; --s5: 1.5rem; --s6: 2rem; --s7: 3rem; --s8: 4rem;
+      --r-sm: 10px; --r-md: 16px; --r-lg: 24px;
+      --shadow: 0 1px 2px rgba(11,37,69,.06), 0 8px 24px rgba(11,37,69,.08);
+      --focus: 0 0 0 3px var(--bg), 0 0 0 6px var(--gold);
+      --t: 200ms ease;
+    }
+    [data-theme="dark"] {
+      --bg: #0A1F3D; --surface: #13315C; --text: #F5F7FA; --muted: #B8C4D6; --border: #24467A;
+      --stage-bg: #0B2545; --chip: #24467A; --gold-ink: #F2B705; --ok: #5CD69A; --warn: #F2B705; --err: #FF8A96;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.3);
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; font-family: var(--font-body); font-size: 1rem; line-height: 1.6;
+      color: var(--text); background: var(--bg); overflow-x: hidden;
+      transition: background-color var(--t), color var(--t);
+    }
+    img, svg, canvas { display: block; max-width: 100%; }
+    a { color: inherit; }
+    :focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; border-radius: 6px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+    .skip { position: absolute; left: var(--s4); top: -100px; z-index: 10; background: var(--navy); color: #fff; padding: var(--s3) var(--s4); border-radius: var(--r-sm); }
+    .skip:focus { top: var(--s4); }
+    .wrap { width: min(100% - 2rem, 1200px); margin-inline: auto; }
+    [hidden] { display: none !important; }
+
+    /* Header */
+    .topbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s3); padding-block: var(--s3); }
+    .back { white-space: nowrap; display: inline-flex; align-items: center; gap: var(--s2); min-height: 44px; padding: 0 var(--s3); margin-left: calc(var(--s3) * -1);
+      font-weight: 600; text-decoration: none; border-radius: var(--r-sm); transition: background-color var(--t); }
+    .back:hover { background: var(--chip); }
+    .topbar__right { display: flex; align-items: center; gap: var(--s2); }
+    .badge-demo { white-space: nowrap; font-size: .8125rem; font-weight: 700; padding: var(--s1) var(--s3); border-radius: 999px; background: var(--chip); color: var(--gold-ink); border: 1px dashed currentColor; }
+    [data-theme="light"] .badge-demo { color: #7A5600; }
+
+    /* Tombol */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--s2); min-height: 44px; min-width: 44px;
+      padding: var(--s2) var(--s4); font: 700 1rem/1.2 var(--font-body); border-radius: var(--r-sm); border: 2px solid transparent;
+      cursor: pointer; text-decoration: none; transition: background-color var(--t), transform var(--t), border-color var(--t), color var(--t); }
+    .btn:active { transform: translateY(1px) scale(.98); }
+    .btn svg { width: 20px; height: 20px; flex: none; }
+    .btn--primary { background: var(--red); color: #fff; }
+    .btn--primary:hover { background: var(--red-hover); }
+    .btn--ghost { background: var(--surface); color: var(--text); border-color: var(--border); }
+    .btn--ghost:hover { border-color: var(--gold); }
+    .btn--icon { padding: var(--s2); }
+    .btn--danger { background: transparent; color: var(--err); border-color: currentColor; min-height: 40px; }
+    .btn--danger:hover { background: var(--err); color: #fff; }
+    .btn[disabled], .btn[aria-disabled="true"] { opacity: .6; cursor: not-allowed; }
+    .btn--link { background: none; border: 0; color: var(--muted); text-decoration: underline; font-weight: 600; padding-inline: var(--s2); }
+
+    /* Hero */
+    .hero { position: relative; padding-block: var(--s5) var(--s6); display: grid; gap: var(--s6); }
+    .eyebrow { display: inline-block; font-weight: 700; font-size: .875rem; letter-spacing: .04em; text-transform: uppercase;
+      padding: var(--s1) var(--s3); border-radius: 999px; background: var(--chip); color: var(--text); }
+    h1 { font-family: var(--font-head); font-weight: 900; font-size: clamp(2.25rem, 1.4rem + 4.2vw, 4.25rem); line-height: 1.04;
+      letter-spacing: -.02em; margin: var(--s4) 0 var(--s4); }
+    .brush { position: relative; display: inline-block; color: var(--red); white-space: nowrap; }
+    [data-theme="dark"] .brush { color: var(--gold); }
+    .brush svg { position: absolute; left: -2%; bottom: -.18em; width: 104%; height: .32em; z-index: -1; }
+    .brush { z-index: 0; }
+    .lead { font-size: clamp(1.0625rem, 1rem + .3vw, 1.1875rem); color: var(--muted); max-width: 34rem; margin: 0; }
+    .spark { position: absolute; pointer-events: none; }
+    .spark--1 { right: 4%; top: 6%; width: 38px; color: var(--gold); }
+    .spark--2 { right: 14%; top: 22%; width: 20px; color: var(--red); }
+    .spark--3 { left: 46%; top: 2%; width: 16px; color: var(--gold); }
+
+    /* Kartu form */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: var(--s5); box-shadow: var(--shadow); }
+    .form label { display: block; font-weight: 700; font-size: 1.0625rem; margin-bottom: var(--s2); }
+    .field { display: flex; flex-direction: column; gap: var(--s3); }
+    .input { width: 100%; min-height: 52px; padding: var(--s3) var(--s4); font: 600 1.25rem/1.2 var(--font-body); color: var(--text);
+      background: var(--bg); border: 2px solid var(--border); border-radius: var(--r-sm); transition: border-color var(--t), box-shadow var(--t); }
+    .input:hover { border-color: var(--muted); }
+    .input:focus { outline: none; border-color: var(--red); box-shadow: 0 0 0 4px rgba(200,16,46,.18); }
+    [data-theme="dark"] .input:focus { border-color: var(--gold); box-shadow: 0 0 0 4px rgba(242,183,5,.25); }
+    .input[aria-invalid="true"] { border-color: var(--err); }
+    .hint { font-size: .9375rem; color: var(--muted); margin: var(--s2) 0 0; }
+    .preview { margin: var(--s3) 0 0; font-size: .9375rem; color: var(--muted); min-height: 1.6em; }
+    .preview strong { font-family: var(--font-head); font-weight: 800; color: var(--text); font-size: 1.0625rem; background: var(--chip); padding: 0 var(--s2); border-radius: 6px; }
+    .msg { margin: var(--s4) 0 0; padding: var(--s3) var(--s4); border-radius: var(--r-sm); font-weight: 600; border-left: 4px solid currentColor; background: var(--bg); }
+    .msg:empty { display: none; }
+    .msg--ok { color: var(--ok); } .msg--err { color: var(--err); } .msg--warn { color: var(--warn); }
+    .msg span { color: var(--text); font-weight: 500; }
+    .spinner { width: 18px; height: 18px; border: 3px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Panggung awan kata */
+    .stage-section { padding-block: var(--s5) var(--s7); }
+    .section-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: var(--s3); margin-bottom: var(--s4); }
+    h2 { font-family: var(--font-head); font-weight: 800; font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.25rem); line-height: 1.15; margin: 0; }
+    .section-head p { margin: var(--s1) 0 0; color: var(--muted); }
+    .toolbar { display: flex; flex-wrap: wrap; gap: var(--s2); }
+    .stage { position: relative; margin: 0; background: var(--stage-bg); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--shadow); }
+    .stage__canvas-wrap { position: relative; width: 100%; display: flex; align-items: center; justify-content: center; }
+    .stage canvas { touch-action: manipulation; }
+    .stage__state { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: var(--s5); pointer-events: none; }
+    .stage__state p { margin: 0; padding: var(--s3) var(--s4); border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--border); font-weight: 600; box-shadow: var(--shadow); max-width: 22rem; }
+    .stage:fullscreen { display: flex; flex-direction: column; justify-content: center; border-radius: 0; border: 0; width: 100vw; height: 100vh; }
+    .stage:fullscreen .stage__canvas-wrap { flex: 1; min-height: 0; }
+
+    .stats { display: grid; gap: var(--s4); margin-top: var(--s5); }
+    .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s4); }
+    .tile { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-md); padding: var(--s4); }
+    .tile dt { color: var(--muted); font-weight: 600; font-size: .9375rem; }
+    .tile dd { margin: 0; font-family: var(--font-head); font-weight: 900; font-size: clamp(1.75rem, 1.4rem + 1.5vw, 2.5rem); line-height: 1.1; }
+    .top { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-md); padding: var(--s4); }
+    .top h3 { margin: 0 0 var(--s3); font-size: 1.0625rem; }
+    .top ol { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s2); counter-reset: r; }
+    .top li { display: grid; grid-template-columns: 2rem 1fr auto; align-items: center; gap: var(--s3); counter-increment: r; }
+    .top li::before { content: counter(r); display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; background: var(--chip); font-weight: 800; font-size: .875rem; }
+    .top li:first-child::before { background: var(--gold); color: var(--navy); }
+    .top .w { font-family: var(--font-head); font-weight: 800; overflow-wrap: anywhere; }
+    .top .bar { grid-column: 2 / 4; height: 6px; border-radius: 3px; background: var(--chip); overflow: hidden; margin-top: -4px; }
+    .top .bar i { display: block; height: 100%; background: var(--red); border-radius: 3px; }
+    .top .n { font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
+    .top .empty { color: var(--muted); }
+
+    /* QR panel (mode layar) */
+    .qr-panel { display: none; }
+
+    /* Admin */
+    .admin { padding-block: var(--s5) var(--s7); }
+    .admin .card { max-width: 46rem; }
+    .admin__bar { display: flex; flex-wrap: wrap; gap: var(--s2); align-items: center; justify-content: space-between; margin-block: var(--s4); }
+    .table-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--r-md); max-height: 60vh; }
+    table { width: 100%; border-collapse: collapse; font-size: .9375rem; }
+    th, td { text-align: left; padding: var(--s2) var(--s3); border-bottom: 1px solid var(--border); }
+    th { position: sticky; top: 0; background: var(--surface); }
+    td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    dialog { border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--surface); color: var(--text); padding: var(--s5); max-width: min(92vw, 26rem); box-shadow: var(--shadow); }
+    dialog::backdrop { background: rgba(11,37,69,.55); }
+    .dialog-actions { display: flex; gap: var(--s2); justify-content: flex-end; flex-wrap: wrap; margin-top: var(--s4); }
+
+    footer { border-top: 1px solid var(--border); padding-block: var(--s5); color: var(--muted); font-size: .9375rem; }
+    footer .wrap { display: flex; flex-wrap: wrap; gap: var(--s3); justify-content: space-between; align-items: center; }
+    footer a { min-height: 44px; display: inline-flex; align-items: center; padding-inline: var(--s2); }
+
+    @media (min-width: 48rem) {
+      .stats { grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); }
+      .card { padding: var(--s6); }
+    }
+    @media (min-width: 64rem) {
+      .hero { grid-template-columns: 1.1fr 1fr; align-items: center; padding-block: var(--s6) var(--s7); }
+    }
+
+    /* Mode layar proyektor (?display=1) */
+    body.is-display { overflow: hidden; height: 100vh; }
+    body.is-display .topbar-wrap, body.is-display .hero, body.is-display .section-head, body.is-display .stats, body.is-display footer, body.is-display .admin { display: none !important; }
+    body.is-display main { height: 100vh; }
+    body.is-display .stage-section { height: 100vh; padding: 2vh 2vw; width: 100%; display: grid; grid-template-columns: 1fr clamp(220px, 19vw, 380px); gap: 2vw; }
+    body.is-display .stage { border: 0; box-shadow: none; border-radius: 0; background: transparent; display: flex; min-height: 0; }
+    body.is-display .stage__canvas-wrap { flex: 1; min-height: 0; }
+    body.is-display .qr-panel { display: flex; flex-direction: column; justify-content: center; gap: 1.5vh; text-align: center; color: #fff; }
+    .qr-panel__title { font-family: var(--font-head); font-weight: 900; font-size: clamp(1.25rem, 1.6vw, 2rem); line-height: 1.1; margin: 0; }
+    .qr-panel__title span { color: var(--gold); }
+    .qr-box { background: #fff; border-radius: 18px; padding: 4%; }
+    .qr-box svg { width: 100%; height: auto; }
+    .qr-panel__cap { font-weight: 700; font-size: clamp(1rem, 1.25vw, 1.5rem); margin: 0; }
+    .qr-panel__url { font-size: clamp(.8rem, .9vw, 1.1rem); color: #B8C4D6; margin: 0; overflow-wrap: anywhere; }
+    .qr-panel__count { font-family: var(--font-head); font-weight: 900; font-size: clamp(1.5rem, 2.4vw, 3rem); color: var(--gold); margin: 0; line-height: 1; }
+    .qr-panel__count small { display: block; font-family: var(--font-body); font-weight: 600; font-size: clamp(.85rem, .9vw, 1.1rem); color: #B8C4D6; margin-top: .4vh; }
+    @media (orientation: portrait) {
+      body.is-display .stage-section { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
+      body.is-display .qr-panel { flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: center; }
+      body.is-display .qr-box { width: 160px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#konten">Lompat ke konten</a>
+
+  <div class="topbar-wrap">
+    <header class="wrap topbar">
+      <a class="back" href="/"><span aria-hidden="true">←</span> Kembali ke YCS 2026</a>
+      <div class="topbar__right">
+        <span class="badge-demo" id="badge-demo" hidden>Mode demo — data lokal</span>
+        <button class="btn btn--ghost btn--icon" id="btn-theme" type="button" aria-label="Ganti ke mode gelap" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path id="theme-icon" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        </button>
+      </div>
+    </header>
+  </div>
+
+  <main id="konten">
+    <!-- Panel admin (?admin=1) -->
+    <section class="wrap admin" id="admin" aria-labelledby="admin-title" hidden>
+      <div class="card">
+        <h1 id="admin-title" style="font-size:clamp(1.75rem,1.4rem + 1.5vw,2.5rem)">Admin Awan Harapan</h1>
+        <form id="admin-login" class="form" novalidate>
+          <label for="admin-pin">PIN admin</label>
+          <div class="field">
+            <input class="input" id="admin-pin" name="pin" type="password" inputmode="numeric" autocomplete="current-password" required aria-describedby="admin-pin-hint admin-msg">
+            <button class="btn btn--primary" type="submit" id="admin-login-btn">Masuk</button>
+          </div>
+          <p class="hint" id="admin-pin-hint">PIN diperiksa di server, tidak disimpan di halaman ini.</p>
+        </form>
+        <div id="admin-panel" hidden>
+          <div class="admin__bar">
+            <p style="margin:0"><strong id="admin-summary">0 kata</strong></p>
+            <div class="toolbar">
+              <button class="btn btn--ghost" type="button" id="admin-refresh">Muat ulang</button>
+              <button class="btn btn--ghost" type="button" id="admin-csv">Ekspor CSV</button>
+              <button class="btn btn--ghost" type="button" id="admin-logout">Keluar</button>
+            </div>
+          </div>
+          <label for="admin-filter" style="font-weight:700">Cari kata</label>
+          <input class="input" id="admin-filter" type="search" autocomplete="off" style="margin:var(--s2) 0 var(--s4);font-size:1rem;min-height:44px">
+          <div class="table-scroll">
+            <table>
+              <caption class="sr-only">Daftar kata dan jumlah kiriman</caption>
+              <thead><tr><th scope="col">Kata</th><th scope="col" class="num">Jumlah</th><th scope="col" class="num">Dummy</th><th scope="col"><span class="sr-only">Aksi</span></th></tr></thead>
+              <tbody id="admin-rows"></tbody>
+            </table>
+          </div>
+        </div>
+        <p class="msg" id="admin-msg" role="status" aria-live="polite"></p>
+      </div>
+      <dialog id="confirm-dialog" aria-labelledby="confirm-title">
+        <h2 id="confirm-title" style="font-size:1.25rem">Hapus kata?</h2>
+        <p id="confirm-text"></p>
+        <div class="dialog-actions">
+          <button class="btn btn--ghost" type="button" id="confirm-no">Batal</button>
+          <button class="btn btn--primary" type="button" id="confirm-yes">Ya, hapus</button>
+        </div>
+      </dialog>
+    </section>
+
+    <!-- Hero + form -->
+    <section class="wrap hero" id="hero" aria-labelledby="judul">
+      <svg class="spark spark--1" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 0c.9 6.4 4.6 10.6 12 12-7.4 1.4-11.1 5.6-12 12-.9-6.4-4.6-10.6-12-12C7.4 10.6 11.1 6.4 12 0z"/></svg>
+      <svg class="spark spark--2" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 0c.9 6.4 4.6 10.6 12 12-7.4 1.4-11.1 5.6-12 12-.9-6.4-4.6-10.6-12-12C7.4 10.6 11.1 6.4 12 0z"/></svg>
+      <svg class="spark spark--3" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 0c.9 6.4 4.6 10.6 12 12-7.4 1.4-11.1 5.6-12 12-.9-6.4-4.6-10.6-12-12C7.4 10.6 11.1 6.4 12 0z"/></svg>
+      <div>
+        <span class="eyebrow">Youth Character Summit 2026</span>
+        <h1 id="judul">Satu Kata untuk <span class="brush">Indonesia<svg viewBox="0 0 300 30" preserveAspectRatio="none" aria-hidden="true"><path fill="#F2B705" d="M4 18c40-9 95-13 150-12 52 1 99 4 142 9 4 1 4 7 0 8-50-3-95-5-146-4-48 1-95 5-142 10-6 1-10-9-4-11z"/></svg></span></h1>
+        <p class="lead">Apa satu kata harapanmu untuk Indonesia? Kirim, lalu lihat katamu bergabung dengan kata teman-teman se-Indonesia membentuk tulisan <strong>YOUTH CHARACTER SUMMIT 2026</strong>.</p>
+      </div>
+      <div class="card">
+        <form class="form" id="form" novalidate>
+          <label for="kata">Satu kata harapanmu untuk Indonesia</label>
+          <div class="field">
+            <input class="input" id="kata" name="kata" type="text" maxlength="20" autocomplete="off" autocapitalize="none" spellcheck="false" enterkeyhint="send" required aria-describedby="kata-hint kata-preview form-msg">
+            <button class="btn btn--primary" type="submit" id="btn-kirim"><span class="btn__label">Kirim kataku</span></button>
+          </div>
+          <p class="hint" id="kata-hint">Cukup satu kata (2–20 huruf), misalnya <em>maju</em>, <em>damai</em>, atau <em>jujur</em>. Satu perangkat, satu kata.</p>
+          <p class="preview" id="kata-preview" aria-live="polite"></p>
+        </form>
+        <p class="msg" id="form-msg" role="status" aria-live="polite"></p>
+        <button class="btn btn--link" type="button" id="btn-reset-demo" hidden>Kirim kata lain (khusus mode demo)</button>
+      </div>
+    </section>
+
+    <!-- Awan kata -->
+    <section class="wrap stage-section" id="awan" aria-labelledby="awan-title">
+      <div class="section-head">
+        <div>
+          <h2 id="awan-title">Awan Harapan</h2>
+          <p>Makin sering sebuah kata dikirim, makin besar ukurannya.</p>
+        </div>
+        <div class="toolbar">
+          <button class="btn btn--ghost" type="button" id="btn-png">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+            Unduh PNG
+          </button>
+          <button class="btn btn--ghost" type="button" id="btn-fs">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+            Layar penuh
+          </button>
+        </div>
+      </div>
+      <figure class="stage" id="stage" aria-busy="true">
+        <div class="stage__canvas-wrap" id="canvas-wrap">
+          <canvas id="cloud" role="img" aria-label="Awan kata berbentuk tulisan YOUTH CHARACTER SUMMIT 2026 sedang dimuat."></canvas>
+        </div>
+        <div class="stage__state" id="stage-state"><p>Memuat awan harapan…</p></div>
+      </figure>
+      <aside class="qr-panel" id="qr-panel" aria-label="Cara ikut mengirim kata">
+        <p class="qr-panel__title">Satu Kata untuk <span>Indonesia</span></p>
+        <div class="qr-box" id="qr-box"></div>
+        <p class="qr-panel__cap">Scan &amp; kirim satu kata harapanmu</p>
+        <p class="qr-panel__url" id="qr-url"></p>
+        <p class="qr-panel__count"><span id="qr-total">0</span><small>kata harapan terkumpul</small></p>
+      </aside>
+      <div class="stats" id="stats">
+        <dl class="tiles">
+          <div class="tile"><dt>Total kata</dt><dd id="stat-total">0</dd></div>
+          <div class="tile"><dt>Kata unik</dt><dd id="stat-unique">0</dd></div>
+        </dl>
+        <div class="top">
+          <h3>5 kata paling banyak</h3>
+          <ol id="top5"><li class="empty">Belum ada kata.</li></ol>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>#YCS2026 · Satu Kata untuk Indonesia</span>
+      <a href="?admin=1" id="link-admin">Admin</a>
+    </div>
+  </footer>
+
+  <script>
+  (() => {
+    'use strict';
+
+    /* =================================================================
+       ISI DI SINI — konfigurasi
+       ================================================================= */
+    // Dari Supabase → Project Settings → API. Biarkan kosong = MODE DEMO (data lokal di browser).
+    const SUPABASE_URL = '';
+    // anon key memang PUBLIK (aman ditaruh di sini, dijaga oleh RLS). JANGAN pernah memakai service_role key.
+    const SUPABASE_ANON_KEY = '';
+
+    // Kata kasar: cocok persis satu kata (setelah huruf dinormalisasi). Tambah/hapus sesukamu.
+    const KATA_KASAR = [
+      'anjing','anjir','bangsat','babi','bajingan','brengsek','kampret','kunyuk','monyet','asu','jancok','jancuk',
+      'cok','cuk','kontol','memek','ngentot','entot','ngewe','tolol','goblok','goblog','bego','idiot','tai','taik',
+      'tahi','keparat','sialan','pantek','pepek','peler','titit','puki','pukimak','lonte','pelacur','sundal','jablay',
+      'bencong','banci','kafir','mampus','modar','matamu','ndasmu','perek','bokep','porno','sange','colmek','coli',
+      'fuck','shit','bitch','asshole','dick','pussy','bastard','nigga','nigger','seks','sex','kimak','setan','iblis',
+      'bodoh','dungu'
+    ];
+    // Kata kasar BERAT: diblok juga bila muncul di dalam kata lain (mis. "xkontolx").
+    // Jangan masukkan kata pendek seperti "asu" (akan memblok "masuk").
+    const KATA_KASAR_BERAT = ['kontol','memek','ngentot','entot','ngewe','jancok','jancuk','bangsat','bajingan',
+      'pukimak','lonte','pepek','bokep','porno','colmek','fuck','asshole','nigga','nigger'];
+
+    const MAX_CHARS = 20;
+    const POLL_MS = 10000;
+    const MASK_LINES = ['YOUTH', 'CHARACTER', 'SUMMIT', '2026'];
+    const PALETTE = {
+      light: { bg: '#FFFDF8', words: ['#C8102E', '#0B2545', '#7A5600'], tint: 'rgba(11,37,69,.07)', mark: 'rgba(242,183,5,.45)' },
+      dark:  { bg: '#0B2545', words: ['#F2B705', '#FFFFFF', '#FF8A96'], tint: 'rgba(255,255,255,.07)', mark: 'rgba(200,16,46,.55)' }
+    };
+    const PIN_DEMO = '1234';
+    /* ================================================================= */
+
+    const SUPABASE_JS = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js';
+    const SUPABASE_SRI = 'sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o';
+    const QR_JS = 'https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js';
+    const QR_SRI = 'sha384-8FWZA6BGMXhsfO+BLtrJK0We6gg5o1JyO8xQm6peWDEUs17ACA5ziE/NIAkl9z2k';
+    const DEMO = !SUPABASE_URL;
+    const params = new URLSearchParams(location.search);
+    const IS_DISPLAY = params.get('display') === '1';
+    const IS_ADMIN = params.get('admin') === '1';
+    const KEY_SENT = 'ycs-harapan:terkirim';
+    const KEY_THEME = 'ycs-harapan:tema';
+    const KEY_DEMO = 'ycs-harapan:demo-v1';
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    const $ = (s) => document.querySelector(s);
+
+    // Frekuensi contoh (sama dengan supabase/seed-dummy.sql)
+    const DUMMY_FREQ = 'maju:25,damai:20,jujur:15,bersatu:13,sejahtera:12,adil:11,cerdas:10,hebat:9,berkarakter:8,toleransi:7,mandiri:7,berani:6,bangkit:6,peduli:6,gotongroyong:5,kreatif:5,unggul:5,santun:4,merdeka:4,bersih:4,inovatif:4,disiplin:4,tangguh:4,makmur:4,harmoni:4,bijak:3,sehat:4,berdaya:3,rukun:3,integritas:3,berbudaya:3,hijau:3,cemerlang:3,setara:3,optimis:3,amanah:3,kuat:3,lestari:2,berprestasi:2,bahagia:2,religius:2,empati:2,solid:2,bermartabat:2,terdidik:2,ramah:2,tulus:2,kolaborasi:2,digital:2,emas:2,gemilang:2,sportif:2,visioner:2,semangat:2,aman:2,terang:1,inklusif:1,produktif:1,tertib:1,cinta:1,syukur:1,bhinneka:1,teladan:1,progresif:1,mulia:1,berakhlak:1,tumbuh:1,terbuka:1,bangga:1,literasi:1,pancasila:1,berintegritas:1,sabar:1,kompak:1,berkelanjutan:1,adaptif:1,rendahhati:1,bermimpi:1,berkah:1,jaya:1'
+      .split(',').map((p) => { const [w, c] = p.split(':'); return [w, +c]; });
+
+    /* ---------- Util ---------- */
+    function hash(str) { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+    function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+    const fmt = (n) => n.toLocaleString('id-ID');
+    function loadScript(src, integrity) {
+      return new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = src; s.integrity = integrity; s.crossOrigin = 'anonymous';
+        s.onload = res; s.onerror = () => rej(new Error('Gagal memuat ' + src));
+        document.head.appendChild(s);
+      });
+    }
+    const sleep0 = () => new Promise((r) => setTimeout(r, 0));
+
+    /* ---------- Normalisasi & filter ---------- */
+    const LEET = { '4': 'a', '@': 'a', '1': 'i', '!': 'i', '0': 'o', '3': 'e', '5': 's', '$': 's', '7': 't' };
+    function firstWord(raw) { return (raw || '').trim().split(/\s+/)[0] || ''; }
+    function stripAccents(s) { return s.normalize('NFD').replace(/[̀-ͯ]/g, ''); }
+    function normalize(raw) { return stripAccents(firstWord(raw).toLowerCase()).replace(/[^a-z]/g, '').slice(0, MAX_CHARS); }
+    function isKasar(raw) {
+      const low = stripAccents(firstWord(raw).toLowerCase());
+      const leet = low.replace(/[4@1!0357$]/g, (c) => LEET[c]).replace(/[^a-z]/g, '');
+      const plain = low.replace(/[^a-z]/g, '');
+      const vars = new Set([leet, plain]);
+      for (const v of [...vars]) vars.add(v.replace(/(.)\1+/g, '$1')); // "anjiiing" → "anjing"
+      for (const v of vars) {
+        if (!v) continue;
+        if (KATA_KASAR.includes(v)) return true;
+        if (KATA_KASAR_BERAT.some((b) => v.includes(b))) return true;
+      }
+      return false;
+    }
+
+    /* ---------- Penyimpanan: Supabase atau demo lokal ---------- */
+    class StoreError extends Error { constructor(code) { super(code); this.code = code; } }
+
+    function makeDemoStore() {
+      function read() { try { return JSON.parse(localStorage.getItem(KEY_DEMO)) || null; } catch { return null; } }
+      function write(rows) { localStorage.setItem(KEY_DEMO, JSON.stringify(rows)); }
+      function fromFreq(scale, seed) {
+        const r = rng(seed); const rows = []; const t0 = Date.now() - 3 * 3600e3;
+        DUMMY_FREQ.forEach(([w, c]) => { const n = scale === 1 ? c : Math.max(1, Math.round(c * scale)); for (let i = 0; i < n; i++) rows.push(w); });
+        for (let i = rows.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [rows[i], rows[j]] = [rows[j], rows[i]]; }
+        return rows.map((w, i) => ({ id: i + 1, word: w, created_at: new Date(t0 + i * 30e3).toISOString(), is_dummy: true }));
+      }
+      let rows = read();
+      if (!rows) { rows = fromFreq(0.33, 7); write(rows); }
+      if (params.get('seed') === '300') {
+        // ganti semua data contoh/dummy dengan 300 kata dummy, kata asli tetap
+        const real = rows.filter((x) => !x.is_dummy);
+        rows = fromFreq(1, 2026).map((x, i) => ({ ...x, id: 100000 + i })).concat(real);
+        write(rows);
+      }
+      const subs = new Set();
+      addEventListener('storage', (e) => { if (e.key === KEY_DEMO) subs.forEach((f) => f()); });
+      const counts = () => { rows = read() || []; const m = new Map(); rows.forEach((x) => m.set(x.word, (m.get(x.word) || 0) + 1)); return m; };
+      return {
+        async fetchCounts() { const m = counts(); return { counts: m, total: rows.length }; },
+        async insert(word) {
+          await new Promise((r) => setTimeout(r, 450));
+          rows = read() || [];
+          if (KATA_KASAR.includes(word)) throw new StoreError('blocked_word');
+          rows.push({ id: Date.now(), word, created_at: new Date().toISOString(), is_dummy: false });
+          write(rows);
+        },
+        subscribe(cb) { subs.add(cb); return 'demo'; },
+        async adminLogin(pin) { await new Promise((r) => setTimeout(r, 300)); return pin === PIN_DEMO ? 'ok' : 'invalid'; },
+        async adminList() { return (read() || []).slice().reverse(); },
+        async adminDelete(pin, word) {
+          if (pin !== PIN_DEMO) return -1;
+          const before = (read() || []); const after = before.filter((x) => x.word !== word);
+          write(after); subs.forEach((f) => f()); return before.length - after.length;
+        }
+      };
+    }
+
+    async function makeSupaStore() {
+      await loadScript(SUPABASE_JS, SUPABASE_SRI);
+      const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: false } });
+      const mapErr = (error) => {
+        const m = ((error && (error.message || '')) + ' ' + (error && error.details || '')).toLowerCase();
+        if (m.includes('rate_limit')) return new StoreError('rate_limit');
+        if (m.includes('blocked_word')) return new StoreError('blocked_word');
+        if (error && error.code === '23514') return new StoreError('invalid');
+        if (m.includes('fetch') || m.includes('network') || !error || !error.code) return new StoreError('network');
+        return new StoreError('unknown');
+      };
+      return {
+        async fetchCounts() {
+          const [a, b] = await Promise.all([
+            db.from('word_counts').select('word,total').order('total', { ascending: false }).limit(1000),
+            db.from('words').select('id', { count: 'exact', head: true })
+          ]);
+          if (a.error) throw mapErr(a.error);
+          const m = new Map(a.data.map((r) => [r.word, r.total]));
+          let total = b.count; if (b.error || total == null) total = a.data.reduce((s, r) => s + r.total, 0);
+          return { counts: m, total };
+        },
+        async insert(word) {
+          let res;
+          try { res = await db.from('words').insert({ word }); } catch (e) { throw new StoreError('network'); }
+          if (res.error) throw mapErr(res.error);
+        },
+        subscribe(cb, onStatus) {
+          db.channel('words-insert')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'words' }, () => cb())
+            .subscribe((status) => onStatus && onStatus(status));
+          return 'realtime';
+        },
+        async adminLogin(pin) { const { data, error } = await db.rpc('admin_login', { p_pin: pin }); if (error) throw mapErr(error); return data; },
+        async adminList(pin) { const { data, error } = await db.rpc('admin_list', { p_pin: pin }); if (error) throw mapErr(error); return data || []; },
+        async adminDelete(pin, word) { const { data, error } = await db.rpc('admin_delete_word', { p_pin: pin, p_word: word }); if (error) throw mapErr(error); return data; }
+      };
+    }
+
+    /* =================================================================
+       Mesin awan kata berbentuk teks.
+       wordcloud2.js / d3-cloud tidak mendukung "mask" berupa tulisan dengan baik,
+       jadi penempatan dibuat sendiri: bitmap mask huruf + bitmap okupansi (sel 2px),
+       tiap kata diuji piksel-demi-piksel agar hanya berada DI DALAM huruf.
+       ================================================================= */
+    const CELL = 2;
+    const WORD_FONT = (px) => `800 ${px}px Montserrat, "Arial Black", sans-serif`;
+    const MASK_FONT = (px) => `900 ${px}px Montserrat, "Arial Black", sans-serif`;
+
+    function buildMask(W, H) {
+      const gw = Math.ceil(W / CELL), gh = Math.ceil(H / CELL);
+      const c = document.createElement('canvas'); c.width = gw; c.height = gh;
+      const ctx = c.getContext('2d', { willReadFrequently: true });
+      ctx.font = MASK_FONT(100);
+      const m = MASK_LINES.map((t) => { const mm = ctx.measureText(t); return { t, w: mm.width, asc: mm.actualBoundingBoxAscent, desc: mm.actualBoundingBoxDescent }; });
+      const availW = gw * 0.95, availH = gh * 0.93, gap = gh * 0.035;
+      const fit = m.map((x) => (availW / x.w) * 100);
+      const total = (fmax) => m.reduce((s, x, i) => s + Math.min(fit[i], fmax) * (x.asc + x.desc) / 100, 0) + gap * (m.length - 1);
+      // batasi agar baris pendek tidak terlalu raksasa dibanding baris terpanjang
+      let lo = 0, hi = Math.min(Math.max(...fit), Math.min(...fit) * (H > W ? 2.6 : 1.55));
+      for (let k = 0; k < 40; k++) { const mid = (lo + hi) / 2; if (total(mid) <= availH) lo = mid; else hi = mid; }
+      const sizes = fit.map((f) => Math.min(f, lo));
+      let y = (gh - total(lo)) / 2;
+      const lines = [];
+      ctx.fillStyle = '#000'; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+      m.forEach((x, i) => {
+        const s = sizes[i]; const base = y + x.asc * s / 100;
+        ctx.font = MASK_FONT(s); ctx.fillText(x.t, gw / 2, base);
+        lines.push({ text: x.t, size: s * CELL, x: W / 2, y: base * CELL });
+        y += (x.asc + x.desc) * s / 100 + gap;
+      });
+      const img = ctx.getImageData(0, 0, gw, gh).data;
+      const grid = new Uint8Array(gw * gh);
+      const cells = [];
+      for (let i = 0; i < gw * gh; i++) if (img[i * 4 + 3] > 140) { grid[i] = 1; cells.push(i); }
+      // jarak chamfer (3-4) ke tepi huruf → kandidat posisi untuk kata besar
+      const dist = new Uint16Array(gw * gh);
+      for (let i = 0; i < gw * gh; i++) dist[i] = grid[i] ? 60000 : 0;
+      for (let yy = 0; yy < gh; yy++) for (let xx = 0; xx < gw; xx++) {
+        const i = yy * gw + xx; if (!dist[i]) continue; let d = dist[i];
+        if (xx > 0) d = Math.min(d, dist[i - 1] + 3); else d = Math.min(d, 3);
+        if (yy > 0) { d = Math.min(d, dist[i - gw] + 3); if (xx > 0) d = Math.min(d, dist[i - gw - 1] + 4); if (xx < gw - 1) d = Math.min(d, dist[i - gw + 1] + 4); } else d = Math.min(d, 3);
+        dist[i] = d;
+      }
+      for (let yy = gh - 1; yy >= 0; yy--) for (let xx = gw - 1; xx >= 0; xx--) {
+        const i = yy * gw + xx; if (!dist[i]) continue; let d = dist[i];
+        if (xx < gw - 1) d = Math.min(d, dist[i + 1] + 3); else d = Math.min(d, 3);
+        if (yy < gh - 1) { d = Math.min(d, dist[i + gw] + 3); if (xx < gw - 1) d = Math.min(d, dist[i + gw + 1] + 4); if (xx > 0) d = Math.min(d, dist[i + gw - 1] + 4); } else d = Math.min(d, 3);
+        dist[i] = d;
+      }
+      const ds = cells.map((i) => dist[i]).sort((a, b) => a - b);
+      const p95 = ds.length ? ds[Math.floor(ds.length * 0.95)] / 3 : 10; // setengah tebal goresan (sel)
+      return { W, H, gw, gh, grid, cells: Int32Array.from(cells), dist, lines, stroke: p95 * 2 * CELL, pools: new Map() };
+    }
+
+    const spriteCache = new Map();
+    const spriteCanvas = document.createElement('canvas');
+    const sctx = spriteCanvas.getContext('2d', { willReadFrequently: true });
+    function sprite(word, size, rot, pad) {
+      const key = word + '|' + size.toFixed(1) + '|' + rot + '|' + pad;
+      let sp = spriteCache.get(key); if (sp) return sp;
+      const fs = size / CELL;
+      sctx.font = WORD_FONT(fs);
+      const tw = Math.ceil(sctx.measureText(word).width) + 2, th = Math.ceil(fs * 1.2) + 2;
+      let cw = (rot ? th : tw) + 2 * pad + 2, ch = (rot ? tw : th) + 2 * pad + 2;
+      cw += cw % 2; ch += ch % 2;
+      spriteCanvas.width = cw; spriteCanvas.height = ch;
+      sctx.font = WORD_FONT(fs); sctx.textAlign = 'center'; sctx.textBaseline = 'middle'; sctx.fillStyle = '#000';
+      sctx.translate(cw / 2, ch / 2); if (rot) sctx.rotate(-Math.PI / 2); sctx.fillText(word, 0, 0);
+      sctx.setTransform(1, 0, 0, 1, 0, 0);
+      const d = sctx.getImageData(0, 0, cw, ch).data;
+      const on = new Uint8Array(cw * ch);
+      for (let i = 0; i < cw * ch; i++) if (d[i * 4 + 3] > 24) on[i] = 1;
+      const out = [];
+      let minX = 1e9, maxX = -1e9, minY = 1e9, maxY = -1e9;
+      for (let y = 0; y < ch; y++) for (let x = 0; x < cw; x++) {
+        let hit = on[y * cw + x];
+        if (!hit && pad) for (let yy = -pad; yy <= pad && !hit; yy++) for (let xx = -pad; xx <= pad; xx++) {
+          const X = x + xx, Y = y + yy; if (X >= 0 && Y >= 0 && X < cw && Y < ch && on[Y * cw + X]) { hit = 1; break; }
+        }
+        if (hit) { const dx = x - cw / 2, dy = y - ch / 2; out.push(dx, dy); if (dx < minX) minX = dx; if (dx > maxX) maxX = dx; if (dy < minY) minY = dy; if (dy > maxY) maxY = dy; }
+      }
+      sp = { cells: Int16Array.from(out), minX, maxX, minY, maxY, w: maxX - minX + 1, h: maxY - minY + 1 };
+      spriteCache.set(key, sp);
+      if (spriteCache.size > 6000) spriteCache.clear();
+      return sp;
+    }
+    function fits(M, sp, cx, cy) {
+      if (cx + sp.minX < 0 || cy + sp.minY < 0 || cx + sp.maxX >= M.gw || cy + sp.maxY >= M.gh) return false;
+      const g = M.grid, gw = M.gw, c = sp.cells;
+      for (let k = 0; k < c.length; k += 2) if (g[(cy + c[k + 1]) * gw + cx + c[k]] !== 1) return false;
+      return true;
+    }
+    function occupy(M, sp, cx, cy) { const c = sp.cells; for (let k = 0; k < c.length; k += 2) M.grid[(cy + c[k + 1]) * M.gw + cx + c[k]] = 2; }
+    function pool(M, need) {
+      need = Math.max(0, Math.floor(need)); let p = M.pools.get(need);
+      if (!p) { p = M.cells.filter((i) => M.dist[i] >= need); M.pools.set(need, p); }
+      return p;
+    }
+
+    let prevPlace = new Map(); // kata → posisi lama, agar kata lama tetap di tempatnya
+    async function layout(M, counts, isCancelled) {
+      M.grid.set(M.grid.map((v) => (v ? 1 : 0)));
+      const t0 = performance.now();
+      const budget = innerWidth < 700 ? 450 : 700;
+      let slice = performance.now();
+      const maybeYield = async () => { if (performance.now() - slice > 12) { await sleep0(); slice = performance.now(); if (isCancelled()) throw new Error('batal'); } };
+      const entries = [...counts.entries()].sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1)).slice(0, 500);
+      const maxC = entries.length ? entries[0][1] : 1;
+      const realMin = Math.max(11, M.W * 0.0085);
+      const realMax = Math.max(realMin * 1.2, M.stroke * 0.95);
+      const sizeFor = (c) => maxC <= 1 ? realMin : realMin + (realMax - realMin) * Math.sqrt((c - 1) / (maxC - 1));
+      const placed = [];
+      const nextPrev = new Map();
+      for (const [word, c] of entries) {
+        await maybeYield();
+        const r = rng(hash(word));
+        const pref = r() < 0.3 ? 1 : 0;
+        const size0 = sizeFor(c);
+        let done = null;
+        const old = prevPlace.get(word);
+        if (old && old.size <= size0 + 0.01 && old.size >= size0 * 0.7) {
+          const sp = sprite(word, old.size, old.rot, 1);
+          if (fits(M, sp, old.x, old.y)) done = { x: old.x, y: old.y, size: old.size, rot: old.rot, sp };
+        }
+        for (let size = size0; !done && size >= realMin - 0.01; size = size > realMin ? Math.max(realMin, size * 0.86) : realMin - 1) {
+          for (const rot of [pref, 1 - pref]) {
+            const sp = sprite(word, size, rot, 1);
+            const need = Math.min(sp.w, sp.h) / 2 * 3 * 0.75;
+            const p = pool(M, need); if (!p.length) continue;
+            const tries = Math.min(p.length, size > realMin ? 260 : 700);
+            for (let t = 0; t < tries; t++) {
+              const i = p[Math.floor(r() * p.length)];
+              const cx = i % M.gw, cy = (i / M.gw) | 0;
+              if (fits(M, sp, cx, cy)) { done = { x: cx, y: cy, size, rot, sp }; break; }
+            }
+            if (done) break;
+          }
+        }
+        if (done) {
+          occupy(M, done.sp, done.x, done.y);
+          placed.push({ word, x: done.x, y: done.y, size: done.size, rot: done.rot, count: c, real: true });
+          nextPrev.set(word, { x: done.x, y: done.y, size: done.size, rot: done.rot });
+        }
+      }
+      prevPlace = nextPrev;
+      // Isi sisa area huruf dengan salinan kecil (berbobot frekuensi) agar tulisan makin tegas
+      const fills = [];
+      if (entries.length) {
+        const cum = []; let s = 0; for (const [, c] of entries) { s += Math.sqrt(c); cum.push(s); }
+        const pick = (r) => { const v = r() * s; let lo = 0, hi = cum.length - 1; while (lo < hi) { const m = (lo + hi) >> 1; if (cum[m] < v) lo = m + 1; else hi = m; } return entries[lo][0]; };
+        const r = rng(2026);
+        const order = Int32Array.from(M.cells);
+        for (let i = order.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); const t = order[i]; order[i] = order[j]; order[j] = t; }
+        const fMin = Math.max(6, realMin * 0.5), fMax = Math.max(realMin, realMax * 0.42);
+        // ukuran dibulatkan ke beberapa tingkat agar sprite bisa dipakai ulang (lebih cepat)
+        const tiers = []; for (let t = fMax; t > fMin; t /= 1.22) tiers.push(t); tiers.push(fMin);
+        const tierFor = (px) => { for (let t = 0; t < tiers.length; t++) if (tiers[t] <= px) return t; return tiers.length - 1; };
+        const gw = M.gw, g = M.grid;
+        outer: for (let pass = 0; pass < 2; pass++) {
+          for (let k = 0; k < order.length; k++) {
+            if ((k & 63) === 0) { await maybeYield(); if (performance.now() - t0 > budget) break outer; }
+            const i = order[k]; if (g[i] !== 1) continue;
+            const cx = i % gw, cy = (i / gw) | 0;
+            // panjang ruang kosong horizontal & vertikal → arah dan ukuran kata
+            let h = 0, v = 0;
+            for (let x = cx; x < gw && g[cy * gw + x] === 1 && h < 300; x++) h++;
+            for (let x = cx - 1; x >= 0 && g[cy * gw + x] === 1 && h < 300; x--) h++;
+            for (let y = cy; y < M.gh && g[y * gw + cx] === 1 && v < 300; y++) v++;
+            for (let y = cy - 1; y >= 0 && g[y * gw + cx] === 1 && v < 300; y--) v++;
+            const rot = v > h * 1.3 ? 1 : 0;
+            const room = (rot ? h : v) * CELL * 0.9;
+            let t = pass ? tiers.length - 1 : tierFor(room * (0.6 + 0.4 * r()));
+            for (let a = 0; a < 5 && t < tiers.length; a++) {
+              const word = pick(r);
+              const sp = sprite(word, tiers[t], rot, 0);
+              if (fits(M, sp, cx, cy)) { occupy(M, sp, cx, cy); fills.push({ word, x: cx, y: cy, size: tiers[t], rot, real: false }); break; }
+              if (a % 2) t++;
+            }
+          }
+        }
+      }
+      window.__harapanStats = { placed: placed.length, fills: fills.length, ms: Math.round(performance.now() - t0) };
+      return { placed, fills, unplaced: entries.length - placed.length };
+    }
+
+    /* ---------- Render ---------- */
+    const canvas = $('#cloud');
+    const wrap = $('#canvas-wrap');
+    let M = null, L = null, layoutClass = '';
+    let anim = new Map(); // kata baru → waktu mulai animasi
+    let myWord = localStorage.getItem(KEY_SENT) || '';
+    let highlightUntil = 0;
+    let staticLayer = null;
+    const theme = () => document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+    const colorFor = (w, pal) => pal.words[hash(w) % pal.words.length];
+
+    function drawWord(ctx, p, pal, alpha, scaleK) {
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = colorFor(p.word, pal);
+      ctx.font = WORD_FONT(p.size);
+      ctx.translate(p.x * CELL, p.y * CELL);
+      if (p.rot) ctx.rotate(-Math.PI / 2);
+      if (scaleK !== 1) ctx.scale(scaleK, scaleK);
+      ctx.fillText(p.word, 0, 0);
+      ctx.restore();
+    }
+    function drawScene(ctx, scale, opts = {}) {
+      const pal = PALETTE[opts.theme || theme()];
+      ctx.save(); ctx.scale(scale, scale);
+      ctx.fillStyle = pal.bg; ctx.fillRect(0, 0, M.W, M.H);
+      ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+      // latar huruf samar agar bentuk tetap terbaca saat kata masih sedikit
+      ctx.fillStyle = pal.tint;
+      for (const ln of M.lines) { ctx.font = MASK_FONT(ln.size / 1); ctx.fillText(ln.text, ln.x, ln.y); }
+      ctx.textBaseline = 'middle';
+      if (L) {
+        for (const p of L.fills) drawWord(ctx, p, pal, 0.5, 1);
+        for (const p of L.placed) if (!opts.skipAnimated || !anim.has(p.word)) drawWord(ctx, p, pal, 1, 1);
+      }
+      ctx.restore();
+    }
+    function fitCanvas() {
+      if (!M) return;
+      const r = wrap.getBoundingClientRect();
+      let w = r.width, h = w * M.H / M.W;
+      if (document.fullscreenElement || IS_DISPLAY) { const maxH = r.height || innerHeight; if (h > maxH) { h = maxH; w = h * M.W / M.H; } }
+      const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+      canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+      canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+      rebuildStatic();
+    }
+    function rebuildStatic() {
+      if (!M) return;
+      staticLayer = document.createElement('canvas');
+      staticLayer.width = canvas.width; staticLayer.height = canvas.height;
+      drawScene(staticLayer.getContext('2d'), canvas.width / M.W, { skipAnimated: true });
+      requestFrame();
+    }
+    let rafId = 0;
+    function requestFrame() { if (!rafId) rafId = requestAnimationFrame(frame); }
+    function frame(now) {
+      rafId = 0;
+      if (!staticLayer) return;
+      const ctx = canvas.getContext('2d');
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.drawImage(staticLayer, 0, 0);
+      const pal = PALETTE[theme()];
+      const sc = canvas.width / M.W;
+      let again = false;
+      ctx.save(); ctx.scale(sc, sc); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      if (L) for (const p of L.placed) {
+        const st = anim.get(p.word); if (st === undefined) continue;
+        const k = reduceMotion.matches ? 1 : Math.min(1, (now - st) / 700);
+        const e = 1 - Math.pow(1 - k, 3);
+        drawWord(ctx, p, pal, e, 0.6 + 0.4 * e);
+        if (k < 1) again = true; else anim.delete(p.word);
+      }
+      // sorot kata milik pengguna
+      if (L && myWord && now < highlightUntil) {
+        const p = L.placed.find((q) => q.word === myWord);
+        if (p) {
+          const sp = sprite(p.word, p.size, p.rot, 1);
+          const pulse = reduceMotion.matches ? 1 : 0.5 + 0.5 * Math.sin(now / 180);
+          const pad = 6 + 4 * pulse;
+          const x = (p.x + sp.minX) * CELL - pad, y = (p.y + sp.minY) * CELL - pad;
+          const w = sp.w * CELL + pad * 2, h = sp.h * CELL + pad * 2;
+          ctx.lineWidth = 3; ctx.strokeStyle = '#F2B705'; ctx.fillStyle = pal.mark;
+          ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x, y, w, h, 8) : ctx.rect(x, y, w, h); ctx.fill(); ctx.stroke();
+          drawWord(ctx, p, pal, 1, 1);
+          again = true;
+        }
+      }
+      ctx.restore();
+      if (again) requestFrame();
+    }
+
+    /* ---------- Data & tata letak ---------- */
+    let counts = new Map(), total = 0, loaded = false;
+    let layoutRun = 0, layoutBusy = false, layoutAgain = false;
+    function chooseClass() {
+      const r = wrap.getBoundingClientRect();
+      if (IS_DISPLAY) { const ar = Math.max(0.5, Math.min(2.2, (r.width || innerWidth) / (r.height || innerHeight))); return 'display:' + ar.toFixed(2); }
+      return (r.width || innerWidth) < 600 ? 'tall' : 'wide';
+    }
+    function dimsFor(cls) {
+      if (cls === 'tall') return [1000, 960];
+      if (cls === 'wide') return [1600, 1000];
+      const ar = parseFloat(cls.split(':')[1]); return [1600, Math.round(1600 / ar)];
+    }
+    async function runLayout() {
+      if (layoutBusy) { layoutAgain = true; return; }
+      layoutBusy = true;
+      try {
+        do {
+          layoutAgain = false;
+          const cls = chooseClass();
+          if (cls !== layoutClass || !M) {
+            layoutClass = cls; const [W, H] = dimsFor(cls);
+            M = buildMask(W, H); prevPlace = new Map(); L = null;
+            if (!IS_DISPLAY) wrap.style.aspectRatio = W + ' / ' + H;
+            fitCanvas();
+          }
+          const my = ++layoutRun;
+          const oldWords = new Set(L ? L.placed.map((p) => p.word) : []);
+          const hadLayout = !!L;
+          let res;
+          try { res = await layout(M, counts, () => my !== layoutRun || layoutAgain); } catch (e) { if (e.message === 'batal') continue; throw e; }
+          L = res;
+          if (hadLayout) { const now = performance.now(); for (const p of L.placed) if (!oldWords.has(p.word)) anim.set(p.word, now); }
+          rebuildStatic();
+        } while (layoutAgain);
+      } finally { layoutBusy = false; }
+      afterLayout();
+    }
+    let afterLayoutHooks = [];
+    function afterLayout() { const h = afterLayoutHooks; afterLayoutHooks = []; h.forEach((f) => f()); }
+
+    function updateStats() {
+      const entries = [...counts.entries()].sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1));
+      $('#stat-total').textContent = fmt(total);
+      $('#stat-unique').textContent = fmt(counts.size);
+      $('#qr-total').textContent = fmt(total);
+      const ol = $('#top5'); ol.textContent = '';
+      if (!entries.length) { const li = document.createElement('li'); li.className = 'empty'; li.textContent = 'Belum ada kata. Jadilah yang pertama!'; ol.appendChild(li); }
+      const max = entries.length ? entries[0][1] : 1;
+      entries.slice(0, 5).forEach(([w, c]) => {
+        const li = document.createElement('li');
+        li.innerHTML = '<span class="w"></span><span class="n"></span><span class="bar" aria-hidden="true"><i></i></span>';
+        li.querySelector('.w').textContent = w;
+        li.querySelector('.n').textContent = fmt(c) + '×';
+        li.querySelector('.bar i').style.width = Math.max(4, c / max * 100) + '%';
+        ol.appendChild(li);
+      });
+      const top = entries.slice(0, 5).map(([w, c]) => `${w} (${c})`).join(', ');
+      canvas.setAttribute('aria-label', entries.length
+        ? `Awan kata berbentuk tulisan YOUTH CHARACTER SUMMIT 2026 dari ${total} kata harapan. Kata terbanyak: ${top}.`
+        : 'Awan kata berbentuk tulisan YOUTH CHARACTER SUMMIT 2026. Belum ada kata yang terkirim.');
+      const st = $('#stage-state');
+      $('#stage').setAttribute('aria-busy', loaded ? 'false' : 'true');
+      if (!loaded) { st.hidden = false; st.firstElementChild.textContent = 'Memuat awan harapan…'; }
+      else if (!entries.length) { st.hidden = false; st.firstElementChild.textContent = 'Belum ada kata. Jadilah yang pertama mengisi awan harapan!'; }
+      else st.hidden = true;
+    }
+
+    let store = null, realtimeOk = false, lastPoll = 0;
+    let fetching = null;
+    async function refresh() {
+      if (fetching) return fetching;
+      fetching = (async () => {
+        try {
+          const res = await store.fetchCounts();
+          counts = res.counts; total = res.total; loaded = true; lastPoll = Date.now();
+          updateStats(); runLayout();
+        } catch (e) {
+          if (!loaded) { const st = $('#stage-state'); st.hidden = false; st.firstElementChild.textContent = 'Gagal memuat data. Periksa koneksimu, halaman akan mencoba lagi otomatis.'; }
+        } finally { fetching = null; }
+      })();
+      return fetching;
+    }
+    let debounceT = 0;
+    const refreshSoon = () => { clearTimeout(debounceT); debounceT = setTimeout(refresh, 800); };
+
+    /* ---------- Form ---------- */
+    const form = $('#form'), input = $('#kata'), btn = $('#btn-kirim'), msg = $('#form-msg');
+    function setMsg(el, type, html) { el.className = 'msg' + (type ? ' msg--' + type : ''); el.innerHTML = html; }
+    const esc = (s) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    function lockForm(word) {
+      input.disabled = true; btn.disabled = true; input.value = word;
+      $('#kata-preview').textContent = '';
+      $('#btn-reset-demo').hidden = !DEMO;
+    }
+    input.addEventListener('input', () => {
+      const n = normalize(input.value);
+      input.removeAttribute('aria-invalid');
+      $('#kata-preview').innerHTML = input.value.trim() ? (n ? `Kata yang akan dikirim: <strong>${esc(n)}</strong>` : 'Gunakan huruf a–z, ya.') : '';
+    });
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (localStorage.getItem(KEY_SENT)) { setMsg(msg, 'warn', `Kamu sudah mengirim kata dari perangkat ini. Satu perangkat, satu kata.`); return; }
+      const raw = input.value; const word = normalize(raw);
+      const fail = (t) => { input.setAttribute('aria-invalid', 'true'); setMsg(msg, 'err', t); input.focus(); };
+      if (!raw.trim()) return fail('Tulis satu kata dulu, ya.');
+      if (word.length < 2) return fail('Kata minimal 2 huruf (a–z), ya.');
+      if (isKasar(raw)) return fail('Ups, kata itu kurang pantas untuk awan harapan. Coba kata positif lain, misalnya "maju" atau "damai".');
+      btn.disabled = true; form.setAttribute('aria-busy', 'true');
+      btn.innerHTML = '<span class="spinner" aria-hidden="true"></span><span class="btn__label">Mengirim…</span>';
+      setMsg(msg, '', '');
+      try {
+        await store.insert(word);
+        localStorage.setItem(KEY_SENT, word); myWord = word;
+        lockForm(word);
+        setMsg(msg, 'ok', `Terima kasih! Kata "${esc(word)}" sudah masuk ke awan harapan.`);
+        afterLayoutHooks.push(() => {
+          highlightUntil = performance.now() + 6000; requestFrame();
+          $('#awan').scrollIntoView({ behavior: reduceMotion.matches ? 'auto' : 'smooth', block: 'start' });
+        });
+        await refresh();
+      } catch (err) {
+        const code = err && err.code;
+        btn.disabled = false;
+        if (code === 'rate_limit') setMsg(msg, 'err', 'Terlalu banyak kiriman dari jaringan ini. Tunggu beberapa menit, lalu coba lagi, ya.');
+        else if (code === 'blocked_word') fail('Ups, kata itu kurang pantas untuk awan harapan. Coba kata positif lain, misalnya "maju" atau "damai".');
+        else if (code === 'invalid') fail('Kata hanya boleh berisi huruf a–z (2–20 huruf).');
+        else setMsg(msg, 'err', 'Koneksi bermasalah, kata belum terkirim. Periksa internetmu lalu coba lagi.');
+      } finally {
+        form.removeAttribute('aria-busy');
+        btn.innerHTML = '<span class="btn__label">Kirim kataku</span>';
+      }
+    });
+    $('#btn-reset-demo').addEventListener('click', () => {
+      localStorage.removeItem(KEY_SENT); myWord = '';
+      input.disabled = false; btn.disabled = false; input.value = ''; input.focus();
+      setMsg(msg, '', ''); $('#btn-reset-demo').hidden = true;
+    });
+
+    /* ---------- Tombol: tema, PNG, layar penuh ---------- */
+    function syncThemeBtn() {
+      const dark = theme() === 'dark';
+      $('#btn-theme').setAttribute('aria-label', dark ? 'Ganti ke mode terang' : 'Ganti ke mode gelap');
+      $('#btn-theme').setAttribute('aria-pressed', String(dark));
+      $('#theme-icon').setAttribute('d', dark ? 'M12 4V2m0 20v-2m8-8h2M2 12h2m13.7-5.7 1.4-1.4M4.9 19.1l1.4-1.4m0-11.4L4.9 4.9m14.2 14.2-1.4-1.4M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z' : 'M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z');
+    }
+    $('#btn-theme').addEventListener('click', () => {
+      const t = theme() === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+      localStorage.setItem(KEY_THEME, t); syncThemeBtn(); rebuildStatic();
+    });
+    $('#btn-png').addEventListener('click', () => {
+      if (!M) return;
+      const scale = 3840 / M.W, foot = 170;
+      const c = document.createElement('canvas'); c.width = 3840; c.height = Math.round(M.H * scale) + foot;
+      const ctx = c.getContext('2d');
+      drawScene(ctx, scale);
+      const pal = PALETTE[theme()];
+      ctx.fillStyle = theme() === 'dark' ? '#081C36' : '#0B2545';
+      ctx.fillRect(0, c.height - foot, c.width, foot);
+      ctx.fillStyle = '#F2B705'; ctx.fillRect(0, c.height - foot, c.width, 10);
+      ctx.fillStyle = '#FFFFFF'; ctx.font = '800 64px Montserrat, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('#YCS2026 · Satu Kata untuk Indonesia', c.width / 2, c.height - foot / 2 + 5);
+      void pal;
+      c.toBlob((b) => {
+        const a = document.createElement('a'); a.href = URL.createObjectURL(b);
+        a.download = 'awan-harapan-ycs2026.png'; document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      }, 'image/png');
+    });
+    const stage = $('#stage');
+    if (!stage.requestFullscreen) $('#btn-fs').hidden = true;
+    $('#btn-fs').addEventListener('click', () => { if (document.fullscreenElement) document.exitFullscreen(); else stage.requestFullscreen().catch(() => {}); });
+    document.addEventListener('fullscreenchange', () => { $('#btn-fs').lastChild.textContent = document.fullscreenElement ? ' Keluar layar penuh' : ' Layar penuh'; setTimeout(fitCanvas, 60); });
+
+    let resizeT = 0;
+    new ResizeObserver(() => { clearTimeout(resizeT); resizeT = setTimeout(() => { if (!M) return; if (chooseClass() !== layoutClass) runLayout(); else fitCanvas(); }, 150); }).observe(wrap);
+
+    /* ---------- Admin ---------- */
+    let adminPin = '', adminRows = [];
+    async function adminLoad() {
+      const am = $('#admin-msg');
+      setMsg(am, '', 'Memuat daftar…');
+      try {
+        adminRows = await store.adminList(adminPin);
+        renderAdmin(); setMsg(am, '', '');
+      } catch { setMsg(am, 'err', 'Gagal memuat daftar. Periksa koneksi lalu coba lagi.'); }
+    }
+    function renderAdmin() {
+      const agg = new Map();
+      for (const r of adminRows) { const a = agg.get(r.word) || { n: 0, d: 0 }; a.n++; if (r.is_dummy) a.d++; agg.set(r.word, a); }
+      const f = normalize($('#admin-filter').value);
+      const list = [...agg.entries()].filter(([w]) => !f || w.includes(f)).sort((a, b) => b[1].n - a[1].n || (a[0] < b[0] ? -1 : 1));
+      $('#admin-summary').textContent = `${fmt(adminRows.length)} kiriman · ${fmt(agg.size)} kata unik`;
+      const tb = $('#admin-rows'); tb.textContent = '';
+      if (!list.length) { const tr = document.createElement('tr'); tr.innerHTML = '<td colspan="4">Tidak ada kata.</td>'; tb.appendChild(tr); }
+      for (const [w, a] of list) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td></td><td class="num"></td><td class="num"></td><td class="num"><button class="btn btn--danger" type="button">Hapus</button></td>';
+        tr.children[0].textContent = w; tr.children[1].textContent = fmt(a.n); tr.children[2].textContent = fmt(a.d);
+        const b = tr.querySelector('button'); b.dataset.word = w; b.dataset.n = a.n; b.setAttribute('aria-label', `Hapus kata ${w}`);
+        tb.appendChild(tr);
+      }
+    }
+    function setupAdmin() {
+      $('#admin').hidden = false; $('#hero').hidden = true; $('#awan').hidden = true;
+      if (DEMO) $('#admin-pin-hint').textContent = `Mode demo: PIN-nya ${PIN_DEMO}. Data hanya tersimpan di browser ini.`;
+      $('#admin-login').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const pin = $('#admin-pin').value; const am = $('#admin-msg');
+        if (!pin) { setMsg(am, 'err', 'Masukkan PIN dulu.'); return; }
+        const b = $('#admin-login-btn'); b.disabled = true; setMsg(am, '', 'Memeriksa PIN…');
+        try {
+          const st = await store.adminLogin(pin);
+          if (st === 'ok') { adminPin = pin; $('#admin-pin').value = ''; $('#admin-login').hidden = true; $('#admin-panel').hidden = false; await adminLoad(); $('#admin-filter').focus(); }
+          else if (st === 'locked') setMsg(am, 'err', 'Terlalu banyak PIN salah. Admin dikunci 15 menit.');
+          else if (st === 'no_pin') setMsg(am, 'warn', 'PIN admin belum diatur. Jalankan baris SQL pengaturan PIN (lihat README).');
+          else setMsg(am, 'err', 'PIN salah. Coba lagi.');
+        } catch { setMsg(am, 'err', 'Koneksi bermasalah. Coba lagi.'); }
+        finally { b.disabled = false; }
+      });
+      $('#admin-filter').addEventListener('input', renderAdmin);
+      $('#admin-refresh').addEventListener('click', adminLoad);
+      $('#admin-logout').addEventListener('click', () => {
+        adminPin = ''; adminRows = []; $('#admin-rows').textContent = '';
+        $('#admin-panel').hidden = true; $('#admin-login').hidden = false; setMsg($('#admin-msg'), 'ok', 'Kamu sudah keluar.'); $('#admin-pin').focus();
+      });
+      $('#admin-csv').addEventListener('click', () => {
+        const q = (v) => '"' + String(v).replace(/"/g, '""') + '"';
+        const csv = 'id,word,created_at,is_dummy\n' + adminRows.map((r) => [r.id, q(r.word), r.created_at, r.is_dummy].join(',')).join('\n');
+        const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' }));
+        a.download = `harapan-ycs2026-${new Date().toISOString().slice(0, 10)}.csv`; document.body.appendChild(a); a.click(); a.remove();
+      });
+      const dlg = $('#confirm-dialog'); let pending = null, opener = null;
+      $('#admin-rows').addEventListener('click', (e) => {
+        const b = e.target.closest('button[data-word]'); if (!b) return;
+        pending = b.dataset.word; opener = b;
+        $('#confirm-text').textContent = `Semua ${b.dataset.n} kiriman kata "${pending}" akan dihapus permanen dari awan harapan.`;
+        dlg.showModal(); $('#confirm-no').focus();
+      });
+      $('#confirm-no').addEventListener('click', () => dlg.close());
+      dlg.addEventListener('close', () => { if (opener && document.contains(opener)) opener.focus(); });
+      $('#confirm-yes').addEventListener('click', async () => {
+        const w = pending; dlg.close(); const am = $('#admin-msg');
+        try {
+          const n = await store.adminDelete(adminPin, w);
+          if (n === -1) setMsg(am, 'err', 'PIN tidak valid lagi. Silakan keluar dan masuk ulang.');
+          else if (n === -2) setMsg(am, 'err', 'Admin sedang terkunci karena terlalu banyak PIN salah.');
+          else { setMsg(am, 'ok', `Kata "${esc(w)}" dihapus (${n} kiriman).`); await adminLoad(); setMsg(am, 'ok', `Kata "${esc(w)}" dihapus (${n} kiriman).`); }
+        } catch { setMsg(am, 'err', 'Gagal menghapus. Coba lagi.'); }
+      });
+    }
+
+    /* ---------- Mode layar (?display=1) ---------- */
+    async function setupDisplay() {
+      document.body.classList.add('is-display');
+      const url = location.origin + location.pathname;
+      $('#qr-url').textContent = url.replace(/^https?:\/\//, '');
+      try {
+        await loadScript(QR_JS, QR_SRI);
+        const qr = window.qrcode(0, 'M'); qr.addData(url); qr.make();
+        $('#qr-box').innerHTML = qr.createSvgTag({ cellSize: 8, margin: 0, scalable: true, alt: 'Kode QR menuju ' + url });
+      } catch { $('#qr-box').textContent = url; }
+    }
+
+    /* ---------- Mulai ---------- */
+    async function start() {
+      syncThemeBtn();
+      if (DEMO) $('#badge-demo').hidden = false;
+      if (IS_DISPLAY) await setupDisplay();
+      if (myWord && !IS_DISPLAY) { lockForm(myWord); setMsg(msg, 'ok', `Kata "${esc(myWord)}" darimu sudah ada di awan harapan. Terima kasih!`); }
+      try { store = DEMO ? makeDemoStore() : await makeSupaStore(); }
+      catch { setMsg(msg, 'err', 'Gagal memuat layanan data. Muat ulang halaman, ya.'); return; }
+      if (IS_ADMIN) { setupAdmin(); return; }
+      try {
+        await Promise.race([
+          Promise.all([document.fonts.load(MASK_FONT(100)), document.fonts.load(WORD_FONT(40))]),
+          new Promise((r) => setTimeout(r, 3000))
+        ]);
+      } catch { /* pakai font cadangan */ }
+      updateStats();
+      await refresh();
+      store.subscribe(refreshSoon, (s) => { realtimeOk = s === 'SUBSCRIBED'; });
+      // polling cadangan: tiap POLL_MS bila realtime mati, tiap menit bila realtime hidup
+      setInterval(() => {
+        if (document.hidden) return;
+        const due = realtimeOk ? 60000 : POLL_MS;
+        if (Date.now() - lastPoll >= due - 50) refresh();
+      }, POLL_MS);
+      if (myWord && params.get('lihat') === '1') { highlightUntil = performance.now() + 6000; }
+    }
+    start();
+  })();
+  </script>
+</body>
+</html>
