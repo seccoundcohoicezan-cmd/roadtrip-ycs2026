@@ -7,6 +7,7 @@ Landing page **Youth Character Summit 2026**. Seluruh halaman ada di satu file s
 ```
 index.html        # HTML + CSS + JS dalam satu file
 assets/img/       # foto dokumentasi (WebP, versi 800px & 1600px)
+assets/img/bali/  # foto ikon Bali dari Wikimedia Commons (WebP, kredit di footer)
 assets/svg/       # ilustrasi & stiker Bali (hasil tools/gen-assets.py)
 tools/            # generator aset SVG
 ```
@@ -51,3 +52,7 @@ Sebelum izin ini diberikan, endpoint Web App menjawab HTTP 403 untuk pengunjung.
 Setelah aktif, lakukan satu uji nyata dengan data panitia, pastikan baris muncul dan unduh PNG berhasil. Jangan nyatakan integrasi aktif sebelum uji ini berhasil. Percobaan ulang pada halaman yang sama memakai ID yang sama sehingga respons hilang tidak menggandakan baris. Unduh ulang tanpa mengubah identitas/bingkai tidak menambah baris.
 
 Statistik Road to Bali dan daftar delegasi masih memakai data contoh berlabel; tidak dihitung dari Sheet pada revisi ini.
+
+## Foto Bali & performa
+
+Foto latar dan galeri "Ikon Bali" berasal dari Wikimedia Commons (CC BY / CC BY-SA); daftar kredit lengkap ada di footer ("Kredit foto Bali"). Latar section dimuat malas (`data-lazy-bg` → kelas `.is-bg` saat mendekati layar). HP memakai versi 720 px/potret, desktop 1440 px. Foto galeri dokumentasi punya varian 480/800/1600 px.

@@ -2,6 +2,18 @@ const SPREADSHEET_ID = '1SKSCKrg_Laux39Xdu1_99tIv_NsgiJcASi27mnVe5ME';
 const SHEET_NAME = 'Twibbon YCS 2026';
 const HEADERS = ['Waktu', 'ID permintaan', 'Nama', 'Sekolah', 'Email', 'Bingkai', 'Klik saluran WhatsApp', 'Persetujuan data', 'Sumber'];
 const REKAP_NAME = 'Rekap';
+const REKAP_VERSI = '2';
+
+// Pemisah argumen rumus mengikuti lokal spreadsheet: lokal desimal-koma (mis. id_ID) memakai ';'.
+function pemisah_(ss) {
+  const lokal = ss.getSpreadsheetLocale() || 'en_US';
+  return /^(en|ja|ko|zh|th|he|iw|hi|ms|fil|tl|sw|ur|bn|ta|te|ga|mt|cy|my|km|ne|si)(_|$)/.test(lokal) ? ',' : ';';
+}
+function rumus_(ss, teks) {
+  const s = pemisah_(ss);
+  // Ganti koma pemisah argumen saja; koma di dalam string "..." (teks QUERY) dibiarkan.
+  return teks.replace(/("[^"]*")|,/g, (m, str) => str || s);
+}
 
 // Jalankan sekali dari editor (pilih siapkanSheet → Jalankan) untuk memberi izin Google
 // dan membangun tab data + rekap. Aman dijalankan ulang; data yang ada tidak dihapus.
@@ -49,25 +61,37 @@ function siapkanTabRekap_(ss) {
     ['Total twibbon dibuat', '=COUNTA(' + d + 'B2:B)'],
     ['Email unik', '=COUNTUNIQUE(' + d + 'E2:E)'],
     ['Sekolah unik', '=COUNTUNIQUE(' + d + 'D2:D)'],
-    ['Hari ini', '=COUNTIFS(' + d + 'A2:A,">="&TODAY())'],
-    ['Bingkai Delegasi', '=COUNTIF(' + d + 'F2:F,"delegasi")'],
-    ['Bingkai YCS Squad', '=COUNTIF(' + d + 'F2:F,"squad")']
+    ['Hari ini', rumus_(ss, '=COUNTIFS(' + d + 'A2:A,">="&TODAY())')],
+    ['Bingkai Delegasi', rumus_(ss, '=COUNTIF(' + d + 'F2:F,"delegasi")')],
+    ['Bingkai YCS Squad', rumus_(ss, '=COUNTIF(' + d + 'F2:F,"squad")')]
   ];
-  sheet.getRange(4, 1, stats.length, 2).setValues(stats);
+  sheet.getRange(4, 1, stats.length, 1).setValues(stats.map(r => [r[0]]));
+  sheet.getRange(4, 2, stats.length, 1).setFormulas(stats.map(r => [r[1]]));
   sheet.getRange(4, 1, stats.length, 1).setFontWeight('bold');
   sheet.getRange(4, 2, stats.length, 1).setFontSize(14).setFontWeight('bold').setFontColor('#C2410C').setHorizontalAlignment('left');
   sheet.getRange('A12:B12').setValues([['Sekolah teratas', '']]).setFontWeight('bold').setFontColor('#FFFFFF').setBackground('#0E5A66');
-  sheet.getRange('A13').setFormula('=IFERROR(QUERY(' + d + 'D2:D,"select D, count(D) where D <> \'\' group by D order by count(D) desc limit 30 label D \'Sekolah\', count(D) \'Jumlah\'",0),"Belum ada data")');
+  sheet.getRange('A13').setFormula(rumus_(ss, '=IFERROR(QUERY(' + d + 'D2:D,"select D, count(D) where D <> \'\' group by D order by count(D) desc limit 30 label D \'Sekolah\', count(D) \'Jumlah\'",0),"Belum ada data")'));
   sheet.getRange('D12:E12').setValues([['Per hari', '']]).setFontWeight('bold').setFontColor('#FFFFFF').setBackground('#0E5A66');
-  sheet.getRange('D13').setFormula('=IFERROR(QUERY(' + d + 'A2:B,"select toDate(A), count(B) where B is not null group by toDate(A) order by toDate(A) desc label toDate(A) \'Tanggal\', count(B) \'Jumlah\'",0),"Belum ada data")');
+  sheet.getRange('D13').setFormula(rumus_(ss, '=IFERROR(QUERY(' + d + 'A2:B,"select toDate(A), count(B) where B is not null group by toDate(A) order by toDate(A) desc label toDate(A) \'Tanggal\', count(B) \'Jumlah\'",0),"Belum ada data")'));
   sheet.getRange('D14:D').setNumberFormat('dd/mm/yyyy');
   sheet.getRange('A13:E13').setFontWeight('bold');
   sheet.setColumnWidth(1, 260); sheet.setColumnWidth(2, 90); sheet.setColumnWidth(3, 24); sheet.setColumnWidth(4, 120); sheet.setColumnWidth(5, 90);
   sheet.setHiddenGridlines(true);
+  PropertiesService.getScriptProperties().setProperty('rekap_versi', REKAP_VERSI);
   return sheet;
 }
 
-function doGet() {
+function doGet(e) {
+  // ?aksi=perbarui-rekap membangun ulang tab Rekap sekali per versi kode (aman dipanggil publik).
+  if (e && e.parameter && e.parameter.aksi === 'perbarui-rekap') {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const perlu = PropertiesService.getScriptProperties().getProperty('rekap_versi') !== REKAP_VERSI;
+    if (perlu) siapkanTabRekap_(ss);
+    SpreadsheetApp.flush();
+    const nilai = ss.getSheetByName(REKAP_NAME).getRange('B4:B9').getDisplayValues().map(r => r[0]);
+    const atas = ss.getSheetByName(REKAP_NAME).getRange('A13:D13').getDisplayValues()[0];
+    return json_({ok: true, dibangunUlang: perlu, lokal: ss.getSpreadsheetLocale(), adaError: nilai.concat(atas).some(v => /^#/.test(v))});
+  }
   return json_({ok: true, service: 'YCS 2026 Twibbon'});
 }
 function json_(data) {
