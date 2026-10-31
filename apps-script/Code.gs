@@ -4,7 +4,7 @@ const HEADERS_LAMA = ['Waktu', 'ID permintaan', 'Nama', 'Sekolah', 'Email', 'Bin
 const HEADERS = HEADERS_LAMA.concat(['Kota/Kabupaten', 'Provinsi']);
 const REKAP_NAME = 'Rekap';
 const REKAP_VERSI = '3';
-const SKEMA_VERSI = '2';
+const SKEMA_VERSI = '3';
 const WIB = 7 * 3600 * 1000;
 
 const TAB = {
@@ -42,9 +42,15 @@ const PENGATURAN = [
   ['dana_tampilkan_sisa', 'YA', 'YA = tampilkan "Tersisa N" di halaman.'],
   ['dana_teks_tutup', 'Form akan dibuka saat panitia mengumumkannya lewat live dan saluran WhatsApp YCS. Simpan halaman ini, ya!', 'Teks saat form Dana Kaget belum dibuka / dinonaktifkan.'],
   ['dana_teks_habis', 'Kuota Dana Kaget kali ini sudah terpenuhi. Terima kasih sudah antusias! Pantau live YCS berikutnya, siapa tahu ada kesempatan lagi.', 'Teks saat kuota habis.'],
-  ['dana_teks_sukses', 'Panitia akan menghubungimu lewat WhatsApp atau email. Pastikan nomormu aktif.', 'Teks setelah pengajuan berhasil.']
+  ['dana_teks_sukses', 'Panitia akan menghubungimu lewat WhatsApp atau email. Pastikan nomormu aktif.', 'Teks setelah pengajuan berhasil.'],
+  ['popup_aktif', 'TIDAK', 'YA = tampilkan pop-up informasi di beranda (sekali per isi; tampil lagi bila isinya diubah).'],
+  ['popup_judul', '', 'Judul pop-up.'],
+  ['popup_teks', '', 'Isi singkat pop-up.'],
+  ['popup_gambar', '', 'Opsional: URL gambar https (rasio 16:9).'],
+  ['popup_tombol', 'Lihat selengkapnya', 'Teks tombol.'],
+  ['popup_link', '', 'Tujuan saat pop-up/tombol diklik: link https://, halaman situs (mis. /klaim/), atau bagian (#live).']
 ];
-const KUNCI_YA_TIDAK = ['pakai_link_cadangan', 'klaim_aktif', 'survei_aktif', 'dana_aktif', 'dana_tampilkan_sisa'];
+const KUNCI_YA_TIDAK = ['pakai_link_cadangan', 'klaim_aktif', 'survei_aktif', 'dana_aktif', 'dana_tampilkan_sisa', 'popup_aktif'];
 const KUNCI_WAKTU = ['waktu_pengumuman', 'klaim_berlaku_hingga', 'survei_buka'];
 const KUNCI_ANGKA = ['road_target', 'road_tambahan', 'dana_kuota'];
 const LIVE_AWAL = [
@@ -317,7 +323,8 @@ function konfigPublik_() {
     survei: {aktif: ya_(cfg.survei_aktif), buka: isNaN(surveiBuka) ? null : isoWib_(surveiBuka)},
     dana: {aktif: danaAktif && dana.sisa > 0, saklar: danaAktif, penuh: dana.sisa <= 0, sisa: ya_(cfg.dana_tampilkan_sisa) ? dana.sisa : null, kuota: ya_(cfg.dana_tampilkan_sisa) ? dana.kuota : null,
       teksTutup: cfg.dana_teks_tutup || '', teksHabis: cfg.dana_teks_habis || '', teksSukses: cfg.dana_teks_sukses || ''},
-    event: {nama: cfg.nama_event || '', link: cfg.link_event || ''}
+    event: {nama: cfg.nama_event || '', link: cfg.link_event || ''},
+    popup: ya_(cfg.popup_aktif) && cfg.popup_judul ? {aktif: true, judul: cfg.popup_judul, teks: cfg.popup_teks || '', gambar: cfg.popup_gambar || '', tombol: cfg.popup_tombol || '', link: cfg.popup_link || ''} : {aktif: false}
   };
 }
 function statistik_() {
@@ -600,6 +607,8 @@ function admin_(p) {
         if (KUNCI_WAKTU.indexOf(k) >= 0 && v) { const t = waktu_(v); if (isNaN(t)) { salah.push(k); return; } v = teksWib_(t); }
         if (KUNCI_ANGKA.indexOf(k) >= 0) { if (!/^\d{1,9}$/.test(v)) { salah.push(k); return; } }
         if (/^link/.test(k) && v && !/^https:\/\/\S+$/.test(v)) { salah.push(k); return; }
+        if (k === 'popup_gambar' && v && !/^https:\/\/\S+$/.test(v)) { salah.push(k); return; }
+        if (k === 'popup_link' && v && !/^(https:\/\/\S+|\/[\w\-\/?=&#.%]*|#[\w-]+)$/.test(v)) { salah.push(k); return; }
         const i = rows.findIndex(r => r[0] === k);
         if (i >= 0) sheet.getRange(i + 2, 2).setNumberFormat('@').setValue(v);
         else sheet.appendRow([k, v, '']);

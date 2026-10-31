@@ -151,7 +151,7 @@
       color: var(--text);
       background: var(--bg);
       overflow-x: hidden;
-      padding-bottom: 5.5rem; /* ruang untuk action bar */
+      padding-bottom: 6rem; /* ruang untuk tombol menu cepat */
     }
     img, svg, video, canvas { display: block; max-width: 100%; }
     img { height: auto; }
@@ -1049,43 +1049,64 @@
     .credits summary { cursor: pointer; font-weight: 700; color: #fff; min-height: 2.75rem; display: flex; align-items: center; }
     .credits p { font-size: .8125rem; }
 
-    /* ============ Action bar ============ */
-    .action-bar {
-      position: fixed; z-index: 40; left: 0; right: 0; bottom: 0;
-      padding: var(--space-2) var(--space-2) calc(var(--space-2) + env(safe-area-inset-bottom));
-      background: color-mix(in srgb, var(--surface) 94%, transparent);
-      backdrop-filter: blur(10px);
-      border-top: 1px solid var(--line);
-      box-shadow: 0 -8px 24px -12px rgb(8 44 51 / .25);
-      transition: transform 300ms var(--ease);
-    }
-    .action-bar.is-hidden { transform: translateY(110%); }
-    .action-bar__inner { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); align-items: stretch; }
-    .action-bar__btn {
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .125rem;
-      min-height: 3.25rem; padding: .375rem .5rem; border-radius: var(--radius);
-      text-decoration: none; font-weight: 800; font-size: .8125rem; line-height: 1.15; text-align: center;
-      transition: transform var(--dur) var(--ease), background-color var(--dur) var(--ease);
-    }
-    .action-bar__btn:hover { transform: translateY(-2px); }
-    .action-bar__btn svg { width: 1.25rem; height: 1.25rem; }
-    .action-bar__btn small { display: none; font-weight: 600; font-size: .75rem; opacity: .9; }
-    .action-bar__btn--tw { background: var(--yellow-400); color: var(--teal-950); }
-    .action-bar__btn--squad { background: var(--cta); color: #fff; }
-    .action-bar__btn--squad:hover { background: var(--cta-hover); }
-    .action-bar__btn--live { background: var(--surface-soft); color: var(--primary); border: 1px solid var(--line); }
-    .action-bar__close { display: none; }
+    /* ============ Pusat energi: tombol bulat dengan 4 menu cepat ============ */
+    .orb { position: fixed; z-index: 45; right: max(1rem, env(safe-area-inset-right)); bottom: calc(1rem + env(safe-area-inset-bottom)); width: 4.25rem; height: 4.25rem; }
+    .orb__core { position: relative; z-index: 2; display: grid; place-items: center; width: 100%; height: 100%; border: 0; border-radius: 50%; cursor: pointer; color: var(--teal-950);
+      background: radial-gradient(circle at 35% 30%, #FFF3CC 0, var(--yellow-400) 38%, var(--orange-500) 100%);
+      box-shadow: 0 0 0 4px rgb(255 255 255 / .9), 0 14px 32px -8px rgb(234 88 12 / .7), inset 0 -6px 12px rgb(154 52 18 / .35);
+      transition: transform 300ms var(--ease), box-shadow 300ms var(--ease); }
+    .orb__core:hover { transform: scale(1.06); }
+    .orb__core svg { width: 1.875rem; height: 1.875rem; transition: transform 400ms var(--ease), opacity 200ms var(--ease); }
+    .orb__core .orb__x { position: absolute; opacity: 0; transform: rotate(-90deg); }
+    .orb.is-open .orb__core .orb__bolt { opacity: 0; transform: rotate(90deg) scale(.6); }
+    .orb.is-open .orb__core .orb__x { opacity: 1; transform: none; }
+    .orb.is-open .orb__core { transform: rotate(0) scale(.92); }
+    /* Cincin energi berdenyut */
+    .orb::before, .orb::after { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: 50%; border: 2px solid var(--orange-400); opacity: 0; animation: denyut 2.6s ease-out infinite; pointer-events: none; }
+    .orb::after { animation-delay: 1.3s; }
+    .orb.is-open::before, .orb.is-open::after { animation: none; }
+    @keyframes denyut { 0% { transform: scale(1); opacity: .7; } 100% { transform: scale(1.9); opacity: 0; } }
+    .orb__hint { position: absolute; right: calc(100% + .75rem); top: 50%; translate: 0 -50%; z-index: 2; white-space: nowrap; padding: .375rem .75rem; border-radius: var(--radius-pill); background: var(--teal-950); color: #fff; font-size: .8125rem; font-weight: 700; box-shadow: var(--shadow); transition: opacity 300ms var(--ease); pointer-events: none; }
+    .orb.is-open .orb__hint, .orb.is-seen .orb__hint { opacity: 0; }
+    .orb__menu { list-style: none; position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+    .orb__item { position: absolute; left: 50%; top: 50%; translate: -50% -50%; opacity: 0; transform: scale(.3); transition: transform 380ms cubic-bezier(.2, 1.3, .4, 1), opacity 220ms var(--ease); transition-delay: calc(var(--i) * 40ms); }
+    .orb.is-open .orb__menu { pointer-events: auto; }
+    .orb.is-open .orb__item { opacity: 1; transform: translate(var(--x), var(--y)); }
+    .orb__item:nth-child(1) { --i: 0; --x: -7.25rem; --y: 0; }
+    .orb__item:nth-child(2) { --i: 1; --x: -6.28rem; --y: -3.63rem; }
+    .orb__item:nth-child(3) { --i: 2; --x: -3.63rem; --y: -6.28rem; }
+    .orb__item:nth-child(4) { --i: 3; --x: 0; --y: -7.25rem; }
+    .orb__link { position: relative; display: grid; place-items: center; width: 3.5rem; height: 3.5rem; border-radius: 50%; color: #fff; text-decoration: none; box-shadow: 0 10px 22px -8px rgb(8 44 51 / .6); transition: transform var(--dur) var(--ease); }
+    .orb__link:hover { transform: scale(1.1); }
+    .orb__link svg { width: 1.5rem; height: 1.5rem; }
+    .orb__item--tw .orb__link { background: linear-gradient(135deg, var(--yellow-400), #F59E0B); color: var(--teal-950); }
+    .orb__item--live .orb__link { background: linear-gradient(135deg, #EF4444, #B91C1C); }
+    .orb__item--dana .orb__link { background: linear-gradient(135deg, var(--orange-500), var(--orange-700)); }
+    .orb__item--wild .orb__link { background: linear-gradient(135deg, var(--teal-600), var(--teal-900)); }
+    .orb__label { position: absolute; display: grid; white-space: nowrap; padding: .3rem .625rem; border-radius: .625rem; background: var(--surface); color: var(--text); font-size: .8125rem; font-weight: 800; line-height: 1.2; box-shadow: var(--shadow); pointer-events: none; }
+    .orb__label small { font-size: .6875rem; font-weight: 600; color: var(--text-muted); }
+    .orb__item:nth-child(-n+3) .orb__label { right: calc(100% + .5rem); top: 50%; translate: 0 -50%; text-align: right; }
+    .orb__item:nth-child(4) .orb__label { bottom: calc(100% + .5rem); right: -.25rem; text-align: right; }
+    .orb__live-dot { position: absolute; top: .125rem; right: .125rem; width: .75rem; height: .75rem; border-radius: 50%; background: #fff; border: 2px solid #DC2626; animation: pulse 1.4s infinite; }
+    .orb-backdrop { position: fixed; inset: 0; z-index: 44; background: radial-gradient(circle at calc(100% - 3rem) calc(100% - 3rem), rgb(8 44 51 / .35), rgb(8 44 51 / .7)); backdrop-filter: blur(3px); opacity: 0; pointer-events: none; transition: opacity 300ms var(--ease); }
+    .orb-backdrop.is-on { opacity: 1; pointer-events: auto; }
+    @media (prefers-reduced-motion: reduce) { .orb::before, .orb::after { display: none; } }
 
-    @media (min-width: 48rem) {
-      body { padding-bottom: 6.5rem; }
-      .action-bar { left: 50%; right: auto; bottom: var(--space-4); width: min(100% - 2rem, 56rem); translate: -50% 0; border-radius: var(--radius-lg); border: 1px solid var(--line); padding: var(--space-2); }
-      .action-bar.is-hidden { transform: translateY(calc(100% + 2rem)); }
-      .action-bar__inner { grid-template-columns: 1fr 1fr auto; }
-      .action-bar__btn { flex-direction: row; gap: var(--space-3); text-align: left; justify-content: flex-start; padding: .5rem 1rem; font-size: .9375rem; }
-      .action-bar__btn small { display: block; }
-      .action-bar__btn span { display: grid; }
-      .action-bar__close { display: inline-grid; align-self: center; }
-    }
+    /* ============ Pop-up informasi (diatur dari admin) ============ */
+    .info-pop { width: min(100% - 2rem, 26rem); padding: 0; border: 0; border-radius: 1.5rem; overflow: hidden; background: var(--surface); color: var(--text); box-shadow: 0 40px 80px -24px rgb(8 44 51 / .6); }
+    .info-pop[open] { animation: muncul-pop .35s cubic-bezier(.2, 1.2, .4, 1); }
+    @keyframes muncul-pop { from { opacity: 0; transform: translateY(24px) scale(.95); } }
+    .info-pop::backdrop { background: rgb(8 44 51 / .6); backdrop-filter: blur(3px); }
+    .info-pop__img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--surface-soft); }
+    .info-pop__img[hidden] { display: none; }
+    .info-pop__body { display: grid; gap: var(--space-3); padding: var(--space-5); }
+    .info-pop__badge { justify-self: start; padding: .25rem .625rem; border-radius: var(--radius-pill); background: var(--yellow-100); color: #7A4A00; font-size: .75rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+    .info-pop h2 { font-size: 1.375rem; }
+    .info-pop p { color: var(--text-muted); white-space: pre-line; }
+    .info-pop__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-2); }
+    .info-pop__actions .btn--cta { flex: 1; }
+    .info-pop__close { position: absolute; top: .625rem; right: .625rem; background: rgb(255 255 255 / .9); color: var(--teal-950); }
+    @media (max-width: 30rem) { .info-pop { margin-bottom: 0; width: 100%; max-width: 100%; border-radius: 1.5rem 1.5rem 0 0; } }
 
     /* ============ Toast ============ */
     .toast {
@@ -2083,29 +2104,34 @@
   </footer>
 
   <!-- ========== ACTION BAR ========== -->
-  <nav class="action-bar is-hidden" id="action-bar" aria-label="Aksi cepat">
-    <div class="action-bar__inner">
-      <a class="action-bar__btn action-bar__btn--tw" href="#delegasi" data-fase="pasca">
-        <svg aria-hidden="true"><use href="#i-search"/></svg>
-        <span>Cari Finalis<small>Siapa saja yang lolos?</small></span>
-      </a>
-      <a class="action-bar__btn action-bar__btn--live" href="klaim/" data-fase="pasca">
-        <svg aria-hidden="true"><use href="#i-ticket"/></svg>
-        <span>Klaim Tiket<small>Untuk yang belum lolos</small></span>
-      </a>
-      <a class="action-bar__btn action-bar__btn--tw" href="#twibbon" data-fase="pra">
-        <svg aria-hidden="true"><use href="#i-image"/></svg>
-        <span>Twibbon<small>Yuk buat sekarang!</small></span>
-      </a>
-      <a class="action-bar__btn action-bar__btn--live" href="#live" data-fase="pra">
-        <svg aria-hidden="true"><use href="#i-play"/></svg>
-        <span>Tonton Live<small>Jangan sampai ketinggalan</small></span>
-      </a>
-      <button class="icon-btn action-bar__close" type="button" id="action-bar-close" aria-label="Sembunyikan bilah aksi cepat">
-        <svg aria-hidden="true"><use href="#i-chevron-down"/></svg>
-      </button>
-    </div>
+  <div class="orb-backdrop" id="orb-backdrop" hidden></div>
+  <nav class="orb" id="orb" aria-label="Menu cepat">
+    <span class="orb__hint" aria-hidden="true">Menu cepat</span>
+    <ul class="orb__menu" id="orb-menu">
+      <li class="orb__item orb__item--tw"><a class="orb__link" href="#twibbon" tabindex="-1"><svg aria-hidden="true"><use href="#i-image"/></svg><span class="orb__label">Twibbon<small>Buat sekarang</small></span></a></li>
+      <li class="orb__item orb__item--live"><a class="orb__link" href="#live" id="orb-live" tabindex="-1"><svg aria-hidden="true"><use href="#i-play"/></svg><span class="orb__label">Tonton Live<small id="orb-live-sub">Jadwal siaran</small></span></a></li>
+      <li class="orb__item orb__item--dana"><a class="orb__link" href="dana-kaget/" tabindex="-1"><svg aria-hidden="true"><use href="#i-gift"/></svg><span class="orb__label">Klaim Dana Kaget<small id="orb-dana-sub">Pakai kode akses</small></span></a></li>
+      <li class="orb__item orb__item--wild"><a class="orb__link" href="klaim/" tabindex="-1"><svg aria-hidden="true"><use href="#i-ticket"/></svg><span class="orb__label">Klaim Wildcard<small id="orb-wild-sub">Untuk yang belum lolos</small></span></a></li>
+    </ul>
+    <button class="orb__core" type="button" id="orb-core" aria-expanded="false" aria-controls="orb-menu" aria-label="Buka menu cepat: Twibbon, Tonton Live, Klaim Dana Kaget, Klaim Wildcard">
+      <svg class="orb__bolt" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M13.2 2.5 5 13.2h5.6L9.8 21.5 18 10.8h-5.6l.8-8.3Z"/></svg>
+      <svg class="orb__x" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
   </nav>
+
+  <dialog class="info-pop" id="info-pop" aria-labelledby="info-pop-title">
+    <a id="info-pop-img-link" href="#" tabindex="-1" aria-hidden="true"><img class="info-pop__img" id="info-pop-img" alt="" width="800" height="450" hidden></a>
+    <div class="info-pop__body">
+      <span class="info-pop__badge">Info YCS</span>
+      <h2 id="info-pop-title"></h2>
+      <p id="info-pop-text"></p>
+      <div class="info-pop__actions">
+        <a class="btn btn--cta" id="info-pop-cta" href="#">Lihat</a>
+        <button class="btn btn--ghost" type="button" data-pop-close>Nanti saja</button>
+      </div>
+    </div>
+    <button class="icon-btn info-pop__close" type="button" data-pop-close aria-label="Tutup informasi"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </dialog>
 
   <dialog class="kode-dialog" id="kode-dialog" aria-labelledby="kode-title">
     <form id="kode-form" novalidate>
@@ -2376,6 +2402,7 @@
       }
       if (Array.isArray(cfg.live)) bangunLive(cfg.live);
       terapkanPromo();
+      if (typeof syncOrb === 'function') syncOrb();
     }
     function terapkanPromo() {
       if (!cfg) return;
@@ -3239,16 +3266,73 @@
       lazyBgs.forEach((el) => bgIo.observe(el));
     } else lazyBgs.forEach((el) => el.classList.add('is-bg'));
 
-    /* ---------- Action bar ---------- */
-    const bar = $('#action-bar');
-    let barDismissed = false;
-    const hero = $('#beranda');
-    const footer = $('.site-footer');
-    let heroVisible = true, footerVisible = false;
-    const syncBar = () => bar.classList.toggle('is-hidden', barDismissed || heroVisible || footerVisible);
-    new IntersectionObserver(([e]) => { heroVisible = e.isIntersecting; syncBar(); }, { rootMargin: '0px 0px -40% 0px' }).observe(hero);
-    new IntersectionObserver(([e]) => { footerVisible = e.isIntersecting; syncBar(); }).observe(footer);
-    $('#action-bar-close').addEventListener('click', () => { barDismissed = true; syncBar(); toast('Bilah aksi cepat disembunyikan.'); });
+    /* ---------- Pusat energi (menu cepat bulat) ---------- */
+    const orb = $('#orb'), orbCore = $('#orb-core'), orbBg = $('#orb-backdrop');
+    const orbLinks = $$('.orb__link');
+    function setOrb(open, fokus) {
+      orb.classList.toggle('is-open', open);
+      orbCore.setAttribute('aria-expanded', String(open));
+      orbCore.setAttribute('aria-label', open ? 'Tutup menu cepat' : 'Buka menu cepat: Twibbon, Tonton Live, Klaim Dana Kaget, Klaim Wildcard');
+      orbBg.hidden = false;
+      orbBg.classList.toggle('is-on', open);
+      orbLinks.forEach((a) => { a.tabIndex = open ? 0 : -1; });
+      if (open) { orb.classList.add('is-seen'); if (fokus) orbLinks[0].focus(); }
+    }
+    orbCore.addEventListener('click', (e) => setOrb(!orb.classList.contains('is-open'), e.detail === 0));
+    orbBg.addEventListener('click', () => setOrb(false));
+    orbLinks.forEach((a) => a.addEventListener('click', () => setOrb(false)));
+    orb.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && orb.classList.contains('is-open')) { setOrb(false); orbCore.focus(); }
+    });
+    setTimeout(() => orb.classList.add('is-seen'), 6000);
+    // Keterangan kecil di tiap menu mengikuti status dari admin.
+    function syncOrb() {
+      if (!cfg) return;
+      const nowMs = now();
+      const liveSekarang = (cfg.live || []).find((l) => nowMs >= Date.parse(l.mulai) && nowMs < Date.parse(l.selesai));
+      const liveBerikut = (cfg.live || []).find((l) => Date.parse(l.mulai) > nowMs);
+      const liveA = $('#orb-live');
+      liveA.querySelector('.orb__live-dot')?.remove();
+      if (liveSekarang) {
+        $('#orb-live-sub').textContent = 'Sedang live!';
+        liveA.href = liveSekarang.link; liveA.target = '_blank'; liveA.rel = 'noopener';
+        liveA.insertAdjacentHTML('beforeend', '<span class="orb__live-dot" aria-hidden="true"></span>');
+      } else {
+        $('#orb-live-sub').textContent = liveBerikut ? fmtHari.format(new Date(liveBerikut.mulai)) : 'Jadwal siaran';
+        liveA.href = '#live'; liveA.removeAttribute('target');
+      }
+      $('#orb-dana-sub').textContent = !cfg.dana.saklar ? 'Belum dibuka' : cfg.dana.penuh ? 'Kuota habis' : cfg.dana.sisa != null ? `Tersisa ${nf.format(cfg.dana.sisa)}` : 'Pakai kode akses';
+      $('#orb-wild-sub').textContent = nowMs < target ? 'Dibuka ' + fmtTglPendek.format(new Date(target)) : 'Untuk yang belum lolos';
+    }
+
+    /* ---------- Pop-up informasi ---------- */
+    // Muncul sekali per isi pop-up; bila panitia mengubah isinya, pop-up tampil lagi.
+    const pop = $('#info-pop');
+    let popKunci = '';
+    function tampilPopup() {
+      const d = cfg && cfg.popup;
+      if (!d || !d.aktif || !d.judul || !pop.showModal) return;
+      popKunci = [d.judul, d.teks, d.link, d.gambar].join('|');
+      try { if (localStorage.getItem('ycs_popup') === popKunci) return; } catch (e) {}
+      const luar = /^https?:/i.test(d.link || '');
+      const link = d.link || '#';
+      $('#info-pop-title').textContent = d.judul;
+      $('#info-pop-text').textContent = d.teks || '';
+      const cta = $('#info-pop-cta');
+      cta.textContent = d.tombol || 'Lihat selengkapnya';
+      cta.hidden = !d.link;
+      [cta, $('#info-pop-img-link')].forEach((a) => { a.href = link; if (luar) { a.target = '_blank'; a.rel = 'noopener'; } });
+      const img = $('#info-pop-img');
+      img.hidden = !d.gambar;
+      if (d.gambar) img.src = d.gambar;
+      setTimeout(() => { if (!document.querySelector('dialog[open]')) pop.showModal(); }, 1500);
+    }
+    const tutupPopup = () => { try { localStorage.setItem('ycs_popup', popKunci); } catch (e) {} pop.close(); };
+    $$('[data-pop-close]', pop).forEach((b) => b.addEventListener('click', tutupPopup));
+    [$('#info-pop-cta'), $('#info-pop-img-link')].forEach((a) => a.addEventListener('click', () => { try { localStorage.setItem('ycs_popup', popKunci); } catch (e) {} pop.close(); }));
+    pop.addEventListener('cancel', () => { try { localStorage.setItem('ycs_popup', popKunci); } catch (e) {} });
+    pop.addEventListener('click', (e) => { if (e.target === pop) tutupPopup(); });
+    Promise.all([ambilConfig(), offsetReady]).then(() => { syncOrb(); tampilPopup(); setInterval(syncOrb, 30000); });
   })();
   </script>
 </body>

@@ -78,7 +78,7 @@ Beranda berganti otomatis berdasarkan **jam server** (`/api/now` + `waktu_pengum
 
 | Tab | Isi |
 |---|---|
-| Pengaturan | `waktu_pengumuman`, link live utama/cadangan, `link_event`, target Road to Bali, saklar klaim/survei/Dana Kaget, kode akses & kuota Dana Kaget |
+| Pengaturan | pop-up informasi (`popup_*`), `waktu_pengumuman`, link live utama/cadangan, `link_event`, target Road to Bali, saklar klaim/survei/Dana Kaget, kode akses & kuota Dana Kaget |
 | Jadwal Live | judul, platform, mulai/selesai (WIB), link, link cadangan, tampil |
 | Finalis | nama, sekolah, kota, provinsi, jalur, foto (URL https; link Google Drive otomatis diubah ke gambar) |
 | Kode Wildcard | kode, email, nama, status (`belum klaim`/`sudah klaim`/`hangus`), berlaku hingga, waktu klaim, percobaan salah |
