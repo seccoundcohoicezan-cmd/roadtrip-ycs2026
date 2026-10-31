@@ -62,12 +62,20 @@
     .kv dt { color: var(--text-muted); }
     .kv dd { margin: 0; font-weight: 700; text-align: right; overflow-wrap: anywhere; }
 
-    .set-group { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--space-5); }
-    .set-group + .set-group { margin-top: var(--space-4); }
-    .set-group legend { font-weight: 800; font-size: 1.0625rem; padding: 0 .25rem; }
-    .set-grid { display: grid; gap: var(--space-4); margin-top: var(--space-3); }
+    .set-card { background: var(--surface); border: 1px solid var(--line); border-radius: 1.25rem; padding: clamp(1rem, 3vw, 1.75rem); box-shadow: var(--shadow-sm); }
+    .set-card + .set-card { margin-top: var(--space-4); }
+    .set-card__head { display: flex; gap: var(--space-3); align-items: center; padding-bottom: var(--space-4); margin-bottom: var(--space-4); border-bottom: 1px solid var(--line); }
+    .set-card__head h2 { font-size: 1.125rem; }
+    .set-card__head p { font-size: .875rem; color: var(--text-muted); }
+    .set-card__icon { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; flex: none; border-radius: .875rem; background: var(--yellow-100); color: var(--orange-700); }
+    .set-card__icon svg { width: 1.25rem; height: 1.25rem; }
+    .field--full { grid-column: 1 / -1; }
+    .input--mono { font-family: var(--font-mono); letter-spacing: .1em; text-transform: uppercase; }
+    .textarea { min-height: 4.5rem; resize: vertical; line-height: 1.5; }
+    .set-grid { display: grid; gap: var(--space-4); align-items: start; }
     @media (min-width: 48rem) { .set-grid { grid-template-columns: 1fr 1fr; } }
-    .switch { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); min-height: 48px; padding: .5rem .875rem; border: 1.5px solid var(--line); border-radius: var(--radius); cursor: pointer; }
+    .switch { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); min-height: 4.5rem; padding: .625rem 1rem; border: 1.5px solid transparent; border-radius: var(--radius); background: var(--surface-soft); cursor: pointer; transition: border-color var(--dur) var(--ease); }
+    .switch:hover { border-color: var(--line); }
     .switch input { appearance: none; width: 3rem; height: 1.75rem; border-radius: var(--radius-pill); background: var(--line); position: relative; cursor: pointer; transition: background var(--dur) var(--ease); flex: none; margin: 0; }
     .switch input::after { content: ""; position: absolute; top: .1875rem; left: .1875rem; width: 1.375rem; height: 1.375rem; border-radius: 50%; background: #fff; box-shadow: var(--shadow-sm); transition: transform var(--dur) var(--ease); }
     .switch input:checked { background: var(--success); }
@@ -112,6 +120,8 @@
     <symbol id="i-upload" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 16V4m-5 5 5-5 5 5M4 20h16"/></symbol>
     <symbol id="i-download" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 3v12m-5-5 5 5 5-5M4 21h16"/></symbol>
     <symbol id="i-plus" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-ticket" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M3 7.5A1.5 1.5 0 0 1 4.5 6h15A1.5 1.5 0 0 1 21 7.5V10a2 2 0 0 0 0 4v2.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 16.5V14a2 2 0 0 0 0-4Z"/></symbol>
+    <symbol id="i-gift" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9M12 8v13M12 8S10.5 3 8 3a2.5 2.5 0 0 0 0 5M12 8s1.5-5 4-5a2.5 2.5 0 0 1 0 5"/></g></symbol>
     <symbol id="i-trash" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13"/></symbol>
   </svg>
 
@@ -188,42 +198,45 @@
         <section role="tabpanel" id="p-pengaturan" aria-labelledby="t-pengaturan" tabindex="0" hidden>
           <div class="content__head"><div><h1>Pengaturan</h1><p class="muted small">Waktu dalam WIB. Perubahan tampil di situs dalam ±1 menit.</p></div></div>
           <form id="f-set" novalidate>
-            <fieldset class="set-group">
-              <legend>Pengumuman &amp; live</legend>
+            <section class="set-card" aria-labelledby="g-umum">
+              <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-play"/></svg></span><div><h2 id="g-umum">Pengumuman &amp; live</h2><p>Jadwal reveal dan link siaran.</p></div></header>
               <div class="set-grid">
-                <div class="field"><label for="s-waktu_pengumuman">Waktu pengumuman (WIB)</label><input class="input" type="datetime-local" id="s-waktu_pengumuman" data-key="waktu_pengumuman" data-type="waktu" required><p class="field__hint">Countdown, reveal finalis, dan pembukaan klaim mengikuti waktu ini.</p></div>
+                <div class="field"><label for="s-waktu_pengumuman">Waktu pengumuman (WIB)</label><input class="input" type="datetime-local" id="s-waktu_pengumuman" data-key="waktu_pengumuman" data-type="waktu" required><p class="field__hint">Countdown, reveal finalis, klaim, dan survei mengikuti waktu ini.</p></div>
                 <label class="switch" for="s-pakai_link_cadangan"><span>Pakai link cadangan<small>Nyalakan bila live utama bermasalah.</small></span><input type="checkbox" id="s-pakai_link_cadangan" data-key="pakai_link_cadangan" data-type="bool"></label>
                 <div class="field"><label for="s-link_live">Link live utama</label><input class="input" type="url" id="s-link_live" data-key="link_live" placeholder="https://"></div>
                 <div class="field"><label for="s-link_live_cadangan">Link live cadangan</label><input class="input" type="url" id="s-link_live_cadangan" data-key="link_live_cadangan" placeholder="https://"></div>
               </div>
-            </fieldset>
-            <fieldset class="set-group">
-              <legend>Klaim wildcard</legend>
+            </section>
+            <section class="set-card" aria-labelledby="g-dana">
+              <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-gift"/></svg></span><div><h2 id="g-dana">Dana Kaget</h2><p>Saklar, kode akses, kuota, dan teks yang dilihat peserta.</p></div></header>
+              <div class="set-grid">
+                <label class="switch" for="s-dana_aktif"><span>Form Dana Kaget aktif<small>Mati = peserta melihat teks "belum dibuka".</small></span><input type="checkbox" id="s-dana_aktif" data-key="dana_aktif" data-type="bool"></label>
+                <label class="switch" for="s-dana_tampilkan_sisa"><span>Tampilkan "Tersisa N"<small>Indikator sisa kuota di halaman.</small></span><input type="checkbox" id="s-dana_tampilkan_sisa" data-key="dana_tampilkan_sisa" data-type="bool"></label>
+                <div class="field"><label for="s-dana_kode_akses">Kode akses</label><input class="input input--mono" id="s-dana_kode_akses" data-key="dana_kode_akses" maxlength="40" autocomplete="off"><p class="field__hint">Peserta memasukkannya lewat tombol <strong>Punya kode?</strong> di menu situs atau di halaman /dana-kaget.</p></div>
+                <div class="field"><label for="s-dana_kuota">Kuota pengajuan</label><input class="input" type="number" min="0" step="1" id="s-dana_kuota" data-key="dana_kuota" data-type="angka"><p class="field__hint" id="dana-terpakai"></p></div>
+                <div class="field field--full"><label for="s-dana_teks_tutup">Teks saat form belum dibuka / dimatikan</label><textarea class="input textarea" id="s-dana_teks_tutup" data-key="dana_teks_tutup" maxlength="400" rows="2"></textarea></div>
+                <div class="field field--full"><label for="s-dana_teks_habis">Teks saat kuota habis <span class="opt">(judul: "Dana sudah habis")</span></label><textarea class="input textarea" id="s-dana_teks_habis" data-key="dana_teks_habis" maxlength="400" rows="2"></textarea></div>
+                <div class="field field--full"><label for="s-dana_teks_sukses">Teks setelah pengajuan berhasil <span class="opt">(judul: "Pengajuan diterima!")</span></label><textarea class="input textarea" id="s-dana_teks_sukses" data-key="dana_teks_sukses" maxlength="400" rows="2"></textarea></div>
+              </div>
+            </section>
+            <section class="set-card" aria-labelledby="g-klaim">
+              <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-ticket"/></svg></span><div><h2 id="g-klaim">Klaim wildcard</h2><p>Tiket untuk peserta yang belum lolos.</p></div></header>
               <div class="set-grid">
                 <label class="switch" for="s-klaim_aktif"><span>Klaim aktif<small>Halaman /klaim tetap tertutup sebelum waktu pengumuman.</small></span><input type="checkbox" id="s-klaim_aktif" data-key="klaim_aktif" data-type="bool"></label>
                 <div class="field"><label for="s-klaim_berlaku_hingga">Kode berlaku sampai (WIB)</label><input class="input" type="datetime-local" id="s-klaim_berlaku_hingga" data-key="klaim_berlaku_hingga" data-type="waktu"></div>
                 <div class="field"><label for="s-nama_event">Nama event berikutnya</label><input class="input" id="s-nama_event" data-key="nama_event" maxlength="120"></div>
                 <div class="field"><label for="s-link_event">Link event <span class="opt">(kosong = Coming Soon)</span></label><input class="input" type="url" id="s-link_event" data-key="link_event" placeholder="https://"></div>
               </div>
-            </fieldset>
-            <fieldset class="set-group">
-              <legend>Dana Kaget</legend>
+            </section>
+            <section class="set-card" aria-labelledby="g-road">
+              <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-grid"/></svg></span><div><h2 id="g-road">Road to Bali &amp; survei</h2><p>Fitur pendukung.</p></div></header>
               <div class="set-grid">
-                <label class="switch" for="s-dana_aktif"><span>Form Dana Kaget aktif<small>Saklar utama.</small></span><input type="checkbox" id="s-dana_aktif" data-key="dana_aktif" data-type="bool"></label>
-                <label class="switch" for="s-dana_tampilkan_sisa"><span>Tampilkan "Tersisa N"<small>Indikator sisa kuota di halaman.</small></span><input type="checkbox" id="s-dana_tampilkan_sisa" data-key="dana_tampilkan_sisa" data-type="bool"></label>
-                <div class="field"><label for="s-dana_kode_akses">Kode akses</label><input class="input" id="s-dana_kode_akses" data-key="dana_kode_akses" maxlength="40" autocomplete="off" style="font-family:var(--font-mono);letter-spacing:.1em;text-transform:uppercase"></div>
-                <div class="field"><label for="s-dana_kuota">Kuota pengajuan</label><input class="input" type="number" min="0" step="1" id="s-dana_kuota" data-key="dana_kuota" data-type="angka"><p class="field__hint" id="dana-terpakai"></p></div>
-              </div>
-            </fieldset>
-            <fieldset class="set-group">
-              <legend>Road to Bali &amp; survei</legend>
-              <div class="set-grid">
-                <div class="field"><label for="s-road_target">Target dukungan</label><input class="input" type="number" min="1" step="1" id="s-road_target" data-key="road_target" data-type="angka"></div>
+                <div class="field"><label for="s-road_target">Target dukungan Road to Bali</label><input class="input" type="number" min="1" step="1" id="s-road_target" data-key="road_target" data-type="angka"></div>
                 <div class="field"><label for="s-road_tambahan">Dukungan tambahan</label><input class="input" type="number" min="0" step="1" id="s-road_tambahan" data-key="road_tambahan" data-type="angka"><p class="field__hint">Ditambahkan ke jumlah twibbon (mis. dukungan offline).</p></div>
                 <label class="switch" for="s-survei_aktif"><span>Survei aktif</span><input type="checkbox" id="s-survei_aktif" data-key="survei_aktif" data-type="bool"></label>
                 <div class="field"><label for="s-survei_buka">Survei dibuka (WIB) <span class="opt">(kosong = saat pengumuman)</span></label><input class="input" type="datetime-local" id="s-survei_buka" data-key="survei_buka" data-type="waktu"></div>
               </div>
-            </fieldset>
+            </section>
             <div class="savebar"><p id="set-status" role="status">Tidak ada perubahan.</p><button class="btn btn--cta btn--sm" type="submit" id="btn-simpan-set">Simpan pengaturan</button></div>
           </form>
         </section>

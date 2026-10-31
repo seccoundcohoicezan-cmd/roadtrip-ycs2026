@@ -100,14 +100,14 @@
         <div id="v-nonaktif" class="empty-state" hidden>
           <div class="closed-art" aria-hidden="true">zZ</div>
           <h2>Dana Kaget belum dibuka</h2>
-          <p class="muted">Form akan dibuka saat panitia mengumumkannya, biasanya lewat live dan saluran WhatsApp YCS. Simpan halaman ini.</p>
+          <p class="muted" id="teks-tutup">Form akan dibuka saat panitia mengumumkannya lewat live dan saluran WhatsApp YCS. Simpan halaman ini, ya!</p>
           <a class="btn btn--soft btn--sm" href="https://whatsapp.com/channel/0029Vb5vVIaId7nEqecJ1I1G" target="_blank" rel="noopener">Ikuti saluran WhatsApp YCS</a>
         </div>
 
         <div id="v-habis" class="empty-state" hidden>
           <div class="closed-art" aria-hidden="true">0</div>
           <h2>Dana sudah habis</h2>
-          <p class="muted">Kuota Dana Kaget kali ini sudah terpenuhi. Terima kasih sudah antusias! Pantau live YCS berikutnya, siapa tahu ada kesempatan lagi.</p>
+          <p class="muted" id="teks-habis">Kuota Dana Kaget kali ini sudah terpenuhi. Terima kasih sudah antusias! Pantau live YCS berikutnya, siapa tahu ada kesempatan lagi.</p>
           <a class="btn btn--soft btn--sm" href="/#live">Lihat jadwal live</a>
         </div>
 
@@ -296,11 +296,18 @@
     (async () => {
       let cfg;
       try { cfg = await config(); } catch (e) { cfg = null; }
-      if (!cfg) { show('gate'); return; }
-      if (!cfg.dana.saklar) return show('nonaktif');
-      if (cfg.dana.penuh) { setKuota(0, cfg.dana.kuota); return show('habis'); }
-      if (cfg.dana.sisa != null) setKuota(cfg.dana.sisa, cfg.dana.kuota);
+      if (cfg) {
+        if (cfg.dana.teksTutup) $('#teks-tutup').textContent = cfg.dana.teksTutup;
+        if (cfg.dana.teksHabis) $('#teks-habis').textContent = cfg.dana.teksHabis;
+        if (cfg.dana.teksSukses) $('#sukses-sub').textContent = cfg.dana.teksSukses;
+      }
+      if (cfg && !cfg.dana.saklar) return show('nonaktif');
+      if (cfg && cfg.dana.penuh) { setKuota(0, cfg.dana.kuota); return show('habis'); }
+      if (cfg && cfg.dana.sisa != null) setKuota(cfg.dana.sisa, cfg.dana.kuota);
       show('gate');
+      // Datang dari tombol "Punya kode?" di beranda: kode langsung diisi dan dicek.
+      const dariUrl = new URLSearchParams(location.search).get('kode');
+      if (dariUrl) { $('#akses').value = dariUrl.slice(0, 40); $('#v-gate').requestSubmit(); }
     })();
   })();
   </script>
