@@ -4,12 +4,12 @@ const HEADERS_LAMA = ['Waktu', 'ID permintaan', 'Nama', 'Sekolah', 'Email', 'Bin
 const HEADERS = HEADERS_LAMA.concat(['Kota/Kabupaten', 'Provinsi']);
 const REKAP_NAME = 'Rekap';
 const REKAP_VERSI = '3';
-const SKEMA_VERSI = '3';
+const SKEMA_VERSI = '4';
 const WIB = 7 * 3600 * 1000;
 
 const TAB = {
   pengaturan: 'Pengaturan', live: 'Jadwal Live', finalis: 'Finalis', kode: 'Kode Wildcard',
-  dana: 'Dana Kaget', survei: 'Survei', admin: 'Admin', log: 'Log Admin'
+  dana: 'Dana Kaget', survei: 'Survei', kata: 'Satu Kata', admin: 'Admin', log: 'Log Admin'
 };
 const KOLOM = {
   pengaturan: ['Kunci', 'Nilai', 'Keterangan'],
@@ -18,6 +18,7 @@ const KOLOM = {
   kode: ['Kode', 'Email', 'Nama', 'Status', 'Berlaku hingga (WIB)', 'Waktu klaim', 'Percobaan salah', 'Catatan'],
   dana: ['Waktu', 'ID permintaan', 'Nama', 'Email', 'Nomor WhatsApp', 'Sekolah', 'Kota/Kabupaten', 'Provinsi', 'Sumber'],
   survei: ['Waktu', 'ID permintaan', 'Destinasi pilihan', 'Kegiatan favorit', 'Waktu ideal', 'Status', 'Provinsi', 'Destinasi impian lain', 'Email', 'Sumber'],
+  kata: ['Waktu', 'ID permintaan', 'Kata', 'Provinsi', 'Sumber', 'Tampil'],
   log: ['Waktu', 'Aksi', 'Detail']
 };
 const STATUS_KODE = {belum: 'belum klaim', sudah: 'sudah klaim', hangus: 'hangus'};
@@ -42,13 +43,15 @@ const PENGATURAN = [
   ['dana_tampilkan_sisa', 'YA', 'YA = tampilkan "Tersisa N" di halaman.'],
   ['dana_teks_tutup', 'Form akan dibuka saat panitia mengumumkannya lewat live dan saluran WhatsApp YCS. Simpan halaman ini, ya!', 'Teks saat form Dana Kaget belum dibuka / dinonaktifkan.'],
   ['dana_teks_habis', 'Kuota Dana Kaget kali ini sudah terpenuhi. Terima kasih sudah antusias! Pantau live YCS berikutnya, siapa tahu ada kesempatan lagi.', 'Teks saat kuota habis.'],
-  ['dana_teks_sukses', 'Panitia akan menghubungimu lewat WhatsApp atau email. Pastikan nomormu aktif.', 'Teks setelah pengajuan berhasil.'],
+  ['dana_teks_sukses', 'Panitia akan menghubungimu lewat email. Pastikan emailmu aktif.', 'Teks setelah pengajuan berhasil.'],
   ['popup_aktif', 'TIDAK', 'YA = tampilkan pop-up informasi di beranda (sekali per isi; tampil lagi bila isinya diubah).'],
   ['popup_judul', '', 'Judul pop-up.'],
   ['popup_teks', '', 'Isi singkat pop-up.'],
   ['popup_gambar', '', 'Opsional: URL gambar https (rasio 16:9).'],
   ['popup_tombol', 'Lihat selengkapnya', 'Teks tombol.'],
-  ['popup_link', '', 'Tujuan saat pop-up/tombol diklik: link https://, halaman situs (mis. /klaim/), atau bagian (#live).']
+  ['popup_link', '', 'Tujuan saat pop-up/tombol diklik: link https://, halaman situs (mis. /klaim/), atau bagian (#live).'],
+  ['link_saluran', 'https://whatsapp.com/channel/0029Vb5vVIaId7nEqecJ1I1G', 'Saluran WhatsApp yang harus diikuti untuk membuka hasil Satu Kata.'],
+  ['kata_blokir', '', 'Kata tambahan yang ditolak di Satu Kata (pisahkan dengan koma). Sembunyikan kata yang sudah masuk lewat kolom Tampil = TIDAK di tab Satu Kata.']
 ];
 const KUNCI_YA_TIDAK = ['pakai_link_cadangan', 'klaim_aktif', 'survei_aktif', 'dana_aktif', 'dana_tampilkan_sisa', 'popup_aktif'];
 const KUNCI_WAKTU = ['waktu_pengumuman', 'klaim_berlaku_hingga', 'survei_buka'];
@@ -251,10 +254,14 @@ function siapkanSkema_(ss) {
   const tambah = PENGATURAN.filter(r => ada.indexOf(r[0]) < 0).map(r => r[0] === 'dana_kode_akses' ? [r[0], 'YCS-' + acak_(5), r[2]] : r);
   if (tambah.length) peng.getRange(peng.getLastRow() + 1, 1, tambah.length, 3).setNumberFormat('@').setValues(tambah);
   peng.setColumnWidth(1, 200); peng.setColumnWidth(2, 320); peng.setColumnWidth(3, 520);
+  // Teks bawaan lama yang masih menyebut WhatsApp (form tidak lagi meminta nomor) diganti, kecuali sudah diubah panitia.
+  baris_(peng, 2).forEach((r, i) => {
+    if (r[0] === 'dana_teks_sukses' && r[1] === 'Panitia akan menghubungimu lewat WhatsApp atau email. Pastikan nomormu aktif.') peng.getRange(i + 2, 2).setValue('Panitia akan menghubungimu lewat email. Pastikan emailmu aktif.');
+  });
   const live = tab_(ss, 'live');
   if (live.getLastRow() < 2 && !props.getProperty('live_diisi')) live.getRange(2, 1, LIVE_AWAL.length, 7).setNumberFormat('@').setValues(LIVE_AWAL);
   props.setProperty('live_diisi', '1');
-  ['finalis', 'kode', 'dana', 'survei', 'log'].forEach(k => tab_(ss, k));
+  ['finalis', 'kode', 'dana', 'survei', 'kata', 'log'].forEach(k => tab_(ss, k));
   if (!props.getProperty('ADMIN_HASH')) {
     const sandi = acak_(4) + '-' + acak_(4) + '-' + acak_(4);
     aturSandi_(sandi);
@@ -271,7 +278,7 @@ function siapkanSkema_(ss) {
     adm.protect().setDescription('Rahasia admin YCS').setWarningOnly(true);
   }
   props.setProperty('skema_versi', SKEMA_VERSI);
-  cache_().removeAll(['cfg', 'reveal', 'stats']);
+  cache_().removeAll(['cfg', 'reveal', 'stats', 'kata']);
 }
 function pastikanSkema_() {
   if (PropertiesService.getScriptProperties().getProperty('skema_versi') !== SKEMA_VERSI) siapkanSkema_(ss_());
@@ -324,27 +331,79 @@ function konfigPublik_() {
     dana: {aktif: danaAktif && dana.sisa > 0, saklar: danaAktif, penuh: dana.sisa <= 0, sisa: ya_(cfg.dana_tampilkan_sisa) ? dana.sisa : null, kuota: ya_(cfg.dana_tampilkan_sisa) ? dana.kuota : null,
       teksTutup: cfg.dana_teks_tutup || '', teksHabis: cfg.dana_teks_habis || '', teksSukses: cfg.dana_teks_sukses || ''},
     event: {nama: cfg.nama_event || '', link: cfg.link_event || ''},
+    saluran: cfg.link_saluran || '',
     popup: ya_(cfg.popup_aktif) && cfg.popup_judul ? {aktif: true, judul: cfg.popup_judul, teks: cfg.popup_teks || '', gambar: cfg.popup_gambar || '', tombol: cfg.popup_tombol || '', link: cfg.popup_link || ''} : {aktif: false}
   };
 }
+// Dukungan = twibbon lama + Satu Kata + klaim Dana Kaget. Leaderboard per provinsi dari ketiganya.
 function statistik_() {
   const c = cache_();
   const simpan = c.get('stats');
   if (simpan) return JSON.parse(simpan);
   const cfg = bacaPengaturan_();
-  const sheet = ss_().getSheetByName(SHEET_NAME);
-  const n = sheet ? sheet.getLastRow() - 1 : 0;
-  const kota = {}, prov = {};
-  if (n > 0 && sheet.getLastColumn() >= 11) {
-    sheet.getRange(2, 10, n, 2).getValues().forEach(r => {
-      const k = String(r[0]).trim(), p = String(r[1]).trim();
-      if (k) kota[k] = (kota[k] || 0) + 1;
+  const ss = ss_();
+  const prov = {};
+  let total = 0;
+  const hitung = (sheet, kolProv, kolTampil) => {
+    const n = sheet ? sheet.getLastRow() - 1 : 0;
+    if (n <= 0) return;
+    const lebar = Math.max(kolProv, kolTampil || 0);
+    sheet.getRange(2, 1, n, lebar).getValues().forEach(r => {
+      if (kolTampil && String(r[kolTampil - 1]).toUpperCase() === 'TIDAK') return;
+      total++;
+      const p = String(r[kolProv - 1] || '').trim();
       if (p) prov[p] = (prov[p] || 0) + 1;
     });
-  }
+  };
+  hitung(ss.getSheetByName(SHEET_NAME), 11);
+  hitung(tab_(ss, 'kata'), 4, 6);
+  hitung(tab_(ss, 'dana'), 8);
   const top = o => Object.keys(o).map(k => ({nama: k, jumlah: o[k]})).sort((a, b) => b.jumlah - a.jumlah).slice(0, 10);
-  const out = {ok: true, road: {current: Math.max(0, n) + (Number(cfg.road_tambahan) || 0), target: Number(cfg.road_target) || 100000}, kota: top(kota), provinsi: top(prov), diperbarui: isoWib_(Date.now())};
+  const out = {ok: true, road: {current: total + (Number(cfg.road_tambahan) || 0), target: Number(cfg.road_target) || 100000}, kota: [], provinsi: top(prov), diperbarui: isoWib_(Date.now())};
   c.put('stats', JSON.stringify(out), 300);
+  return out;
+}
+
+/* ===================== Satu Kata ===================== */
+
+// Daftar dasar kata kasar/tidak pantas (bentuk dasar; pencocokan juga menangkap imbuhan sederhana).
+const KATA_KASAR = ['anjing', 'anjir', 'anjay', 'babi', 'bangsat', 'bajingan', 'brengsek', 'kampret', 'kontol', 'memek', 'ngentot', 'entot', 'jancuk', 'jancok', 'cuk', 'asu', 'tai', 'taik', 'goblok', 'goblog', 'tolol', 'bego', 'idiot', 'kafir', 'pelacur', 'lonte', 'perek', 'pepek', 'jembut', 'titit', 'peler', 'setan', 'iblis', 'bodoh', 'sialan', 'keparat', 'fuck', 'shit', 'bitch', 'porn', 'bokep', 'sange', 'mesum', 'judi', 'slot', 'gacor', 'togel'];
+function kataDiblokir_(k, cfg) {
+  const ekstra = String(cfg.kata_blokir || '').toLowerCase().split(',').map(x => x.trim()).filter(Boolean);
+  return KATA_KASAR.concat(ekstra).some(b => k === b || (b.length >= 4 && k.indexOf(b) >= 0));
+}
+function kataKirim_(p) {
+  const cfg = bacaPengaturan_();
+  const kata = teks_(p.kata, 30).toLowerCase().replace(/[^a-z\u00c0-\u024f-]/g, '');
+  const prov = teks_(p.provinsi, 40), ref = teks_(p.ref, 40).replace(/[^\w-]/g, '');
+  if (!/^[a-z\u00c0-\u024f-]{2,20}$/.test(kata) || /\s/.test(teks_(p.kata, 30)) || !/^[a-f0-9-]{36}$/i.test(p.requestId || '') || p.website) return {ok: false, error: 'validation'};
+  if (kataDiblokir_(kata, cfg)) return {ok: false, error: 'kata_ditolak'};
+  if (batasKirim_('kata', p, 10)) return {ok: false, error: 'terlalu_banyak'};
+  return kunci_(LockService.getScriptLock(), () => {
+    const sheet = tab_(ss_(), 'kata');
+    if (sheet.getLastRow() > 1 && sheet.getRange(2, 2, sheet.getLastRow() - 1, 1).createTextFinder(p.requestId).matchEntireCell(true).findNext()) return {ok: true, kata: kata, duplicate: true};
+    sheet.appendRow([teksWib_(Date.now()), p.requestId, kata, cleanCell_(prov), ref || 'web', 'YA']);
+    return {ok: true, kata: kata};
+  });
+}
+function kataPublik_() {
+  const c = cache_();
+  const simpan = c.get('kata');
+  if (simpan) return JSON.parse(simpan);
+  const sheet = tab_(ss_(), 'kata');
+  const n = sheet.getLastRow() - 1;
+  const hit = {};
+  let total = 0;
+  if (n > 0) sheet.getRange(2, 1, n, 6).getValues().forEach(r => {
+    if (String(r[5]).toUpperCase() === 'TIDAK') return;
+    const k = String(r[2] || '').trim().toLowerCase();
+    if (!k) return;
+    total++;
+    hit[k] = (hit[k] || 0) + 1;
+  });
+  const kata = Object.keys(hit).map(k => [k, hit[k]]).sort((a, b) => b[1] - a[1]).slice(0, 150);
+  const out = {ok: true, total: total, kata: kata, diperbarui: isoWib_(Date.now())};
+  c.put('kata', JSON.stringify(out), 60);
   return out;
 }
 function urlFoto_(u) {
@@ -435,18 +494,18 @@ function dana_(p) {
   const nama = teks_(p.nama, 60), email = teks_(p.email, 254).toLowerCase(), sekolah = teks_(p.sekolah, 100);
   const wa = teks_(p.wa, 20).replace(/[^0-9]/g, '').replace(/^62/, '0');
   const kota = teks_(p.kota, 80), prov = teks_(p.provinsi, 40), ref = teks_(p.ref, 40).replace(/[^\w-]/g, '');
-  if (nama.length < 2 || !emailValid_(email) || !/^08\d{8,12}$/.test(wa) || sekolah.length < 2 || !kota || !prov || !/^[a-f0-9-]{36}$/i.test(p.requestId || '') || p.consent !== true || p.website) return {ok: false, error: 'validation'};
+  if (nama.length < 2 || !emailValid_(email) || (wa && !/^08\d{8,12}$/.test(wa)) || sekolah.length < 2 || !prov || !/^[a-f0-9-]{36}$/i.test(p.requestId || '') || p.consent !== true || p.website) return {ok: false, error: 'validation'};
   return kunci_(LockService.getScriptLock(), () => {
     const ss = ss_();
     const sheet = tab_(ss, 'dana');
     const rows = baris_(sheet, 5);
     const lama = rows.find(r => r[1] === p.requestId);
     if (lama) return {ok: true, duplicate: true};
-    if (rows.some(r => String(r[3]).toLowerCase() === email || String(r[4]).replace(/^'/, '') === wa)) return {ok: false, error: 'sudah_mengajukan'};
+    if (rows.some(r => String(r[3]).toLowerCase() === email || (wa && String(r[4]).replace(/^'/, '') === wa))) return {ok: false, error: 'sudah_mengajukan'};
     // Sisa dihitung ulang di dalam lock: pengajuan bersamaan tidak bisa melewati kuota.
     const d = hitungDana_(cfg, ss);
     if (d.sisa <= 0) return {ok: false, error: 'habis'};
-    sheet.appendRow([teksWib_(Date.now()), p.requestId, cleanCell_(nama), cleanCell_(email), "'" + wa, cleanCell_(sekolah), cleanCell_(kota), cleanCell_(prov), ref || 'web']);
+    sheet.appendRow([teksWib_(Date.now()), p.requestId, cleanCell_(nama), cleanCell_(email), wa ? "'" + wa : '', cleanCell_(sekolah), cleanCell_(kota), cleanCell_(prov), ref || 'web']);
     SpreadsheetApp.flush();
     return {ok: true, sisa: ya_(cfg.dana_tampilkan_sisa) ? d.sisa - 1 : null};
   });
@@ -501,7 +560,8 @@ const EKSPOR = {
   kode: () => [TAB.kode, KOLOM.kode.length],
   dana: () => [TAB.dana, KOLOM.dana.length],
   survei: () => [TAB.survei, KOLOM.survei.length],
-  finalis: () => [TAB.finalis, KOLOM.finalis.length]
+  finalis: () => [TAB.finalis, KOLOM.finalis.length],
+  kata: () => [TAB.kata, KOLOM.kata.length]
 };
 function hitungStatus_(ss) {
   const kode = {total: 0, belum: 0, sudah: 0, hangus: 0};
@@ -528,7 +588,15 @@ function ringkasanAdmin_() {
       if (r[0] instanceof Date && r[0].getTime() >= awalHari) hariIni++;
     });
   }
+  const kt = tab_(ss, 'kata'), nk = kt.getLastRow() - 1, sumberKata = {};
+  let kataHariIni = 0;
+  if (nk > 0) kt.getRange(2, 1, nk, 5).getValues().forEach(r => {
+    const s = String(r[4] || 'web');
+    sumberKata[s] = (sumberKata[s] || 0) + 1;
+    if (waktu_(r[0]) >= awalHari) kataHariIni++;
+  });
   return {
+    kata: {total: Math.max(0, nk), hariIni: kataHariIni, sumber: Object.keys(sumberKata).map(k => ({nama: k, jumlah: sumberKata[k]})).sort((a, b) => b.jumlah - a.jumlah).slice(0, 15)},
     twibbon: {total: Math.max(0, n), hariIni: hariIni, sumber: Object.keys(sumber).map(k => ({nama: k, jumlah: sumber[k]})).sort((a, b) => b.jumlah - a.jumlah).slice(0, 15)},
     klaim: hitungStatus_(ss),
     dana: hitungDana_(cfg, ss),
@@ -674,6 +742,7 @@ function doGet(e) {
     if (aksi === 'config') { pastikanSkema_(); return json_(konfigPublik_()); }
     if (aksi === 'stats') { pastikanSkema_(); return json_(statistik_()); }
     if (aksi === 'reveal') { pastikanSkema_(); return json_(reveal_()); }
+    if (aksi === 'kata') { pastikanSkema_(); return json_(kataPublik_()); }
     if (aksi === 'siapkan') { pastikanSkema_(); return json_({ok: true, skema: SKEMA_VERSI}); }
     // ?aksi=perbarui-rekap membangun ulang tab Rekap sekali per versi kode (aman dipanggil publik).
     if (aksi === 'perbarui-rekap') {
@@ -703,6 +772,7 @@ function doPost(e) {
     if (aksi === 'klaim-verifikasi') return json_(klaim_(p, true));
     if (aksi === 'dana-akses' || aksi === 'dana-kirim') return json_(dana_(p));
     if (aksi === 'survei-kirim') return json_(survei_(p));
+    if (aksi === 'kata-kirim') return json_(kataKirim_(p));
     if (aksi.indexOf('admin-') === 0) return json_(admin_(p));
     return json_({ok: false, error: 'aksi_tidak_dikenal'});
   } catch (err) {

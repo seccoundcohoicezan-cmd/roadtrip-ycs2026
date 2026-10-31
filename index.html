@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Youth Character Summit 2026 — Karakter Kuat. Langkah ke Bali.</title>
-  <meta name="description" content="Youth Character Summit 2026: 150 delegasi pelajar SMA/SMK/MA se-Indonesia berangkat ke Bali, 23 Desember 2026 – 2 Januari 2027. Ikuti live, buat twibbon, dan gabung YCS Squad.">
+  <meta name="description" content="Youth Character Summit 2026: 150 delegasi pelajar SMA/SMK/MA se-Indonesia berangkat ke Bali, 23 Desember 2026 – 2 Januari 2027. Ikuti live, klaim Dana Kaget, dan kirim Satu Kata untuk Indonesia.">
   <meta name="theme-color" content="#0E5A66">
   <meta name="color-scheme" content="light dark">
   <link rel="canonical" href="https://events.stekom.ac.id/ycs2026">
@@ -12,7 +12,7 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Youth Character Summit 2026">
   <meta property="og:title" content="Youth Character Summit 2026 — Karakter Kuat. Langkah ke Bali.">
-  <meta property="og:description" content="150 delegasi pelajar se-Indonesia, 7 destinasi, satu perjalanan karakter ke Bali. Buat twibbon dan dukung gerakannya.">
+  <meta property="og:description" content="150 delegasi pelajar se-Indonesia, 7 destinasi, satu perjalanan karakter ke Bali. Kirim satu kata untuk Indonesia dan dukung gerakannya.">
   <meta property="og:image" content="https://events.stekom.ac.id/api/media/2736/view">
   <meta property="og:url" content="https://events.stekom.ac.id/ycs2026">
   <meta name="twitter:card" content="summary_large_image">
@@ -513,13 +513,13 @@
     }
     :root[data-theme="dark"] #live.is-bg { background: linear-gradient(180deg, rgb(7 31 36 / .78) 0, rgb(7 31 36 / .95) 30rem, var(--bg) 46rem), url("assets/img/bali/bg-sawah2-720.webp") center top / 100% auto no-repeat, var(--bg); }
     @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) #live.is-bg { background: linear-gradient(180deg, rgb(7 31 36 / .78) 0, rgb(7 31 36 / .95) 30rem, var(--bg) 46rem), url("assets/img/bali/bg-sawah2-720.webp") center top / 100% auto no-repeat, var(--bg); } }
-    .twibbon.is-bg {
+    .spot.is-bg {
       background:
         linear-gradient(180deg, rgb(12 74 85 / .7) 0, rgb(8 44 51 / .86) 50%, rgb(8 44 51 / .95) 100%),
         url("assets/img/bali/bg-penjor1-m.webp") center top / cover no-repeat, var(--teal-950);
     }
     @media (min-width: 48rem) {
-      .twibbon.is-bg { background: linear-gradient(170deg, rgb(12 74 85 / .86), rgb(8 44 51 / .95) 70%), url("assets/img/bali/bg-penjor1-1440.webp") center / cover no-repeat, var(--teal-950); }
+      .spot.is-bg { background: linear-gradient(170deg, rgb(12 74 85 / .86), rgb(8 44 51 / .95) 70%), url("assets/img/bali/bg-penjor1-1440.webp") center / cover no-repeat, var(--teal-950); }
     }
     .harapan-card.is-bg {
       background:
@@ -673,117 +673,77 @@
       .live-grid { grid-template-columns: 1fr 1fr; align-items: stretch; }
     }
 
-    /* ============ Twibbon ============ */
-    .twibbon {
-      position: relative; isolation: isolate; overflow: hidden;
-      padding-block: calc(var(--space-7) + 2.5rem);
-      background: linear-gradient(170deg, var(--teal-800), var(--teal-950));
-      color: #fff;
-    }
-    .twibbon .sticker--leaf1 { width: clamp(7rem, 15vw, 13rem); left: -3rem; bottom: 2rem; rotate: 35deg; }
-    .twibbon .sticker--leaf2 { width: clamp(6rem, 12vw, 10rem); right: -2.5rem; top: 2.5rem; rotate: -150deg; }
-    .twibbon .sticker--kite { width: clamp(3rem, 5vw, 4.5rem); left: 44%; top: 2.5rem; }
-    .twibbon .sticker--fr { width: 2.5rem; left: 4%; top: 30%; }
-    .twibbon > .container { position: relative; z-index: 1; }
-    @media (max-width: 47.99rem) { .twibbon .sticker--kite { left: auto; right: 4%; top: 1.25rem; } .twibbon .sticker--leaf1 { display: none; } }
-    .twibbon::before {
-      content: ""; position: absolute; inset: auto -10% -30% -10%; height: 60%; z-index: -1;
-      background: radial-gradient(closest-side, rgb(255 201 60 / .22), transparent);
-    }
-    .twibbon__grid { display: grid; gap: var(--space-6); align-items: start; }
-    .twibbon__title { font-size: clamp(1.75rem, 2vw + 1.1rem, 2.5rem); font-weight: 800; margin-top: var(--space-3); }
-    .twibbon__lead { color: #D5ECEC; margin-top: var(--space-2); max-width: 30rem; }
+    /* ============ Klaim Dana Kaget (section gelap) ============ */
+    .spot { position: relative; isolation: isolate; overflow: hidden; padding-block: calc(var(--space-7) + 2.5rem); background: linear-gradient(170deg, var(--teal-800), var(--teal-950)); color: #fff; }
+    .spot::before { content: ""; position: absolute; inset: auto -10% -30% -10%; height: 60%; z-index: -1; background: radial-gradient(closest-side, rgb(255 201 60 / .22), transparent); }
+    .spot__grid { display: grid; gap: var(--space-6); align-items: center; }
+    @media (min-width: 64rem) { .spot__grid { grid-template-columns: 1fr 1.05fr; gap: var(--space-7); } }
+    .spot__title { margin-top: var(--space-3); font-size: clamp(1.875rem, 2.4vw + 1.1rem, 2.75rem); font-weight: 800; line-height: 1.1; }
+    .spot__lead { margin-top: var(--space-3); max-width: 32rem; color: #D5ECEC; font-size: 1.0625rem; }
+    .dk-quota { display: grid; gap: .5rem; max-width: 26rem; margin-top: var(--space-5); padding: var(--space-4); border-radius: var(--radius); background: rgb(255 255 255 / .08); border: 1px solid rgb(255 255 255 / .14); }
+    .dk-quota[hidden] { display: none; }
+    .dk-quota__row { display: flex; justify-content: space-between; align-items: baseline; font-size: .875rem; color: #D5ECEC; }
+    .dk-quota__row strong { font-size: 1.75rem; color: var(--yellow-400); font-variant-numeric: tabular-nums; }
+    .dk-quota .meter { background: rgb(255 255 255 / .15); }
+    .dk-how { list-style: none; display: grid; gap: var(--space-3); margin-top: var(--space-5); counter-reset: dk; }
+    .dk-how li { display: flex; gap: var(--space-3); align-items: center; color: #EAF6F5; counter-increment: dk; }
+    .dk-how li::before { content: counter(dk); display: grid; place-items: center; width: 2rem; height: 2rem; flex: none; border-radius: 50%; background: var(--yellow-400); color: var(--teal-950); font-weight: 800; font-size: .875rem; }
+    .dk-card { position: relative; padding: clamp(1.25rem, 4vw, 2rem); border-radius: 1.5rem; background: var(--surface); color: var(--text); box-shadow: 0 30px 60px -24px rgb(0 0 0 / .55); }
+    .dk-steps { display: flex; gap: var(--space-2); margin-bottom: var(--space-4); list-style: none; }
+    .dk-steps li { flex: 1; display: grid; gap: .375rem; font-size: .75rem; font-weight: 700; color: var(--text-muted); }
+    .dk-steps li::before { content: ""; height: 5px; border-radius: 3px; background: var(--line); }
+    .dk-steps li[aria-current="step"] { color: var(--text); }
+    .dk-steps li[aria-current="step"]::before { background: var(--orange-500); }
+    .dk-steps li.is-done::before { background: var(--teal-600); }
+    .dk-card h3 { font-size: 1.375rem; }
+    .dk-card__sub { margin-top: .25rem; color: var(--text-muted); font-size: .9375rem; }
+    .dk-fields { display: grid; gap: var(--space-3); margin-top: var(--space-4); }
+    @media (min-width: 36rem) { .dk-fields { grid-template-columns: 1fr 1fr; } .dk-fields .field--wide { grid-column: 1 / -1; } }
+    .dk-who { display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); margin-top: var(--space-4); padding: var(--space-3) var(--space-4); border-radius: var(--radius); background: var(--surface-soft); font-size: .9375rem; }
+    .dk-who button { border: 0; background: none; color: var(--primary); font: inherit; font-weight: 700; cursor: pointer; text-decoration: underline; min-height: 2.75rem; }
+    .dk-kode { min-height: 3.75rem; text-align: center; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 1.375rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; }
+    .dk-alert { margin-top: var(--space-3); padding: var(--space-3) var(--space-4); border-radius: var(--radius); background: var(--error-bg); color: var(--error); font-weight: 600; font-size: .9375rem; }
+    .dk-alert:empty { display: none; }
+    .dk-state { display: grid; justify-items: center; gap: var(--space-3); padding: var(--space-4) 0; text-align: center; }
+    .dk-state[hidden], .dk-card form[hidden] { display: none; }
+    .dk-state__art { display: grid; place-items: center; width: 5rem; height: 5rem; border-radius: 50%; background: var(--surface-soft); color: var(--primary); }
+    .dk-state__art svg { width: 2.5rem; height: 2.5rem; }
+    .dk-state--ok .dk-state__art { background: var(--success-bg); color: var(--success); animation: pop-ok .5s cubic-bezier(.2, 1.4, .4, 1) both; }
+    @keyframes pop-ok { from { transform: scale(.3); opacity: 0; } }
+    .dk-state p { color: var(--text-muted); max-width: 26rem; }
 
-    .seg { display: inline-flex; padding: .25rem; border-radius: var(--radius-pill); background: rgb(255 255 255 / .12); margin-top: var(--space-5); }
-    .seg__btn {
-      min-height: 2.75rem; min-width: 8rem; padding: 0 1.25rem; border: 0; border-radius: var(--radius-pill);
-      background: transparent; color: #fff; font-weight: 700; cursor: pointer;
-      transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
-    }
-    .seg__btn:hover { background: rgb(255 255 255 / .12); }
-    .seg__btn[aria-checked="true"] { background: #fff; color: var(--teal-900); }
-
-    .tw-editor { display: grid; gap: var(--space-5); }
-    .tw-preview { margin-top: var(--space-6); }
-    .tw-canvas-wrap { position: relative; width: min(100%, 30rem); margin-inline: auto; }
-    .tw-canvas {
-      width: 100%; aspect-ratio: 1; border-radius: var(--radius-lg); background: var(--teal-900);
-      box-shadow: var(--shadow-lg); border: 4px solid #fff; touch-action: none; cursor: grab;
-    }
-    .tw-canvas.is-dragging { cursor: grabbing; }
-    .tw-canvas-hint { margin-top: var(--space-2); text-align: center; font-size: .8125rem; color: #CDE6E6; }
-
-    .tw-steps { list-style: none; display: grid; gap: var(--space-3); counter-reset: step; }
-    .tw-step {
-      display: grid; grid-template-columns: 2rem 1fr; gap: var(--space-3); align-items: start;
-      padding: var(--space-4); border-radius: var(--radius); background: var(--surface); color: var(--text);
-    }
-    .tw-step__num {
-      display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%;
-      background: var(--teal-700); color: #fff; font-weight: 800; font-size: .875rem;
-    }
-    .tw-step.is-done .tw-step__num { background: var(--success); }
-    .tw-step h3 { font-size: 1rem; font-weight: 800; }
-    .tw-step p { font-size: .875rem; color: var(--text-muted); }
-    .tw-step__ctrl { margin-top: var(--space-3); display: grid; gap: var(--space-2); }
-
-    .file-btn { position: relative; }
-    .file-btn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
-    .file-btn:focus-within { outline: 3px solid var(--focus); outline-offset: 3px; }
-
-    .range { width: 100%; accent-color: var(--teal-700); min-height: 2.75rem; }
-    .range-row { display: flex; align-items: center; gap: var(--space-3); }
-    .range-row label { font-size: .875rem; font-weight: 700; min-width: 3.5rem; }
-    .nudge { display: flex; gap: var(--space-2); flex-wrap: wrap; }
-
-    .tw-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
-    .tw-actions .btn { flex: 1 1 12rem; }
-    .tw-fields { display: grid; gap: var(--space-3); }
-    @media (min-width: 36rem) { .tw-fields { grid-template-columns: 1fr 1fr; } .tw-fields .field--wide { grid-column: 1 / -1; } }
-
-    /* Kartu syarat: klik saluran = centang otomatis (gaya "unlock") */
-    .req-card { display: grid; gap: var(--space-3); padding: var(--space-3); border-radius: var(--radius); border: 2px dashed var(--line); background: var(--surface-soft); }
-    .unlock {
-      display: grid; grid-template-columns: auto 1fr auto; gap: var(--space-3); align-items: center;
-      min-height: 4.5rem; padding: var(--space-3) var(--space-4); border-radius: var(--radius);
-      background: var(--surface); border: 2px solid #25D366; color: var(--text); text-decoration: none;
-      box-shadow: 0 6px 16px -10px rgb(21 128 61 / .6);
-      transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease), background-color var(--dur) var(--ease);
-    }
-    .unlock:hover { transform: translateY(-2px); box-shadow: 0 12px 22px -12px rgb(21 128 61 / .7); }
-    .unlock:active { transform: translateY(0); }
-    .unlock__icon { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 50%; background: #25D366; color: #fff; }
-    .unlock__icon svg { width: 1.5rem; height: 1.5rem; }
-    .unlock__eyebrow { display: block; font-size: .75rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--text-muted); }
-    .unlock__title { display: block; font-size: 1rem; font-weight: 800; }
-    .unlock__state { display: block; font-size: .8125rem; color: #166534; font-weight: 600; }
-    .unlock__check {
-      display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: .5rem;
-      border: 2px solid var(--line); background: var(--surface); color: transparent;
-      transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease);
-    }
-    .unlock__check svg { width: 1.125rem; height: 1.125rem; }
-    .unlock.is-done { background: var(--success-bg); border-style: solid; }
-    .unlock.is-done .unlock__check { background: var(--success); border-color: var(--success); color: #fff; animation: pop 300ms var(--ease); }
-    .unlock.is-done .unlock__state { color: var(--success); }
-    @keyframes pop { 50% { transform: scale(1.25); } }
-    .req-card .check { padding-inline: var(--space-1); }
-    @media (max-width: 35.99rem) {
-      /* Di HP, isi langkah memakai lebar penuh; nomor tetap di samping judul */
-      .tw-step { display: block; position: relative; }
-      .tw-step__num { position: absolute; left: var(--space-4); top: var(--space-4); }
-      .tw-step h3, .tw-step h3 + p { padding-left: 2.75rem; }
-      .unlock { padding: var(--space-3); gap: var(--space-2); }
-    }
-
-    .tw-result { display: grid; gap: var(--space-3); margin-top: var(--space-3); padding: var(--space-3); border-radius: var(--radius); background: var(--surface-soft); }
-    .tw-result[hidden] { display: none; }
-    .tw-result img { width: min(100%, 16rem); border-radius: var(--radius-sm); box-shadow: var(--shadow); -webkit-touch-callout: default; }
-    .tw-result p { font-size: .8125rem; }
-
-    @media (min-width: 64rem) {
-      .twibbon__grid { grid-template-columns: 1fr 1.1fr; gap: var(--space-7); }
-    }
+    /* ============ Satu Kata: kirim gratis, hasil terkunci sampai ikut saluran ============ */
+    .sk { align-items: stretch; }
+    .sk__form { display: grid; align-content: center; gap: var(--space-3); }
+    .sk__row { display: flex; gap: var(--space-2); margin-top: var(--space-2); }
+    .sk__input { flex: 1; min-width: 0; min-height: 3.5rem; border: 0; font-size: 1.25rem; font-weight: 700; color: var(--ink); background: #fff; }
+    .sk__select { min-height: 2.75rem; border: 1px solid rgb(255 255 255 / .35); background-color: rgb(255 255 255 / .12); color: #fff; }
+    .sk__select option { color: var(--ink); }
+    .sk__msg { min-height: 1.5rem; font-weight: 700; color: #FFE9EC; }
+    .sk__msg.is-ok { color: #FFD86B; }
+    .sk__count { font-size: .9375rem; color: #FFE9EC; }
+    .sk__count strong { font-size: 1.375rem; color: #fff; }
+    .sk__result { position: relative; min-height: 18rem; border-radius: 1.25rem; background: rgb(0 0 0 / .18); overflow: hidden; display: grid; }
+    .sk__cloud { display: flex; flex-wrap: wrap; align-content: center; justify-content: center; gap: .25rem .75rem; padding: var(--space-5); font-weight: 800; line-height: 1.05; transition: filter 500ms var(--ease); }
+    .sk__cloud span { color: #fff; }
+    .sk__cloud span:nth-child(3n) { color: #FFD86B; }
+    .sk__cloud span:nth-child(3n+2) { color: #FFC2CB; }
+    .sk__cloud .is-mine { padding: 0 .375rem; border-radius: .375rem; background: #FFD86B; color: #7A0A1C !important; }
+    .sk.is-locked .sk__cloud { filter: blur(9px); user-select: none; pointer-events: none; }
+    .sk__lock { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: var(--space-2); padding: var(--space-5); text-align: center; background: radial-gradient(closest-side, rgb(110 8 25 / .55), transparent); }
+    .sk:not(.is-locked) .sk__lock { display: none; }
+    .sk__lock-ico { display: grid; place-items: center; width: 3.5rem; height: 3.5rem; border-radius: 50%; background: #fff; color: #9B0D23; box-shadow: 0 12px 30px -10px rgb(0 0 0 / .5); }
+    .sk__lock-ico svg { width: 1.5rem; height: 1.5rem; }
+    .sk__lock strong { font-size: 1.25rem; }
+    .sk__lock p { max-width: 20rem; color: #FFE9EC; font-size: .9375rem; margin: 0; }
+    .sk__lock small { color: #FFC2CB; }
+    .btn--wa { background: #25D366; color: #073B1F; }
+    .btn--wa:hover { background: #1EBE5A; }
+    .sk__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); justify-content: center; padding: 0 var(--space-4) var(--space-4); }
+    .sk.is-locked .sk__actions { display: none; }
+    .btn--ghost-light { background: transparent; color: #fff; border-color: rgb(255 255 255 / .6); }
+    .btn--ghost-light:hover { background: rgb(255 255 255 / .12); }
+    .sk__empty { align-self: center; padding: var(--space-5); text-align: center; color: #FFE9EC; }
 
     /* ============ Forms (shared) ============ */
     .field { display: grid; gap: .375rem; }
@@ -1351,6 +1311,7 @@
     <symbol id="i-compass" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5Z"/></g></symbol>
     <symbol id="i-gift" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9M12 8v13M12 8S10.5 3 8 3a2.5 2.5 0 0 0 0 5M12 8s1.5-5 4-5a2.5 2.5 0 0 1 0 5"/></g></symbol>
     <symbol id="i-key" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="m10.8 12.2 8.7-8.7M16 7l2.5 2.5M18.5 4.5 21 7"/></g></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M4 5h16v11H9l-5 4V5Z"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M8 9.5h8M8 12.5h5"/></symbol>
     <symbol id="i-pause" viewBox="0 0 24 24"><path fill="currentColor" d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></symbol>
     <symbol id="i-whatsapp" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.2-.2-.5-.3Z"/></symbol>
   </svg>
@@ -1375,8 +1336,8 @@
         <ul class="nav__list">
           <li><a class="nav__link" href="#delegasi">Finalis<span class="nav__dot" data-fase="pasca" aria-hidden="true"></span></a></li>
           <li><a class="nav__link" href="#live">Live</a></li>
-          <li><a class="nav__link" href="#twibbon">Twibbon</a></li>
-          <li><a class="nav__link" href="survei/">Survei</a></li>
+          <li><a class="nav__link" href="#dana">Dana Kaget</a></li>
+          <li><a class="nav__link" href="#satu-kata">Satu Kata</a></li>
         </ul>
       </nav>
 
@@ -1405,15 +1366,15 @@
         <ul class="mobile-nav__main">
           <li><a href="#delegasi">Finalis</a></li>
           <li><a href="#live">Live</a></li>
-          <li><a href="#twibbon">Twibbon</a></li>
-          <li><a href="survei/">Survei destinasi</a></li>
+          <li><a href="#dana">Dana Kaget</a></li>
+          <li><a href="#satu-kata">Satu Kata</a></li>
           <li><a href="klaim/">Klaim tiket</a></li>
-          <li><a href="dana-kaget/">Dana Kaget</a></li>
+          <li><a href="survei/">Survei</a></li>
         </ul>
         <p class="mobile-nav__label">Lainnya</p>
         <ul class="mobile-nav__more">
           <li><a href="#road-to-bali">Road to Bali</a></li>
-          <li><a href="#harapan">Satu Kata</a></li>
+          <li><a href="#leaderboard">Leaderboard</a></li>
           <li><a href="#faq">FAQ</a></li>
         </ul>
         <div class="mobile-nav__socials">
@@ -1488,9 +1449,9 @@
             <svg class="btn__arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
           </a>
           <a class="hero__klaim" href="klaim/" data-fase="pasca">Belum lolos? <strong>Klaim tiket wildcard</strong><svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
-          <a class="btn btn--cta btn--hero" href="#twibbon" data-fase="pra">
-            <span class="btn__icon"><svg aria-hidden="true"><use href="#i-users"/></svg></span>
-            <span>Buat Twibbon<small>Dukung gerakan YCS 2026!</small></span>
+          <a class="btn btn--cta btn--hero" href="#dana" data-fase="pra">
+            <span class="btn__icon"><svg aria-hidden="true"><use href="#i-gift"/></svg></span>
+            <span>Klaim Dana Kaget<small>Isi data, masukkan kode</small></span>
             <svg class="btn__arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
           </a>
           <p class="hero__script" aria-hidden="true" data-fase="pra">Bersama kita bisa!</p>
@@ -1528,7 +1489,7 @@
           <ul class="keydates">
             <li>
               <svg aria-hidden="true"><use href="#i-calendar"/></svg>
-              <div><span>Dukung gerakan YCS</span><strong>Buat &amp; bagikan twibbon</strong></div>
+              <div><span>Kampanye</span><strong>Kirim Satu Kata</strong></div>
             </li>
             <li>
               <svg aria-hidden="true"><use href="#i-megaphone"/></svg>
@@ -1540,7 +1501,7 @@
             </li>
           </ul>
           <p class="countdown-card__foot" data-fase="pra">
-            Dukung YCS 2026 dengan <a href="#twibbon">membuat dan membagikan twibbon</a>.
+            Sambil menunggu, <a href="#satu-kata">kirim satu kata untuk Indonesia</a>, gratis.
           </p>
         </div>
       </div>
@@ -1610,146 +1571,77 @@
       </div>
     </section>
 
-    <!-- ========== TWIBBON ========== -->
-    <section class="section twibbon" id="twibbon" aria-labelledby="twibbon-title" data-lazy-bg>
+    <!-- ========== KLAIM DANA KAGET (identitas dulu, lalu kode akses) ========== -->
+    <section class="section spot" id="dana" aria-labelledby="dana-title" data-lazy-bg>
       <svg class="wave memories-wave wave--top" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true"><path d="M0 46C180 78 360 10 560 30s380 50 560 26 240-46 320-34V80H0Z"/></svg>
-      <img class="sticker sticker--leaf1" src="assets/svg/palm-leaf-teal.svg" alt="" width="220" height="300" loading="lazy">
-      <img class="sticker sticker--leaf2" src="assets/svg/palm-leaf.svg" alt="" width="220" height="300" loading="lazy">
-      <img class="sticker sticker--kite sticker--sway" src="assets/svg/kite.svg" alt="" width="200" height="300" loading="lazy">
-      <img class="sticker sticker--fr sticker--float" src="assets/svg/frangipani.svg" alt="" width="120" height="120" loading="lazy">
-      <div class="container twibbon__grid">
+      <div class="container spot__grid">
         <div class="reveal">
-          <span class="badge badge--brand">Twibbon</span>
-          <h2 class="twibbon__title" id="twibbon-title">Buat &amp; Bagikan <span class="scribble">Twibbon</span></h2>
-          <p class="twibbon__lead">Tunjukkan dukunganmu untuk YCS 2026 dengan foto terbaikmu. Foto diproses di perangkatmu dan tidak diunggah. Setiap twibbon menambah progres Road to Bali dan poin leaderboard daerahmu.</p>
-
-          <div class="seg" role="radiogroup" aria-label="Pilih bingkai twibbon">
-            <button class="seg__btn" type="button" role="radio" aria-checked="true" data-frame="delegasi">Delegasi</button>
-            <button class="seg__btn" type="button" role="radio" aria-checked="false" data-frame="squad">YCS Squad</button>
+          <span class="badge badge--brand">Dana Kaget</span>
+          <h2 class="spot__title" id="dana-title">Klaim <span class="scribble">Dana Kaget</span> YCS</h2>
+          <p class="spot__lead">Isi identitasmu, masukkan kode akses dari panitia, dan amankan Dana Kaget sebelum kuota habis. Satu orang satu klaim.</p>
+          <div class="dk-quota" id="dk-quota" hidden>
+            <div class="dk-quota__row"><span>Sisa kuota</span><span><strong id="dk-sisa">–</strong> <span id="dk-kuota"></span></span></div>
+            <div class="meter" role="progressbar" aria-label="Sisa kuota Dana Kaget" aria-valuemin="0" id="dk-meter"><div class="meter__fill" id="dk-fill" style="width:100%"></div></div>
           </div>
-
-          <div class="tw-preview">
-            <div class="tw-canvas-wrap">
-              <canvas class="tw-canvas" id="tw-canvas" width="1080" height="1080" tabindex="0"
-                      role="img" aria-label="Pratinjau twibbon. Setelah foto diunggah, seret atau gunakan tombol panah untuk menggeser posisi foto."></canvas>
-            </div>
-            <p class="tw-canvas-hint">Seret foto untuk mengatur posisi · ukuran hasil 1080×1080 px</p>
-          </div>
-          <noscript><p class="twibbon__lead">Pembuat twibbon membutuhkan JavaScript. Aktifkan JavaScript di browsermu untuk memakainya.</p></noscript>
+          <ol class="dk-how">
+            <li>Isi nama, sekolah, provinsi, dan email</li>
+            <li>Masukkan kode akses (dibagikan saat live &amp; di saluran WA)</li>
+            <li>Selesai! Panitia menghubungimu lewat email</li>
+          </ol>
         </div>
 
-        <div class="tw-editor reveal">
+        <div class="dk-card reveal" aria-live="polite">
+          <div class="dk-state" id="dk-muat"><p>Memeriksa status Dana Kaget…</p></div>
 
-          <ol class="tw-steps">
-            <li class="tw-step" data-step="1">
-              <span class="tw-step__num" aria-hidden="true">1</span>
-              <div>
-                <h3>Unggah foto</h3>
-                <p>Pilih foto terbaikmu (JPG/PNG, maks. 10 MB).</p>
-                <div class="tw-step__ctrl">
-                  <label class="btn btn--soft btn--sm file-btn">
-                    <svg aria-hidden="true"><use href="#i-image"/></svg>
-                    <span data-file-label>Pilih foto</span>
-                    <input type="file" id="tw-file" accept="image/png,image/jpeg,image/webp" aria-describedby="tw-file-error">
-                  </label>
-                  <p class="field__error" id="tw-file-error" role="alert"></p>
-                </div>
-              </div>
-            </li>
-            <li class="tw-step" data-step="2">
-              <span class="tw-step__num" aria-hidden="true">2</span>
-              <div>
-                <h3>Atur posisi &amp; zoom</h3>
-                <p>Sesuaikan fotomu dengan bingkai.</p>
-                <div class="tw-step__ctrl">
-                  <div class="range-row">
-                    <label for="tw-zoom">Zoom</label>
-                    <input class="range" type="range" id="tw-zoom" min="1" max="3" step="0.01" value="1" disabled>
-                  </div>
-                  <div class="nudge" role="group" aria-label="Geser foto">
-                    <button class="btn btn--soft btn--sm" type="button" data-nudge="0,-1" aria-label="Geser ke atas" disabled>↑</button>
-                    <button class="btn btn--soft btn--sm" type="button" data-nudge="0,1" aria-label="Geser ke bawah" disabled>↓</button>
-                    <button class="btn btn--soft btn--sm" type="button" data-nudge="-1,0" aria-label="Geser ke kiri" disabled>←</button>
-                    <button class="btn btn--soft btn--sm" type="button" data-nudge="1,0" aria-label="Geser ke kanan" disabled>→</button>
-                    <button class="btn btn--soft btn--sm" type="button" data-reset disabled>Reset</button>
-                  </div>
-                </div>
-              </div>
-            </li>
-            <li class="tw-step" data-step="3">
-              <span class="tw-step__num" aria-hidden="true">3</span>
-              <div>
-                <h3>Isi identitasmu</h3>
-                <p>Tampilkan identitasmu di bingkai.</p>
-                <div class="tw-step__ctrl">
-                  <div class="tw-fields">
-                    <div class="field">
-                      <label for="tw-name">Nama</label>
-                      <input class="input" id="tw-name" required minlength="2" maxlength="60" aria-describedby="tw-name-error" autocomplete="name" placeholder="Contoh: Budi Santoso"><p class="field__error" id="tw-name-error"></p>
-                    </div>
-                    <div class="field">
-                      <label for="tw-city">Sekolah</label>
-                      <input class="input" id="tw-city" required minlength="2" maxlength="100" placeholder="Contoh: SMAN 1 Semarang" aria-describedby="tw-city-error"><p class="field__error" id="tw-city-error"></p>
-                    </div>
-                    <div class="field">
-                      <label for="tw-prov">Provinsi</label>
-                      <select class="select" id="tw-prov" required aria-describedby="tw-prov-error"><option value="">Pilih provinsi</option></select><p class="field__error" id="tw-prov-error"></p>
-                    </div>
-                    <div class="field">
-                      <label for="tw-kota">Kota/Kabupaten</label>
-                      <select class="select" id="tw-kota" required disabled aria-describedby="tw-kota-error"><option value="">Pilih kota/kabupaten</option></select><p class="field__error" id="tw-kota-error"></p>
-                    </div>
-                    <div class="field field--wide">
-                      <label for="tw-email">Email</label>
-                      <input class="input" type="email" id="tw-email" autocomplete="email" inputmode="email" required maxlength="254" placeholder="nama@email.com" aria-describedby="tw-email-hint tw-email-error">
-                      <p class="field__hint" id="tw-email-hint">Untuk informasi YCS. Email tidak tampil di twibbon.</p>
-                      <p class="field__error" id="tw-email-error"></p>
-                    </div>
-                  </div>
-                  <div class="req-card">
-                    <a class="unlock" id="tw-channel" href="https://whatsapp.com/channel/0029Vb5vVIaId7nEqecJ1I1G" target="_blank" rel="noopener" aria-describedby="tw-channel-state tw-channel-error">
-                      <span class="unlock__icon" aria-hidden="true"><svg><use href="#i-whatsapp"/></svg></span>
-                      <span>
-                        <span class="unlock__eyebrow">Syarat wajib</span>
-                        <span class="unlock__title">Ikuti Saluran WhatsApp YCS</span>
-                        <span class="unlock__state" id="tw-channel-state" role="status">Ketuk kartu ini, syarat langsung tercentang</span>
-                      </span>
-                      <span class="unlock__check" aria-hidden="true"><svg><use href="#i-check"/></svg></span>
-                    </a>
-                    <p class="field__error" id="tw-channel-error"></p>
-                    <label class="check" for="tw-consent">
-                      <input type="checkbox" id="tw-consent" required aria-describedby="tw-consent-error">
-                      <span>Saya setuju nama, sekolah, daerah, dan email disimpan oleh panitia sesuai <a href="privasi/" target="_blank">Kebijakan Privasi</a>. Jika di bawah 18 tahun, saya sudah mendapat izin orang tua/wali.</span>
-                    </label>
-                    <p class="field__error" id="tw-consent-error"></p>
-                  </div>
-                  <div hidden><label for="tw-website">Website</label><input id="tw-website" tabindex="-1" autocomplete="off"></div>
-                </div>
-              </div>
-            </li>
-            <li class="tw-step" data-step="4">
-              <span class="tw-step__num" aria-hidden="true">4</span>
-              <div>
-                <h3>Buat, unduh &amp; bagikan</h3>
-                <p>Twibbon langsung terunduh dan data terkirim ke panitia. Foto tetap di perangkatmu.</p>
-                <p id="tw-status" role="status" aria-live="polite"></p>
-                <p>Unggah ke Instagram/TikTok dan tag akun resmi YCS.</p>
-                <div class="tw-step__ctrl tw-actions">
-                  <button class="btn btn--cta" type="button" id="tw-download" disabled>
-                    <svg aria-hidden="true"><use href="#i-download"/></svg>Buat &amp; unduh PNG
-                  </button>
-                  <button class="btn btn--primary" type="button" id="tw-share" hidden disabled>
-                    <svg aria-hidden="true"><use href="#i-share"/></svg>Bagikan
-                  </button>
-                </div>
-                <div class="tw-result" id="tw-result" hidden>
-                  <img id="tw-result-img" alt="Twibbon hasil buatanmu" width="1080" height="1080">
-                  <p>Unduhan tidak mulai? Di browser dalam aplikasi (WhatsApp, Instagram, TikTok) <strong>tekan lama gambar di atas</strong>, lalu pilih <em>Simpan gambar</em>. Atau buka halaman ini di Chrome/Safari.</p>
-                  <a class="btn btn--soft btn--sm" id="tw-result-link" href="#twibbon" download>Unduh lagi</a>
-                </div>
-              </div>
-            </li>
-          </ol>
+          <div class="dk-state" id="dk-tutup" hidden>
+            <span class="dk-state__art" aria-hidden="true"><svg><use href="#i-lock"/></svg></span>
+            <h3>Dana Kaget belum dibuka</h3>
+            <p id="dk-teks-tutup">Form akan dibuka saat panitia mengumumkannya lewat live dan saluran WhatsApp YCS. Simpan halaman ini, ya!</p>
+            <a class="btn btn--wa btn--sm" href="https://whatsapp.com/channel/0029Vb5vVIaId7nEqecJ1I1G" target="_blank" rel="noopener" data-saluran><svg aria-hidden="true"><use href="#i-whatsapp"/></svg>Ikuti saluran WhatsApp YCS</a>
+          </div>
+
+          <div class="dk-state" id="dk-habis" hidden>
+            <span class="dk-state__art" aria-hidden="true"><svg><use href="#i-gift"/></svg></span>
+            <h3>Dana sudah habis</h3>
+            <p id="dk-teks-habis">Kuota Dana Kaget kali ini sudah terpenuhi. Terima kasih sudah antusias! Pantau live YCS berikutnya, siapa tahu ada kesempatan lagi.</p>
+            <a class="btn btn--soft btn--sm" href="#live">Lihat jadwal live</a>
+          </div>
+
+          <form id="dk-step1" novalidate hidden>
+            <ol class="dk-steps" aria-label="Langkah klaim"><li aria-current="step">Identitas</li><li>Kode akses</li></ol>
+            <h3>Isi identitasmu dulu</h3>
+            <p class="dk-card__sub">Dipakai panitia untuk verifikasi dan menyalurkan Dana Kaget.</p>
+            <div class="dk-fields">
+              <div class="field field--wide"><label for="dk-nama">Nama</label><input class="input" id="dk-nama" required minlength="2" maxlength="60" autocomplete="name" placeholder="Contoh: Budi Santoso" aria-describedby="dk-nama-error"><p class="field__error" id="dk-nama-error"></p></div>
+              <div class="field field--wide"><label for="dk-sekolah">Sekolah</label><input class="input" id="dk-sekolah" required minlength="2" maxlength="100" placeholder="Contoh: SMAN 1 Semarang" aria-describedby="dk-sekolah-error"><p class="field__error" id="dk-sekolah-error"></p></div>
+              <div class="field"><label for="dk-prov">Provinsi</label><select class="select" id="dk-prov" required aria-describedby="dk-prov-error"><option value="">Pilih provinsi</option></select><p class="field__error" id="dk-prov-error"></p></div>
+              <div class="field"><label for="dk-email">Email</label><input class="input" type="email" id="dk-email" required maxlength="254" autocomplete="email" inputmode="email" placeholder="nama@email.com" aria-describedby="dk-email-error"><p class="field__error" id="dk-email-error"></p></div>
+            </div>
+            <label class="check" for="dk-setuju" style="margin-top:1rem">
+              <input type="checkbox" id="dk-setuju" required aria-describedby="dk-setuju-error">
+              <span>Data saya benar dan boleh disimpan panitia sesuai <a href="privasi/" target="_blank">Kebijakan Privasi</a>. Jika di bawah 18 tahun, saya sudah mendapat izin orang tua/wali.</span>
+            </label>
+            <p class="field__error" id="dk-setuju-error"></p>
+            <div hidden><label for="dk-website">Website</label><input id="dk-website" tabindex="-1" autocomplete="off"></div>
+            <button class="btn btn--cta btn--block" type="submit" style="margin-top:1.25rem">Lanjut: masukkan kode <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+          </form>
+
+          <form id="dk-step2" novalidate hidden>
+            <ol class="dk-steps" aria-label="Langkah klaim"><li class="is-done">Identitas</li><li aria-current="step">Kode akses</li></ol>
+            <h3 tabindex="-1" id="dk-step2-judul">Masukkan kode akses</h3>
+            <p class="dk-card__sub">Kode dibagikan panitia saat live dan di saluran WhatsApp YCS.</p>
+            <div class="dk-who"><span>Atas nama <strong id="dk-who"></strong></span><button type="button" id="dk-ubah">Ubah</button></div>
+            <div class="field" style="margin-top:1rem"><label for="dk-kode">Kode akses</label><input class="input dk-kode" id="dk-kode" required maxlength="40" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="YCS-XXXXX"></div>
+            <p class="dk-alert" id="dk-alert" role="alert"></p>
+            <button class="btn btn--cta btn--block" type="submit" id="dk-kirim" style="margin-top:1rem"><svg aria-hidden="true"><use href="#i-gift"/></svg>Klaim Dana Kaget</button>
+          </form>
+
+          <div class="dk-state dk-state--ok" id="dk-sukses" hidden>
+            <span class="dk-state__art" aria-hidden="true"><svg><use href="#i-check"/></svg></span>
+            <h3 tabindex="-1" id="dk-sukses-judul">Klaim diterima!</h3>
+            <p id="dk-teks-sukses">Panitia akan menghubungimu lewat email. Pastikan emailmu aktif.</p>
+            <a class="btn btn--soft btn--sm" href="#satu-kata">Sekalian kirim Satu Kata</a>
+          </div>
         </div>
       </div>
       <svg class="wave wave--bottom" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true"><path d="M0 46C180 78 360 10 560 30s380 50 560 26 240-46 320-34V80H0Z"/></svg>
@@ -1765,7 +1657,7 @@
         <article class="card road reveal" id="road-to-bali" aria-labelledby="road-title">
           <div class="road__head">
             <h2 class="road__title" id="road-title">Road to Bali</h2>
-            <p class="road__lead">Setiap twibbon yang dibuat menambah langkah kita. Semakin banyak yang bergabung, semakin dekat ke Bali!</p>
+            <p class="road__lead">Setiap kata yang dikirim dan setiap klaim menambah langkah kita. Semakin banyak yang ikut, semakin dekat ke Bali!</p>
           </div>
 
           <div class="road__progress">
@@ -1794,20 +1686,10 @@
 
         <!-- Leaderboard -->
         <article class="card panel reveal" id="leaderboard" aria-labelledby="lb-title">
-          <h2 class="panel__title" id="lb-title">Leaderboard Daerah</h2>
-          <p class="panel__sub">Daerah dengan twibbon terbanyak. Wakili daerahmu dengan membuat twibbon!</p>
+          <h2 class="panel__title" id="lb-title">Leaderboard Provinsi</h2>
+          <p class="panel__sub">Provinsi dengan dukungan terbanyak. Kirim Satu Kata dan pilih provinsimu!</p>
 
-          <div class="tabs" role="tablist" aria-label="Kategori leaderboard">
-            <button class="tab" type="button" role="tab" id="tab-kota" aria-controls="panel-kota" aria-selected="true">Kota</button>
-            <button class="tab" type="button" role="tab" id="tab-prov" aria-controls="panel-prov" aria-selected="false" tabindex="-1">Provinsi</button>
-          </div>
-
-          <div role="tabpanel" id="panel-kota" aria-labelledby="tab-kota" tabindex="0">
-            <ol class="rank-list">
-              <li class="rank-empty">Memuat leaderboard…</li>
-            </ol>
-          </div>
-          <div role="tabpanel" id="panel-prov" aria-labelledby="tab-prov" tabindex="0">
+          <div id="panel-prov">
             <ol class="rank-list">
               <li class="rank-empty">Memuat leaderboard…</li>
             </ol>
@@ -1881,16 +1763,11 @@
     </section>
 
     <!-- ========== SURVEI & DANA KAGET (tampil jika aktif) ========== -->
-    <section class="section" id="promo" aria-label="Survei destinasi dan Dana Kaget" style="padding-top:0" hidden>
+    <section class="section" id="promo" aria-label="Survei destinasi" style="padding-top:0" hidden>
       <div class="container promo-grid">
         <a class="promo promo--survei" href="survei/?ref=beranda" data-promo="survei" hidden>
           <span class="promo__icon" aria-hidden="true"><svg><use href="#i-compass"/></svg></span>
           <span><strong>Ke mana YCS berikutnya?</strong><span>Isi survei destinasi impian, cuma 1 menit.</span></span>
-          <svg aria-hidden="true"><use href="#i-arrow"/></svg>
-        </a>
-        <a class="promo promo--dana" href="dana-kaget/?ref=beranda" data-promo="dana" hidden>
-          <span class="promo__icon" aria-hidden="true"><svg><use href="#i-gift"/></svg></span>
-          <span><strong id="promo-dana-judul">Dana Kaget YCS dibuka!</strong><span>Punya kode akses? Ajukan sebelum kuota habis.</span><span class="promo__pill" id="promo-dana-sisa" hidden></span></span>
           <svg aria-hidden="true"><use href="#i-arrow"/></svg>
         </a>
       </div>
@@ -1952,19 +1829,43 @@
       </div>
     </section>
 
-    <!-- ========== FAQ ========== -->
-    <section class="section deco-bg" id="harapan" aria-labelledby="harapan-title" style="padding-top:0">
+    <!-- ========== SATU KATA (kirim gratis, hasil terkunci sampai ikut saluran WA) ========== -->
+    <section class="section deco-bg" id="satu-kata" aria-labelledby="sk-title">
       <div class="container">
-        <div class="harapan-card reveal" data-lazy-bg>
-          <div>
-            <span class="badge" style="background:#FFD86B;color:#5B0A16">Baru</span>
-            <h2 id="harapan-title" style="margin-top:.75rem">Satu Kata <span>untuk Indonesia</span></h2>
-            <p>Tulis satu kata harapanmu. Semua kata dari peserta dirangkai jadi satu karya besar bertuliskan <strong>YOUTH CHARACTER SUMMIT 2026</strong> dan ditayangkan di layar acara.</p>
-            <a class="btn btn--light" href="harapan/" style="margin-top:1.25rem">Kirim kata harapanku <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+        <div class="harapan-card sk is-locked reveal" id="sk" data-lazy-bg>
+          <div class="sk__form">
+            <span class="badge" style="background:#FFD86B;color:#5B0A16;justify-self:start">#SatuKataUntukIndonesia</span>
+            <h2 id="sk-title">Satu Kata <span>untuk Indonesia</span></h2>
+            <p>Kirim satu kata harapanmu, <strong>gratis</strong>. Semua kata dirangkai jadi satu karya besar dan ditayangkan di layar acara YCS 2026.</p>
+            <form id="sk-form" novalidate>
+              <label class="visually-hidden" for="sk-kata">Satu kata harapanmu</label>
+              <div class="sk__row">
+                <input class="input sk__input" id="sk-kata" maxlength="20" placeholder="Contoh: berani" autocomplete="off" autocapitalize="none" spellcheck="false" aria-describedby="sk-msg">
+                <button class="btn btn--light" type="submit" id="sk-kirim">Kirim</button>
+              </div>
+              <label class="visually-hidden" for="sk-prov">Provinsi (opsional)</label>
+              <select class="select sk__select" id="sk-prov" style="margin-top:.5rem"><option value="">Dari provinsi mana? (opsional)</option></select>
+              <div hidden><label for="sk-website">Website</label><input id="sk-website" tabindex="-1" autocomplete="off"></div>
+              <p class="sk__msg" id="sk-msg" role="status"></p>
+            </form>
+            <p class="sk__count"><strong id="sk-total">–</strong> kata sudah terkumpul</p>
           </div>
-          <p class="harapan-words" aria-hidden="true">
-            <span style="font-size:2.6rem">maju</span><span style="font-size:1.4rem">jujur</span><span style="font-size:2rem">damai</span><span style="font-size:1rem">peduli</span><span style="font-size:1.7rem">bersatu</span><span style="font-size:1.2rem">berani</span><span style="font-size:2.2rem">hebat</span><span style="font-size:1rem">adil</span><span style="font-size:1.5rem">cerdas</span><span style="font-size:1.1rem">toleran</span><span style="font-size:1.9rem">sejahtera</span><span style="font-size:1.2rem">mandiri</span>
-          </p>
+          <div class="sk__result">
+            <div class="sk__cloud" id="sk-cloud" aria-hidden="true">
+              <span style="font-size:2.6rem">maju</span><span style="font-size:1.4rem">jujur</span><span style="font-size:2rem">damai</span><span style="font-size:1rem">peduli</span><span style="font-size:1.7rem">bersatu</span><span style="font-size:1.2rem">berani</span><span style="font-size:2.2rem">hebat</span><span style="font-size:1rem">adil</span><span style="font-size:1.5rem">cerdas</span><span style="font-size:1.1rem">toleran</span><span style="font-size:1.9rem">sejahtera</span><span style="font-size:1.2rem">mandiri</span>
+            </div>
+            <div class="sk__lock" id="sk-lock">
+              <span class="sk__lock-ico" aria-hidden="true"><svg><use href="#i-lock"/></svg></span>
+              <strong>Hasilnya masih terkunci</strong>
+              <p>Penasaran kata apa yang paling banyak dikirim? Ikuti Saluran WhatsApp YCS untuk membuka awan kata lengkap dan mengunduh kartu katamu.</p>
+              <a class="btn btn--wa" id="sk-buka" href="https://whatsapp.com/channel/0029Vb5vVIaId7nEqecJ1I1G" target="_blank" rel="noopener" data-saluran><svg aria-hidden="true"><use href="#i-whatsapp"/></svg>Ikuti saluran &amp; buka hasil</a>
+              <small>Ketuk, ikuti saluran, lalu kembali ke halaman ini.</small>
+            </div>
+            <div class="sk__actions">
+              <button class="btn btn--light btn--sm" type="button" id="sk-unduh"><svg aria-hidden="true"><use href="#i-download"/></svg>Unduh kartu kata</button>
+              <button class="btn btn--ghost-light btn--sm" type="button" data-share-open="kata"><svg aria-hidden="true"><use href="#i-share"/></svg>Ajak teman</button>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -2027,7 +1928,7 @@
           </details>
           <details class="faq">
             <summary>Apa itu YCS Squad?<svg aria-hidden="true"><use href="#i-plus"/></svg></summary>
-            <p class="faq__body">YCS Squad adalah komunitas pendukung: teman, guru, keluarga, dan siapa pun yang ingin ikut menyebarkan semangat YCS 2026. Anggota Squad mendapat info live lebih dulu dan bingkai twibbon khusus. Untuk mendukung gerakan ini, cukup buat twibbon dan bergabung ke saluran WhatsApp resmi.</p>
+            <p class="faq__body">YCS Squad adalah komunitas pendukung: teman, guru, keluarga, dan siapa pun yang ingin ikut menyebarkan semangat YCS 2026. Anggota Squad mendapat info live lebih dulu. Untuk mendukung gerakan ini, cukup kirim Satu Kata dan ikuti saluran WhatsApp resmi.</p>
           </details>
           <details class="faq">
             <summary>Apa saja beasiswanya?<svg aria-hidden="true"><use href="#i-plus"/></svg></summary>
@@ -2090,7 +1991,7 @@
       <div class="footer-legal">
         <details id="privasi">
           <summary>Kebijakan Privasi singkat YCS 2026</summary>
-          <p>Data pembuat twibbon (nama, sekolah, email) hanya dipakai panitia Universitas STEKOM untuk mengirim informasi seputar Youth Character Summit 2026 dan tidak dijual ke pihak lain. Foto twibbon diproses di perangkatmu dan tidak dikirim ke server. Pengisian oleh pelajar di bawah 18 tahun memerlukan izin orang tua/wali. Untuk menghapus datamu, hubungi CS di WhatsApp 0878-4877-5292. <a href="privasi/">Baca kebijakan lengkap</a>.</p>
+          <p>Data klaim Dana Kaget (nama, sekolah, provinsi, email) hanya dipakai panitia Universitas STEKOM untuk verifikasi dan informasi seputar Youth Character Summit 2026, dan tidak dijual ke pihak lain. Satu Kata hanya menyimpan kata dan provinsi (opsional). Pengisian oleh pelajar di bawah 18 tahun memerlukan izin orang tua/wali. Untuk menghapus datamu, hubungi CS di WhatsApp 0878-4877-5292. <a href="privasi/">Baca kebijakan lengkap</a>.</p>
         </details>
         <details class="credits">
           <summary>Kredit foto Bali (Wikimedia Commons)</summary>
@@ -2107,12 +2008,12 @@
   <nav class="orb" id="orb" aria-label="Menu cepat">
     <span class="orb__hint" aria-hidden="true">Menu cepat</span>
     <ul class="orb__menu" id="orb-menu">
-      <li class="orb__item orb__item--tw"><a class="orb__link" href="#twibbon" tabindex="-1"><svg aria-hidden="true"><use href="#i-image"/></svg><span class="orb__label">Twibbon<small>Buat sekarang</small></span></a></li>
+      <li class="orb__item orb__item--tw"><a class="orb__link" href="#satu-kata" tabindex="-1"><svg aria-hidden="true"><use href="#i-chat"/></svg><span class="orb__label">Satu Kata<small>Kirim gratis</small></span></a></li>
       <li class="orb__item orb__item--live"><a class="orb__link" href="#live" id="orb-live" tabindex="-1"><svg aria-hidden="true"><use href="#i-play"/></svg><span class="orb__label">Tonton Live<small id="orb-live-sub">Jadwal siaran</small></span></a></li>
-      <li class="orb__item orb__item--dana"><a class="orb__link" href="dana-kaget/" tabindex="-1"><svg aria-hidden="true"><use href="#i-gift"/></svg><span class="orb__label">Klaim Dana Kaget<small id="orb-dana-sub">Pakai kode akses</small></span></a></li>
+      <li class="orb__item orb__item--dana"><a class="orb__link" href="#dana" tabindex="-1"><svg aria-hidden="true"><use href="#i-gift"/></svg><span class="orb__label">Klaim Dana Kaget<small id="orb-dana-sub">Pakai kode akses</small></span></a></li>
       <li class="orb__item orb__item--wild"><a class="orb__link" href="klaim/" tabindex="-1"><svg aria-hidden="true"><use href="#i-ticket"/></svg><span class="orb__label">Klaim Wildcard<small id="orb-wild-sub">Untuk yang belum lolos</small></span></a></li>
     </ul>
-    <button class="orb__core" type="button" id="orb-core" aria-expanded="false" aria-controls="orb-menu" aria-label="Buka menu cepat: Twibbon, Tonton Live, Klaim Dana Kaget, Klaim Wildcard">
+    <button class="orb__core" type="button" id="orb-core" aria-expanded="false" aria-controls="orb-menu" aria-label="Buka menu cepat: Satu Kata, Tonton Live, Klaim Dana Kaget, Klaim Wildcard">
       <svg class="orb__bolt" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M13.2 2.5 5 13.2h5.6L9.8 21.5 18 10.8h-5.6l.8-8.3Z"/></svg>
       <svg class="orb__x" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></svg>
     </button>
@@ -2173,9 +2074,10 @@
        KONFIGURASI — ubah di sini.
        ========================================================== */
     const CONFIG = {
-      twibbonEndpoint: '/api/twibbon',
+      danaEndpoint: '/api/dana',
+      kataEndpoint: '/api/kata',
       configEndpoint: '/api/config',   // pengaturan dari panel admin (cache CDN 30 dtk)
-      statsEndpoint: '/api/stats',     // Road to Bali + leaderboard dari data twibbon
+      statsEndpoint: '/api/stats',     // Road to Bali + leaderboard (Satu Kata + Dana Kaget)
       revealEndpoint: '/api/reveal',   // daftar finalis; ditolak server sebelum waktu pengumuman
       nowEndpoint: '/api/now',         // jam server untuk countdown
       finalisPageSize: 12,
@@ -2247,12 +2149,13 @@
       const bersih = mentah.replace(/[^A-Z0-9]/g, '');
       if (bersih.length < 5) { $('#kode-error').textContent = 'Kode terlalu pendek. Periksa lagi kode dari email atau panitia.'; return; }
       const dana = /^YCS-?[A-Z0-9]{5}$/.test(mentah) || bersih.length !== 8;
-      location.href = (dana ? 'dana-kaget/?kode=' : 'klaim/?kode=') + encodeURIComponent(dana ? mentah : bersih);
+      if (dana) { kodeDlg.close(); bukaDanaDenganKode(mentah); return; }
+      location.href = 'klaim/?kode=' + encodeURIComponent(bersih);
     });
 
     /* ---------- Scrollspy ---------- */
     const navLinks = $$('.nav__link, .mobile-nav a');
-    const spyIds = ['live', 'twibbon', 'road-to-bali', 'delegasi', 'harapan', 'faq'];
+    const spyIds = ['live', 'dana', 'satu-kata', 'road-to-bali', 'delegasi', 'faq'];
     const spyTargets = spyIds.map((id) => document.getElementById(id)).filter(Boolean);
     const setCurrent = (id) => navLinks.forEach((a) => {
       if (a.getAttribute('href') === '#' + id) a.setAttribute('aria-current', 'true');
@@ -2275,7 +2178,7 @@
     }
 
     /* ---------- Sumber kunjungan (?ref=) ---------- */
-    // Disimpan 30 hari sebagai sentuhan pertama; dikirim bersama twibbon untuk mengukur efektivitas blasting.
+    // Disimpan 30 hari sebagai sentuhan pertama; dikirim bersama Satu Kata & Dana Kaget untuk mengukur efektivitas blasting.
     const sumber = (() => {
       const dariUrl = (new URLSearchParams(location.search).get('ref') || '').toLowerCase().replace(/[^\w-]/g, '').slice(0, 40);
       try {
@@ -2311,8 +2214,8 @@
     /* ---------- Fase halaman: pra (countdown) / pasca (reveal) ---------- */
     // Urutan section per fase. DOM statis sudah berurutan "pra" agar tampilan tanpa JS tetap wajar.
     const URUTAN = {
-      pra: ['beranda', 'live', 'twibbon', 'road', 'delegasi', 'promo', 'jejak', 'ikon-bali', 'harapan', 'komunitas', 'faq', 'klaim-cta'],
-      pasca: ['beranda', 'delegasi', 'klaim-cta', 'live', 'twibbon', 'road', 'promo', 'jejak', 'ikon-bali', 'harapan', 'komunitas', 'faq'],
+      pra: ['beranda', 'dana', 'satu-kata', 'live', 'road', 'delegasi', 'promo', 'jejak', 'ikon-bali', 'komunitas', 'faq', 'klaim-cta'],
+      pasca: ['beranda', 'delegasi', 'klaim-cta', 'dana', 'satu-kata', 'live', 'road', 'promo', 'jejak', 'ikon-bali', 'komunitas', 'faq'],
     };
     let fase = 'pra';
     function setFase(f) {
@@ -2407,14 +2310,10 @@
       if (!cfg) return;
       const surveiBuka = !cfg.survei.buka || now() >= Date.parse(cfg.survei.buka);
       const survei = cfg.survei.aktif && surveiBuka;
-      const dana = cfg.dana.saklar;
       $$('[data-promo="survei"]').forEach((el) => { el.hidden = !survei; });
-      $$('[data-promo="dana"]').forEach((el) => { el.hidden = !dana; });
-      const pill = $('#promo-dana-sisa');
-      pill.hidden = !(dana && cfg.dana.sisa != null);
-      $('#promo-dana-judul').textContent = cfg.dana.penuh ? 'Dana Kaget sudah habis' : 'Dana Kaget YCS dibuka!';
-      if (!pill.hidden) pill.textContent = cfg.dana.penuh ? 'Kuota habis' : `Tersisa ${nf.format(cfg.dana.sisa)}`;
-      $('#promo').hidden = !(survei || dana);
+      $('#promo').hidden = !survei;
+      if (cfg.saluran) $$('[data-saluran]').forEach((a) => { a.href = cfg.saluran; });
+      terapkanDana();
     }
 
     Promise.all([ambilConfig(), offsetReady]).then(() => {
@@ -2601,28 +2500,6 @@
       });
     });
 
-    /* ---------- Tabs leaderboard ---------- */
-    const tabs = $$('[role="tab"]');
-    const selectTab = (tab, focus) => {
-      tabs.forEach((t) => {
-        const on = t === tab;
-        t.setAttribute('aria-selected', String(on));
-        t.tabIndex = on ? 0 : -1;
-        document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
-      });
-      if (focus) tab.focus();
-    };
-    tabs.forEach((t, i) => {
-      t.addEventListener('click', () => selectTab(t));
-      t.addEventListener('keydown', (e) => {
-        const dir = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
-        if (dir) { e.preventDefault(); selectTab(tabs[(i + dir + tabs.length) % tabs.length], true); }
-        if (e.key === 'Home') { e.preventDefault(); selectTab(tabs[0], true); }
-        if (e.key === 'End') { e.preventDefault(); selectTab(tabs[tabs.length - 1], true); }
-      });
-    });
-    selectTab(tabs[0]);
-
     /* ---------- Road to Bali ---------- */
     function gambarRoad(current, target) {
       const pct = Math.max(0, Math.min(100, (current / target) * 100));
@@ -2642,11 +2519,11 @@
 
     const lb = { data: { kota: [], provinsi: [] }, lebar: 5 };
     function renderRank() {
-      [['#panel-kota', lb.data.kota], ['#panel-prov', lb.data.provinsi]].forEach(([sel, list]) => {
+      [['#panel-prov', lb.data.provinsi]].forEach(([sel, list]) => {
         const ol = $(sel + ' .rank-list');
         ol.textContent = '';
         if (!list.length) {
-          ol.innerHTML = '<li class="rank-empty">Belum ada data daerah. Buat twibbon dan jadikan daerahmu yang pertama!</li>';
+          ol.innerHTML = '<li class="rank-empty">Belum ada data provinsi. Kirim Satu Kata dan jadikan provinsimu yang pertama!</li>';
           return;
         }
         list.slice(0, lb.lebar).forEach((x, i) => {
@@ -2660,7 +2537,7 @@
         });
       });
       const btn = $('#lb-more');
-      btn.hidden = Math.max(lb.data.kota.length, lb.data.provinsi.length) <= 5;
+      btn.hidden = lb.data.provinsi.length <= 5;
       btn.textContent = lb.lebar > 5 ? 'Tampilkan 5 besar' : 'Tampilkan 10 besar';
       btn.setAttribute('aria-expanded', String(lb.lebar > 5));
     }
@@ -2844,6 +2721,7 @@
       pasca: () => ({ url: tautan('share-finalis'), text: 'Pengumuman finalis YCS 2026 sudah rilis! Cek siapa saja yang melangkah ke Bali:' }),
       live: () => ({ url: tautan('share-live', '#live'), text: 'Jadwal live Youth Character Summit 2026, jangan sampai ketinggalan:' }),
       daftar: () => ({ url: tautan('share-daftar', '#delegasi'), text: 'Daftar finalis Youth Character Summit 2026. Ada nama temanmu?' }),
+      kata: () => ({ url: tautan('share-kata', '#satu-kata'), text: kataSaya ? `Aku kirim kata "${kataSaya}" untuk Indonesia. Kata apa yang paling banyak dikirim? Kirim katamu & buka hasilnya:` : 'Kirim satu kata untuk Indonesia, gratis! Penasaran hasilnya? Buka di sini:' }),
     };
     // HP: langsung buka lembar bagikan bawaan (sudah berisi WhatsApp/Instagram). Desktop: dialog pilihan.
     function bagikan(data) {
@@ -2877,361 +2755,226 @@
       toast('File pengingat (.ics) diunduh. Buka untuk menambahkannya ke kalender.');
     }));
 
-    /* ---------- Twibbon ---------- */
-    const tw = {
-      canvas: $('#tw-canvas'), file: $('#tw-file'), fileErr: $('#tw-file-error'), zoom: $('#tw-zoom'),
-      name: $('#tw-name'), city: $('#tw-city'), dl: $('#tw-download'), share: $('#tw-share'),
-      img: null, frame: 'delegasi', scale: 1, ox: 0, oy: 0,
-    };
-    const ctx = tw.canvas.getContext('2d');
-    const S = 1080;
-
-    const FRAMES = {
-      delegasi: { band: '#0E5A66', band2: '#082C33', line1: "I'm Ready", line2: 'for YCS 2026', pill: 'DELEGASI', pillBg: '#FFC93C', pillFg: '#082C33' },
-      squad:    { band: '#C2410C', band2: '#7C2D12', line1: 'Proud to be', line2: 'YCS Squad', pill: 'YCS SQUAD', pillBg: '#FFFFFF', pillFg: '#9A3412' },
-    };
-
-    function roundRect(x, y, w, h, r) {
-      ctx.beginPath();
-      ctx.moveTo(x + r, y);
-      ctx.arcTo(x + w, y, x + w, y + h, r);
-      ctx.arcTo(x + w, y + h, x, y + h, r);
-      ctx.arcTo(x, y + h, x, y, r);
-      ctx.arcTo(x, y, x + w, y, r);
-      ctx.closePath();
-    }
-    function fitText(text, maxW, size, weight, family) {
-      let s = size;
-      do { ctx.font = `${weight} ${s}px ${family}`; s -= 2; } while (ctx.measureText(text).width > maxW && s > 18);
-    }
-    function flower(x, y, r, color) {
-      ctx.save(); ctx.translate(x, y); ctx.fillStyle = color;
-      for (let i = 0; i < 5; i++) {
-        ctx.rotate((Math.PI * 2) / 5);
-        ctx.beginPath(); ctx.ellipse(0, -r * .6, r * .42, r * .7, 0, 0, Math.PI * 2); ctx.fill();
-      }
-      ctx.fillStyle = '#FFC93C'; ctx.beginPath(); ctx.arc(0, 0, r * .28, 0, Math.PI * 2); ctx.fill();
-      ctx.restore();
-    }
-
-    function sparkle(x, y, r, color) {
-      ctx.save(); ctx.translate(x, y); ctx.fillStyle = color; ctx.beginPath();
-      for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4, rr = i % 2 ? r * .28 : r; ctx.lineTo(Math.cos(a) * rr, Math.sin(a) * rr); }
-      ctx.closePath(); ctx.fill(); ctx.restore();
-    }
-    function kite(x, y, k) {
-      ctx.save(); ctx.translate(x, y); ctx.scale(k, k); ctx.rotate(.18);
-      ctx.fillStyle = '#FB923C'; ctx.beginPath(); ctx.moveTo(0, -80); ctx.lineTo(68, 0); ctx.lineTo(0, 88); ctx.lineTo(-68, 0); ctx.closePath(); ctx.fill();
-      ctx.fillStyle = '#EA580C'; ctx.beginPath(); ctx.moveTo(0, -80); ctx.lineTo(0, 88); ctx.lineTo(-68, 0); ctx.closePath(); ctx.fill();
-      ctx.fillStyle = '#FFC93C'; ctx.beginPath(); ctx.moveTo(0, -40); ctx.lineTo(38, 0); ctx.lineTo(0, 48); ctx.lineTo(-38, 0); ctx.closePath(); ctx.fill();
-      ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(0, 88); ctx.bezierCurveTo(-20, 130, 30, 150, 0, 200); ctx.stroke();
-      ctx.restore();
-    }
-    function draw() {
-      const f = FRAMES[tw.frame];
-      ctx.clearRect(0, 0, S, S);
-
-      // Foto / placeholder
-      if (tw.img) {
-        const base = Math.max(S / tw.img.width, S / tw.img.height) * tw.scale;
-        const w = tw.img.width * base, h = tw.img.height * base;
-        ctx.drawImage(tw.img, (S - w) / 2 + tw.ox, (S - h) / 2 + tw.oy, w, h);
-      } else {
-        const g = ctx.createLinearGradient(0, 0, S, S);
-        g.addColorStop(0, '#12707E'); g.addColorStop(1, '#0B3B44');
-        ctx.fillStyle = g; ctx.fillRect(0, 0, S, S);
-        ctx.fillStyle = 'rgba(255,255,255,.14)';
-        ctx.beginPath(); ctx.arc(S / 2, 380, 140, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.ellipse(S / 2, 720, 260, 190, 0, Math.PI, 0); ctx.fill();
-        ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
-        ctx.font = '700 40px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText('Unggah fotomu di langkah 1', S / 2, 260);
-        ctx.textAlign = 'left';
-      }
-
-      // Bingkai dalam
-      ctx.lineWidth = 14; ctx.strokeStyle = '#FFC93C';
-      roundRect(26, 26, S - 52, S - 52, 44); ctx.stroke();
-
-      // Badge kiri atas
-      ctx.fillStyle = 'rgba(255,255,255,.94)';
-      roundRect(60, 60, 470, 74, 37); ctx.fill();
-      ctx.fillStyle = '#0B3B44';
-      ctx.font = '800 30px "Plus Jakarta Sans", sans-serif';
-      ctx.fillText('YOUTH CHARACTER SUMMIT', 92, 109);
-      // Pill kanan atas
-      ctx.font = '800 30px "Plus Jakarta Sans", sans-serif';
-      const pw = ctx.measureText(f.pill).width + 56;
-      ctx.fillStyle = f.pillBg; roundRect(S - 60 - pw, 60, pw, 74, 37); ctx.fill();
-      ctx.fillStyle = f.pillFg; ctx.fillText(f.pill, S - 60 - pw + 28, 109);
-
-      // Gelombang bawah
-      ctx.fillStyle = f.band;
-      ctx.beginPath();
-      ctx.moveTo(0, 780);
-      ctx.bezierCurveTo(260, 700, 520, 830, 760, 760);
-      ctx.bezierCurveTo(900, 720, 1000, 740, S, 700);
-      ctx.lineTo(S, S); ctx.lineTo(0, S); ctx.closePath(); ctx.fill();
-      ctx.fillStyle = f.band2;
-      ctx.beginPath();
-      ctx.moveTo(0, 930); ctx.bezierCurveTo(300, 880, 700, 960, S, 900);
-      ctx.lineTo(S, S); ctx.lineTo(0, S); ctx.closePath(); ctx.fill();
-
-
-      sparkle(150, 210, 26, '#FFC93C'); sparkle(930, 200, 18, '#FFFFFF'); sparkle(1000, 640, 22, '#FFC93C');
-      kite(1000, 180, .55);
-      flower(980, 790, 46, '#FFFFFF');
-      flower(905, 850, 30, '#FB923C');
-      flower(1010, 900, 26, '#FFD86B');
-
-      // Teks utama
-      ctx.save();
-      ctx.translate(70, 822); ctx.rotate(-0.05);
-      ctx.shadowColor = 'rgba(0,0,0,.35)'; ctx.shadowBlur = 8; ctx.shadowOffsetY = 3;
-      ctx.fillStyle = '#FFFFFF';
-      ctx.font = '400 58px "Permanent Marker", cursive';
-      ctx.fillText(f.line1, 0, 0);
-      ctx.fillStyle = '#FFC93C';
-      ctx.font = '400 76px "Permanent Marker", cursive';
-      ctx.fillText(f.line2, 4, 78);
-      ctx.restore();
-
-      // Nama & kota
-      const name = tw.name.value.trim();
-      const city = tw.city.value.trim();
-      ctx.fillStyle = '#FFFFFF';
-      if (name) { fitText(name, 760, 46, 800, '"Plus Jakarta Sans", sans-serif'); ctx.fillText(name, 72, 1000); }
-      if (city) {
-        fitText(city, 580, 30, 600, '"Plus Jakarta Sans", sans-serif');
-        ctx.fillStyle = '#FFD86B';
-        ctx.fillText(city, 72, name ? 1042 : 1010);
-      }
-      ctx.fillStyle = 'rgba(255,255,255,.85)';
-      ctx.font = '700 22px "Plus Jakarta Sans", sans-serif';
-      ctx.textAlign = 'right';
-      ctx.fillText('#YCS2026  ·  Bali, 23 Des – 2 Jan', S - 64, 1042);
-      ctx.textAlign = 'left';
-    }
-
-    const setStepDone = (n, done) => $(`.tw-step[data-step="${n}"]`).classList.toggle('is-done', done);
-    const enableEditing = (on) => {
-      tw.zoom.disabled = !on;
-      $$('[data-nudge], [data-reset]').forEach((b) => { b.disabled = !on; });
-      tw.dl.disabled = !on;
-      tw.share.disabled = !on;
-    };
-
-    tw.file.addEventListener('change', () => {
-      const file = tw.file.files[0];
-      tw.fileErr.textContent = '';
-      if (!file) return;
-      if (!/^image\/(png|jpeg|webp)$/.test(file.type)) { tw.fileErr.textContent = 'Format belum didukung. Gunakan JPG, PNG, atau WebP.'; return; }
-      if (file.size > 10 * 1024 * 1024) { tw.fileErr.textContent = 'Ukuran foto lebih dari 10 MB. Pilih foto yang lebih kecil.'; return; }
-      const url = URL.createObjectURL(file);
-      const img = new Image();
-      img.onload = () => {
-        tw.img = img; tw.scale = 1; tw.ox = 0; tw.oy = 0; tw.zoom.value = 1;
-        $('[data-file-label]').textContent = 'Ganti foto';
-        enableEditing(true);
-        setStepDone(1, true); setStepDone(2, true);
-        draw();
-        URL.revokeObjectURL(url);
-        toast('Foto dimuat. Seret untuk mengatur posisinya.');
-      };
-      img.onerror = () => { tw.fileErr.textContent = 'Foto gagal dibaca. Coba pilih foto lain.'; URL.revokeObjectURL(url); };
-      img.src = url;
-    });
-
-    tw.zoom.addEventListener('input', () => { tw.scale = +tw.zoom.value; draw(); });
-    $$('[data-nudge]').forEach((b) => b.addEventListener('click', () => {
-      const [dx, dy] = b.dataset.nudge.split(',').map(Number);
-      tw.ox += dx * 30; tw.oy += dy * 30; draw();
-    }));
-    $('[data-reset]').addEventListener('click', () => { tw.scale = 1; tw.ox = 0; tw.oy = 0; tw.zoom.value = 1; draw(); });
-    [tw.name, tw.city].forEach((el) => el.addEventListener('input', () => {
-      setStepDone(3, !!(tw.name.value.trim() && tw.city.value.trim()));
-      draw();
-    }));
-
-    // Seret foto di kanvas (mouse & sentuh)
-    let drag = null;
-    tw.canvas.addEventListener('pointerdown', (e) => {
-      if (!tw.img) return;
-      drag = { x: e.clientX, y: e.clientY, ox: tw.ox, oy: tw.oy, k: S / tw.canvas.getBoundingClientRect().width };
-      tw.canvas.setPointerCapture(e.pointerId);
-      tw.canvas.classList.add('is-dragging');
-    });
-    tw.canvas.addEventListener('pointermove', (e) => {
-      if (!drag) return;
-      tw.ox = drag.ox + (e.clientX - drag.x) * drag.k;
-      tw.oy = drag.oy + (e.clientY - drag.y) * drag.k;
-      draw();
-    });
-    const endDrag = () => { drag = null; tw.canvas.classList.remove('is-dragging'); };
-    tw.canvas.addEventListener('pointerup', endDrag);
-    tw.canvas.addEventListener('pointercancel', endDrag);
-    tw.canvas.addEventListener('keydown', (e) => {
-      if (!tw.img) return;
-      const m = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] }[e.key];
-      if (m) { e.preventDefault(); tw.ox += m[0] * 20; tw.oy += m[1] * 20; draw(); }
-      if (e.key === '+' || e.key === '=') { tw.zoom.value = tw.scale = Math.min(3, tw.scale + .05); draw(); }
-      if (e.key === '-') { tw.zoom.value = tw.scale = Math.max(1, tw.scale - .05); draw(); }
-    });
-
-    // Pilihan bingkai (radiogroup)
-    const frameBtns = $$('.seg__btn');
-    const setFrame = (btn, focus) => {
-      frameBtns.forEach((b) => { const on = b === btn; b.setAttribute('aria-checked', String(on)); b.tabIndex = on ? 0 : -1; });
-      tw.frame = btn.dataset.frame;
-      if (focus) btn.focus();
-      draw();
-    };
-    frameBtns.forEach((b, i) => {
-      b.addEventListener('click', () => setFrame(b));
-      b.addEventListener('keydown', (e) => {
-        const dir = ['ArrowRight', 'ArrowDown'].includes(e.key) ? 1 : ['ArrowLeft', 'ArrowUp'].includes(e.key) ? -1 : 0;
-        if (dir) { e.preventDefault(); setFrame(frameBtns[(i + dir + frameBtns.length) % frameBtns.length], true); }
-      });
-    });
-    frameBtns[1].tabIndex = -1;
-
-
-    const fileName = () => `twibbon-ycs2026-${(tw.name.value.trim() || tw.frame).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}.png`;
-    const toBlob = () => new Promise((res) => tw.canvas.toBlob(res, 'image/png'));
-
-    let channelClicked = false, saving = false;
-    const saved = new Set(), attempts = new Map();
-    const status = $('#tw-status');
-    $('#tw-channel').addEventListener('click', () => {
-      channelClicked = true;
-      $('#tw-channel').classList.add('is-done');
-      $('#tw-channel').setAttribute('aria-invalid', 'false');
-      $('#tw-channel-state').textContent = 'Syarat terpenuhi: saluran sudah dibuka. Jangan lupa tekan Ikuti.';
-      $('#tw-channel-error').textContent = '';
-      sessionStorage.setItem('ycs_tw_channel', '1');
-    });
-    if (sessionStorage.getItem('ycs_tw_channel')) {
-      channelClicked = true;
-      $('#tw-channel').classList.add('is-done');
-      $('#tw-channel-state').textContent = 'Syarat terpenuhi: saluran sudah dibuka.';
-    }
-    function validateTwibbon() {
-      const values = [
-        ['tw-name', tw.name.value.trim().length >= 2, 'Isi nama minimal 2 karakter.'],
-        ['tw-city', tw.city.value.trim().length >= 2, 'Isi nama sekolah minimal 2 karakter.'],
-        ['tw-prov', !!$('#tw-prov').value, 'Pilih provinsi asalmu.'],
-        ['tw-kota', !!$('#tw-kota').value, 'Pilih kota/kabupaten asalmu.'],
-        ['tw-email', /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test($('#tw-email').value.trim()), 'Isi email yang valid, contoh: nama@email.com.'],
-        ['tw-channel', channelClicked, 'Buka tautan saluran WhatsApp terlebih dahulu.'],
-        ['tw-consent', $('#tw-consent').checked, 'Centang persetujuan penyimpanan data.']
-      ];
-      let first;
-      values.forEach(([id, valid, message]) => {
-        $('#' + id + '-error').textContent = valid ? '' : message;
-        $('#' + id).setAttribute('aria-invalid', String(!valid));
-        if (!valid && !first) first = $('#' + id);
-      });
-      if (!tw.img) { tw.fileErr.textContent = 'Unggah fotomu dulu di langkah 1.'; if (!first) first = tw.file; }
-      if (first) first.focus();
-      return !first;
-    }
-    // Data dikirim di latar belakang; unduhan TIDAK menunggu server. Bila gagal (offline/server sibuk),
-    // kiriman disimpan di antrean lokal dan dicoba ulang otomatis (requestId sama → tidak dobel di Sheet).
-    const QUEUE_KEY = 'ycs_tw_queue';
-    const readQueue = () => { try { return JSON.parse(localStorage.getItem(QUEUE_KEY)) || []; } catch (_) { return []; } };
-    const writeQueue = (q) => { try { q.length ? localStorage.setItem(QUEUE_KEY, JSON.stringify(q.slice(-10))) : localStorage.removeItem(QUEUE_KEY); } catch (_) { /* penyimpanan penuh/diblokir */ } };
-    async function postTwibbon(payload) {
-      const response = await fetch(CONFIG.twibbonEndpoint, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload), signal: AbortSignal.timeout(25000)});
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok || result.ok !== true || result.requestId !== payload.requestId) throw new Error(result.error || 'connection');
-    }
-    async function flushQueue() {
-      for (const item of readQueue()) {
-        try { await postTwibbon(item); writeQueue(readQueue().filter((x) => x.requestId !== item.requestId)); }
-        catch (err) { if (err.message === 'validation') writeQueue(readQueue().filter((x) => x.requestId !== item.requestId)); else break; }
-      }
-    }
-    window.addEventListener('online', flushQueue);
-    setTimeout(flushQueue, 3000);
-
-    async function saveTwibbon() {
-      const data = {name: tw.name.value.trim(), school: tw.city.value.trim(), email: $('#tw-email').value.trim(), frame: tw.frame, consent: true, channelClicked: true, website: $('#tw-website').value, province: $('#tw-prov').value, city: $('#tw-kota').value};
-      if (sumber) data.ref = sumber;
-      const key = JSON.stringify(data);
-      if (saved.has(key) || saving) return;
-      if (!attempts.has(key)) attempts.set(key, crypto.randomUUID());
-      const payload = {...data, requestId: attempts.get(key)};
-      saving = true;
-      status.textContent = 'Twibbon siap. Mengirim data ke panitia…';
+    /* ---------- Wilayah (provinsi) ---------- */
+    const isiProvinsi = () => fetch('assets/data/wilayah.json').then((r) => r.json()).then((data) => {
+      Object.keys(data).forEach((pv) => { $('#dk-prov').append(new Option(pv, pv)); $('#sk-prov').append(new Option(pv, pv)); });
+    }).catch(() => {});
+    (window.requestIdleCallback || ((fn) => setTimeout(fn, 1200)))(isiProvinsi);
+    const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3 | 8)).toString(16); }));
+    const perangkat = (() => { try { let id = localStorage.getItem('ycs_perangkat'); if (!id) { id = uuid(); localStorage.setItem('ycs_perangkat', id); } return id; } catch (e) { return ''; } })();
+    async function kirimJson(url, body) {
       try {
-        await postTwibbon(payload);
-        saved.add(key);
-        status.textContent = 'Data tersimpan. Terima kasih sudah mendukung YCS 2026!';
-      } catch (err) {
-        if (err.message === 'rate_limit') { status.textContent = 'Twibbon tetap bisa dipakai, tapi email ini sudah terlalu sering dikirim. Coba lagi satu jam lagi.'; return; }
-        writeQueue([...readQueue().filter((x) => x.requestId !== payload.requestId), payload]);
-        status.textContent = 'Twibbon sudah jadi. Data belum terkirim karena koneksi; akan dikirim ulang otomatis.';
-      } finally { saving = false; }
+        const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: AbortSignal.timeout(25000) });
+        return await r.json().catch(() => ({ ok: false, error: 'connection' }));
+      } catch (e) { return { ok: false, error: 'connection' }; }
     }
+    const sibuk = (btn, on) => { btn.setAttribute('aria-busy', String(on)); btn.disabled = on; };
 
-    let resultUrl = null;
-    function showResult(blob) {
-      if (resultUrl) URL.revokeObjectURL(resultUrl);
-      resultUrl = URL.createObjectURL(blob);
-      $('#tw-result-img').src = resultUrl;
-      Object.assign($('#tw-result-link'), { href: resultUrl, download: fileName() });
-      $('#tw-result').hidden = false;
+    /* ---------- Klaim Dana Kaget: identitas dulu, lalu kode akses ---------- */
+    const DK_VIEW = ['dk-muat', 'dk-tutup', 'dk-habis', 'dk-step1', 'dk-step2', 'dk-sukses'];
+    const dkShow = (id) => DK_VIEW.forEach((v) => { $('#' + v).hidden = v !== id; });
+    const dkReq = uuid();
+    let dkSelesai = false;
+    const DK_PESAN = {
+      kode_salah: 'Kode akses tidak cocok. Periksa lagi penulisannya.',
+      terlalu_banyak: 'Terlalu banyak percobaan. Coba lagi dalam 1 jam.',
+      sudah_mengajukan: 'Email ini sudah pernah klaim. Satu orang hanya bisa klaim sekali.',
+      validation: 'Ada data yang belum sesuai. Tekan "Ubah" dan periksa identitasmu.',
+      busy: 'Server sedang ramai. Tunggu beberapa detik lalu tekan tombol lagi.',
+      connection: 'Koneksi bermasalah. Periksa internetmu lalu coba lagi.',
+    };
+    function setKuotaDana(sisa, kuota) {
+      const box = $('#dk-quota');
+      box.hidden = sisa == null;
+      if (sisa == null) return;
+      $('#dk-sisa').textContent = nf.format(sisa);
+      $('#dk-kuota').textContent = kuota ? 'dari ' + nf.format(kuota) : '';
+      if (kuota) $('#dk-fill').style.width = Math.max(2, sisa / kuota * 100) + '%';
+      $('#dk-meter').setAttribute('aria-valuenow', sisa);
+      if (kuota) $('#dk-meter').setAttribute('aria-valuemax', kuota);
     }
-    tw.dl.addEventListener('click', async () => {
-      if (!validateTwibbon()) return;
-      tw.dl.setAttribute('aria-busy', 'true');
-      const blob = await toBlob().catch(() => null);
-      tw.dl.setAttribute('aria-busy', 'false');
-      if (!blob) { status.textContent = 'Gambar gagal dibuat. Silakan coba kembali.'; return; }
-      showResult(blob);
-      const a = Object.assign(document.createElement('a'), { href: resultUrl, download: fileName() });
-      document.body.append(a); a.click(); a.remove();
-      setStepDone(4, true);
-      toast('Twibbon diunduh! Jangan lupa tag akun resmi YCS saat membagikannya.');
-      saveTwibbon();
+    function terapkanDana() {
+      if (!cfg || dkSelesai) return;
+      const d = cfg.dana;
+      if (d.teksTutup) $('#dk-teks-tutup').textContent = d.teksTutup;
+      if (d.teksHabis) $('#dk-teks-habis').textContent = d.teksHabis;
+      if (d.teksSukses) $('#dk-teks-sukses').textContent = d.teksSukses;
+      setKuotaDana(d.saklar ? d.sisa : null, d.kuota);
+      const sedangIsi = !$('#dk-step1').hidden || !$('#dk-step2').hidden;
+      if (!d.saklar) dkShow('dk-tutup');
+      else if (d.penuh) dkShow('dk-habis');
+      else if (!sedangIsi) dkShow('dk-step1');
+    }
+    function bukaDanaDenganKode(kode) {
+      $('#dk-kode').value = kode;
+      location.hash = 'dana';
+      document.getElementById('dana').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+      if (!$('#dk-step1').hidden) { $('#dk-nama').focus(); toast('Kodemu sudah tersimpan. Isi identitas dulu, ya.'); }
+    }
+    $('#dk-step1').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const cek = [
+        ['dk-nama', $('#dk-nama').value.trim().length >= 2, 'Isi nama minimal 2 karakter.'],
+        ['dk-sekolah', $('#dk-sekolah').value.trim().length >= 2, 'Isi nama sekolah.'],
+        ['dk-prov', !!$('#dk-prov').value, 'Pilih provinsi.'],
+        ['dk-email', /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test($('#dk-email').value.trim()), 'Isi email yang valid, contoh: nama@email.com.'],
+        ['dk-setuju', $('#dk-setuju').checked, 'Centang persetujuan untuk melanjutkan.'],
+      ];
+      let first = null;
+      cek.forEach(([id, ok, msg]) => { $('#' + id + '-error').textContent = ok ? '' : msg; $('#' + id).setAttribute('aria-invalid', String(!ok)); if (!ok && !first) first = $('#' + id); });
+      if (first) { first.focus(); return; }
+      $('#dk-who').textContent = `${$('#dk-nama').value.trim()} · ${$('#dk-sekolah').value.trim()}`;
+      dkShow('dk-step2');
+      $('#dk-alert').textContent = '';
+      ($('#dk-kode').value ? $('#dk-kirim') : $('#dk-kode')).focus();
     });
+    $('#dk-ubah').addEventListener('click', () => { dkShow('dk-step1'); $('#dk-nama').focus(); });
+    $('#dk-step2').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const kode = $('#dk-kode').value.trim();
+      if (!kode) { $('#dk-alert').textContent = 'Masukkan kode akses dari panitia.'; $('#dk-kode').focus(); return; }
+      const btn = $('#dk-kirim');
+      sibuk(btn, true);
+      const d = await kirimJson(CONFIG.danaEndpoint, {
+        aksi: 'kirim', kodeAkses: kode, requestId: dkReq, perangkat, ref: sumber, consent: true, website: $('#dk-website').value,
+        nama: $('#dk-nama').value.trim(), sekolah: $('#dk-sekolah').value.trim(), provinsi: $('#dk-prov').value, email: $('#dk-email').value.trim(),
+      });
+      sibuk(btn, false);
+      if (!d.ok) {
+        if (d.error === 'habis') { setKuotaDana(0, cfg && cfg.dana.kuota); dkShow('dk-habis'); return; }
+        if (d.error === 'nonaktif') { dkShow('dk-tutup'); return; }
+        $('#dk-alert').textContent = DK_PESAN[d.error] || DK_PESAN.connection;
+        return;
+      }
+      dkSelesai = true;
+      if (d.sisa != null) setKuotaDana(d.sisa, cfg && cfg.dana.kuota);
+      dkShow('dk-sukses');
+      $('#dk-sukses-judul').focus();
+    });
+    const kodeUrl = new URLSearchParams(location.search).get('kode');
+    if (kodeUrl) { $('#dk-kode').value = kodeUrl.slice(0, 40); setTimeout(() => bukaDanaDenganKode(kodeUrl.slice(0, 40)), 600); }
 
-    if (navigator.canShare && navigator.canShare({ files: [new File([''], 'x.png', { type: 'image/png' })] })) {
-      tw.share.hidden = false;
-      tw.share.addEventListener('click', async () => {
-        if (!validateTwibbon()) return;
-        try {
-          const blob = await toBlob();
-          showResult(blob);
-          saveTwibbon();
-          await navigator.share({ files: [new File([blob], fileName(), { type: 'image/png' })], title: 'Twibbon YCS 2026', text: 'Aku siap mendukung Youth Character Summit 2026! #YCS2026' });
-          setStepDone(4, true);
-        } catch (e) {
-          if (e.name !== 'AbortError') toast('Gagal membagikan. Unduh PNG lalu bagikan manual, ya.');
+    /* ---------- Satu Kata: kirim gratis, hasil dibuka dengan ikut saluran ---------- */
+    const sk = $('#sk');
+    let kataSaya = '';
+    let dataKata = [];
+    try { kataSaya = localStorage.getItem('ycs_kata_saya') || ''; } catch (e) {}
+    const terbuka = () => { try { return localStorage.getItem('ycs_kata_buka') === '1'; } catch (e) { return false; } };
+    const setTerbuka = () => { try { localStorage.setItem('ycs_kata_buka', '1'); } catch (e) {} sk.classList.remove('is-locked'); $('#sk-cloud').setAttribute('aria-hidden', 'false'); };
+    if (terbuka()) setTerbuka();
+    function gambarAwan() {
+      const box = $('#sk-cloud');
+      let list = dataKata.slice(0, 70);
+      if (kataSaya && !list.some(([k]) => k === kataSaya)) list = [[kataSaya, 1], ...list];
+      if (!list.length) { box.innerHTML = '<p class="sk__empty">Belum ada kata. Jadilah yang pertama!</p>'; return; }
+      const max = Math.max(...list.map(([, n]) => n)), min = Math.min(...list.map(([, n]) => n));
+      // Urutan diacak tetap (bukan per muatan) supaya kata besar tidak menumpuk di depan.
+      const acak = list.map((x, i) => [x, (i * 7919) % 97]).sort((a, b) => a[1] - b[1]).map(([x]) => x);
+      box.textContent = '';
+      acak.forEach(([k, n]) => {
+        const sp = document.createElement('span');
+        const t = max === min ? .5 : (Math.sqrt(n) - Math.sqrt(min)) / (Math.sqrt(max) - Math.sqrt(min));
+        sp.style.fontSize = (1 + t * 2.1).toFixed(2) + 'rem';
+        sp.textContent = k;
+        if (k === kataSaya) sp.className = 'is-mine';
+        box.append(sp);
+      });
+    }
+    async function muatKata() {
+      try {
+        const r = await fetch(CONFIG.kataEndpoint, { headers: { Accept: 'application/json' }, cache: 'no-cache' });
+        const d = await r.json();
+        if (!d.ok) return;
+        dataKata = d.kata || [];
+        $('#sk-total').textContent = nf.format(d.total || 0);
+        gambarAwan();
+      } catch (e) { /* tetap tampilkan contoh */ }
+    }
+    muatKata();
+    $('#sk-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const msg = $('#sk-msg');
+      const kata = $('#sk-kata').value.trim();
+      msg.classList.remove('is-ok');
+      if (!/^[A-Za-zÀ-ɏ-]{2,20}$/.test(kata)) { msg.textContent = 'Tulis satu kata saja (2–20 huruf, tanpa spasi atau angka).'; $('#sk-kata').focus(); return; }
+      const btn = $('#sk-kirim');
+      sibuk(btn, true);
+      const d = await kirimJson(CONFIG.kataEndpoint, { aksi: 'kirim', kata, provinsi: $('#sk-prov').value, requestId: uuid(), perangkat, ref: sumber, website: $('#sk-website').value });
+      sibuk(btn, false);
+      if (!d.ok) {
+        msg.textContent = { kata_ditolak: 'Kata ini tidak bisa ditampilkan. Coba kata positif lain, ya.', terlalu_banyak: 'Kamu sudah mengirim banyak kata. Coba lagi nanti.', validation: 'Tulis satu kata saja, tanpa spasi.' }[d.error] || 'Koneksi bermasalah. Coba kirim lagi.';
+        return;
+      }
+      kataSaya = d.kata;
+      try { localStorage.setItem('ycs_kata_saya', kataSaya); } catch (er) {}
+      $('#sk-kata').value = '';
+      $('#sk-total').textContent = nf.format((Number(($('#sk-total').textContent || '0').replace(/\D/g, '')) || 0) + (d.duplicate ? 0 : 1));
+      const sama = dataKata.find(([k]) => k === kataSaya);
+      if (sama) sama[1]++; else dataKata.push([kataSaya, 1]);
+      gambarAwan();
+      msg.classList.add('is-ok');
+      msg.textContent = terbuka() ? `Kata "${kataSaya}" sudah masuk! Lihat di awan kata.` : `Kata "${kataSaya}" sudah masuk! Buka hasilnya untuk melihat posisinya.`;
+      if (!terbuka()) $('#sk-buka').focus();
+    });
+    // Klik tombol saluran = membuka saluran di tab baru, lalu hasil terbuka (sama seperti syarat unduh twibbon sebelumnya).
+    $('#sk-buka').addEventListener('click', () => { setTimeout(setTerbuka, 600); toast('Terima kasih! Jangan lupa tekan "Ikuti" di saluran. Hasil sudah terbuka.'); });
+
+    // Kartu kata 1080×1350 untuk diunduh & dibagikan.
+    $('#sk-unduh').addEventListener('click', async () => {
+      if (document.fonts) await Promise.all([document.fonts.load('400 80px "Permanent Marker"'), document.fonts.load('800 60px "Plus Jakarta Sans"')]).catch(() => {});
+      const W = 1080, H = 1350, c = document.createElement('canvas');
+      c.width = W; c.height = H;
+      const x = c.getContext('2d');
+      const g = x.createLinearGradient(0, 0, W, H);
+      g.addColorStop(0, '#6E0819'); g.addColorStop(.55, '#C8102E'); g.addColorStop(1, '#E0571F');
+      x.fillStyle = g; x.fillRect(0, 0, W, H);
+      x.textAlign = 'center';
+      x.fillStyle = '#FFD86B'; x.font = '800 34px "Plus Jakarta Sans", sans-serif';
+      x.fillText('#SATUKATAUNTUKINDONESIA', W / 2, 110);
+      x.fillStyle = '#fff'; x.font = '400 70px "Permanent Marker", cursive';
+      x.fillText('Satu Kata untuk Indonesia', W / 2, 205, W - 120);
+      if (kataSaya) {
+        x.fillStyle = 'rgba(255,255,255,.85)'; x.font = '700 36px "Plus Jakarta Sans", sans-serif';
+        x.fillText('Kataku', W / 2, 300);
+        x.font = '800 120px "Plus Jakarta Sans", sans-serif';
+        const lebar = Math.min(W - 160, x.measureText(kataSaya).width + 90);
+        x.fillStyle = "#FFD86B"; x.beginPath(); if (x.roundRect) x.roundRect((W - lebar) / 2, 320, lebar, 160, 36); else x.rect((W - lebar) / 2, 320, lebar, 160); x.fill();
+        x.fillStyle = '#7A0A1C'; x.fillText(kataSaya, W / 2, 445, W - 220);
+      }
+      // Awan kata: penempatan spiral sederhana dengan deteksi tabrakan kotak.
+      const top = (kataSaya ? 560 : 330), bawah = H - 170, cx = W / 2, cy = (top + bawah) / 2;
+      const kotak = [];
+      const list = dataKata.filter(([k]) => k !== kataSaya).slice(0, 45);
+      const max = Math.max(1, ...list.map(([, n]) => n));
+      const warna = ['#FFFFFF', '#FFD86B', '#FFC2CB'];
+      list.forEach(([k, n], i) => {
+        const fs = Math.round(30 + Math.sqrt(n / max) * 62);
+        x.font = `800 ${fs}px "Plus Jakarta Sans", sans-serif`;
+        const w = x.measureText(k).width + 18, h = fs * 1.05;
+        for (let t = 0; t < 900; t++) {
+          const a = t * .35, r = 6 * a;
+          const px = cx + r * Math.cos(a) * 1.4 - w / 2, py = cy + r * Math.sin(a) - h / 2;
+          if (px < 50 || px + w > W - 50 || py < top || py + h > bawah) continue;
+          if (kotak.some((b) => px < b[0] + b[2] && px + w > b[0] && py < b[1] + b[3] && py + h > b[1])) continue;
+          kotak.push([px, py, w, h]);
+          x.fillStyle = warna[i % 3];
+          x.fillText(k, px + w / 2, py + h * .8);
+          break;
         }
       });
-    }
-
-    // Daftar provinsi → kabupaten/kota (38 provinsi, 514 kab/kota) dimuat saat browser senggang.
-    const isiWilayah = () => fetch('assets/data/wilayah.json').then((r) => r.json()).then((data) => {
-      const prov = $('#tw-prov'), kota = $('#tw-kota');
-      Object.keys(data).forEach((p) => prov.append(new Option(p, p)));
-      prov.addEventListener('change', () => {
-        kota.length = 1;
-        (data[prov.value] || []).forEach((k) => kota.append(new Option(k, k)));
-        kota.disabled = !prov.value;
-      });
-    }).catch(() => { $('#tw-prov-error').textContent = 'Daftar wilayah gagal dimuat. Muat ulang halaman.'; });
-    (window.requestIdleCallback || ((fn) => setTimeout(fn, 1500)))(isiWilayah);
-
-    // Gambar ulang setelah font siap agar teks bingkai memakai font yang benar.
-    draw();
-    if (document.fonts) {
-      Promise.all([
-        document.fonts.load('400 66px "Permanent Marker"'),
-        document.fonts.load('800 46px "Plus Jakarta Sans"'),
-      ]).then(draw, draw);
-    }
+      x.fillStyle = 'rgba(255,255,255,.9)'; x.font = '700 30px "Plus Jakarta Sans", sans-serif';
+      x.fillText('Youth Character Summit 2026', W / 2, H - 95);
+      x.fillStyle = 'rgba(255,255,255,.7)'; x.font = '600 26px "Plus Jakarta Sans", sans-serif';
+      x.fillText(location.host + '/#satu-kata', W / 2, H - 55);
+      c.toBlob((blob) => {
+        if (!blob) return;
+        const url = URL.createObjectURL(blob);
+        const a = Object.assign(document.createElement('a'), { href: url, download: `satu-kata-ycs2026${kataSaya ? '-' + kataSaya : ''}.png` });
+        document.body.append(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+        toast('Kartu kata diunduh. Bagikan ke story dan ajak temanmu!');
+      }, 'image/png');
+    });
 
     /* ---------- Galeri berjalan ---------- */
     const marquee = $('#marquee');
@@ -3271,7 +3014,7 @@
     function setOrb(open, fokus) {
       orb.classList.toggle('is-open', open);
       orbCore.setAttribute('aria-expanded', String(open));
-      orbCore.setAttribute('aria-label', open ? 'Tutup menu cepat' : 'Buka menu cepat: Twibbon, Tonton Live, Klaim Dana Kaget, Klaim Wildcard');
+      orbCore.setAttribute('aria-label', open ? 'Tutup menu cepat' : 'Buka menu cepat: Satu Kata, Tonton Live, Klaim Dana Kaget, Klaim Wildcard');
       orbBg.hidden = false;
       orbBg.classList.toggle('is-on', open);
       orbLinks.forEach((a) => { a.tabIndex = open ? 0 : -1; });

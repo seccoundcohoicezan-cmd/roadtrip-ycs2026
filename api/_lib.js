@@ -3,7 +3,7 @@ const crypto = require('node:crypto');
 
 // Endpoint Apps Script bersifat publik; tidak ada OAuth/token akun di frontend.
 const ENDPOINT = process.env.YCS_APPS_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbzbzKw_rqGIgOxczylvv9C9jt1YkJdRK6wmgNK3Jkxh7XFbAhMA3aBhRgOENjYHjdI7/exec';
-const STATUS = {validation: 400, sesi_habis: 401, sandi_salah: 401, terlalu_banyak: 429, rate_limit: 429, busy: 503, server: 502, save_failed: 502, connection: 502};
+const STATUS = {kata_ditolak: 422, validation: 400, sesi_habis: 401, sandi_salah: 401, terlalu_banyak: 429, rate_limit: 429, busy: 503, server: 502, save_failed: 502, connection: 502};
 
 async function upstreamGet(aksi, timeout = 20000) {
   const r = await fetch(ENDPOINT + '?aksi=' + encodeURIComponent(aksi), {headers: {Accept: 'application/json'}, redirect: 'follow', signal: AbortSignal.timeout(timeout)});

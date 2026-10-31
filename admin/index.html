@@ -190,7 +190,7 @@
           <div class="tiles" id="tiles"></div>
           <div class="panel-grid">
             <div class="panel">
-              <h2>Twibbon per sumber (<code>?ref=</code>)</h2>
+              <h2>Satu Kata per sumber (<code>?ref=</code>)</h2>
               <p class="panel__sub">Efektivitas link blasting. Pakai link seperti <code>/?ref=email-1</code> atau <code>/?ref=ig-bio</code>.</p>
               <ul class="bars" id="bars-sumber"></ul>
             </div>
@@ -221,7 +221,7 @@
                 <label class="switch" for="s-popup_aktif"><span>Tampilkan pop-up<small>Matikan untuk menyembunyikan tanpa menghapus isi.</small></span><input type="checkbox" id="s-popup_aktif" data-key="popup_aktif" data-type="bool"></label>
                 <div class="field"><label for="s-popup_judul">Judul</label><input class="input" id="s-popup_judul" data-key="popup_judul" maxlength="80" placeholder="Contoh: Dana Kaget dibuka malam ini!"></div>
                 <div class="field field--full"><label for="s-popup_teks">Isi singkat</label><textarea class="input textarea" id="s-popup_teks" data-key="popup_teks" maxlength="300" rows="2" placeholder="Contoh: Tonton live jam 19.00 WIB, kode akses dibagikan di siaran."></textarea></div>
-                <div class="field"><label for="s-popup_link">Link tujuan saat diklik</label><input class="input" id="s-popup_link" data-key="popup_link" placeholder="https://… atau /dana-kaget/ atau #live"><p class="field__hint">Pintasan: <button type="button" class="chip-mini" data-isi="/dana-kaget/">Dana Kaget</button> <button type="button" class="chip-mini" data-isi="/klaim/">Wildcard</button> <button type="button" class="chip-mini" data-isi="#twibbon">Twibbon</button> <button type="button" class="chip-mini" data-isi="#live">Live</button> <button type="button" class="chip-mini" data-isi="/survei/">Survei</button></p></div>
+                <div class="field"><label for="s-popup_link">Link tujuan saat diklik</label><input class="input" id="s-popup_link" data-key="popup_link" placeholder="https://… atau #dana atau /klaim/"><p class="field__hint">Pintasan: <button type="button" class="chip-mini" data-isi="#dana">Dana Kaget</button> <button type="button" class="chip-mini" data-isi="/klaim/">Wildcard</button> <button type="button" class="chip-mini" data-isi="#satu-kata">Satu Kata</button> <button type="button" class="chip-mini" data-isi="#live">Live</button> <button type="button" class="chip-mini" data-isi="/survei/">Survei</button></p></div>
                 <div class="field"><label for="s-popup_tombol">Teks tombol</label><input class="input" id="s-popup_tombol" data-key="popup_tombol" maxlength="40"></div>
                 <div class="field field--full"><label for="s-popup_gambar">Gambar <span class="opt">(opsional, URL https, rasio 16:9)</span></label><input class="input" type="url" id="s-popup_gambar" data-key="popup_gambar" placeholder="https://"></div>
                 <div class="field field--full"><span class="label">Pratinjau</span>
@@ -241,6 +241,13 @@
                 <div class="field field--full"><label for="s-dana_teks_sukses">Teks setelah pengajuan berhasil <span class="opt">(judul: "Pengajuan diterima!")</span></label><textarea class="input textarea" id="s-dana_teks_sukses" data-key="dana_teks_sukses" maxlength="400" rows="2"></textarea></div>
               </div>
             </section>
+            <section class="set-card" aria-labelledby="g-kata">
+              <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-grid"/></svg></span><div><h2 id="g-kata">Satu Kata</h2><p>Kirim kata gratis; hasil awan kata terbuka setelah pengunjung mengikuti saluran WhatsApp.</p></div></header>
+              <div class="set-grid">
+                <div class="field field--full"><label for="s-link_saluran">Link Saluran WhatsApp</label><input class="input" type="url" id="s-link_saluran" data-key="link_saluran" placeholder="https://whatsapp.com/channel/…"><p class="field__hint">Dipakai untuk membuka hasil Satu Kata dan tombol saluran di Dana Kaget.</p></div>
+                <div class="field field--full"><label for="s-kata_blokir">Kata yang ditolak <span class="opt">(pisahkan dengan koma)</span></label><textarea class="input textarea" id="s-kata_blokir" data-key="kata_blokir" rows="2" maxlength="500" placeholder="contoh: katasatu, katadua"></textarea><p class="field__hint">Kata kasar umum sudah ditolak otomatis. Untuk menyembunyikan kata yang sudah masuk, ubah kolom <strong>Tampil</strong> menjadi TIDAK di tab Satu Kata pada Google Sheet.</p></div>
+              </div>
+            </section>
             <section class="set-card" aria-labelledby="g-klaim">
               <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-ticket"/></svg></span><div><h2 id="g-klaim">Klaim wildcard</h2><p>Tiket untuk peserta yang belum lolos.</p></div></header>
               <div class="set-grid">
@@ -254,7 +261,7 @@
               <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-grid"/></svg></span><div><h2 id="g-road">Road to Bali &amp; survei</h2><p>Fitur pendukung.</p></div></header>
               <div class="set-grid">
                 <div class="field"><label for="s-road_target">Target dukungan Road to Bali</label><input class="input" type="number" min="1" step="1" id="s-road_target" data-key="road_target" data-type="angka"></div>
-                <div class="field"><label for="s-road_tambahan">Dukungan tambahan</label><input class="input" type="number" min="0" step="1" id="s-road_tambahan" data-key="road_tambahan" data-type="angka"><p class="field__hint">Ditambahkan ke jumlah twibbon (mis. dukungan offline).</p></div>
+                <div class="field"><label for="s-road_tambahan">Dukungan tambahan</label><input class="input" type="number" min="0" step="1" id="s-road_tambahan" data-key="road_tambahan" data-type="angka"><p class="field__hint">Ditambahkan ke jumlah dukungan (Satu Kata + klaim Dana Kaget), mis. dukungan offline.</p></div>
                 <label class="switch" for="s-survei_aktif"><span>Survei aktif</span><input type="checkbox" id="s-survei_aktif" data-key="survei_aktif" data-type="bool"></label>
                 <div class="field"><label for="s-survei_buka">Survei dibuka (WIB) <span class="opt">(kosong = saat pengumuman)</span></label><input class="input" type="datetime-local" id="s-survei_buka" data-key="survei_buka" data-type="waktu"></div>
               </div>
@@ -317,7 +324,8 @@
               <h2>Unduh data (CSV)</h2>
               <p class="panel__sub">Setiap unduhan dicatat di tab Log Admin. Simpan file di tempat aman: berisi data pribadi.</p>
               <div class="export-grid" id="ekspor">
-                <button class="btn btn--ghost btn--sm" type="button" data-ekspor="twibbon">Twibbon <svg aria-hidden="true"><use href="#i-download"/></svg></button>
+                <button class="btn btn--ghost btn--sm" type="button" data-ekspor="kata">Satu Kata <svg aria-hidden="true"><use href="#i-download"/></svg></button>
+                <button class="btn btn--ghost btn--sm" type="button" data-ekspor="twibbon">Twibbon (arsip) <svg aria-hidden="true"><use href="#i-download"/></svg></button>
                 <button class="btn btn--ghost btn--sm" type="button" data-ekspor="kode">Kode wildcard <svg aria-hidden="true"><use href="#i-download"/></svg></button>
                 <button class="btn btn--ghost btn--sm" type="button" data-ekspor="dana">Dana Kaget <svg aria-hidden="true"><use href="#i-download"/></svg></button>
                 <button class="btn btn--ghost btn--sm" type="button" data-ekspor="survei">Survei <svg aria-hidden="true"><use href="#i-download"/></svg></button>
@@ -431,15 +439,16 @@
     function renderRingkasan() {
       const r = data.ringkasan;
       const tiles = [
-        ['Twibbon dibuat', nf.format(r.twibbon.total), `${nf.format(r.twibbon.hariIni)} hari ini`],
+        ['Satu Kata terkirim', nf.format(r.kata ? r.kata.total : 0), `${nf.format(r.kata ? r.kata.hariIni : 0)} hari ini`],
         ['Klaim wildcard', `${nf.format(r.klaim.sudah)} / ${nf.format(r.klaim.total)}`, `${nf.format(r.klaim.belum)} belum · ${nf.format(r.klaim.hangus)} hangus`],
         ['Dana Kaget', `${nf.format(r.dana.terpakai)} / ${nf.format(r.dana.kuota)}`, `Sisa ${nf.format(r.dana.sisa)} · ${/^YA$/i.test(cfgVal('dana_aktif')) ? 'aktif' : 'nonaktif'}`],
         ['Respons survei', nf.format(r.survei), /^YA$/i.test(cfgVal('survei_aktif')) ? 'Survei aktif' : 'Survei nonaktif'],
         ['Finalis terdaftar', nf.format(r.finalis), r.finalis ? 'Siap untuk reveal' : 'Belum diimpor']
       ];
       $('#tiles').innerHTML = tiles.map(([l, v, m]) => `<div class="tile"><p class="tile__label">${esc(l)}</p><p class="tile__value">${esc(v)}</p><p class="tile__meta">${esc(m)}</p></div>`).join('');
-      const max = Math.max(1, ...r.twibbon.sumber.map((x) => x.jumlah));
-      $('#bars-sumber').innerHTML = r.twibbon.sumber.length ? r.twibbon.sumber.map((x) => `<li style="--w:${(x.jumlah / max * 100).toFixed(1)}%"><span>${esc(x.nama)}</span><strong>${nf.format(x.jumlah)}</strong></li>`).join('') : '<li>Belum ada data twibbon.</li>';
+      const sumber = r.kata ? r.kata.sumber : [];
+      const max = Math.max(1, ...sumber.map((x) => x.jumlah));
+      $('#bars-sumber').innerHTML = sumber.length ? sumber.map((x) => `<li style="--w:${(x.jumlah / max * 100).toFixed(1)}%"><span>${esc(x.nama)}</span><strong>${nf.format(x.jumlah)}</strong></li>`).join('') : '<li>Belum ada kata terkirim.</li>';
       const umum = Date.parse(cfgVal('waktu_pengumuman').replace(' ', 'T') + ':00+07:00');
       const sekarang = Date.parse(data.sekarang);
       const kv = [
