@@ -70,6 +70,13 @@
     .set-card__icon { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; flex: none; border-radius: .875rem; background: var(--yellow-100); color: var(--orange-700); }
     .set-card__icon svg { width: 1.25rem; height: 1.25rem; }
     .field--full { grid-column: 1 / -1; }
+    .chip-mini { min-height: 1.75rem; padding: 0 .625rem; margin: .125rem .125rem 0 0; border: 1px solid var(--line); border-radius: var(--radius-pill); background: var(--surface); font-size: .75rem; font-weight: 700; color: var(--primary); cursor: pointer; }
+    .chip-mini:hover { border-color: var(--primary); }
+    .pop-preview { display: grid; overflow: hidden; max-width: 22rem; border-radius: 1.25rem; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); }
+    .pop-preview img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+    .pop-preview > div { display: grid; gap: .375rem; padding: 1rem; }
+    .pop-preview p { font-size: .875rem; color: var(--text-muted); white-space: pre-line; }
+    .pv-btn { justify-self: start; margin-top: .25rem; padding: .5rem 1rem; border-radius: var(--radius-pill); background: var(--cta); color: #fff; font-weight: 800; font-size: .875rem; }
     .input--mono { font-family: var(--font-mono); letter-spacing: .1em; text-transform: uppercase; }
     .textarea { min-height: 4.5rem; resize: vertical; line-height: 1.5; }
     .set-grid { display: grid; gap: var(--space-4); align-items: start; }
@@ -122,6 +129,7 @@
     <symbol id="i-plus" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" d="M12 5v14M5 12h14"/></symbol>
     <symbol id="i-ticket" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M3 7.5A1.5 1.5 0 0 1 4.5 6h15A1.5 1.5 0 0 1 21 7.5V10a2 2 0 0 0 0 4v2.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 16.5V14a2 2 0 0 0 0-4Z"/></symbol>
     <symbol id="i-gift" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9M12 8v13M12 8S10.5 3 8 3a2.5 2.5 0 0 0 0 5M12 8s1.5-5 4-5a2.5 2.5 0 0 1 0 5"/></g></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9m4.3 13a1.9 1.9 0 0 0 3.4 0"/></symbol>
     <symbol id="i-trash" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13"/></symbol>
   </svg>
 
@@ -205,6 +213,20 @@
                 <label class="switch" for="s-pakai_link_cadangan"><span>Pakai link cadangan<small>Nyalakan bila live utama bermasalah.</small></span><input type="checkbox" id="s-pakai_link_cadangan" data-key="pakai_link_cadangan" data-type="bool"></label>
                 <div class="field"><label for="s-link_live">Link live utama</label><input class="input" type="url" id="s-link_live" data-key="link_live" placeholder="https://"></div>
                 <div class="field"><label for="s-link_live_cadangan">Link live cadangan</label><input class="input" type="url" id="s-link_live_cadangan" data-key="link_live_cadangan" placeholder="https://"></div>
+              </div>
+            </section>
+            <section class="set-card" aria-labelledby="g-popup">
+              <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-bell"/></svg></span><div><h2 id="g-popup">Pop-up informasi</h2><p>Muncul di beranda; diklik mengarah ke link tujuan. Tampil sekali per pengunjung, muncul lagi bila isinya diubah.</p></div></header>
+              <div class="set-grid">
+                <label class="switch" for="s-popup_aktif"><span>Tampilkan pop-up<small>Matikan untuk menyembunyikan tanpa menghapus isi.</small></span><input type="checkbox" id="s-popup_aktif" data-key="popup_aktif" data-type="bool"></label>
+                <div class="field"><label for="s-popup_judul">Judul</label><input class="input" id="s-popup_judul" data-key="popup_judul" maxlength="80" placeholder="Contoh: Dana Kaget dibuka malam ini!"></div>
+                <div class="field field--full"><label for="s-popup_teks">Isi singkat</label><textarea class="input textarea" id="s-popup_teks" data-key="popup_teks" maxlength="300" rows="2" placeholder="Contoh: Tonton live jam 19.00 WIB, kode akses dibagikan di siaran."></textarea></div>
+                <div class="field"><label for="s-popup_link">Link tujuan saat diklik</label><input class="input" id="s-popup_link" data-key="popup_link" placeholder="https://… atau /dana-kaget/ atau #live"><p class="field__hint">Pintasan: <button type="button" class="chip-mini" data-isi="/dana-kaget/">Dana Kaget</button> <button type="button" class="chip-mini" data-isi="/klaim/">Wildcard</button> <button type="button" class="chip-mini" data-isi="#twibbon">Twibbon</button> <button type="button" class="chip-mini" data-isi="#live">Live</button> <button type="button" class="chip-mini" data-isi="/survei/">Survei</button></p></div>
+                <div class="field"><label for="s-popup_tombol">Teks tombol</label><input class="input" id="s-popup_tombol" data-key="popup_tombol" maxlength="40"></div>
+                <div class="field field--full"><label for="s-popup_gambar">Gambar <span class="opt">(opsional, URL https, rasio 16:9)</span></label><input class="input" type="url" id="s-popup_gambar" data-key="popup_gambar" placeholder="https://"></div>
+                <div class="field field--full"><span class="label">Pratinjau</span>
+                  <div class="pop-preview" aria-live="polite"><img id="pv-img" alt="" hidden><div><strong id="pv-judul">Judul pop-up</strong><p id="pv-teks"></p><span class="pv-btn" id="pv-btn">Lihat selengkapnya</span></div></div>
+                </div>
               </div>
             </section>
             <section class="set-card" aria-labelledby="g-dana">
@@ -443,12 +465,27 @@
         else el.value = v;
       });
       $('#set-status').textContent = 'Tidak ada perubahan.';
+      pratinjauPopup();
     }
     function nilaiSet() {
       const out = {};
       setInputs().forEach((el) => { out[el.dataset.key] = el.dataset.type === 'bool' ? (el.checked ? 'YA' : 'TIDAK') : el.dataset.type === 'waktu' ? dariInput(el.value) : el.value.trim(); });
       return out;
     }
+    function pratinjauPopup() {
+      $('#pv-judul').textContent = $('#s-popup_judul').value || 'Judul pop-up';
+      $('#pv-teks').textContent = $('#s-popup_teks').value;
+      $('#pv-btn').textContent = $('#s-popup_tombol').value || 'Lihat selengkapnya';
+      $('#pv-btn').hidden = !$('#s-popup_link').value;
+      const g = $('#s-popup_gambar').value;
+      $('#pv-img').hidden = !/^https:/.test(g);
+      if (/^https:/.test(g)) $('#pv-img').src = g;
+    }
+    $$('.chip-mini[data-isi]').forEach((b) => b.addEventListener('click', () => {
+      $('#s-popup_link').value = b.dataset.isi;
+      $('#f-set').dispatchEvent(new Event('input'));
+    }));
+    $('#f-set').addEventListener('input', pratinjauPopup);
     $('#f-set').addEventListener('input', () => { $('#set-status').textContent = 'Ada perubahan yang belum disimpan.'; });
     $('#f-set').addEventListener('submit', async (e) => {
       e.preventDefault();

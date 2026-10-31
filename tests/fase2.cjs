@@ -155,3 +155,15 @@ test('proxy reveal menolak sebelum waktunya tanpa memanggil endpoint reveal', as
     assert.match(headers['Cache-Control'], /s-maxage=(\d+)/);
   } finally { global.fetch = previous; }
 });
+
+test('pop-up informasi: hanya tampil di config bila aktif, link tujuan divalidasi', () => {
+  const app = muat({now: Date.parse('2026-11-10T09:00:00+07:00')});
+  app.get('siapkan');
+  const {token} = app.post({aksi: 'admin-login', sandi: app.sheets.Admin.rows[1][1]});
+  assert.equal(app.get('config').popup.aktif, false);
+  assert.equal(app.post({aksi: 'admin-simpan-pengaturan', token, nilai: {popup_link: 'javascript:alert(1)'}}).error, 'nilai_tidak_valid');
+  assert.equal(app.post({aksi: 'admin-simpan-pengaturan', token, nilai: {popup_aktif: 'YA', popup_judul: 'Dana Kaget dibuka!', popup_link: '/dana-kaget/'}}).ok, true);
+  const pop = app.get('config').popup;
+  assert.equal(pop.aktif, true);
+  assert.equal(pop.link, '/dana-kaget/');
+});
