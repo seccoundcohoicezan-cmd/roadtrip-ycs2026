@@ -4,7 +4,7 @@ const HEADERS_LAMA = ['Waktu', 'ID permintaan', 'Nama', 'Sekolah', 'Email', 'Bin
 const HEADERS = HEADERS_LAMA.concat(['Kota/Kabupaten', 'Provinsi']);
 const REKAP_NAME = 'Rekap';
 const REKAP_VERSI = '3';
-const SKEMA_VERSI = '1';
+const SKEMA_VERSI = '2';
 const WIB = 7 * 3600 * 1000;
 
 const TAB = {
@@ -39,7 +39,10 @@ const PENGATURAN = [
   ['dana_aktif', 'TIDAK', 'YA/TIDAK. Saklar form Dana Kaget.'],
   ['dana_kode_akses', '', 'Kode akses form Dana Kaget (dibagikan panitia). Kosong = dibuat otomatis.'],
   ['dana_kuota', '100', 'Jumlah maksimal pengajuan Dana Kaget.'],
-  ['dana_tampilkan_sisa', 'YA', 'YA = tampilkan "Tersisa N" di halaman.']
+  ['dana_tampilkan_sisa', 'YA', 'YA = tampilkan "Tersisa N" di halaman.'],
+  ['dana_teks_tutup', 'Form akan dibuka saat panitia mengumumkannya lewat live dan saluran WhatsApp YCS. Simpan halaman ini, ya!', 'Teks saat form Dana Kaget belum dibuka / dinonaktifkan.'],
+  ['dana_teks_habis', 'Kuota Dana Kaget kali ini sudah terpenuhi. Terima kasih sudah antusias! Pantau live YCS berikutnya, siapa tahu ada kesempatan lagi.', 'Teks saat kuota habis.'],
+  ['dana_teks_sukses', 'Panitia akan menghubungimu lewat WhatsApp atau email. Pastikan nomormu aktif.', 'Teks setelah pengajuan berhasil.']
 ];
 const KUNCI_YA_TIDAK = ['pakai_link_cadangan', 'klaim_aktif', 'survei_aktif', 'dana_aktif', 'dana_tampilkan_sisa'];
 const KUNCI_WAKTU = ['waktu_pengumuman', 'klaim_berlaku_hingga', 'survei_buka'];
@@ -312,7 +315,8 @@ function konfigPublik_() {
     live: bacaLive_(cfg),
     klaim: {aktif: ya_(cfg.klaim_aktif), buka: isNaN(umum) ? null : isoWib_(umum), berlaku: isNaN(waktu_(cfg.klaim_berlaku_hingga)) ? null : isoWib_(waktu_(cfg.klaim_berlaku_hingga))},
     survei: {aktif: ya_(cfg.survei_aktif), buka: isNaN(surveiBuka) ? null : isoWib_(surveiBuka)},
-    dana: {aktif: danaAktif && dana.sisa > 0, saklar: danaAktif, penuh: dana.sisa <= 0, sisa: ya_(cfg.dana_tampilkan_sisa) ? dana.sisa : null, kuota: ya_(cfg.dana_tampilkan_sisa) ? dana.kuota : null},
+    dana: {aktif: danaAktif && dana.sisa > 0, saklar: danaAktif, penuh: dana.sisa <= 0, sisa: ya_(cfg.dana_tampilkan_sisa) ? dana.sisa : null, kuota: ya_(cfg.dana_tampilkan_sisa) ? dana.kuota : null,
+      teksTutup: cfg.dana_teks_tutup || '', teksHabis: cfg.dana_teks_habis || '', teksSukses: cfg.dana_teks_sukses || ''},
     event: {nama: cfg.nama_event || '', link: cfg.link_event || ''}
   };
 }

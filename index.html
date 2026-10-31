@@ -1101,14 +1101,6 @@
     /* ============ Fase pengumuman (pra = sebelum, pasca = sesudah; diatur dari jam server) ============ */
     html:not([data-fase="pasca"]) [data-fase="pasca"], html[data-fase="pasca"] [data-fase="pra"] { display: none; }
 
-    .nav__more { position: relative; }
-    .nav__more-btn { border: 0; background: transparent; cursor: pointer; gap: .25rem; font-family: inherit; }
-    .nav__more-btn svg { width: 1rem; height: 1rem; transition: transform var(--dur) var(--ease); }
-    .nav__more-btn[aria-expanded="true"] svg { transform: rotate(180deg); }
-    .nav__menu { position: absolute; right: 0; top: calc(100% + .375rem); z-index: 5; min-width: 14rem; list-style: none; padding: .375rem; display: grid; gap: 2px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-lg); }
-    .nav__menu[hidden] { display: none; }
-    .nav__menu a { display: flex; align-items: center; min-height: 2.75rem; padding: 0 .75rem; border-radius: var(--radius-sm); color: var(--text); text-decoration: none; font-weight: 600; font-size: .875rem; }
-    .nav__menu a:hover, .nav__menu a[aria-current="true"] { background: var(--surface-soft); color: var(--primary); }
     .nav__link--klaim { color: var(--cta); font-weight: 800; }
     :root[data-theme="dark"] .nav__link--klaim { color: var(--orange-400); }
     .mobile-nav .is-hot { color: var(--cta); font-weight: 800; }
@@ -1233,6 +1225,67 @@
     .burst i { position: absolute; top: -4vh; width: .55rem; height: .95rem; border-radius: 2px; animation: jatuh var(--t, 2.6s) cubic-bezier(.2, .6, .4, 1) var(--d, 0s) forwards; }
     @keyframes jatuh { to { transform: translate3d(var(--dx, 0), 112vh, 0) rotate(var(--r, 540deg)); } }
 
+
+    /* ============ Menu ringkas + tombol kode (putaran 2) ============ */
+    .site-header { background: color-mix(in srgb, var(--surface) 82%, transparent); backdrop-filter: saturate(1.6) blur(14px); }
+    .nav__list { gap: .25rem; padding: .3rem; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--surface-soft) 70%, transparent); border: 1px solid var(--line); }
+    .nav__link { min-height: 2.5rem; padding: 0 1.125rem; border-radius: var(--radius-pill); font-size: .9375rem; }
+    .nav__link:hover { background: var(--surface); }
+    .nav__link[aria-current="true"] { background: var(--surface); box-shadow: var(--shadow-sm); }
+    .nav__link[aria-current="true"]::after { display: none; }
+    .nav__dot { width: .5rem; height: .5rem; margin-left: .375rem; border-radius: 50%; background: var(--cta); animation: pulse 1.4s infinite; }
+    .nav-code { display: inline-flex; align-items: center; gap: .5rem; min-height: 2.75rem; padding: 0 1.125rem 0 .875rem; border: 0; border-radius: var(--radius-pill); background: var(--teal-950); color: #fff; font: inherit; font-weight: 800; font-size: .9375rem; cursor: pointer; box-shadow: 0 6px 16px -8px rgb(8 44 51 / .6); transition: transform var(--dur) var(--ease), background-color var(--dur) var(--ease); }
+    .nav-code svg { width: 1.125rem; height: 1.125rem; color: var(--yellow-400); }
+    .nav-code:hover { transform: translateY(-1px); background: var(--teal-800); }
+    :root[data-theme="dark"] .nav-code { background: var(--yellow-400); color: var(--teal-950); }
+    :root[data-theme="dark"] .nav-code svg { color: var(--teal-950); }
+    @media (max-width: 30rem) { .nav-code span { display: none; } .nav-code { width: 2.75rem; padding: 0; justify-content: center; } }
+    .mobile-nav { padding-block: var(--space-4) var(--space-5); }
+    .mobile-code { display: grid; grid-template-columns: auto 1fr auto; gap: var(--space-3); align-items: center; width: 100%; padding: var(--space-3) var(--space-4); border: 0; border-radius: var(--radius-lg); background: linear-gradient(120deg, var(--teal-950), var(--teal-700)); color: #fff; font: inherit; text-align: left; cursor: pointer; }
+    .mobile-code__icon { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 50%; background: var(--yellow-400); color: var(--teal-950); }
+    .mobile-code__icon svg, .mobile-code__arrow { width: 1.25rem; height: 1.25rem; }
+    .mobile-code strong { display: block; }
+    .mobile-code small { display: block; font-size: .8125rem; opacity: .85; }
+    .mobile-nav__main { grid-template-columns: 1fr 1fr; margin-top: var(--space-3); }
+    .mobile-nav__main a { justify-content: center; background: var(--surface-soft); font-weight: 700; }
+    .mobile-nav__label { margin: var(--space-4) var(--space-4) var(--space-1); font-size: .75rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); }
+    .mobile-nav__more { grid-template-columns: repeat(3, 1fr); }
+    .mobile-nav__more a { justify-content: center; min-height: 2.75rem; font-size: .875rem; color: var(--text-muted); }
+
+    .kode-dialog { width: min(100% - 2rem, 26rem); padding: 0; border: 0; border-radius: 1.75rem; background: var(--surface); color: var(--text); box-shadow: 0 40px 80px -24px rgb(8 44 51 / .55); }
+    .kode-dialog[open] { animation: muncul-dialog .28s var(--ease); }
+    @keyframes muncul-dialog { from { opacity: 0; transform: translateY(16px) scale(.97); } }
+    .kode-dialog::backdrop { background: rgb(8 44 51 / .6); backdrop-filter: blur(4px); }
+    .kode-dialog form { position: relative; display: grid; gap: var(--space-3); padding: var(--space-6) var(--space-5) var(--space-5); text-align: center; }
+    .kode-dialog__icon { justify-self: center; display: grid; place-items: center; width: 3.5rem; height: 3.5rem; border-radius: 1.125rem; background: var(--yellow-100); color: var(--orange-700); transform: rotate(-6deg); }
+    .kode-dialog__icon svg { width: 1.75rem; height: 1.75rem; }
+    .kode-dialog h2 { font-size: 1.5rem; }
+    .kode-dialog__sub { font-size: .9375rem; color: var(--text-muted); }
+    .kode-dialog__input { min-height: 3.75rem; text-align: center; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 1.375rem; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; }
+    .kode-dialog__input::placeholder { letter-spacing: .12em; font-weight: 500; }
+    .kode-dialog__alt { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); margin-top: var(--space-2); padding-top: var(--space-4); border-top: 1px dashed var(--line); }
+    .kode-dialog__alt a { display: flex; gap: var(--space-2); align-items: center; padding: var(--space-3); border-radius: var(--radius); background: var(--surface-soft); color: var(--text); text-decoration: none; text-align: left; transition: transform var(--dur) var(--ease); }
+    .kode-dialog__alt a:hover { transform: translateY(-2px); }
+    .kode-dialog__alt svg { width: 1.25rem; height: 1.25rem; flex: none; color: var(--cta); }
+    .kode-dialog__alt strong { display: block; font-size: .8125rem; }
+    .kode-dialog__alt small { display: block; font-size: .75rem; color: var(--text-muted); }
+    .kode-dialog__close { position: absolute; top: .75rem; right: .75rem; }
+
+    /* Road to Bali ringkas: progres bar + titik target, tanpa peta besar */
+    .road__progress { padding-top: var(--space-5); }
+    .road .meter { position: relative; height: 1.125rem; overflow: visible; background: rgb(14 90 102 / .14); }
+    .road .meter__fill { position: relative; min-width: 1.125rem; }
+    .road__van { position: absolute; right: -1rem; top: 50%; translate: 0 -50%; display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 50%; background: #fff; box-shadow: var(--shadow); font-size: 0; }
+    .road__van svg { width: 1.375rem; height: 1.375rem; }
+    .road__ticks { position: relative; height: 2.25rem; margin-top: .5rem; list-style: none; font-size: .75rem; font-weight: 700; color: #4A5B62; }
+    .road__ticks li { position: absolute; top: 0; translate: -50% 0; display: grid; justify-items: center; white-space: nowrap; }
+    .road__ticks li::before { content: ""; width: 2px; height: .5rem; margin-bottom: .125rem; border-radius: 1px; background: rgb(14 90 102 / .35); }
+    .road__ticks li.is-on { color: var(--teal-900); }
+    .road__ticks li.is-on::before { background: var(--orange-500); }
+    .road__ticks li:first-child { translate: -20% 0; }
+    .road__ticks li:last-child { translate: -80% 0; }
+    @media (min-width: 64rem) { .trio { grid-template-columns: 1fr 1fr; } }
+
     /* ============ Reveal ============ */
     .js .reveal { opacity: 0; transform: translateY(16px); transition: opacity 600ms var(--ease), transform 600ms var(--ease); }
     .js .reveal.is-in { opacity: 1; transform: none; }
@@ -1277,6 +1330,7 @@
     <symbol id="i-lock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></g></symbol>
     <symbol id="i-compass" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5Z"/></g></symbol>
     <symbol id="i-gift" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9M12 8v13M12 8S10.5 3 8 3a2.5 2.5 0 0 0 0 5M12 8s1.5-5 4-5a2.5 2.5 0 0 1 0 5"/></g></symbol>
+    <symbol id="i-key" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="m10.8 12.2 8.7-8.7M16 7l2.5 2.5M18.5 4.5 21 7"/></g></symbol>
     <symbol id="i-pause" viewBox="0 0 24 24"><path fill="currentColor" d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></symbol>
     <symbol id="i-whatsapp" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.2-.2-.5-.3Z"/></symbol>
   </svg>
@@ -1299,33 +1353,17 @@
 
       <nav class="nav" aria-label="Navigasi utama">
         <ul class="nav__list">
-          <li><a class="nav__link" href="#beranda">Beranda</a></li>
-          <li data-fase="pasca"><a class="nav__link" href="#delegasi">Finalis</a></li>
+          <li><a class="nav__link" href="#delegasi">Finalis<span class="nav__dot" data-fase="pasca" aria-hidden="true"></span></a></li>
           <li><a class="nav__link" href="#live">Live</a></li>
           <li><a class="nav__link" href="#twibbon">Twibbon</a></li>
-          <li><a class="nav__link" href="#road-to-bali">Road to Bali</a></li>
-          <li data-fase="pra"><a class="nav__link" href="#leaderboard">Leaderboard</a></li>
-          <li data-fase="pasca"><a class="nav__link nav__link--klaim" href="klaim/">Klaim Tiket</a></li>
-          <li class="nav__more">
-            <button class="nav__link nav__more-btn" type="button" aria-expanded="false" aria-controls="nav-more">Lainnya<svg aria-hidden="true"><use href="#i-chevron-down"/></svg></button>
-            <ul class="nav__menu" id="nav-more" hidden>
-              <li data-fase="pra"><a href="#delegasi">Finalis</a></li>
-              <li data-fase="pasca"><a href="#leaderboard">Leaderboard</a></li>
-              <li><a href="survei/">Survei destinasi</a></li>
-              <li data-promo="dana" hidden><a href="dana-kaget/">Dana Kaget</a></li>
-              <li><a href="#harapan">Satu Kata untuk Indonesia</a></li>
-              <li><a href="#faq">FAQ</a></li>
-            </ul>
-          </li>
+          <li><a class="nav__link" href="survei/">Survei</a></li>
         </ul>
       </nav>
 
       <div class="header-tools">
-        <div class="header-socials">
-          <a class="icon-btn" href="https://www.instagram.com/universitasstekom" target="_blank" rel="noopener" aria-label="Instagram Universitas STEKOM (tab baru)"><svg aria-hidden="true"><use href="#i-instagram"/></svg></a>
-          <a class="icon-btn" href="https://www.tiktok.com/@universitasstekom" target="_blank" rel="noopener" aria-label="TikTok Universitas STEKOM (tab baru)"><svg aria-hidden="true"><use href="#i-tiktok"/></svg></a>
-          <a class="icon-btn" href="https://www.youtube.com/@universitasstekom" target="_blank" rel="noopener" aria-label="YouTube Universitas STEKOM (tab baru)"><svg aria-hidden="true"><use href="#i-youtube"/></svg></a>
-        </div>
+        <button class="nav-code" type="button" data-kode-open aria-haspopup="dialog">
+          <svg aria-hidden="true"><use href="#i-key"/></svg><span>Punya kode?</span>
+        </button>
         <button class="icon-btn theme-toggle" type="button" aria-label="Ganti tema terang/gelap" aria-pressed="false" hidden>
           <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"/></svg>
           <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></g></svg>
@@ -1339,18 +1377,23 @@
 
     <nav class="mobile-nav" id="mobile-nav" aria-label="Navigasi utama (seluler)" hidden>
       <div class="container">
-        <ul>
-          <li><a href="#beranda">Beranda</a></li>
-          <li data-fase="pasca"><a href="#delegasi">Finalis</a></li>
-          <li data-fase="pasca"><a class="is-hot" href="klaim/">Klaim tiket wildcard</a></li>
+        <button class="mobile-code" type="button" data-kode-open>
+          <span class="mobile-code__icon" aria-hidden="true"><svg><use href="#i-key"/></svg></span>
+          <span><strong>Punya kode?</strong><small>Kode wildcard dari email atau kode Dana Kaget</small></span>
+          <svg class="mobile-code__arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
+        </button>
+        <ul class="mobile-nav__main">
+          <li><a href="#delegasi">Finalis</a></li>
           <li><a href="#live">Live</a></li>
           <li><a href="#twibbon">Twibbon</a></li>
-          <li><a href="#road-to-bali">Road to Bali</a></li>
-          <li><a href="#leaderboard">Leaderboard</a></li>
-          <li data-fase="pra"><a href="#delegasi">Finalis</a></li>
           <li><a href="survei/">Survei destinasi</a></li>
-          <li data-promo="dana" hidden><a href="dana-kaget/">Dana Kaget</a></li>
-          <li><a href="#harapan">Satu Kata untuk Indonesia</a></li>
+          <li><a href="klaim/">Klaim tiket</a></li>
+          <li><a href="dana-kaget/">Dana Kaget</a></li>
+        </ul>
+        <p class="mobile-nav__label">Lainnya</p>
+        <ul class="mobile-nav__more">
+          <li><a href="#road-to-bali">Road to Bali</a></li>
+          <li><a href="#harapan">Satu Kata</a></li>
           <li><a href="#faq">FAQ</a></li>
         </ul>
         <div class="mobile-nav__socials">
@@ -1705,37 +1748,11 @@
             <p class="road__lead">Setiap twibbon yang dibuat menambah langkah kita. Semakin banyak yang bergabung, semakin dekat ke Bali!</p>
           </div>
 
-          <div class="road__map" aria-hidden="true">
-            <svg viewBox="0 0 640 300" id="road-svg">
-              <defs>
-                <linearGradient id="sea" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#7DD3E0"/><stop offset="1" stop-color="#3BB3C3"/></linearGradient>
-              </defs>
-              <path d="M0 210c80-20 160 10 240-5s170-40 260-20 110 20 140 15v100H0Z" fill="#A7E3B9"/>
-              <path d="M380 140c40-10 120-20 260-5v60c-90-15-170-10-260-5Z" fill="url(#sea)" opacity=".8"/>
-              <path d="M470 120l18-46 18 46Z M486 74l2-14 2 14" fill="#0B3B44" opacity=".75"/>
-              <g fill="#15803D" opacity=".85">
-                <circle cx="70" cy="190" r="18"/><circle cx="96" cy="182" r="14"/><circle cx="560" cy="222" r="16"/><circle cx="590" cy="214" r="12"/>
-              </g>
-              <path id="road-path" d="M30 250 C120 250 120 170 210 175 S330 245 400 200 S500 130 585 120"
-                    fill="none" stroke="#F2E2C4" stroke-width="22" stroke-linecap="round"/>
-              <path d="M30 250 C120 250 120 170 210 175 S330 245 400 200 S500 130 585 120"
-                    fill="none" stroke="#fff" stroke-width="2.5" stroke-dasharray="10 12" stroke-linecap="round"/>
-              <path id="road-done" d="M30 250 C120 250 120 170 210 175 S330 245 400 200 S500 130 585 120" pathLength="100"
-                    fill="none" stroke="#EA580C" stroke-width="7" stroke-linecap="round" stroke-dasharray="0 100"/>
-              <g id="road-milestones"></g>
-              <g id="road-van">
-                <rect x="-20" y="-16" width="40" height="22" rx="6" fill="#C2410C"/>
-                <rect x="-14" y="-12" width="12" height="9" rx="2" fill="#CDEDEC"/>
-                <rect x="1" y="-12" width="12" height="9" rx="2" fill="#CDEDEC"/>
-                <circle cx="-11" cy="7" r="5" fill="#13232A"/><circle cx="11" cy="7" r="5" fill="#13232A"/>
-              </g>
-            </svg>
-          </div>
-
           <div class="road__progress">
             <div class="meter" role="progressbar" aria-labelledby="road-title" aria-valuemin="0" aria-valuemax="100000" aria-valuenow="0" aria-valuetext="Memuat jumlah dukungan">
-              <div class="meter__fill" id="road-meter" style="width:0"></div>
+              <div class="meter__fill" id="road-meter" style="width:0"><span class="road__van" aria-hidden="true"><svg viewBox="-24 -20 48 34"><rect x="-20" y="-16" width="40" height="22" rx="6" fill="#C2410C"/><rect x="-14" y="-12" width="12" height="9" rx="2" fill="#CDEDEC"/><rect x="1" y="-12" width="12" height="9" rx="2" fill="#CDEDEC"/><circle cx="-11" cy="7" r="5" fill="#13232A"/><circle cx="11" cy="7" r="5" fill="#13232A"/></svg></span></div>
             </div>
+            <ol class="road__ticks" id="road-ticks" aria-hidden="true"></ol>
             <p class="road__stats"><span><strong id="road-current">–</strong> dukungan terkumpul</span><span>Target <strong id="road-target">100.000</strong></span></p>
             <p class="small" id="road-note" style="margin-top:.25rem"></p>
 
@@ -1853,7 +1870,7 @@
         </a>
         <a class="promo promo--dana" href="dana-kaget/?ref=beranda" data-promo="dana" hidden>
           <span class="promo__icon" aria-hidden="true"><svg><use href="#i-gift"/></svg></span>
-          <span><strong>Dana Kaget YCS dibuka!</strong><span>Punya kode akses? Ajukan sebelum kuota habis.</span><span class="promo__pill" id="promo-dana-sisa" hidden></span></span>
+          <span><strong id="promo-dana-judul">Dana Kaget YCS dibuka!</strong><span>Punya kode akses? Ajukan sebelum kuota habis.</span><span class="promo__pill" id="promo-dana-sisa" hidden></span></span>
           <svg aria-hidden="true"><use href="#i-arrow"/></svg>
         </a>
       </div>
@@ -2090,6 +2107,23 @@
     </div>
   </nav>
 
+  <dialog class="kode-dialog" id="kode-dialog" aria-labelledby="kode-title">
+    <form id="kode-form" novalidate>
+      <span class="kode-dialog__icon" aria-hidden="true"><svg><use href="#i-key"/></svg></span>
+      <h2 id="kode-title">Masukkan kodemu</h2>
+      <p class="kode-dialog__sub">Tempel kode dari email panitia atau kode akses Dana Kaget. Kami arahkan ke halaman yang tepat.</p>
+      <label class="visually-hidden" for="kode-input">Kode</label>
+      <input class="input kode-dialog__input" id="kode-input" maxlength="40" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false" placeholder="Contoh: AB12CD34" aria-describedby="kode-error">
+      <p class="field__error" id="kode-error" role="alert"></p>
+      <button class="btn btn--cta btn--block" type="submit">Lanjut <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+      <div class="kode-dialog__alt">
+        <a href="klaim/"><svg aria-hidden="true"><use href="#i-ticket"/></svg><span><strong>Kode wildcard</strong><small>8 karakter, dari email</small></span></a>
+        <a href="dana-kaget/"><svg aria-hidden="true"><use href="#i-gift"/></svg><span><strong>Kode Dana Kaget</strong><small>Dari live / saluran WA</small></span></a>
+      </div>
+      <button class="icon-btn kode-dialog__close" type="button" data-kode-close aria-label="Tutup"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </form>
+  </dialog>
+
   <dialog class="share-dialog" id="share-dialog" aria-labelledby="share-title">
     <form method="dialog">
       <h2 id="share-title">Bagikan</h2>
@@ -2169,21 +2203,31 @@
     mobileNav.addEventListener('click', (e) => { if (e.target.closest('a')) setMenu(false); });
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && menuBtn.getAttribute('aria-expanded') === 'true') { setMenu(false); menuBtn.focus(); }
-      if (e.key === 'Escape' && !moreMenu.hidden) { setMore(false); moreBtn.focus(); }
     });
 
-    /* ---------- Menu "Lainnya" (desktop) ---------- */
-    const moreBtn = $('.nav__more-btn');
-    const moreMenu = $('#nav-more');
-    const setMore = (open) => { moreBtn.setAttribute('aria-expanded', String(open)); moreMenu.hidden = !open; };
-    moreBtn.addEventListener('click', () => setMore(moreMenu.hidden));
-    moreMenu.addEventListener('click', (e) => { if (e.target.closest('a')) setMore(false); });
-    document.addEventListener('click', (e) => { if (!e.target.closest('.nav__more')) setMore(false); });
-    $('.nav__more').addEventListener('focusout', (e) => { if (!e.currentTarget.contains(e.relatedTarget)) setMore(false); });
+    /* ---------- Dialog "Punya kode?" ---------- */
+    // Satu kolom untuk dua jenis kode: format YCS-XXXXX → Dana Kaget, 8 huruf/angka → klaim wildcard.
+    const kodeDlg = $('#kode-dialog');
+    $$('[data-kode-open]').forEach((b) => b.addEventListener('click', () => {
+      setMenu(false);
+      $('#kode-error').textContent = '';
+      kodeDlg.showModal ? kodeDlg.showModal() : (location.href = 'klaim/');
+      $('#kode-input').focus();
+    }));
+    $('[data-kode-close]').addEventListener('click', () => kodeDlg.close());
+    kodeDlg.addEventListener('click', (e) => { if (e.target === kodeDlg) kodeDlg.close(); });
+    $('#kode-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const mentah = $('#kode-input').value.trim().toUpperCase();
+      const bersih = mentah.replace(/[^A-Z0-9]/g, '');
+      if (bersih.length < 5) { $('#kode-error').textContent = 'Kode terlalu pendek. Periksa lagi kode dari email atau panitia.'; return; }
+      const dana = /^YCS-?[A-Z0-9]{5}$/.test(mentah) || bersih.length !== 8;
+      location.href = (dana ? 'dana-kaget/?kode=' : 'klaim/?kode=') + encodeURIComponent(dana ? mentah : bersih);
+    });
 
     /* ---------- Scrollspy ---------- */
-    const navLinks = $$('.nav__link, .nav__menu a, .mobile-nav a');
-    const spyIds = ['beranda', 'live', 'twibbon', 'road-to-bali', 'leaderboard', 'delegasi', 'harapan', 'faq'];
+    const navLinks = $$('.nav__link, .mobile-nav a');
+    const spyIds = ['live', 'twibbon', 'road-to-bali', 'delegasi', 'harapan', 'faq'];
     const spyTargets = spyIds.map((id) => document.getElementById(id)).filter(Boolean);
     const setCurrent = (id) => navLinks.forEach((a) => {
       if (a.getAttribute('href') === '#' + id) a.setAttribute('aria-current', 'true');
@@ -2337,12 +2381,13 @@
       if (!cfg) return;
       const surveiBuka = !cfg.survei.buka || now() >= Date.parse(cfg.survei.buka);
       const survei = cfg.survei.aktif && surveiBuka;
-      const dana = cfg.dana.aktif;
+      const dana = cfg.dana.saklar;
       $$('[data-promo="survei"]').forEach((el) => { el.hidden = !survei; });
       $$('[data-promo="dana"]').forEach((el) => { el.hidden = !dana; });
       const pill = $('#promo-dana-sisa');
       pill.hidden = !(dana && cfg.dana.sisa != null);
-      if (!pill.hidden) pill.textContent = `Tersisa ${nf.format(cfg.dana.sisa)}`;
+      $('#promo-dana-judul').textContent = cfg.dana.penuh ? 'Dana Kaget sudah habis' : 'Dana Kaget YCS dibuka!';
+      if (!pill.hidden) pill.textContent = cfg.dana.penuh ? 'Kuota habis' : `Tersisa ${nf.format(cfg.dana.sisa)}`;
       $('#promo').hidden = !(survei || dana);
     }
 
@@ -2554,63 +2599,18 @@
 
     /* ---------- Road to Bali ---------- */
     function gambarRoad(current, target) {
-      const milestones = [.1, .25, .5, .75, 1].map((f) => Math.round(target * f));
       const pct = Math.max(0, Math.min(100, (current / target) * 100));
       $('#road-current').textContent = nf.format(current);
       $('#road-target').textContent = nf.format(target);
-      const meter = $('.meter');
+      const meter = $('.road .meter');
       meter.setAttribute('aria-valuemax', target);
       meter.setAttribute('aria-valuenow', current);
       meter.setAttribute('aria-valuetext', `${nf.format(current)} dari target ${nf.format(target)} dukungan`);
-
-      const path = $('#road-path');
-      const total = path.getTotalLength();
-      const g = $('#road-milestones');
-      g.textContent = '';
-      const NS = 'http://www.w3.org/2000/svg';
-      milestones.forEach((m, idx) => {
-        const p = path.getPointAtLength(total * (m / target));
-        const reached = current >= m;
-        const isTarget = idx === milestones.length - 1;
-        const grp = document.createElementNS(NS, 'g');
-        grp.setAttribute('transform', `translate(${p.x} ${p.y})`);
-        const label = isTarget ? 'Target' : reached ? 'Tercapai' : 'Berikutnya';
-        // Di layar kecil SVG mengecil, jadi label diperbesar agar tetap terbaca.
-        const k = matchMedia('(min-width: 40rem)').matches ? 1 : 1.55;
-        const w = 78 * k, h = 38 * k, up = idx % 2 === 0 ? -1 : 1;
-        const y = up < 0 ? -h - 14 : 14;
-        const dx = idx === 0 ? -16 * k : idx === 1 ? 16 * k : 0; // pisahkan dua label pertama yang berdekatan
-        grp.innerHTML = `
-          <circle r="9" fill="${reached ? '#EA580C' : '#fff'}" stroke="${reached ? '#fff' : '#0E5A66'}" stroke-width="3"/>
-          <rect x="${dx - w / 2}" y="${y}" width="${w}" height="${h}" rx="10" fill="${isTarget ? '#fff' : reached ? '#0E5A66' : '#fff'}" stroke="#0E5A66" stroke-width="${isTarget || !reached ? 2 : 0}"/>
-          <text x="${dx}" y="${y + 18 * k}" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="${15 * k}" fill="${reached && !isTarget ? '#fff' : '#0B3B44'}">${nf.format(m)}</text>
-          <text x="${dx}" y="${y + 33 * k}" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-weight="600" font-size="${11 * k}" fill="${reached && !isTarget ? '#FFD86B' : '#4A5B62'}">${label}</text>`;
-        g.append(grp);
-      });
-
-      const done = $('#road-done');
-      const van = $('#road-van');
-      const place = (f) => {
-        done.setAttribute('stroke-dasharray', `${pct * f} 100`);
-        const p = path.getPointAtLength(total * (pct * f / 100));
-        const p2 = path.getPointAtLength(Math.min(total, total * (pct * f / 100) + 1));
-        const ang = Math.atan2(p2.y - p.y, p2.x - p.x) * 180 / Math.PI;
-        van.setAttribute('transform', `translate(${p.x} ${p.y - 10}) rotate(${ang * .5})`);
-        $('#road-meter').style.width = `${pct * f}%`;
-      };
-      if (reduceMotion) { place(1); return; }
-      place(0);
-      const io = new IntersectionObserver(([e]) => {
-        if (!e.isIntersecting) return;
-        io.disconnect();
-        const t0 = performance.now();
-        const step = (t) => {
-          const k = Math.min(1, (t - t0) / 1600);
-          place(1 - Math.pow(1 - k, 3));
-          if (k < 1) requestAnimationFrame(step);
-        };
-        requestAnimationFrame(step);
-      }, { threshold: .35 });
+      const ringkas = new Intl.NumberFormat('id-ID', { notation: 'compact' });
+      $('#road-ticks').innerHTML = [.25, .5, .75, 1].map((f) => `<li class="${current >= target * f ? 'is-on' : ''}" style="left:${f * 100}%">${ringkas.format(Math.round(target * f))}</li>`).join('');
+      const isi = () => { $('#road-meter').style.width = pct + '%'; };
+      if (reduceMotion) return isi();
+      const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); isi(); } }, { threshold: .4 });
       io.observe($('#road-to-bali'));
     }
 
