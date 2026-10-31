@@ -2860,13 +2860,17 @@
     let dataKata = [];
     try { kataSaya = localStorage.getItem('ycs_kata_saya') || ''; } catch (e) {}
     const terbuka = () => { try { return localStorage.getItem('ycs_kata_buka') === '1'; } catch (e) { return false; } };
-    const setTerbuka = () => { try { localStorage.setItem('ycs_kata_buka', '1'); } catch (e) {} sk.classList.remove('is-locked'); $('#sk-cloud').setAttribute('aria-hidden', 'false'); };
+    const setTerbuka = () => { try { localStorage.setItem('ycs_kata_buka', '1'); } catch (e) {} sk.classList.remove('is-locked'); $('#sk-cloud').setAttribute('aria-hidden', 'false'); if (typeof gambarAwan === 'function' && dataKata) gambarAwan(); };
     if (terbuka()) setTerbuka();
     function gambarAwan() {
       const box = $('#sk-cloud');
       let list = dataKata.slice(0, 70);
       if (kataSaya && !list.some(([k]) => k === kataSaya)) list = [[kataSaya, 1], ...list];
-      if (!list.length) { box.innerHTML = '<p class="sk__empty">Belum ada kata. Jadilah yang pertama!</p>'; return; }
+      if (!list.length) {
+        if (sk.classList.contains('is-locked')) return; // biarkan kata contoh yang buram sebagai pemancing rasa penasaran
+        box.innerHTML = '<p class="sk__empty">Belum ada kata. Jadilah yang pertama!</p>';
+        return;
+      }
       const max = Math.max(...list.map(([, n]) => n)), min = Math.min(...list.map(([, n]) => n));
       // Urutan diacak tetap (bukan per muatan) supaya kata besar tidak menumpuk di depan.
       const acak = list.map((x, i) => [x, (i * 7919) % 97]).sort((a, b) => a[1] - b[1]).map(([x]) => x);
