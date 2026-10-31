@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Klaim Tiket Wildcard — Youth Character Summit 2026</title>
+  <meta name="description" content="Belum masuk 100 finalis YCS 2026? Aktifkan kode wildcard dari email panitia untuk mendapat prioritas di event YCS berikutnya.">
+  <meta name="theme-color" content="#082C33">
+  <meta name="color-scheme" content="light dark">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Youth Character Summit 2026">
+  <meta property="og:title" content="Belum lolos? Klaim tiket wildcard YCS 2026">
+  <meta property="og:description" content="Aktifkan kode dari email panitia dan amankan prioritasmu di event YCS berikutnya.">
+  <meta property="og:url" content="https://roadtrip-ycs2026.vercel.app/klaim/">
+  <meta property="og:image" content="https://roadtrip-ycs2026.vercel.app/assets/img/ycs-rombongan-banner-1600.webp">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <script>(function(){try{var t=localStorage.getItem('ycs-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}})();</script>
+  <link rel="stylesheet" href="/assets/css/halaman.css">
+  <style>
+    .klaim-grid { display: grid; gap: var(--space-5); align-items: start; }
+    @media (min-width: 60rem) { .klaim-grid { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); } }
+
+    /* Tiket: lekukan di sisi kiri-kanan garis sobek dibuat dengan mask radial. */
+    .ticket { --notch: 14px; --cut: calc(100% - 5.8rem); position: relative; display: grid; border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow-lg); border: 1px solid var(--line);
+      -webkit-mask: radial-gradient(circle var(--notch) at 0 var(--cut, 70%), #0000 98%, #000) left / 51% 100% no-repeat, radial-gradient(circle var(--notch) at 100% var(--cut, 70%), #0000 98%, #000) right / 51% 100% no-repeat;
+              mask: radial-gradient(circle var(--notch) at 0 var(--cut, 70%), #0000 98%, #000) left / 51% 100% no-repeat, radial-gradient(circle var(--notch) at 100% var(--cut, 70%), #0000 98%, #000) right / 51% 100% no-repeat; }
+    .ticket__main { padding: clamp(1.25rem, 4vw, 2.25rem); }
+    .ticket__stub { position: relative; padding: var(--space-4) clamp(1.25rem, 4vw, 2.25rem) var(--space-5); border-top: 2px dashed var(--line); display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); background: linear-gradient(135deg, var(--teal-900), var(--teal-700)); color: #fff; border-radius: 0 0 var(--radius-lg) var(--radius-lg); }
+    .ticket__stub small { display: block; font-size: .6875rem; letter-spacing: .12em; text-transform: uppercase; color: var(--yellow-300); font-weight: 800; }
+    .ticket__no { font-family: var(--font-mono); font-size: clamp(1.125rem, 3.5vw, 1.375rem); font-weight: 700; letter-spacing: .18em; }
+    .ticket__barcode { width: 6.5rem; height: 2.5rem; flex: none; background: repeating-linear-gradient(90deg, #fff 0 2px, transparent 2px 4px, #fff 4px 5px, transparent 5px 8px, #fff 8px 11px, transparent 11px 13px); opacity: .85; border-radius: 2px; }
+    .ticket__head { display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); margin-bottom: var(--space-4); }
+    .ticket__brand { font-family: var(--font-brush); font-size: 1.5rem; color: var(--orange-600); line-height: 1; }
+    :root[data-theme="dark"] .ticket__brand { color: var(--orange-400); }
+    .ticket h2 { font-size: clamp(1.375rem, 3.5vw, 1.75rem); }
+
+    .input--code { font-family: var(--font-mono); font-size: clamp(1.375rem, 5vw, 1.75rem); font-weight: 700; letter-spacing: .3em; text-transform: uppercase; text-align: center; min-height: 64px; }
+    .input--code::placeholder { letter-spacing: .3em; color: color-mix(in srgb, var(--text-muted) 55%, transparent); }
+
+    .holder { display: grid; gap: var(--space-3); margin: var(--space-4) 0 var(--space-5); padding: var(--space-4); border-radius: var(--radius); background: var(--surface-soft); }
+    .holder div { display: flex; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; font-size: .9375rem; }
+    .holder dt { color: var(--text-muted); }
+    .holder dd { margin: 0; font-weight: 800; text-align: right; }
+
+    .stamp { position: absolute; top: 6.5rem; right: 1.5rem; width: 7.5rem; height: 7.5rem; border-radius: 50%; display: grid; place-items: center; text-align: center; color: var(--success); border: 4px double currentColor; transform: rotate(-14deg); font-weight: 800; letter-spacing: .14em; line-height: 1.1; font-size: .75rem; text-transform: uppercase; background: color-mix(in srgb, var(--surface) 85%, transparent); pointer-events: none; }
+    .stamp strong { display: block; font-size: 1.5rem; letter-spacing: .08em; }
+    .stamp.is-new { animation: cap .55s cubic-bezier(.2, 1.4, .4, 1) both; }
+    @keyframes cap { from { opacity: 0; transform: rotate(-14deg) scale(2.2); } }
+    @media (max-width: 30rem) { .stamp { width: 5.75rem; height: 5.75rem; font-size: .625rem; top: .25rem; right: .5rem; } .stamp strong { font-size: 1.125rem; } }
+
+    .event-cta { display: grid; gap: var(--space-3); margin-top: var(--space-5); }
+    .soon { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 52px; border-radius: var(--radius-pill); border: 2px dashed var(--line); font-weight: 800; color: var(--text-muted); letter-spacing: .04em; }
+    .soon .dot { width: .5rem; height: .5rem; border-radius: 50%; background: var(--orange-500); animation: kedip 1.4s ease-in-out infinite; }
+    @keyframes kedip { 50% { opacity: .25; } }
+
+    .how { list-style: none; margin: var(--space-4) 0 0; padding: 0; display: grid; gap: var(--space-4); }
+    .how li { display: grid; grid-template-columns: 2.5rem 1fr; gap: var(--space-3); align-items: start; }
+    .how__num { width: 2.5rem; height: 2.5rem; border-radius: 50%; display: grid; place-items: center; font-weight: 800; background: var(--yellow-100); color: var(--orange-700); }
+    :root[data-theme="dark"] .how__num { background: #3D2E07; color: var(--yellow-300); }
+    .how strong { display: block; }
+    .how p { font-size: .9375rem; color: var(--text-muted); }
+
+    .locked { text-align: center; display: grid; gap: var(--space-3); justify-items: center; padding: var(--space-4) 0; }
+    .locked__clock { font-family: var(--font-mono); font-size: clamp(1.75rem, 7vw, 2.5rem); font-weight: 700; letter-spacing: .06em; color: var(--orange-600); }
+    :root[data-theme="dark"] .locked__clock { color: var(--orange-400); }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#konten">Langsung ke konten utama</a>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5m0 3.5v.01"/></g></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></g></symbol>
+    <symbol id="i-ticket" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M3 8a2 2 0 0 0 2-2h14a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H5a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4Zm11-2v12" stroke-dasharray="0"/></symbol>
+  </svg>
+
+  <header class="p-header">
+    <div class="container p-header__inner">
+      <a class="p-brand" href="/" aria-label="Youth Character Summit 2026, ke beranda">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><g stroke="#FFC93C" stroke-width="3" stroke-linecap="round"><path d="M24 3v5M24 40v5M3 24h5M40 24h5M9.2 9.2l3.5 3.5M35.3 35.3l3.5 3.5M9.2 38.8l3.5-3.5M35.3 12.7l3.5-3.5"/></g><circle cx="24" cy="24" r="12.5" fill="#12707E"/><circle cx="24" cy="19.5" r="3.4" fill="#FFC93C"/><path d="M16.5 31c1.5-4.6 4.2-6.8 7.5-6.8s6 2.2 7.5 6.8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>
+        <span><strong>Youth Character Summit</strong><span>YCS 2026</span></span>
+      </a>
+      <div class="p-header__tools">
+        <a class="p-back" href="/"><svg aria-hidden="true"><use href="#i-arrow"/></svg><span>Beranda</span></a>
+        <button class="icon-btn theme-toggle" type="button" aria-label="Ganti tema terang/gelap" aria-pressed="false" hidden>
+          <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"/></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></g></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <section class="p-hero" aria-labelledby="judul">
+    <div class="container">
+      <p class="p-hero__eyebrow">Tiket Wildcard YCS</p>
+      <h1 id="judul">Belum lolos? <span class="hl">Klaim tiketmu.</span></h1>
+      <p class="p-hero__lead">Belum masuk 100 finalis bukan akhir perjalanan. Aktifkan kode wildcard dari email panitia untuk mendapat prioritas di event YCS berikutnya.</p>
+    </div>
+    <svg class="p-hero__wave" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0 34C180 60 360 6 560 22s380 38 560 20 240-34 320-26V60H0Z"/></svg>
+  </section>
+
+  <main class="p-main" id="konten" tabindex="-1">
+    <div class="container klaim-grid">
+      <div>
+        <article class="ticket" id="tiket" aria-labelledby="tiket-judul">
+          <div class="ticket__main">
+            <div class="ticket__head">
+              <span class="ticket__brand" aria-hidden="true">Wildcard</span>
+              <span class="badge" id="tiket-badge">Tiket YCS</span>
+            </div>
+
+            <!-- Memuat -->
+            <div id="v-muat" aria-live="polite">
+              <h2 id="tiket-judul">Menyiapkan halaman klaim…</h2>
+              <p class="card__sub">Sebentar ya, kami cek jadwal klaim di server.</p>
+            </div>
+
+            <!-- Belum dibuka -->
+            <div id="v-tutup" class="locked" hidden>
+              <svg width="40" height="40" aria-hidden="true"><use href="#i-lock"/></svg>
+              <h2>Klaim dibuka setelah pengumuman</h2>
+              <p class="muted" id="tutup-info">Kode wildcard bisa diaktifkan setelah 100 finalis diumumkan.</p>
+              <p class="locked__clock" id="tutup-jam" aria-hidden="true">--:--:--</p>
+              <a class="btn btn--soft btn--sm" href="/#live">Tonton live pengumuman</a>
+            </div>
+
+            <!-- Nonaktif -->
+            <div id="v-nonaktif" class="locked" hidden>
+              <svg width="40" height="40" aria-hidden="true"><use href="#i-lock"/></svg>
+              <h2>Klaim sedang ditutup</h2>
+              <p class="muted">Panitia sedang menutup sementara klaim wildcard. Pantau info terbaru di saluran WhatsApp YCS.</p>
+            </div>
+
+            <!-- Langkah 1: masukkan kode -->
+            <form id="v-form" novalidate hidden>
+              <ol class="steps" aria-label="Langkah klaim">
+                <li aria-current="step">Masukkan kode</li><li>Cek tiket</li><li>Aktif</li>
+              </ol>
+              <h2>Masukkan kode dari email</h2>
+              <p class="card__sub">Kode terdiri dari 8 karakter (huruf dan angka) dan hanya berlaku untuk email penerimanya.</p>
+              <div class="field" style="margin-top:1.25rem">
+                <label for="kode">Kode wildcard</label>
+                <input class="input input--code" id="kode" name="kode" required maxlength="9" placeholder="XXXX-XXXX" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false" aria-describedby="kode-error">
+                <p class="field__error" id="kode-error"></p>
+              </div>
+              <div class="field">
+                <label for="email">Email penerima kode</label>
+                <input class="input" type="email" id="email" name="email" required maxlength="254" autocomplete="email" inputmode="email" placeholder="nama@email.com" aria-describedby="email-hint email-error">
+                <p class="field__hint" id="email-hint">Sama dengan email yang menerima kode dari panitia.</p>
+                <p class="field__error" id="email-error"></p>
+              </div>
+              <p class="alert alert--err" id="form-alert" role="alert" style="margin-top:1rem"></p>
+              <button class="btn btn--cta btn--block" type="submit" id="btn-cek" style="margin-top:1.25rem">Cek kode <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+            </form>
+
+            <!-- Langkah 2: konfirmasi -->
+            <div id="v-cek" hidden>
+              <ol class="steps" aria-label="Langkah klaim">
+                <li class="is-done">Masukkan kode</li><li aria-current="step">Cek tiket</li><li>Aktif</li>
+              </ol>
+              <h2 tabindex="-1" id="cek-judul">Tiketmu ditemukan<span id="cek-nama"></span></h2>
+              <p class="card__sub">Pastikan data di bawah benar, lalu tekan <strong>Verifikasi</strong>. Setelah aktif, kode tidak bisa dipakai orang lain.</p>
+              <dl class="holder">
+                <div><dt>Pemilik</dt><dd id="cek-email"></dd></div>
+                <div><dt>Status</dt><dd>Belum diklaim</dd></div>
+                <div><dt>Berlaku sampai</dt><dd id="cek-berlaku"></dd></div>
+              </dl>
+              <p class="alert alert--err" id="cek-alert" role="alert"></p>
+              <div class="btn-row">
+                <button class="btn btn--cta" type="button" id="btn-verif"><svg aria-hidden="true"><use href="#i-check"/></svg>Verifikasi &amp; aktifkan</button>
+                <button class="btn btn--ghost" type="button" id="btn-ulang">Ganti kode</button>
+              </div>
+            </div>
+
+            <!-- Langkah 3: aktif -->
+            <div id="v-aktif" hidden>
+              <div class="stamp" id="stamp" aria-hidden="true"><span>Tiket<strong>Aktif</strong>YCS</span></div>
+              <ol class="steps" aria-label="Langkah klaim">
+                <li class="is-done">Masukkan kode</li><li class="is-done">Cek tiket</li><li class="is-done" aria-current="step">Aktif</li>
+              </ol>
+              <h2 tabindex="-1" id="aktif-judul">Tiketmu sudah aktif!</h2>
+              <p class="card__sub" id="aktif-sub">Kode ini sekarang terikat ke emailmu dan berlaku untuk event berikutnya.</p>
+              <dl class="holder">
+                <div><dt>Pemilik</dt><dd id="aktif-email"></dd></div>
+                <div><dt>Diaktifkan</dt><dd id="aktif-waktu"></dd></div>
+                <div><dt>Event</dt><dd id="aktif-event"></dd></div>
+              </dl>
+              <div class="event-cta">
+                <a class="btn btn--cta btn--block" id="event-link" href="#" target="_blank" rel="noopener" hidden>Buka info event <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+                <p class="soon" id="event-soon"><span class="dot" aria-hidden="true"></span>Coming Soon</p>
+                <p class="small muted">Link event akan muncul di halaman ini. Buka lagi kapan saja dengan kode dan email yang sama, kodenya tidak berubah.</p>
+              </div>
+            </div>
+          </div>
+          <div class="ticket__stub" aria-hidden="true">
+            <div><small>Nomor tiket</small><span class="ticket__no" id="stub-no">····-····</span></div>
+            <span class="ticket__barcode"></span>
+          </div>
+        </article>
+      </div>
+
+      <aside>
+        <section class="card" aria-labelledby="cara-judul">
+          <h2 id="cara-judul">Cara kerja tiket wildcard</h2>
+          <ol class="how">
+            <li><span class="how__num">1</span><div><strong>Cek email</strong><p>Panitia mengirim kode 8 karakter ke email yang kamu pakai saat mendaftar.</p></div></li>
+            <li><span class="how__num">2</span><div><strong>Masukkan kode + email</strong><p>Kode hanya cocok dengan email penerimanya, jadi tidak bisa dipakai orang lain.</p></div></li>
+            <li><span class="how__num">3</span><div><strong>Verifikasi</strong><p>Kode aktif untuk event berikutnya. Link event muncul di halaman ini saat dibuka.</p></div></li>
+          </ol>
+        </section>
+        <section class="card" aria-labelledby="sk-judul">
+          <h2 id="sk-judul">Syarat &amp; ketentuan</h2>
+          <details class="faq" open>
+            <summary>Siapa yang berhak?</summary>
+            <div class="faq__body">Peserta YCS 2026 yang belum masuk 100 finalis dan menerima email kode wildcard dari panitia Universitas STEKOM.</div>
+          </details>
+          <details class="faq">
+            <summary>Apa yang aku dapat?</summary>
+            <div class="faq__body">Prioritas antrean atau slot terbatas di event YCS berikutnya. Tiket wildcard <strong>bukan jaminan lolos</strong>; seleksi tetap berlaku.</div>
+          </details>
+          <details class="faq">
+            <summary>Berapa lama kode berlaku?</summary>
+            <div class="faq__body">Sampai <span data-berlaku>batas yang tertulis di email</span>. Kode yang tidak diklaim sampai batas itu otomatis hangus.</div>
+          </details>
+          <details class="faq">
+            <summary>Boleh dipindahtangankan?</summary>
+            <div class="faq__body">Tidak. Satu kode untuk satu peserta, sekali pakai, dan terikat ke email penerima.</div>
+          </details>
+          <details class="faq">
+            <summary>Bagaimana jika ada kecurangan?</summary>
+            <div class="faq__body">Jual-beli kode, memakai kode orang lain, atau mencoba menebak kode membuat tiket dibatalkan. Salah memasukkan kode 5 kali akan memblokir percobaan selama 1 jam.</div>
+          </details>
+          <p class="small muted" style="margin-top:1rem">Kode tidak sampai? Cek folder Spam/Promosi, lalu hubungi CS di <a href="https://wa.me/6287848775292" target="_blank" rel="noopener">WhatsApp 0878-4877-5292</a>.</p>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="p-footer">
+    <div class="container p-footer__inner">
+      <p>© 2026 Universitas STEKOM · Youth Character Summit</p>
+      <ul><li><a href="/">Beranda</a></li><li><a href="/privasi/">Kebijakan Privasi</a></li><li><a href="https://wa.me/6287848775292" target="_blank" rel="noopener">Kontak CS</a></li></ul>
+    </div>
+  </footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="/assets/js/halaman.js"></script>
+  <script>
+  (() => {
+    'use strict';
+    const {$, post, config, offset, perangkat, waktu, hitungMundur, sibuk} = window.YCS;
+    const views = ['muat', 'tutup', 'nonaktif', 'form', 'cek', 'aktif'];
+    const show = (v) => views.forEach((x) => { $('#v-' + x).hidden = x !== v; });
+    const kodeEl = $('#kode'), emailEl = $('#email');
+    const fmtKode = (s) => s.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8).replace(/^(.{4})(.+)$/, '$1-$2');
+    let terakhir = null;
+
+    const PESAN = {
+      tidak_cocok: 'Kode dan email tidak cocok. Periksa lagi huruf/angka di email dari panitia (tidak ada huruf O dan I).',
+      hangus: 'Kode ini sudah hangus karena melewati masa berlaku.',
+      terlalu_banyak: 'Terlalu banyak percobaan yang salah. Demi keamanan, coba lagi dalam 1 jam.',
+      belum_waktunya: 'Klaim belum dibuka. Tunggu sampai pengumuman finalis.',
+      nonaktif: 'Klaim sedang ditutup oleh panitia.',
+      validation: 'Periksa kembali kode (8 karakter) dan email.',
+      busy: 'Server sedang ramai. Tunggu beberapa detik lalu coba lagi.',
+      connection: 'Koneksi bermasalah. Periksa internetmu lalu coba lagi.'
+    };
+    const pesan = (e) => PESAN[e] || PESAN.connection;
+
+    kodeEl.addEventListener('input', () => {
+      const pos = kodeEl.selectionStart, before = kodeEl.value.length;
+      kodeEl.value = fmtKode(kodeEl.value);
+      const p = Math.max(0, pos + kodeEl.value.length - before);
+      kodeEl.setSelectionRange(p, p);
+      $('#stub-no').textContent = kodeEl.value.padEnd(9, '·').replace(/^(.{4})·/, '$1-');
+    });
+    const awal = new URLSearchParams(location.search).get('kode');
+    if (awal) { kodeEl.value = fmtKode(awal); kodeEl.dispatchEvent(new Event('input')); }
+
+    function validasi() {
+      const kode = kodeEl.value.replace('-', ''), email = emailEl.value.trim();
+      const cek = [
+        [kodeEl, /^[A-Z0-9]{8}$/.test(kode), 'Kode harus 8 karakter, contoh: AB12-CD34.'],
+        [emailEl, /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email), 'Isi email yang valid, contoh: nama@email.com.']
+      ];
+      let first = null;
+      cek.forEach(([el, ok, msg]) => { $('#' + el.id + '-error').textContent = ok ? '' : msg; el.setAttribute('aria-invalid', String(!ok)); if (!ok && !first) first = el; });
+      if (first) first.focus();
+      return !first;
+    }
+
+    function tampilAktif(d, baru) {
+      $('#aktif-email').textContent = d.email;
+      $('#aktif-waktu').textContent = d.waktuKlaim ? waktu(d.waktuKlaim) : 'Baru saja';
+      $('#aktif-event').textContent = d.event && d.event.nama ? d.event.nama : 'Event YCS berikutnya';
+      $('#aktif-judul').textContent = baru ? 'Tiketmu sudah aktif!' : 'Tiket ini sudah aktif';
+      $('#aktif-sub').textContent = baru ? 'Kode ini sekarang terikat ke emailmu dan berlaku untuk event berikutnya.' : 'Kode ini sudah diverifikasi sebelumnya. Simpan halaman ini untuk melihat link event.';
+      const link = d.event && d.event.link;
+      $('#event-link').hidden = !link;
+      $('#event-soon').hidden = !!link;
+      if (link) $('#event-link').href = link;
+      $('#tiket-badge').hidden = true; // cap "Tiket Aktif" menggantikan badge
+      $('#stamp').classList.toggle('is-new', baru);
+      show('aktif');
+      $('#aktif-judul').focus();
+    }
+
+    $('#v-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      $('#form-alert').textContent = '';
+      if (!validasi()) return;
+      const btn = $('#btn-cek');
+      sibuk(btn, true);
+      terakhir = {kode: kodeEl.value.replace('-', ''), email: emailEl.value.trim(), perangkat: perangkat()};
+      const d = await post('/api/klaim', {aksi: 'cek', ...terakhir});
+      sibuk(btn, false);
+      if (!d.ok) { $('#form-alert').textContent = pesan(d.error); return; }
+      if (d.status === 'sudah') return tampilAktif(d, false);
+      $('#cek-nama').textContent = d.nama ? ', ' + d.nama + '!' : '!';
+      $('#cek-email').textContent = d.email;
+      $('#cek-berlaku').textContent = d.berlaku ? waktu(d.berlaku) : 'Sesuai info panitia';
+      $('#cek-alert').textContent = '';
+      show('cek');
+      $('#cek-judul').focus();
+    });
+
+    $('#btn-verif').addEventListener('click', async () => {
+      const btn = $('#btn-verif');
+      sibuk(btn, true);
+      const d = await post('/api/klaim', {aksi: 'verifikasi', ...terakhir});
+      sibuk(btn, false);
+      if (!d.ok) { $('#cek-alert').textContent = pesan(d.error); return; }
+      tampilAktif(d, d.status === 'aktif');
+    });
+    $('#btn-ulang').addEventListener('click', () => { show('form'); kodeEl.focus(); kodeEl.select(); });
+
+    (async () => {
+      let cfg;
+      try { cfg = await config(); } catch (e) { cfg = null; }
+      if (!cfg) { show('form'); return; } // server pengaturan tidak terjangkau: biarkan Apps Script yang menolak bila belum waktunya
+      if (cfg.klaim.berlaku) $('[data-berlaku]').textContent = waktu(cfg.klaim.berlaku);
+      if (!cfg.klaim.aktif) return show('nonaktif');
+      const buka = Date.parse(cfg.klaim.buka);
+      const off = await offset();
+      if (buka && Date.now() + off < buka) {
+        $('#tutup-info').textContent = 'Kode wildcard bisa diaktifkan mulai ' + waktu(cfg.klaim.buka) + '.';
+        show('tutup');
+        hitungMundur($('#tutup-jam'), buka, () => { show('form'); });
+        return;
+      }
+      show('form');
+    })();
+  })();
+  </script>
+</body>
+</html>
