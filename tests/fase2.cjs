@@ -136,7 +136,7 @@ test('twibbon: migrasi header lama, simpan kota/provinsi/ref, statistik leaderbo
   assert.equal(tw.rows[3][8], 'web-ycs2026');
   const st = app.get('stats');
   assert.equal(st.road.current, 3);
-  assert.deepEqual(st.kota[0], {nama: 'Kota Semarang', jumlah: 2});
+  assert.deepEqual(st.provinsi[0], {nama: 'Jawa Tengah', jumlah: 2});
 });
 
 test('proxy reveal menolak sebelum waktunya tanpa memanggil endpoint reveal', async () => {
@@ -166,4 +166,36 @@ test('pop-up informasi: hanya tampil di config bila aktif, link tujuan divalidas
   const pop = app.get('config').popup;
   assert.equal(pop.aktif, true);
   assert.equal(pop.link, '/dana-kaget/');
+});
+
+test('Satu Kata: satu kata saja, kata kasar ditolak, dedup, awan kata + statistik provinsi', () => {
+  const app = muat({now: Date.parse('2026-11-10T09:00:00+07:00')});
+  app.get('siapkan');
+  const kirim = (kata, extra = {}) => app.post({aksi: 'kata-kirim', kata, requestId: crypto.randomUUID(), ipHash: 'ip-' + kata, ...extra});
+  assert.equal(kirim('dua kata').error, 'validation');
+  assert.equal(kirim('Anjing').error, 'kata_ditolak');
+  assert.equal(kirim('goblokk').error, 'kata_ditolak');
+  assert.equal(kirim('Berani!', {provinsi: 'Jawa Tengah'}).kata, 'berani');
+  kirim('berani', {provinsi: 'Jawa Tengah'}); kirim('jujur', {provinsi: 'Bali'});
+  const id = crypto.randomUUID();
+  app.post({aksi: 'kata-kirim', kata: 'damai', requestId: id});
+  assert.equal(app.post({aksi: 'kata-kirim', kata: 'damai', requestId: id}).duplicate, true);
+  const k = app.get('kata');
+  assert.equal(k.total, 4);
+  assert.deepEqual(k.kata[0], ['berani', 2]);
+  const st = app.get('stats');
+  assert.equal(st.road.current, 4);
+  assert.deepEqual(st.provinsi[0], {nama: 'Jawa Tengah', jumlah: 2});
+});
+
+test('Dana Kaget: identitas cukup nama, sekolah, provinsi, email', () => {
+  const app = muat({now: Date.parse('2026-11-20T09:00:00+07:00')});
+  app.get('siapkan');
+  const peng = app.sheets.Pengaturan.rows;
+  peng.find((r) => r[0] === 'dana_aktif')[1] = 'YA'; app.cache.delete('cfg');
+  const kode = peng.find((r) => r[0] === 'dana_kode_akses')[1];
+  const base = {aksi: 'dana-kirim', kodeAkses: kode, nama: 'Sinta', sekolah: 'SMA 1', provinsi: 'Bali', email: 's@mail.com', consent: true};
+  assert.equal(app.post({...base, provinsi: '', requestId: crypto.randomUUID()}).error, 'validation');
+  assert.equal(app.post({...base, requestId: crypto.randomUUID()}).ok, true);
+  assert.equal(app.post({...base, requestId: crypto.randomUUID()}).error, 'sudah_mengajukan');
 });

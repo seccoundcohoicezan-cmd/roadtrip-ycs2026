@@ -103,3 +103,10 @@ node --test tests/backend.cjs tests/fase2.cjs   # logika Code.gs + proxy
 node tools/dev-server.cjs 8787                    # situs lokal + Apps Script tiruan
 curl -X POST localhost:8787/__seed -d '{"finalis":30,"twibbon":40}'   # data contoh, membalas password admin
 ```
+
+## Putaran 4 (MRKT-45): Twibbon diganti Dana Kaget + Satu Kata
+
+- **Twibbon dihapus** dari beranda dan menu. Data twibbon lama tetap ada di Sheet sebagai arsip dan masih dihitung di Road to Bali.
+- **Klaim Dana Kaget** ada langsung di beranda (`#dana`). Alurnya: isi identitas (nama, sekolah, provinsi, email) → masukkan kode akses → selesai. `/dana-kaget/` mengalihkan ke `/#dana` dan membawa `?kode=`.
+- **Satu Kata** (`#satu-kata`): kirim kata gratis. Awan kata hasilnya ter-blur dan terbuka setelah pengunjung mengetuk tombol Saluran WhatsApp (link diatur di Admin → Satu Kata). Setelah terbuka, kartu kata PNG bisa diunduh. Layar acara: `/harapan/?display=1`. Detail: `harapan/README.md`.
+- **Road to Bali & leaderboard provinsi** = twibbon lama + Satu Kata + klaim Dana Kaget.
