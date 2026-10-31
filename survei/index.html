@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Survei Destinasi Impian — Youth Character Summit 2026</title>
+  <meta name="description" content="Ke mana YCS berikutnya? Isi survei 1 menit tentang destinasi dan kegiatan impianmu, lalu ajak temanmu ikut memilih.">
+  <meta name="theme-color" content="#082C33">
+  <meta name="color-scheme" content="light dark">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Youth Character Summit 2026">
+  <meta property="og:title" content="Ke mana YCS berikutnya? Kamu yang tentukan!">
+  <meta property="og:description" content="Survei 1 menit: pilih destinasi dan kegiatan impianmu untuk perjalanan karakter berikutnya.">
+  <meta property="og:url" content="https://roadtrip-ycs2026.vercel.app/survei/">
+  <meta property="og:image" content="https://roadtrip-ycs2026.vercel.app/assets/img/bali/bg-tanahlot2-1440.webp">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <script>(function(){try{var t=localStorage.getItem('ycs-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}})();</script>
+  <link rel="stylesheet" href="/assets/css/halaman.css">
+  <style>
+    .p-hero { background: linear-gradient(180deg, rgb(8 44 51 / .55), rgb(8 44 51 / .92)), url("/assets/img/bali/bg-tanahlot2-720.webp") center 60% / cover; }
+    @media (min-width: 48rem) { .p-hero { background-image: linear-gradient(180deg, rgb(8 44 51 / .5), rgb(8 44 51 / .9)), url("/assets/img/bali/bg-tanahlot2-1440.webp"); } }
+    .survey { padding: 0; overflow: hidden; }
+    .survey__top { padding: var(--space-4) clamp(1.25rem, 4vw, 2.25rem); border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: var(--space-4); }
+    .survey__top .meter { flex: 1; height: .5rem; }
+    .survey__count { font-size: .8125rem; font-weight: 800; color: var(--text-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .survey__body { padding: clamp(1.25rem, 4vw, 2.25rem); min-height: 24rem; }
+    .q { border: 0; margin: 0; padding: 0; min-width: 0; }
+    .q legend { padding: 0; font-size: clamp(1.25rem, 3.5vw, 1.625rem); font-weight: 800; line-height: 1.25; }
+    .q__hint { margin-top: var(--space-2); color: var(--text-muted); font-size: .9375rem; }
+    .q.fade-in { animation-duration: .35s; }
+    .choices { display: grid; gap: var(--space-3); margin-top: var(--space-5); grid-template-columns: repeat(auto-fill, minmax(min(100%, 12rem), 1fr)); }
+    .choice { position: relative; display: block; cursor: pointer; }
+    .choice input { position: absolute; z-index: 1; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+    .choice__box { display: flex; align-items: center; gap: var(--space-3); min-height: 56px; padding: .75rem 1rem; border-radius: var(--radius); border: 2px solid var(--line); background: var(--surface); font-weight: 700; transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease), transform var(--dur) var(--ease); }
+    .choice__box::before { content: ""; flex: none; width: 1.375rem; height: 1.375rem; border-radius: .375rem; border: 2px solid var(--line); background: var(--surface) center / 70% no-repeat; transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease); }
+    .choice input[type="radio"] + .choice__box::before { border-radius: 50%; }
+    .choice:hover .choice__box { border-color: color-mix(in srgb, var(--primary) 55%, var(--line)); transform: translateY(-1px); }
+    .choice input:checked + .choice__box { border-color: var(--teal-700); background: var(--surface-soft); }
+    .choice input:checked + .choice__box::before { background-color: var(--teal-700); border-color: var(--teal-700); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round' d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E"); }
+    .choice input:focus-visible + .choice__box { outline: 3px solid var(--focus); outline-offset: 2px; }
+    .choice input:disabled + .choice__box { opacity: .45; cursor: not-allowed; transform: none; }
+    .choice small { display: block; font-weight: 500; color: var(--text-muted); font-size: .8125rem; }
+    .q__error { margin-top: var(--space-3); }
+    .survey__nav { display: flex; justify-content: space-between; gap: var(--space-3); padding: var(--space-4) clamp(1.25rem, 4vw, 2.25rem); border-top: 1px solid var(--line); background: var(--surface-soft); }
+    .survey__nav .btn--cta { margin-left: auto; }
+    .kbd-hint { font-size: .75rem; color: var(--text-muted); align-self: center; }
+    @media (max-width: 40rem) { .kbd-hint { display: none; } }
+    .thanks { text-align: center; display: grid; gap: var(--space-4); justify-items: center; padding: var(--space-5) 0; }
+    .thanks__art { width: 7rem; height: 7rem; }
+    .thanks .share-row { justify-content: center; }
+    .side-note { display: grid; gap: var(--space-3); }
+    .layout { display: grid; gap: var(--space-5); align-items: start; }
+    @media (min-width: 60rem) { .layout { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); } }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#konten">Langsung ke konten utama</a>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-whatsapp" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.2-.2-.5-.3Z"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="13" height="13" rx="2.5"/><path d="M16 8V5.5A2.5 2.5 0 0 0 13.5 3h-8A2.5 2.5 0 0 0 3 5.5v8A2.5 2.5 0 0 0 5.5 16H8"/></g></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.5 6.8-4m-6.8 7 6.8 4"/></g></symbol>
+  </svg>
+
+  <header class="p-header">
+    <div class="container p-header__inner">
+      <a class="p-brand" href="/" aria-label="Youth Character Summit 2026, ke beranda">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><g stroke="#FFC93C" stroke-width="3" stroke-linecap="round"><path d="M24 3v5M24 40v5M3 24h5M40 24h5M9.2 9.2l3.5 3.5M35.3 35.3l3.5 3.5M9.2 38.8l3.5-3.5M35.3 12.7l3.5-3.5"/></g><circle cx="24" cy="24" r="12.5" fill="#12707E"/><circle cx="24" cy="19.5" r="3.4" fill="#FFC93C"/><path d="M16.5 31c1.5-4.6 4.2-6.8 7.5-6.8s6 2.2 7.5 6.8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>
+        <span><strong>Youth Character Summit</strong><span>YCS 2026</span></span>
+      </a>
+      <div class="p-header__tools">
+        <a class="p-back" href="/"><svg aria-hidden="true"><use href="#i-arrow"/></svg><span>Beranda</span></a>
+        <button class="icon-btn theme-toggle" type="button" aria-label="Ganti tema terang/gelap" aria-pressed="false" hidden>
+          <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"/></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></g></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <section class="p-hero" aria-labelledby="judul">
+    <div class="container">
+      <p class="p-hero__eyebrow">Survei 1 menit</p>
+      <h1 id="judul">Ke mana YCS <span class="hl">berikutnya?</span></h1>
+      <p class="p-hero__lead">Kamu yang menentukan. Pilih destinasi dan kegiatan impianmu; jawabanmu dipakai panitia merancang perjalanan karakter selanjutnya.</p>
+    </div>
+    <svg class="p-hero__wave" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0 34C180 60 360 6 560 22s380 38 560 20 240-34 320-26V60H0Z"/></svg>
+  </section>
+
+  <main class="p-main" id="konten" tabindex="-1">
+    <div class="container layout">
+      <form class="card survey" id="survei" novalidate>
+        <div class="survey__top" id="atas">
+          <div class="meter" role="progressbar" aria-label="Kemajuan survei" aria-valuemin="0" aria-valuemax="6" aria-valuenow="1" id="progres"><div class="meter__fill" id="progres-fill" style="width:16%"></div></div>
+          <span class="survey__count" id="hitung">1 / 6</span>
+        </div>
+        <div class="survey__body" id="isi" aria-live="polite">
+          <div id="v-muat"><h2>Menyiapkan survei…</h2></div>
+          <div id="v-tutup" hidden class="empty-state">
+            <h2>Survei dibuka setelah pengumuman</h2>
+            <p class="muted" id="tutup-info">Kembali lagi setelah 100 finalis diumumkan, ya.</p>
+            <a class="btn btn--soft btn--sm" href="/">Kembali ke beranda</a>
+          </div>
+          <div id="v-nonaktif" hidden class="empty-state">
+            <h2>Survei sudah ditutup</h2>
+            <p class="muted">Terima kasih atas antusiasmenya! Hasil survei sedang diolah panitia.</p>
+            <a class="btn btn--soft btn--sm" href="/">Kembali ke beranda</a>
+          </div>
+          <div id="v-tanya" hidden></div>
+          <div id="v-selesai" hidden class="thanks">
+            <svg class="thanks__art" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="56" fill="#FFF3CC"/><path d="M34 62l17 17 36-38" fill="none" stroke="#C2410C" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><g fill="#0E5A66"><circle cx="18" cy="24" r="4"/><circle cx="104" cy="30" r="3"/><circle cx="98" cy="98" r="4"/></g></svg>
+            <h2 tabindex="-1" id="selesai-judul">Terima kasih, suaramu tercatat!</h2>
+            <p class="muted" style="max-width:30rem">Semakin banyak yang mengisi, semakin tepat rencana perjalanannya. Ajak teman sekelasmu ikut memilih:</p>
+            <div class="share-row" id="bagikan">
+              <button class="share-btn share-btn--wa" type="button" data-share="wa"><svg aria-hidden="true"><use href="#i-whatsapp"/></svg>Bagikan ke WhatsApp</button>
+              <button class="share-btn" type="button" data-share="copy"><svg aria-hidden="true"><use href="#i-copy"/></svg>Salin link</button>
+              <button class="share-btn" type="button" data-share="native"><svg aria-hidden="true"><use href="#i-share"/></svg>Bagikan…</button>
+            </div>
+            <a class="btn btn--ghost btn--sm" href="/">Kembali ke beranda</a>
+          </div>
+        </div>
+        <div class="survey__nav" id="nav" hidden>
+          <button class="btn btn--ghost" type="button" id="kembali">Kembali</button>
+          <span class="kbd-hint">Tekan <kbd>Enter</kbd> untuk lanjut</span>
+          <button class="btn btn--cta" type="submit" id="lanjut">Lanjut <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+        </div>
+        <div hidden><label for="website">Website</label><input id="website" tabindex="-1" autocomplete="off"></div>
+      </form>
+
+      <aside class="card side-note" aria-labelledby="kenapa">
+        <h2 id="kenapa">Kenapa survei ini?</h2>
+        <p class="muted">YCS 2026 membawa 150 pelajar ke Bali. Untuk perjalanan berikutnya, panitia ingin tahu destinasi dan kegiatan yang paling kamu tunggu.</p>
+        <p class="muted small">Tanpa login. Email opsional dan hanya dipakai bila kamu ingin dikabari hasilnya. Lihat <a href="/privasi/">Kebijakan Privasi</a>.</p>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="p-footer">
+    <div class="container p-footer__inner">
+      <p>© 2026 Universitas STEKOM · Youth Character Summit</p>
+      <ul><li><a href="/">Beranda</a></li><li><a href="/privasi/">Kebijakan Privasi</a></li><li><a href="https://wa.me/6287848775292" target="_blank" rel="noopener">Kontak CS</a></li></ul>
+    </div>
+  </footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="/assets/js/halaman.js"></script>
+  <script>
+  (() => {
+    'use strict';
+    const {$, $$, post, config, offset, perangkat, ref, uuid, waktu, wilayah, pasangBagikan, sibuk} = window.YCS;
+    // Pilihan harus sama persis dengan daftar SURVEI_* di apps-script/Code.gs.
+    const Q = [
+      {id: 'destinasi', type: 'checkbox', max: 3, legend: 'Destinasi mana yang paling ingin kamu kunjungi bersama YCS?', hint: 'Pilih maksimal 3.',
+        opts: [['Bali', 'Pura, pantai, budaya'], ['Lombok', 'Gili & Rinjani'], ['Labuan Bajo', 'Komodo & pulau'], ['Yogyakarta', 'Kota budaya'], ['Raja Ampat', 'Laut terindah'], ['Danau Toba', 'Danau vulkanik'], ['Bromo', 'Lautan pasir'], ['Belitung', 'Pantai granit'], ['Toraja', 'Tradisi unik'], ['Bandung', 'Sains & kreatif'], ['Wakatobi', 'Surga penyelam']]},
+      {id: 'kegiatan', type: 'checkbox', max: 2, legend: 'Kegiatan seperti apa yang paling kamu suka?', hint: 'Pilih maksimal 2.',
+        opts: [['Alam & petualangan'], ['Budaya & sejarah'], ['Edukasi & sains'], ['Bakti sosial'], ['Kuliner lokal'], ['Kreatif (foto/video)']]},
+      {id: 'waktu', type: 'radio', legend: 'Kapan waktu paling pas untuk ikut perjalanan?', opts: [['Libur semester Desember'], ['Libur kenaikan kelas', 'Juni–Juli'], ['Akhir pekan panjang']]},
+      {id: 'status', type: 'radio', legend: 'Kamu saat ini…', opts: [['Kelas 10'], ['Kelas 11'], ['Kelas 12'], ['Guru/pendamping'], ['Lainnya']]},
+      {id: 'provinsi', type: 'select', legend: 'Kamu dari provinsi mana?', hint: 'Untuk melihat sebaran peminat per daerah.'},
+      {id: 'akhir', type: 'text', legend: 'Satu lagi (opsional)', hint: 'Boleh dilewati, tekan Kirim.'}
+    ];
+    const jawab = {destinasi: [], kegiatan: [], waktu: '', status: '', provinsi: '', impian: '', email: ''};
+    const requestId = uuid();
+    let i = 0, provinsiList = [];
+    const views = ['muat', 'tutup', 'nonaktif', 'tanya', 'selesai'];
+    const show = (v) => { views.forEach((x) => { $('#v-' + x).hidden = x !== v; }); $('#nav').hidden = v !== 'tanya'; $('#atas').hidden = v !== 'tanya'; };
+    const esc = (s) => s.replace(/[&<>"]/g, (c) => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+
+    function render(focus) {
+      const q = Q[i];
+      const box = $('#v-tanya');
+      let html = `<fieldset class="q fade-in" aria-describedby="q-hint q-error"><legend tabindex="-1" id="q-legend">${esc(q.legend)}</legend>`;
+      html += `<p class="q__hint" id="q-hint">${esc(q.hint || '')}</p>`;
+      if (q.type === 'checkbox' || q.type === 'radio') {
+        html += '<div class="choices">' + q.opts.map(([v, sub], k) => {
+          const on = q.type === 'checkbox' ? jawab[q.id].includes(v) : jawab[q.id] === v;
+          return `<label class="choice"><input type="${q.type}" name="${q.id}" value="${esc(v)}"${on ? ' checked' : ''}><span class="choice__box"><span>${esc(v)}${sub ? `<small>${esc(sub)}</small>` : ''}</span></span></label>`;
+        }).join('') + '</div>';
+      } else if (q.type === 'select') {
+        html += `<div class="field" style="margin-top:1.5rem;max-width:24rem"><label class="visually-hidden" for="q-provinsi">Provinsi</label><select class="select" id="q-provinsi"><option value="">Pilih provinsi</option>${provinsiList.map((p) => `<option${p === jawab.provinsi ? ' selected' : ''}>${esc(p)}</option>`).join('')}</select></div>`;
+      } else {
+        html += `<div class="field" style="margin-top:1.5rem"><label for="q-impian">Ada destinasi impian lain? <span class="opt">(opsional)</span></label><input class="input" id="q-impian" maxlength="80" value="${esc(jawab.impian)}" placeholder="Contoh: Derawan, Kalimantan Timur"></div>`;
+        html += `<div class="field"><label for="q-email">Email untuk kabar hasil survei <span class="opt">(opsional)</span></label><input class="input" type="email" id="q-email" maxlength="254" autocomplete="email" inputmode="email" value="${esc(jawab.email)}" placeholder="nama@email.com"></div>`;
+      }
+      html += '<p class="field__error q__error" id="q-error" role="alert"></p></fieldset>';
+      box.innerHTML = html;
+      if (q.type === 'checkbox') {
+        const sync = () => {
+          const boxes = $$('input', box), n = boxes.filter((b) => b.checked).length;
+          boxes.forEach((b) => { b.disabled = !b.checked && n >= q.max; });
+        };
+        box.addEventListener('change', sync);
+        sync();
+      }
+      // Lanjut otomatis hanya untuk klik/sentuh; pengguna keyboard tetap memilih dengan panah lalu Enter.
+      if (q.type === 'radio') box.onclick = (ev) => { if (ev.target.matches('input') && ev.detail > 0) { box.onclick = null; setTimeout(() => $('#survei').requestSubmit(), 220); } };
+      $('#hitung').textContent = `${i + 1} / ${Q.length}`;
+      $('#progres').setAttribute('aria-valuenow', i + 1);
+      $('#progres-fill').style.width = ((i + 1) / Q.length * 100) + '%';
+      $('#kembali').disabled = i === 0;
+      $('#lanjut').innerHTML = i === Q.length - 1 ? 'Kirim jawaban' : 'Lanjut <svg aria-hidden="true"><use href="#i-arrow"/></svg>';
+      if (focus) $('#q-legend').focus();
+    }
+
+    function simpan() {
+      const q = Q[i], box = $('#v-tanya');
+      if (q.type === 'checkbox') jawab[q.id] = $$('input:checked', box).map((b) => b.value);
+      if (q.type === 'radio') jawab[q.id] = ($('input:checked', box) || {}).value || '';
+      if (q.type === 'select') jawab.provinsi = $('#q-provinsi').value;
+      if (q.type === 'text') { jawab.impian = $('#q-impian').value.trim(); jawab.email = $('#q-email').value.trim(); }
+      const err = q.type === 'checkbox' && !jawab[q.id].length ? 'Pilih minimal satu jawaban.'
+        : q.type === 'radio' && !jawab[q.id] ? 'Pilih salah satu jawaban.'
+        : q.type === 'select' && !jawab.provinsi ? 'Pilih provinsimu.'
+        : q.type === 'text' && jawab.email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(jawab.email) ? 'Format email belum benar, atau kosongkan saja.' : '';
+      $('#q-error').textContent = err;
+      return !err;
+    }
+
+    $('#survei').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if ($('#v-tanya').hidden || !simpan()) return;
+      if (i < Q.length - 1) { i++; render(true); return; }
+      const btn = $('#lanjut');
+      sibuk(btn, true);
+      const d = await post('/api/survei', {aksi: 'kirim', requestId, perangkat: perangkat(), ref: ref(), website: $('#website').value, ...jawab});
+      sibuk(btn, false);
+      if (!d.ok) {
+        $('#q-error').textContent = {terlalu_banyak: 'Terlalu banyak kiriman dari jaringan ini. Coba lagi nanti.', validation: 'Ada jawaban yang belum lengkap. Kembali dan periksa lagi.', nonaktif: 'Survei sudah ditutup.', belum_waktunya: 'Survei belum dibuka.'}[d.error] || 'Koneksi bermasalah. Tekan Kirim lagi.';
+        return;
+      }
+      try { localStorage.setItem('ycs_survei_selesai', '1'); } catch (er) {}
+      show('selesai');
+      $('#selesai-judul').focus();
+    });
+    $('#kembali').addEventListener('click', () => { if (i > 0) { simpan(); i--; render(true); } });
+    pasangBagikan($('#bagikan'), {url: location.origin + '/survei/?ref=survei-share', text: 'Ke mana YCS berikutnya? Ikut pilih destinasi impianmu di survei 1 menit ini!'});
+
+    (async () => {
+      wilayah().then((d) => { provinsiList = Object.keys(d); if (Q[i].type === 'select') render(false); }).catch(() => {});
+      let cfg = null;
+      try { cfg = await config(); } catch (e) { /* lanjut, server akan menolak bila belum dibuka */ }
+      if (cfg && !cfg.survei.aktif) return show('nonaktif');
+      const buka = cfg && Date.parse(cfg.survei.buka);
+      if (buka && Date.now() + await offset() < buka) {
+        $('#tutup-info').textContent = 'Survei dibuka mulai ' + waktu(cfg.survei.buka) + '. Kembali lagi nanti, ya.';
+        return show('tutup');
+      }
+      let selesai = false;
+      try { selesai = localStorage.getItem('ycs_survei_selesai') === '1'; } catch (e) {}
+      if (selesai) { show('selesai'); $('#selesai-judul').textContent = 'Kamu sudah mengisi survei ini. Terima kasih!'; return; }
+      show('tanya');
+      render(false);
+    })();
+  })();
+  </script>
+</body>
+</html>

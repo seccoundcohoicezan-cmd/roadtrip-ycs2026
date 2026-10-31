@@ -387,7 +387,7 @@
       font-size: clamp(2.375rem, 5vw + .75rem, 4.25rem); line-height: 1.05;
       transform: rotate(-2deg); transform-origin: left center;
     }
-    .hero__title span { display: block; }
+    .hero__title > span { display: block; }
     .hero__title .hl { color: var(--yellow-400); }
     .hero__lead { margin-top: var(--space-5); max-width: 34rem; font-size: clamp(1rem, .4vw + .9rem, 1.125rem); color: #E4F2F2; }
     .hero__lead strong { color: var(--yellow-300); }
@@ -482,8 +482,6 @@
     }
     .countdown__num { font-size: clamp(1.5rem, 3vw + .75rem, 2.25rem); font-weight: 800; line-height: 1.1; color: var(--primary-strong); font-variant-numeric: tabular-nums; }
     .countdown__label { font-size: .8125rem; color: var(--text-muted); font-weight: 600; }
-    .countdown-done { margin-top: var(--space-4); padding: var(--space-4); border-radius: var(--radius); background: var(--success-bg); color: var(--success); font-weight: 700; }
-    .countdown-done[hidden] { display: none; }
 
     .keydates { list-style: none; display: grid; gap: var(--space-3); margin-top: var(--space-5); padding-top: var(--space-4); border-top: 1px dashed var(--line); }
     .keydates li { display: flex; gap: var(--space-3); align-items: flex-start; }
@@ -633,14 +631,16 @@
     .live-title { font-size: 1rem; font-weight: 800; margin-top: .25rem; }
     .live-platform { display: inline-flex; align-items: center; gap: .375rem; margin-top: .25rem; font-size: .875rem; color: var(--text-muted); }
     .live-platform svg { width: 1rem; height: 1rem; }
-    .live-action { grid-column: 1 / -1; }
-    .live-action .btn { width: 100%; }
+    .live-action { grid-column: 1 / -1; display: flex; gap: var(--space-2); align-items: center; }
+    .live-action .btn { flex: 1; }
+    .live-backup { grid-column: 1 / -1; font-size: .8125rem; color: var(--text-muted); }
+    .live-backup a { font-weight: 700; }
     .live-empty { padding: var(--space-5); text-align: center; color: var(--text-muted); border: 1px dashed var(--line); border-radius: var(--radius); }
 
     @media (min-width: 40rem) {
       .live-item { grid-template-columns: auto 1fr auto; align-items: center; }
       .live-action { grid-column: auto; }
-      .live-action .btn { width: auto; min-width: 9.5rem; }
+      .live-action .btn { flex: none; min-width: 9.5rem; }
     }
 
     .video-card {
@@ -809,14 +809,7 @@
 
     /* ============ Road / Leaderboard / Delegates ============ */
     .trio { display: grid; gap: var(--space-5); }
-    @media (min-width: 48rem) { .trio { grid-template-columns: 1fr 1fr; } .road { grid-column: 1 / -1; } }
-    @media (min-width: 64rem) {
-      .trio { grid-template-columns: .9fr 1.1fr; }
-      .road { display: grid; grid-template-columns: 1fr 1.4fr; grid-template-areas: "head map" "prog map"; align-items: center; }
-      .road__head { grid-area: head; align-self: end; }
-      .road__map { grid-area: map; padding: var(--space-4) var(--space-4) var(--space-4) 0; }
-      .road__progress { grid-area: prog; align-self: start; padding-top: var(--space-4); }
-    }
+    @media (min-width: 64rem) { .trio { grid-template-columns: 1.45fr 1fr; align-items: start; } }
 
     .road {
       position: relative; overflow: hidden; color: var(--ink);
@@ -1104,6 +1097,142 @@
     }
     .toast.is-visible { opacity: 1; transform: none; }
 
+
+    /* ============ Fase pengumuman (pra = sebelum, pasca = sesudah; diatur dari jam server) ============ */
+    html:not([data-fase="pasca"]) [data-fase="pasca"], html[data-fase="pasca"] [data-fase="pra"] { display: none; }
+
+    .nav__more { position: relative; }
+    .nav__more-btn { border: 0; background: transparent; cursor: pointer; gap: .25rem; font-family: inherit; }
+    .nav__more-btn svg { width: 1rem; height: 1rem; transition: transform var(--dur) var(--ease); }
+    .nav__more-btn[aria-expanded="true"] svg { transform: rotate(180deg); }
+    .nav__menu { position: absolute; right: 0; top: calc(100% + .375rem); z-index: 5; min-width: 14rem; list-style: none; padding: .375rem; display: grid; gap: 2px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-lg); }
+    .nav__menu[hidden] { display: none; }
+    .nav__menu a { display: flex; align-items: center; min-height: 2.75rem; padding: 0 .75rem; border-radius: var(--radius-sm); color: var(--text); text-decoration: none; font-weight: 600; font-size: .875rem; }
+    .nav__menu a:hover, .nav__menu a[aria-current="true"] { background: var(--surface-soft); color: var(--primary); }
+    .nav__link--klaim { color: var(--cta); font-weight: 800; }
+    :root[data-theme="dark"] .nav__link--klaim { color: var(--orange-400); }
+    .mobile-nav .is-hot { color: var(--cta); font-weight: 800; }
+
+    .countdown-card__when { margin-top: .25rem; font-size: .875rem; color: var(--text-muted); font-weight: 600; }
+    .countdown-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-4); }
+    .countdown-wait { display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-4); padding: var(--space-4); border-radius: var(--radius); background: var(--yellow-100); color: #5B3B00; font-weight: 700; }
+    .countdown-wait[hidden] { display: none; }
+    .spinner { width: 1.25rem; height: 1.25rem; flex: none; border-radius: 50%; border: 3px solid rgb(91 59 0 / .25); border-top-color: currentColor; animation: spin-slow .8s linear infinite; }
+    .countdown-card__released { margin-top: .25rem; font-size: .9375rem; color: var(--text-muted); }
+
+    .hero__klaim { display: inline-flex; align-items: center; gap: .375rem; min-height: 2.75rem; color: #fff; font-weight: 600; text-decoration: none; }
+    .hero__klaim strong { color: var(--yellow-300); text-decoration: underline; text-underline-offset: .25em; }
+    .hero__klaim svg { width: 1rem; height: 1rem; transition: transform var(--dur) var(--ease); }
+    .hero__klaim:hover svg { transform: translateX(3px); }
+
+    /* Panggung kartu finalis di hero (fase pasca) */
+    .stage { padding-bottom: var(--space-4); }
+    .stage__deck { position: relative; width: min(80%, 21rem); aspect-ratio: 4 / 5.3; margin-inline: auto; }
+    .stage__deck::before, .stage__deck::after { content: ""; position: absolute; inset: 0; border-radius: .5rem; background: #fff; box-shadow: var(--shadow); }
+    .stage__deck::before { transform: rotate(-7deg) translate(-6%, 2%); opacity: .55; }
+    .stage__deck::after { transform: rotate(5deg) translate(5%, 1%); opacity: .75; }
+    .fcard { position: absolute; inset: 0; z-index: 1; display: flex; flex-direction: column; margin: 0; padding: .625rem .625rem 0; border-radius: .5rem; background: #fff; box-shadow: var(--shadow-lg); opacity: 0; transform: rotate(var(--tilt, 0deg)) scale(.94); transition: opacity 600ms var(--ease), transform 600ms var(--ease); }
+    .fcard.is-on { opacity: 1; z-index: 2; transform: rotate(var(--tilt, 0deg)); }
+    .fcard__photo, .fitem__photo { position: relative; overflow: hidden; display: grid; place-items: center; background: linear-gradient(150deg, var(--teal-600), var(--teal-950)); }
+    .fcard__photo { flex: 1; border-radius: .25rem; }
+    .fcard__photo img, .fitem__photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .fcard__mono, .fitem__mono { font-family: var(--font-brush); color: var(--yellow-300); line-height: 1; }
+    .fcard__mono { font-size: clamp(4rem, 12vw, 6rem); }
+    .fcard__body { padding: .625rem .25rem .875rem; text-align: center; color: var(--teal-950); }
+    .fcard__name { font-weight: 800; font-size: 1.125rem; line-height: 1.2; }
+    .fcard__school { font-size: .875rem; color: #33464D; }
+    .fcard__region { font-family: var(--font-brush); color: var(--orange-600); font-size: 1rem; }
+    .gb-tag { position: absolute; top: .5rem; left: .5rem; z-index: 1; display: inline-flex; align-items: center; gap: .25rem; padding: .25rem .5rem; border-radius: var(--radius-pill); background: #F5B301; color: #3B2A00; font-size: .6875rem; font-weight: 800; letter-spacing: .03em; text-transform: uppercase; }
+    .stage__controls { display: flex; justify-content: center; align-items: center; gap: var(--space-2); margin-top: var(--space-5); color: #fff; }
+    .stage__count { min-width: 5rem; text-align: center; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .stage__btn { display: inline-grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 50%; border: 1.5px solid rgb(255 255 255 / .4); background: rgb(8 44 51 / .45); color: #fff; cursor: pointer; transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease); }
+    .stage__btn:hover { background: rgb(8 44 51 / .75); border-color: #fff; }
+    .stage__btn svg { width: 1.125rem; height: 1.125rem; }
+    .stage__btn--prev svg { transform: rotate(180deg); }
+
+    /* Finalis */
+    .locked-card { display: grid; gap: var(--space-5); align-items: center; padding: clamp(1.5rem, 4vw, 2.5rem); overflow: hidden; }
+    @media (min-width: 48rem) { .locked-card { grid-template-columns: 1.1fr 1fr; } }
+    .locked-card__when { display: inline-flex; align-items: center; gap: var(--space-2); margin-top: var(--space-4); font-weight: 700; color: var(--primary); }
+    .locked-card__when svg { width: 1.25rem; height: 1.25rem; }
+    .ghosts { position: relative; display: grid; grid-template-columns: repeat(5, 1fr); gap: .5rem; }
+    .ghosts span { aspect-ratio: 4 / 5; border-radius: .5rem; background: linear-gradient(150deg, var(--teal-100), var(--surface-soft)); filter: blur(1.5px); }
+    .ghosts span:nth-child(3n) { background: linear-gradient(150deg, var(--yellow-100), var(--surface-soft)); }
+    .ghosts__lock { position: absolute; inset: 0; display: grid; place-items: center; }
+    .ghosts__lock span { filter: none; aspect-ratio: auto; display: inline-flex; align-items: center; gap: .5rem; padding: .625rem 1rem; border-radius: var(--radius-pill); background: var(--teal-950); color: #fff; font-weight: 800; font-size: .875rem; box-shadow: var(--shadow-lg); }
+    .ghosts__lock svg { width: 1.125rem; height: 1.125rem; color: var(--yellow-400); }
+    .finalis__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: var(--space-3); }
+    .finalis__tools { display: grid; gap: var(--space-3); margin-top: var(--space-5); }
+    @media (min-width: 48rem) { .finalis__tools { grid-template-columns: 1.4fr 1fr auto; align-items: center; } }
+    .chips { display: flex; flex-wrap: wrap; gap: .375rem; }
+    .chip { min-height: 2.75rem; padding: 0 1rem; border-radius: var(--radius-pill); border: 1.5px solid var(--line); background: var(--surface); font-weight: 700; font-size: .875rem; color: var(--text); cursor: pointer; transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease); }
+    .chip:hover { border-color: var(--primary); }
+    .chip[aria-pressed="true"] { background: var(--teal-700); border-color: var(--teal-700); color: #fff; }
+    .fgrid { list-style: none; display: grid; gap: var(--space-4); grid-template-columns: repeat(auto-fill, minmax(min(100%, 10.5rem), 1fr)); margin-top: var(--space-4); }
+    .fitem { overflow: hidden; border-radius: var(--radius); border: 1px solid var(--line); background: var(--surface); transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
+    .fitem:hover { transform: translateY(-3px) rotate(-1deg); box-shadow: var(--shadow); }
+    .fitem:nth-child(even):hover { transform: translateY(-3px) rotate(1deg); }
+    .fitem__photo { aspect-ratio: 4 / 5; }
+    .fitem__mono { font-size: 2.75rem; }
+    .fitem__body { padding: .75rem .875rem .875rem; }
+    .fitem__name { font-weight: 800; font-size: .9375rem; line-height: 1.25; }
+    .fitem__meta { margin-top: .125rem; font-size: .8125rem; color: var(--text-muted); line-height: 1.4; }
+    .finalis__more { display: flex; justify-content: center; margin-top: var(--space-5); }
+    .finalis-skel { aspect-ratio: 4 / 6; border-radius: var(--radius); background: linear-gradient(90deg, var(--surface-soft), var(--line), var(--surface-soft)) 0 0 / 200% 100%; animation: kilau 1.4s linear infinite; }
+    @keyframes kilau { to { background-position: -200% 0; } }
+
+    /* Klaim wildcard (pasca) */
+    .klaim-cta { position: relative; overflow: hidden; isolation: isolate; display: grid; gap: var(--space-6); align-items: center; padding: clamp(1.5rem, 5vw, 3rem); border-radius: var(--radius-lg); background: linear-gradient(120deg, var(--teal-950), var(--teal-700)); color: #fff; box-shadow: var(--shadow-lg); }
+    .klaim-cta::before { content: ""; position: absolute; inset: 0; z-index: -1; background: url("assets/svg/pattern-kawung.svg") center / 200px repeat; opacity: .08; }
+    @media (min-width: 48rem) { .klaim-cta { grid-template-columns: 1.3fr 1fr; } }
+    .klaim-cta h2 { margin-top: var(--space-2); font-size: clamp(1.75rem, 3vw + .5rem, 2.5rem); font-weight: 800; }
+    .klaim-cta h2 .hl { color: var(--yellow-400); font-family: var(--font-brush); font-weight: 400; }
+    .klaim-cta p { margin-top: var(--space-3); max-width: 34rem; color: rgb(255 255 255 / .86); }
+    .klaim-cta .btn { margin-top: var(--space-5); }
+    .mini-ticket { position: relative; justify-self: center; width: min(100%, 20rem); transform: rotate(-6deg); border-radius: 1rem; background: var(--yellow-400); color: var(--teal-950); box-shadow: 0 24px 40px -16px rgb(0 0 0 / .5); display: grid; grid-template-columns: 1fr auto; }
+    .mini-ticket__main { padding: 1.25rem 1.25rem 1.25rem 1.5rem; }
+    .mini-ticket__main small { display: block; font-size: .6875rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    .mini-ticket__main strong { display: block; font-family: var(--font-brush); font-weight: 400; font-size: 2rem; line-height: 1.1; }
+    .mini-ticket__code { margin-top: .5rem; font-family: ui-monospace, Menlo, Consolas, monospace; font-weight: 700; letter-spacing: .2em; }
+    .mini-ticket__stub { display: grid; place-items: center; padding: 0 1rem; border-left: 2px dashed rgb(8 44 51 / .35); writing-mode: vertical-rl; font-weight: 800; letter-spacing: .2em; font-size: .75rem; }
+
+    /* Banner survei & Dana Kaget */
+    .promo-grid { display: grid; gap: var(--space-4); }
+    @media (min-width: 48rem) { .promo-grid { grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr)); } }
+    .promo { display: grid; grid-template-columns: auto 1fr auto; gap: var(--space-4); align-items: center; padding: var(--space-5); border-radius: var(--radius-lg); text-decoration: none; box-shadow: var(--shadow); transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
+    .promo[hidden] { display: none; }
+    .promo:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+    .promo__icon { display: grid; place-items: center; width: 3.5rem; height: 3.5rem; border-radius: 1rem; background: rgb(255 255 255 / .55); }
+    .promo__icon svg { width: 1.75rem; height: 1.75rem; }
+    .promo strong { display: block; font-size: 1.125rem; line-height: 1.25; }
+    .promo span span { display: block; font-size: .875rem; margin-top: .125rem; }
+    .promo > svg { width: 1.25rem; height: 1.25rem; transition: transform var(--dur) var(--ease); }
+    .promo:hover > svg { transform: translateX(4px); }
+    .promo--survei { background: var(--yellow-100); color: #3B2A00; }
+    .promo--dana { background: linear-gradient(135deg, var(--orange-600), #9A3412); color: #fff; }
+    .promo--dana .promo__icon { background: rgb(255 255 255 / .16); }
+    .promo__pill { display: inline-block; margin-top: .375rem; padding: .125rem .5rem; border-radius: var(--radius-pill); background: var(--yellow-400); color: var(--teal-950); font-size: .75rem; font-weight: 800; }
+
+    .rank-empty { padding: var(--space-5) var(--space-3); margin-top: var(--space-3); text-align: center; color: var(--text-muted); border: 1px dashed var(--line); border-radius: var(--radius); font-size: .9375rem; }
+
+    /* Dialog bagikan */
+    .share-dialog { width: min(100% - 2rem, 24rem); padding: 0; border: 0; border-radius: var(--radius-lg); background: var(--surface); color: var(--text); box-shadow: var(--shadow-lg); }
+    .share-dialog::backdrop { background: rgb(8 44 51 / .55); backdrop-filter: blur(2px); }
+    .share-dialog form { position: relative; padding: var(--space-5); }
+    .share-dialog h2 { font-size: 1.25rem; }
+    .share-dialog__text { margin-top: var(--space-2); font-size: .875rem; color: var(--text-muted); }
+    .share-dialog__grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); margin-top: var(--space-4); }
+    .share-dialog__grid button { display: flex; align-items: center; gap: var(--space-2); min-height: 3rem; padding: 0 var(--space-3); border-radius: var(--radius); border: 1.5px solid var(--line); background: var(--surface); font-weight: 700; font-size: .875rem; cursor: pointer; color: var(--text); transition: border-color var(--dur) var(--ease); }
+    .share-dialog__grid button:hover { border-color: var(--primary); }
+    .share-dialog__grid button[hidden] { display: none; }
+    .share-dialog__grid svg { width: 1.25rem; height: 1.25rem; flex: none; }
+    .share-dialog__close { position: absolute; top: .5rem; right: .5rem; }
+
+    /* Perayaan saat pengumuman dibuka */
+    .burst { position: fixed; inset: 0; z-index: 90; pointer-events: none; overflow: hidden; }
+    .burst i { position: absolute; top: -4vh; width: .55rem; height: .95rem; border-radius: 2px; animation: jatuh var(--t, 2.6s) cubic-bezier(.2, .6, .4, 1) var(--d, 0s) forwards; }
+    @keyframes jatuh { to { transform: translate3d(var(--dx, 0), 112vh, 0) rotate(var(--r, 540deg)); } }
+
     /* ============ Reveal ============ */
     .js .reveal { opacity: 0; transform: translateY(16px); transition: opacity 600ms var(--ease), transform 600ms var(--ease); }
     .js .reveal.is-in { opacity: 1; transform: none; }
@@ -1143,6 +1272,11 @@
     <symbol id="d-star" viewBox="0 0 40 40"><path fill="currentColor" d="M20 2c1.6 9 4.2 13.5 18 18-13.8 4.5-16.4 9-18 18-1.6-9-4.2-13.5-18-18 13.8-4.5 16.4-9 18-18Z"/></symbol>
     <symbol id="d-arrow" viewBox="0 0 100 60"><g fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 50c18-30 46-40 70-30 8 3 12 9 10 14-3 6-14 4-14-4 0-10 14-18 26-16"/><path d="m86 6 10 8-11 6"/></g></symbol>
     <symbol id="d-spark" viewBox="0 0 40 40"><g fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><path d="M20 3v10M20 27v10M3 20h10M27 20h10M8 8l6 6M26 26l6 6M8 32l6-6M26 14l6-6"/></g></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="13" height="13" rx="2.5"/><path d="M16 8V5.5A2.5 2.5 0 0 0 13.5 3h-8A2.5 2.5 0 0 0 3 5.5v8A2.5 2.5 0 0 0 5.5 16H8"/></g></symbol>
+    <symbol id="i-ticket" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M3 7.5A1.5 1.5 0 0 1 4.5 6h15A1.5 1.5 0 0 1 21 7.5V10a2 2 0 0 0 0 4v2.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 16.5V14a2 2 0 0 0 0-4Z"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="2 2.5" d="M15 6v12"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></g></symbol>
+    <symbol id="i-compass" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5Z"/></g></symbol>
+    <symbol id="i-gift" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9M12 8v13M12 8S10.5 3 8 3a2.5 2.5 0 0 0 0 5M12 8s1.5-5 4-5a2.5 2.5 0 0 1 0 5"/></g></symbol>
     <symbol id="i-pause" viewBox="0 0 24 24"><path fill="currentColor" d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></symbol>
     <symbol id="i-whatsapp" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.2-.2-.5-.3Z"/></symbol>
   </svg>
@@ -1166,11 +1300,23 @@
       <nav class="nav" aria-label="Navigasi utama">
         <ul class="nav__list">
           <li><a class="nav__link" href="#beranda">Beranda</a></li>
+          <li data-fase="pasca"><a class="nav__link" href="#delegasi">Finalis</a></li>
           <li><a class="nav__link" href="#live">Live</a></li>
-          <li><a class="nav__link" href="#twibbon">Twibbon</a></li><li><a class="nav__link" href="#harapan">Harapan</a></li>
+          <li><a class="nav__link" href="#twibbon">Twibbon</a></li>
           <li><a class="nav__link" href="#road-to-bali">Road to Bali</a></li>
-          <li><a class="nav__link" href="#leaderboard">Leaderboard</a></li>
-          <li><a class="nav__link" href="#delegasi">Delegasi</a></li>
+          <li data-fase="pra"><a class="nav__link" href="#leaderboard">Leaderboard</a></li>
+          <li data-fase="pasca"><a class="nav__link nav__link--klaim" href="klaim/">Klaim Tiket</a></li>
+          <li class="nav__more">
+            <button class="nav__link nav__more-btn" type="button" aria-expanded="false" aria-controls="nav-more">Lainnya<svg aria-hidden="true"><use href="#i-chevron-down"/></svg></button>
+            <ul class="nav__menu" id="nav-more" hidden>
+              <li data-fase="pra"><a href="#delegasi">Finalis</a></li>
+              <li data-fase="pasca"><a href="#leaderboard">Leaderboard</a></li>
+              <li><a href="survei/">Survei destinasi</a></li>
+              <li data-promo="dana" hidden><a href="dana-kaget/">Dana Kaget</a></li>
+              <li><a href="#harapan">Satu Kata untuk Indonesia</a></li>
+              <li><a href="#faq">FAQ</a></li>
+            </ul>
+          </li>
         </ul>
       </nav>
 
@@ -1195,11 +1341,17 @@
       <div class="container">
         <ul>
           <li><a href="#beranda">Beranda</a></li>
+          <li data-fase="pasca"><a href="#delegasi">Finalis</a></li>
+          <li data-fase="pasca"><a class="is-hot" href="klaim/">Klaim tiket wildcard</a></li>
           <li><a href="#live">Live</a></li>
-          <li><a href="#twibbon">Twibbon</a></li><li><a href="#harapan">Harapan</a></li>
+          <li><a href="#twibbon">Twibbon</a></li>
           <li><a href="#road-to-bali">Road to Bali</a></li>
           <li><a href="#leaderboard">Leaderboard</a></li>
-          <li><a href="#delegasi">Delegasi</a></li>
+          <li data-fase="pra"><a href="#delegasi">Finalis</a></li>
+          <li><a href="survei/">Survei destinasi</a></li>
+          <li data-promo="dana" hidden><a href="dana-kaget/">Dana Kaget</a></li>
+          <li><a href="#harapan">Satu Kata untuk Indonesia</a></li>
+          <li><a href="#faq">FAQ</a></li>
         </ul>
         <div class="mobile-nav__socials">
           <a class="icon-btn" href="https://www.instagram.com/universitasstekom" target="_blank" rel="noopener" aria-label="Instagram (tab baru)"><svg aria-hidden="true"><use href="#i-instagram"/></svg></a>
@@ -1223,18 +1375,32 @@
 
       <div class="container hero__grid">
         <div class="hero__text">
-          <p class="eyebrow hero__eyebrow">Youth Character Summit 2026</p>
+          <p class="eyebrow hero__eyebrow" data-fase="pra">Youth Character Summit 2026</p>
+          <p class="eyebrow hero__eyebrow" data-fase="pasca">Pengumuman resmi YCS 2026</p>
           <h1 class="hero__title" id="hero-title">
-            <span>Karakter Kuat.</span>
-            <span class="hl">Langkah ke Bali.</span>
+            <span data-fase="pra">Karakter Kuat.</span>
+            <span class="hl" data-fase="pra">Langkah ke Bali.</span>
+            <span data-fase="pasca">Selamat,</span>
+            <span class="hl" data-fase="pasca">Para Finalis!</span>
           </h1>
-          <p class="hero__lead">
+          <p class="hero__lead" data-fase="pasca">Inilah pelajar terpilih yang akan melangkah ke Bali, <strong>23 Desember 2026 – 2 Januari 2027</strong>. Cari namamu atau teman sekolahmu, lalu rayakan bersama!</p>
+          <p class="hero__lead" data-fase="pra">
             Jadilah bagian dari <strong>150 delegasi</strong> dan ribuan anak muda lainnya yang siap membangun Indonesia dengan karakter, kolaborasi, dan aksi nyata.
           </p>
 
         </div>
 
-        <div class="hero__media">
+        <div class="hero__media stage" data-fase="pasca" role="region" aria-roledescription="carousel" aria-label="Kartu finalis YCS 2026">
+          <div class="stage__deck" id="stage-deck"></div>
+          <div class="stage__controls" id="stage-controls" hidden>
+            <button class="stage__btn stage__btn--prev" type="button" id="stage-prev" aria-label="Finalis sebelumnya"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+            <span class="stage__count" id="stage-count" aria-live="off"></span>
+            <button class="stage__btn" type="button" id="stage-toggle" aria-pressed="false" aria-label="Jeda pergantian kartu"><svg aria-hidden="true"><use href="#i-pause"/></svg></button>
+            <button class="stage__btn" type="button" id="stage-next" aria-label="Finalis berikutnya"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+          </div>
+        </div>
+
+        <div class="hero__media" data-fase="pra">
           <p class="hero__date-note" aria-hidden="true">Bali<br>23 Des 2026<br>– 2 Jan 2027</p>
           <figure class="polaroid hero__photo">
             <img src="assets/img/ycs-delegasi-danau-800.webp" srcset="assets/img/ycs-delegasi-danau-480.webp 480w, assets/img/ycs-delegasi-danau-800.webp 800w, assets/img/ycs-delegasi-danau-1600.webp 1600w" sizes="(min-width: 64rem) 34rem, 90vw" width="1600" height="1066" alt="Enam pelajar berpose ceria di dermaga tepi danau Bali saat perjalanan Duta Teladan STEKOM" fetchpriority="high">
@@ -1253,30 +1419,48 @@
         </div>
 
         <div class="hero__cta-wrap">
-          <a class="btn btn--cta btn--hero" href="#twibbon">
+          <a class="btn btn--cta btn--hero" href="#delegasi" data-fase="pasca">
+            <span class="btn__icon"><svg aria-hidden="true"><use href="#i-search"/></svg></span>
+            <span>Cari namaku<small>Lihat daftar lengkap finalis</small></span>
+            <svg class="btn__arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
+          </a>
+          <a class="hero__klaim" href="klaim/" data-fase="pasca">Belum lolos? <strong>Klaim tiket wildcard</strong><svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          <a class="btn btn--cta btn--hero" href="#twibbon" data-fase="pra">
             <span class="btn__icon"><svg aria-hidden="true"><use href="#i-users"/></svg></span>
             <span>Buat Twibbon<small>Dukung gerakan YCS 2026!</small></span>
             <svg class="btn__arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
           </a>
-          <p class="hero__script" aria-hidden="true">Bersama kita bisa!</p>
+          <p class="hero__script" aria-hidden="true" data-fase="pra">Bersama kita bisa!</p>
         </div>
 
         <div class="countdown-card" aria-labelledby="countdown-title">
+          <div data-fase="pasca">
+            <p class="countdown-card__head"><svg aria-hidden="true"><use href="#i-megaphone"/></svg>Pengumuman sudah dirilis</p>
+            <p class="countdown-card__released" id="cd-released">Selamat untuk semua finalis! Yang belum lolos, perjalananmu belum selesai: aktifkan tiket wildcard.</p>
+            <div class="countdown-actions">
+              <a class="btn btn--live btn--sm" id="cd-replay" href="https://www.youtube.com/@universitasstekom/streams" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-play"/></svg>Tonton siaran pengumuman</a>
+              <button class="btn btn--soft btn--sm" type="button" data-share-open="pasca"><svg aria-hidden="true"><use href="#i-share"/></svg>Bagikan kabar ini</button>
+            </div>
+          </div>
+          <div data-fase="pra">
           <p class="countdown-card__head" id="countdown-title">
             <svg aria-hidden="true"><use href="#i-megaphone"/></svg>
             Menuju pengumuman 100 finalis
           </p>
-          <div class="countdown" data-countdown="2026-11-16T00:00:00+07:00" aria-hidden="true">
+          <p class="countdown-card__when" data-umum-teks>Senin, 16 November 2026 · 19.00 WIB</p>
+          <div class="countdown" data-countdown="2026-11-16T19:00:00+07:00" aria-hidden="true">
             <div class="countdown__unit"><span class="countdown__num" data-unit="d">--</span><span class="countdown__label">Hari</span></div>
             <div class="countdown__unit"><span class="countdown__num" data-unit="h">--</span><span class="countdown__label">Jam</span></div>
             <div class="countdown__unit"><span class="countdown__num" data-unit="m">--</span><span class="countdown__label">Menit</span></div>
             <div class="countdown__unit"><span class="countdown__num" data-unit="s">--</span><span class="countdown__label">Detik</span></div>
           </div>
-          <p class="visually-hidden" id="countdown-sr">Pengumuman 100 finalis pada 16 November 2026.</p>
-          <p class="countdown-done" hidden>
-            Pengumuman finalis sudah dirilis.
-            <a href="https://events.stekom.ac.id/ycs2026/pemenang-ycs2026">Cek daftar peserta lolos</a>
-          </p>
+          <p class="visually-hidden" id="countdown-sr">Pengumuman 100 finalis pada Senin, 16 November 2026 pukul 19.00 WIB.</p>
+          <div class="countdown-wait" id="cd-wait" role="status" hidden><span class="spinner" aria-hidden="true"></span><span id="cd-wait-text">Waktunya tiba! Membuka daftar finalis…</span></div>
+          <div class="countdown-actions">
+            <button class="btn btn--primary btn--sm" type="button" data-remind><svg aria-hidden="true"><use href="#i-bell"/></svg><span>Ingatkan saya</span></button>
+            <button class="btn btn--soft btn--sm" type="button" data-share-open="pra"><svg aria-hidden="true"><use href="#i-share"/></svg>Bagikan countdown</button>
+          </div>
+          </div>
 
           <ul class="keydates">
             <li>
@@ -1285,14 +1469,14 @@
             </li>
             <li>
               <svg aria-hidden="true"><use href="#i-megaphone"/></svg>
-              <div><span>Pengumuman 100 finalis</span><strong>16 Nov 2026</strong></div>
+              <div><span>Pengumuman 100 finalis</span><strong data-umum-tgl>16 Nov 2026</strong></div>
             </li>
             <li>
               <svg aria-hidden="true"><use href="#i-pin"/></svg>
               <div><span>Kegiatan di Bali</span><strong>23 Des 2026 – 2 Jan 2027</strong></div>
             </li>
           </ul>
-          <p class="countdown-card__foot">
+          <p class="countdown-card__foot" data-fase="pra">
             Dukung YCS 2026 dengan <a href="#twibbon">membuat dan membagikan twibbon</a>.
           </p>
         </div>
@@ -1306,8 +1490,11 @@
       <div class="container live-grid">
         <div class="card live-card reveal">
           <div class="sec-head">
-            <h2 class="sec-title" id="live-title"><span class="badge badge--live"><span class="dot" aria-hidden="true"></span>Live</span> Jadwal Live YCS <span class="tag-demo">Jadwal contoh</span></h2>
-            <a class="link-arrow" href="https://www.youtube.com/@universitasstekom/streams" target="_blank" rel="noopener">Semua siaran <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            <h2 class="sec-title" id="live-title"><span class="badge badge--live"><span class="dot" aria-hidden="true"></span>Live</span> Jadwal Live YCS</h2>
+            <div class="countdown-actions" style="margin-top:0">
+              <button class="btn btn--soft btn--sm" type="button" data-share-open="live"><svg aria-hidden="true"><use href="#i-share"/></svg>Bagikan jadwal</button>
+              <a class="link-arrow" id="live-all" href="https://www.youtube.com/@universitasstekom/streams" target="_blank" rel="noopener">Semua siaran <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            </div>
           </div>
 
           <!-- Waktu dalam WIB (+07:00). Status (Segera/Live/Selesai) dihitung otomatis oleh script. -->
@@ -1360,62 +1547,6 @@
       </div>
     </section>
 
-    <!-- ========== JEJAK PERJALANAN ========== -->
-    <section class="memories" id="jejak" aria-labelledby="mem-title">
-      <svg class="doodle doodle--float memories__doodle" aria-hidden="true"><use href="#d-star"/></svg>
-      <div class="container">
-        <div class="memories__head reveal">
-          <p class="eyebrow" style="color:var(--primary)">Jejak perjalanan sebelumnya</p>
-          <h2 class="memories__title" id="mem-title">Begini serunya <span class="brush scribble">ke Bali</span> bareng STEKOM</h2>
-          <p class="muted">Dokumentasi Kunjungan Duta Teladan Universitas STEKOM ke Bali, 24 Desember 2025 – 3 Januari 2026. Tahun ini giliranmu!</p>
-        </div>
-        <ul class="stats reveal">
-          <li class="stat"><strong>11 hari</strong><span>perjalanan edukatif</span></li>
-          <li class="stat"><strong>7</strong><span>destinasi di Jawa Timur &amp; Bali</span></li>
-          <li class="stat"><strong>150</strong><span>delegasi pelajar terpilih</span></li>
-          <li class="stat"><strong>100%</strong><span>gratis untuk delegasi</span></li>
-        </ul>
-      </div>
-      <div class="marquee" id="marquee" role="region" aria-label="Galeri foto perjalanan, bisa digeser" tabindex="0">
-        <ul class="marquee__track">
-          <li><figure class="polaroid"><img src="assets/img/ycs-rombongan-banner-800.webp" srcset="assets/img/ycs-rombongan-banner-480.webp 480w, assets/img/ycs-rombongan-banner-800.webp 800w, assets/img/ycs-rombongan-banner-1600.webp 1600w" sizes="(min-width: 64rem) 19rem, 60vw" width="1600" height="1066" alt="Rombongan Duta Teladan STEKOM berfoto bersama spanduk program di taman air Bali" loading="lazy" decoding="async"><figcaption>Satu rombongan, satu cerita</figcaption></figure></li>
-          <li><figure class="polaroid"><img src="assets/img/ycs-kayak-800.webp" srcset="assets/img/ycs-kayak-480.webp 480w, assets/img/ycs-kayak-800.webp 800w, assets/img/ycs-kayak-1600.webp 1600w" sizes="(min-width: 64rem) 19rem, 60vw" width="1600" height="1066" alt="Tiga pelajar mendayung kayak di teluk dengan kapal layar di belakang" loading="lazy" decoding="async"><figcaption>Kayak di teluk</figcaption></figure></li>
-          <li><figure class="polaroid"><img src="assets/img/ycs-busana-bali-800.webp" srcset="assets/img/ycs-busana-bali-480.webp 480w, assets/img/ycs-busana-bali-800.webp 800w, assets/img/ycs-busana-bali-1600.webp 1600w" sizes="(min-width: 64rem) 19rem, 60vw" width="1600" height="1066" alt="Tiga pelajar berbusana adat Bali di tangga pura" loading="lazy" decoding="async"><figcaption>Belajar budaya Bali</figcaption></figure></li>
-          <li><figure class="polaroid"><img src="assets/img/ycs-squad-danau-800.webp" srcset="assets/img/ycs-squad-danau-480.webp 480w, assets/img/ycs-squad-danau-800.webp 800w, assets/img/ycs-squad-danau-1600.webp 1600w" sizes="(min-width: 64rem) 19rem, 60vw" width="1600" height="1066" alt="Empat pelajar putri berpose di dermaga tepi danau" loading="lazy" decoding="async"><figcaption>Teman baru se-Indonesia</figcaption></figure></li>
-          <li><figure class="polaroid"><img src="assets/img/ycs-gwk-800.webp" srcset="assets/img/ycs-gwk-480.webp 480w, assets/img/ycs-gwk-800.webp 800w, assets/img/ycs-gwk-1600.webp 1536w" sizes="(min-width: 64rem) 19rem, 60vw" width="1536" height="1024" alt="Rombongan pelajar berfoto di depan patung Garuda Wisnu Kencana" loading="lazy" decoding="async"><figcaption>Sampai di GWK!</figcaption></figure></li>
-          <li><figure class="polaroid"><img src="assets/img/ycs-main-air-800.webp" srcset="assets/img/ycs-main-air-480.webp 480w, assets/img/ycs-main-air-800.webp 800w, assets/img/ycs-main-air-1600.webp 1600w" sizes="(min-width: 64rem) 19rem, 60vw" width="1600" height="1066" alt="Pelajar berpelampung bermain air di pantai" loading="lazy" decoding="async"><figcaption>Main air sampai puas</figcaption></figure></li>
-          <li><figure class="polaroid"><img src="assets/img/ycs-kumpul-rombongan-800.webp" srcset="assets/img/ycs-kumpul-rombongan-480.webp 480w, assets/img/ycs-kumpul-rombongan-800.webp 800w, assets/img/ycs-kumpul-rombongan-1600.webp 1600w" sizes="(min-width: 64rem) 19rem, 60vw" width="1600" height="1066" alt="Rombongan pelajar berpose dengan properti foto sebelum berangkat" loading="lazy" decoding="async"><figcaption>Siap berangkat!</figcaption></figure></li>
-          <li><figure class="polaroid"><img src="assets/img/ycs-tirta-gangga-800.webp" srcset="assets/img/ycs-tirta-gangga-480.webp 480w, assets/img/ycs-tirta-gangga-800.webp 800w, assets/img/ycs-tirta-gangga-1600.webp 1600w" sizes="(min-width: 64rem) 19rem, 60vw" width="1600" height="1066" alt="Rombongan pelajar di taman air dengan kolam dan pura" loading="lazy" decoding="async"><figcaption>Taman air & pura</figcaption></figure></li>
-        </ul>
-      </div>
-      <div class="marquee__controls" hidden>
-        <button class="btn btn--ghost btn--sm" type="button" id="marquee-toggle" aria-pressed="false" aria-controls="marquee">
-          <svg aria-hidden="true"><use href="#i-pause"/></svg><span>Jeda galeri</span>
-        </button>
-      </div>
-    </section>
-
-    <!-- ========== IKON BALI ========== -->
-    <section class="ikon" id="ikon-bali" aria-labelledby="ikon-title">
-      <div class="container">
-        <div class="ikon__head reveal">
-          <p class="eyebrow" style="color:var(--primary)">Pesona Bali</p>
-          <h2 class="ikon__title" id="ikon-title">Ikon Bali yang bikin <span class="brush">jatuh cinta</span></h2>
-          <p class="muted">Pura di atas danau, gapura candi bentar, tarian sakral, sampai sawah subak. Inilah wajah Bali yang jadi latar perjalanan karakter YCS 2026.</p>
-        </div>
-        <ul class="ikon-grid" aria-label="Galeri ikon Bali">
-          <li><figure class="ikon-card"><img src="assets/img/bali/ikon-uludanu2.webp" width="480" height="600" alt="Pura Ulun Danu Beratan" loading="lazy" decoding="async"><span class="ikon-card__tag" aria-hidden="true">Pura</span><figcaption><strong>Pura Ulun Danu Beratan</strong><span>Bedugul · pura di atas danau</span></figcaption></figure></li>
-          <li><figure class="ikon-card"><img src="assets/img/bali/ikon-gate.webp" width="480" height="600" alt="Gerbang Candi Bentar" loading="lazy" decoding="async"><span class="ikon-card__tag" aria-hidden="true">Arsitektur</span><figcaption><strong>Gerbang Candi Bentar</strong><span>Gapura khas pura Bali</span></figcaption></figure></li>
-          <li><figure class="ikon-card"><img src="assets/img/bali/ikon-lempuyang.webp" width="480" height="600" alt="Pura Lempuyang" loading="lazy" decoding="async"><span class="ikon-card__tag" aria-hidden="true">Pura</span><figcaption><strong>Pura Lempuyang</strong><span>Karangasem · "Gerbang Surga"</span></figcaption></figure></li>
-          <li><figure class="ikon-card"><img src="assets/img/bali/ikon-legong2.webp" width="480" height="600" alt="Tari Legong" loading="lazy" decoding="async"><span class="ikon-card__tag" aria-hidden="true">Budaya</span><figcaption><strong>Tari Legong</strong><span>Tarian klasik penuh ekspresi</span></figcaption></figure></li>
-          <li><figure class="ikon-card"><img src="assets/img/bali/ikon-kecak.webp" width="480" height="600" alt="Tari Kecak" loading="lazy" decoding="async"><span class="ikon-card__tag" aria-hidden="true">Budaya</span><figcaption><strong>Tari Kecak</strong><span>Paduan suara "cak" ratusan penari</span></figcaption></figure></li>
-          <li><figure class="ikon-card"><img src="assets/img/bali/ikon-tanahlot.webp" width="480" height="600" alt="Pura Tanah Lot" loading="lazy" decoding="async"><span class="ikon-card__tag" aria-hidden="true">Pantai</span><figcaption><strong>Pura Tanah Lot</strong><span>Tabanan · pura di atas batu karang</span></figcaption></figure></li>
-          <li><figure class="ikon-card"><img src="assets/img/bali/ikon-sawah.webp" width="480" height="600" alt="Sawah Terasering" loading="lazy" decoding="async"><span class="ikon-card__tag" aria-hidden="true">Alam</span><figcaption><strong>Sawah Terasering</strong><span>Sistem subak warisan dunia UNESCO</span></figcaption></figure></li>
-          <li><figure class="ikon-card"><img src="assets/img/bali/ikon-penjor1.webp" width="480" height="600" alt="Penjor Galungan" loading="lazy" decoding="async"><span class="ikon-card__tag" aria-hidden="true">Tradisi</span><figcaption><strong>Penjor Galungan</strong><span>Hiasan bambu saat hari raya</span></figcaption></figure></li>
-        </ul>
-      </div>
-    </section>
-
     <!-- ========== TWIBBON ========== -->
     <section class="section twibbon" id="twibbon" aria-labelledby="twibbon-title" data-lazy-bg>
       <svg class="wave memories-wave wave--top" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true"><path d="M0 46C180 78 360 10 560 30s380 50 560 26 240-46 320-34V80H0Z"/></svg>
@@ -1427,7 +1558,7 @@
         <div class="reveal">
           <span class="badge badge--brand">Twibbon</span>
           <h2 class="twibbon__title" id="twibbon-title">Buat &amp; Bagikan <span class="scribble">Twibbon</span></h2>
-          <p class="twibbon__lead">Tunjukkan dukunganmu untuk YCS 2026 dengan foto terbaikmu. Foto diproses di perangkatmu dan tidak diunggah. Nama, sekolah, dan email disimpan oleh panitia saat twibbon dibuat.</p>
+          <p class="twibbon__lead">Tunjukkan dukunganmu untuk YCS 2026 dengan foto terbaikmu. Foto diproses di perangkatmu dan tidak diunggah. Setiap twibbon menambah progres Road to Bali dan poin leaderboard daerahmu.</p>
 
           <div class="seg" role="radiogroup" aria-label="Pilih bingkai twibbon">
             <button class="seg__btn" type="button" role="radio" aria-checked="true" data-frame="delegasi">Delegasi</button>
@@ -1497,6 +1628,14 @@
                       <label for="tw-city">Sekolah</label>
                       <input class="input" id="tw-city" required minlength="2" maxlength="100" placeholder="Contoh: SMAN 1 Semarang" aria-describedby="tw-city-error"><p class="field__error" id="tw-city-error"></p>
                     </div>
+                    <div class="field">
+                      <label for="tw-prov">Provinsi</label>
+                      <select class="select" id="tw-prov" required aria-describedby="tw-prov-error"><option value="">Pilih provinsi</option></select><p class="field__error" id="tw-prov-error"></p>
+                    </div>
+                    <div class="field">
+                      <label for="tw-kota">Kota/Kabupaten</label>
+                      <select class="select" id="tw-kota" required disabled aria-describedby="tw-kota-error"><option value="">Pilih kota/kabupaten</option></select><p class="field__error" id="tw-kota-error"></p>
+                    </div>
                     <div class="field field--wide">
                       <label for="tw-email">Email</label>
                       <input class="input" type="email" id="tw-email" autocomplete="email" inputmode="email" required maxlength="254" placeholder="nama@email.com" aria-describedby="tw-email-hint tw-email-error">
@@ -1517,7 +1656,7 @@
                     <p class="field__error" id="tw-channel-error"></p>
                     <label class="check" for="tw-consent">
                       <input type="checkbox" id="tw-consent" required aria-describedby="tw-consent-error">
-                      <span>Saya setuju nama, sekolah, dan email disimpan oleh panitia sesuai <a href="#privasi">Kebijakan Privasi</a>.</span>
+                      <span>Saya setuju nama, sekolah, daerah, dan email disimpan oleh panitia sesuai <a href="privasi/" target="_blank">Kebijakan Privasi</a>. Jika di bawah 18 tahun, saya sudah mendapat izin orang tua/wali.</span>
                     </label>
                     <p class="field__error" id="tw-consent-error"></p>
                   </div>
@@ -1563,7 +1702,7 @@
         <article class="card road reveal" id="road-to-bali" aria-labelledby="road-title">
           <div class="road__head">
             <h2 class="road__title" id="road-title">Road to Bali</h2>
-            <p class="road__lead">Setiap twibbon dan link yang kamu bagikan menambah langkah kita. Semakin banyak yang bergabung, semakin dekat ke Bali! <span class="tag-demo">Data contoh</span></p>
+            <p class="road__lead">Setiap twibbon yang dibuat menambah langkah kita. Semakin banyak yang bergabung, semakin dekat ke Bali!</p>
           </div>
 
           <div class="road__map" aria-hidden="true">
@@ -1594,10 +1733,11 @@
           </div>
 
           <div class="road__progress">
-            <div class="meter" role="progressbar" aria-labelledby="road-title" aria-valuemin="0" aria-valuemax="100000" aria-valuenow="75000" aria-valuetext="75.000 dari target 100.000 dukungan">
-              <div class="meter__fill" id="road-meter" style="width:75%"></div>
+            <div class="meter" role="progressbar" aria-labelledby="road-title" aria-valuemin="0" aria-valuemax="100000" aria-valuenow="0" aria-valuetext="Memuat jumlah dukungan">
+              <div class="meter__fill" id="road-meter" style="width:0"></div>
             </div>
-            <p class="road__stats"><span><strong id="road-current">75.000</strong> dukungan terkumpul</span><span>Target <strong id="road-target">100.000</strong></span></p>
+            <p class="road__stats"><span><strong id="road-current">–</strong> dukungan terkumpul</span><span>Target <strong id="road-target">100.000</strong></span></p>
+            <p class="small" id="road-note" style="margin-top:.25rem"></p>
 
             <details class="disclosure" id="rute">
               <summary class="link-arrow">Lihat detail perjalanan <svg aria-hidden="true"><use href="#i-arrow"/></svg></summary>
@@ -1617,8 +1757,8 @@
 
         <!-- Leaderboard -->
         <article class="card panel reveal" id="leaderboard" aria-labelledby="lb-title">
-          <h2 class="panel__title" id="lb-title">Leaderboard Daerah <span class="tag-demo">Data contoh</span></h2>
-          <p class="panel__sub">Top 5 berdasarkan jumlah twibbon &amp; link yang dibagikan.</p>
+          <h2 class="panel__title" id="lb-title">Leaderboard Daerah</h2>
+          <p class="panel__sub">Daerah dengan twibbon terbanyak. Wakili daerahmu dengan membuat twibbon!</p>
 
           <div class="tabs" role="tablist" aria-label="Kategori leaderboard">
             <button class="tab" type="button" role="tab" id="tab-kota" aria-controls="panel-kota" aria-selected="true">Kota</button>
@@ -1627,59 +1767,168 @@
 
           <div role="tabpanel" id="panel-kota" aria-labelledby="tab-kota" tabindex="0">
             <ol class="rank-list">
-              <li class="rank"><span class="rank__pos">1</span><span class="rank__name">Semarang</span><span class="rank__val">12.432</span></li>
-              <li class="rank"><span class="rank__pos">2</span><span class="rank__name">Grobogan</span><span class="rank__val">9.872</span></li>
-              <li class="rank"><span class="rank__pos">3</span><span class="rank__name">Kendal</span><span class="rank__val">8.905</span></li>
-              <li class="rank"><span class="rank__pos">4</span><span class="rank__name">Pekalongan</span><span class="rank__val">7.661</span></li>
-              <li class="rank"><span class="rank__pos">5</span><span class="rank__name">Jepara</span><span class="rank__val">6.321</span></li>
+              <li class="rank-empty">Memuat leaderboard…</li>
             </ol>
           </div>
           <div role="tabpanel" id="panel-prov" aria-labelledby="tab-prov" tabindex="0">
             <ol class="rank-list">
-              <li class="rank"><span class="rank__pos">1</span><span class="rank__name">Jawa Tengah</span><span class="rank__val">48.210</span></li>
-              <li class="rank"><span class="rank__pos">2</span><span class="rank__name">Jawa Timur</span><span class="rank__val">11.540</span></li>
-              <li class="rank"><span class="rank__pos">3</span><span class="rank__name">DI Yogyakarta</span><span class="rank__val">6.118</span></li>
-              <li class="rank"><span class="rank__pos">4</span><span class="rank__name">Jawa Barat</span><span class="rank__val">4.902</span></li>
-              <li class="rank"><span class="rank__pos">5</span><span class="rank__name">Bali</span><span class="rank__val">3.077</span></li>
+              <li class="rank-empty">Memuat leaderboard…</li>
             </ol>
           </div>
 
           <div class="panel__foot">
-            <a class="link-arrow" href="https://events.stekom.ac.id/ycs2026/leaderboard">Lihat leaderboard lengkap <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            <button class="btn btn--soft btn--sm btn--block" type="button" id="lb-more" aria-expanded="false" hidden>Tampilkan 10 besar</button>
+            <p class="small muted" id="lb-update" style="margin-top:.5rem"></p>
           </div>
         </article>
 
-        <!-- Delegates -->
-        <article class="card panel reveal" id="delegasi" aria-labelledby="dl-title">
-          <h2 class="panel__title" id="dl-title">Meet the Delegates <span class="tag-demo">Data contoh</span></h2>
-          <p class="panel__sub">150 delegasi pelajar dari seluruh Indonesia.</p>
+      </div>
+    </section>
 
-          <div class="search-row">
+
+    <!-- ========== FINALIS (pra: teaser terkunci, pasca: daftar dari /api/reveal) ========== -->
+    <section class="section deco-bg" id="delegasi" aria-label="Finalis YCS 2026" style="padding-top:0">
+      <div class="container">
+        <div class="card locked-card reveal" data-fase="pra">
+          <div>
+            <span class="badge badge--soon">Segera</span>
+            <h2 class="sec-title" style="margin-top:.75rem">Siapa saja <span class="scribble">finalisnya?</span></h2>
+            <p class="sec-sub">Daftar finalis dirilis serentak saat pengumuman. Server baru membuka datanya tepat waktu, jadi semua orang tahu di detik yang sama.</p>
+            <p class="locked-card__when"><svg aria-hidden="true"><use href="#i-calendar"/></svg><span data-umum-teks>Senin, 16 November 2026 · 19.00 WIB</span></p>
+            <div class="countdown-actions">
+              <button class="btn btn--primary btn--sm" type="button" data-remind><svg aria-hidden="true"><use href="#i-bell"/></svg><span>Ingatkan saya</span></button>
+              <a class="btn btn--soft btn--sm" href="#live">Lihat jadwal live</a>
+            </div>
+          </div>
+          <div class="ghosts" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+            <div class="ghosts__lock"><span><svg><use href="#i-lock"/></svg>Terkunci sampai pengumuman</span></div>
+          </div>
+        </div>
+
+        <div data-fase="pasca">
+          <div class="finalis__head">
+            <div>
+              <p class="eyebrow" style="color:var(--cta)">Meet the Finalists</p>
+              <h2 class="sec-title" id="dl-title" style="margin-top:.5rem">Finalis <span class="scribble">YCS 2026</span></h2>
+              <p class="sec-sub" id="dl-sub">Para pelajar terpilih dari seluruh Indonesia.</p>
+            </div>
+            <button class="btn btn--soft btn--sm" type="button" data-share-open="daftar"><svg aria-hidden="true"><use href="#i-share"/></svg>Bagikan daftar</button>
+          </div>
+          <div class="finalis__tools">
             <div class="search">
-              <label class="visually-hidden" for="dl-search">Cari delegasi berdasarkan nama atau kota</label>
+              <label class="visually-hidden" for="dl-search">Cari finalis berdasarkan nama, sekolah, atau daerah</label>
               <svg aria-hidden="true"><use href="#i-search"/></svg>
-              <input class="input" type="search" id="dl-search" placeholder="Cari nama atau kota…" autocomplete="off">
+              <input class="input" type="search" id="dl-search" placeholder="Cari nama, sekolah, atau daerah…" autocomplete="off">
             </div>
             <div>
-              <label class="visually-hidden" for="dl-city">Filter kota</label>
-              <select class="select" id="dl-city"><option value="">Semua kota</option></select>
+              <label class="visually-hidden" for="dl-prov">Filter provinsi</label>
+              <select class="select" id="dl-prov"><option value="">Semua provinsi</option></select>
+            </div>
+            <div class="chips" role="group" aria-label="Filter jalur">
+              <button class="chip" type="button" data-jalur="" aria-pressed="true">Semua</button>
+              <button class="chip" type="button" data-jalur="Golden Buzzer" aria-pressed="false">Golden Buzzer</button>
+              <button class="chip" type="button" data-jalur="Seleksi Umum" aria-pressed="false">Seleksi Umum</button>
             </div>
           </div>
-
           <p class="result-count" id="dl-count" aria-live="polite"></p>
-          <ul class="delegates" id="dl-grid"></ul>
+          <ul class="fgrid" id="dl-grid"></ul>
           <div class="empty" id="dl-empty" hidden>
             <svg aria-hidden="true"><use href="#i-search"/></svg>
-            <p><strong>Delegasi tidak ditemukan.</strong><br>Coba kata kunci lain atau pilih "Semua kota".</p>
+            <p id="dl-empty-text"><strong>Finalis tidak ditemukan.</strong><br>Coba kata kunci lain atau reset filter.</p>
             <button class="btn btn--soft btn--sm" type="button" id="dl-reset">Reset pencarian</button>
           </div>
-          <noscript><p class="panel__sub">Daftar delegasi lengkap tersedia di <a href="https://events.stekom.ac.id/ycs2026/pemenang-ycs2026">halaman peserta lolos YCS 2026</a>.</p></noscript>
+          <div class="finalis__more"><button class="btn btn--soft" type="button" id="dl-more" hidden>Lihat lebih banyak</button></div>
+        </div>
+      </div>
+    </section>
 
-          <div class="panel__foot">
-            <button class="btn btn--soft btn--sm btn--block" type="button" id="dl-more" hidden>Lihat lebih banyak</button>
-            <a class="link-arrow" href="https://events.stekom.ac.id/ycs2026/pemenang-ycs2026">Daftar resmi peserta lolos <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+    <!-- ========== SURVEI & DANA KAGET (tampil jika aktif) ========== -->
+    <section class="section" id="promo" aria-label="Survei destinasi dan Dana Kaget" style="padding-top:0" hidden>
+      <div class="container promo-grid">
+        <a class="promo promo--survei" href="survei/?ref=beranda" data-promo="survei" hidden>
+          <span class="promo__icon" aria-hidden="true"><svg><use href="#i-compass"/></svg></span>
+          <span><strong>Ke mana YCS berikutnya?</strong><span>Isi survei destinasi impian, cuma 1 menit.</span></span>
+          <svg aria-hidden="true"><use href="#i-arrow"/></svg>
+        </a>
+        <a class="promo promo--dana" href="dana-kaget/?ref=beranda" data-promo="dana" hidden>
+          <span class="promo__icon" aria-hidden="true"><svg><use href="#i-gift"/></svg></span>
+          <span><strong>Dana Kaget YCS dibuka!</strong><span>Punya kode akses? Ajukan sebelum kuota habis.</span><span class="promo__pill" id="promo-dana-sisa" hidden></span></span>
+          <svg aria-hidden="true"><use href="#i-arrow"/></svg>
+        </a>
+      </div>
+    </section>
+
+    <!-- ========== JEJAK PERJALANAN ========== -->
+    <section class="memories" id="jejak" aria-labelledby="mem-title">
+      <svg class="doodle doodle--float memories__doodle" aria-hidden="true"><use href="#d-star"/></svg>
+      <div class="container">
+        <div class="memories__head reveal">
+          <p class="eyebrow" style="color:var(--primary)">Jejak perjalanan sebelumnya</p>
+          <h2 class="memories__title" id="mem-title">Begini serunya <span class="brush scribble">ke Bali</span> bareng STEKOM</h2>
+          <p class="muted">Dokumentasi Kunjungan Duta Teladan Universitas STEKOM ke Bali, 24 Desember 2025 – 3 Januari 2026. Tahun ini giliranmu!</p>
+        </div>
+        <ul class="stats reveal">
+          <li class="stat"><strong>11 hari</strong><span>perjalanan edukatif</span></li>
+          <li class="stat"><strong>7</strong><span>destinasi di Jawa Timur &amp; Bali</span></li>
+          <li class="stat"><strong>150</strong><span>delegasi pelajar terpilih</span></li>
+          <li class="stat"><strong>100%</strong><span>gratis untuk delegasi</span></li>
+        </ul>
+      </div>
+      <div class="marquee" id="marquee" role="region" aria-label="Galeri foto perjalanan, bisa digeser" tabindex="0">
+        <ul class="marquee__track">
+          <li><figure class="polaroid"><img src="assets/img/ycs-rombongan-banner-800.webp" srcset="assets/img/ycs-rombongan-banner-480.webp 480w, assets/img/ycs-rombongan-banner-800.webp 800w, assets/img/ycs-rombongan-banner-1600.webp 1600w" sizes="(min-width: 64rem) 19rem, 60vw" width="1600" height="1066" alt="Rombongan Duta Teladan STEKOM berfoto bersama spanduk program di taman air Bali" loading="lazy" decoding="async"><figcaption>Satu rombongan, satu cerita</figcaption></figure></li>
+          <li><figure class="polaroid"><img src="assets/img/ycs-kayak-800.webp" srcset="assets/img/ycs-kayak-480.webp 480w, assets/img/ycs-kayak-800.webp 800w, assets/img/ycs-kayak-1600.webp 1600w" sizes="(min-width: 64rem) 19rem, 60vw" width="1600" height="1066" alt="Tiga pelajar mendayung kayak di teluk dengan kapal layar di belakang" loading="lazy" decoding="async"><figcaption>Kayak di teluk</figcaption></figure></li>
+          <li><figure class="polaroid"><img src="assets/img/ycs-busana-bali-800.webp" srcset="assets/img/ycs-busana-bali-480.webp 480w, assets/img/ycs-busana-bali-800.webp 800w, assets/img/ycs-busana-bali-1600.webp 1600w" sizes="(min-width: 64rem) 19rem, 60vw" width="1600" height="1066" alt="Tiga pelajar berbusana adat Bali di tangga pura" loading="lazy" decoding="async"><figcaption>Belajar budaya Bali</figcaption></figure></li>
+          <li><figure class="polaroid"><img src="assets/img/ycs-squad-danau-800.webp" srcset="assets/img/ycs-squad-danau-480.webp 480w, assets/img/ycs-squad-danau-800.webp 800w, assets/img/ycs-squad-danau-1600.webp 1600w" sizes="(min-width: 64rem) 19rem, 60vw" width="1600" height="1066" alt="Empat pelajar putri berpose di dermaga tepi danau" loading="lazy" decoding="async"><figcaption>Teman baru se-Indonesia</figcaption></figure></li>
+          <li><figure class="polaroid"><img src="assets/img/ycs-gwk-800.webp" srcset="assets/img/ycs-gwk-480.webp 480w, assets/img/ycs-gwk-800.webp 800w, assets/img/ycs-gwk-1600.webp 1536w" sizes="(min-width: 64rem) 19rem, 60vw" width="1536" height="1024" alt="Rombongan pelajar berfoto di depan patung Garuda Wisnu Kencana" loading="lazy" decoding="async"><figcaption>Sampai di GWK!</figcaption></figure></li>
+          <li><figure class="polaroid"><img src="assets/img/ycs-main-air-800.webp" srcset="assets/img/ycs-main-air-480.webp 480w, assets/img/ycs-main-air-800.webp 800w, assets/img/ycs-main-air-1600.webp 1600w" sizes="(min-width: 64rem) 19rem, 60vw" width="1600" height="1066" alt="Pelajar berpelampung bermain air di pantai" loading="lazy" decoding="async"><figcaption>Main air sampai puas</figcaption></figure></li>
+          <li><figure class="polaroid"><img src="assets/img/ycs-kumpul-rombongan-800.webp" srcset="assets/img/ycs-kumpul-rombongan-480.webp 480w, assets/img/ycs-kumpul-rombongan-800.webp 800w, assets/img/ycs-kumpul-rombongan-1600.webp 1600w" sizes="(min-width: 64rem) 19rem, 60vw" width="1600" height="1066" alt="Rombongan pelajar berpose dengan properti foto sebelum berangkat" loading="lazy" decoding="async"><figcaption>Siap berangkat!</figcaption></figure></li>
+          <li><figure class="polaroid"><img src="assets/img/ycs-tirta-gangga-800.webp" srcset="assets/img/ycs-tirta-gangga-480.webp 480w, assets/img/ycs-tirta-gangga-800.webp 800w, assets/img/ycs-tirta-gangga-1600.webp 1600w" sizes="(min-width: 64rem) 19rem, 60vw" width="1600" height="1066" alt="Rombongan pelajar di taman air dengan kolam dan pura" loading="lazy" decoding="async"><figcaption>Taman air & pura</figcaption></figure></li>
+        </ul>
+      </div>
+      <div class="marquee__controls" hidden>
+        <button class="btn btn--ghost btn--sm" type="button" id="marquee-toggle" aria-pressed="false" aria-controls="marquee">
+          <svg aria-hidden="true"><use href="#i-pause"/></svg><span>Jeda galeri</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ========== IKON BALI ========== -->
+    <section class="ikon" id="ikon-bali" aria-labelledby="ikon-title">
+      <div class="container">
+        <div class="ikon__head reveal">
+          <p class="eyebrow" style="color:var(--primary)">Pesona Bali</p>
+          <h2 class="ikon__title" id="ikon-title">Ikon Bali yang bikin <span class="brush">jatuh cinta</span></h2>
+          <p class="muted">Pura di atas danau, gapura candi bentar, tarian sakral, sampai sawah subak. Inilah wajah Bali yang jadi latar perjalanan karakter YCS 2026.</p>
+        </div>
+        <ul class="ikon-grid" aria-label="Galeri ikon Bali">
+          <li><figure class="ikon-card"><img src="assets/img/bali/ikon-uludanu2.webp" width="480" height="600" alt="Pura Ulun Danu Beratan" loading="lazy" decoding="async"><span class="ikon-card__tag" aria-hidden="true">Pura</span><figcaption><strong>Pura Ulun Danu Beratan</strong><span>Bedugul · pura di atas danau</span></figcaption></figure></li>
+          <li><figure class="ikon-card"><img src="assets/img/bali/ikon-gate.webp" width="480" height="600" alt="Gerbang Candi Bentar" loading="lazy" decoding="async"><span class="ikon-card__tag" aria-hidden="true">Arsitektur</span><figcaption><strong>Gerbang Candi Bentar</strong><span>Gapura khas pura Bali</span></figcaption></figure></li>
+          <li><figure class="ikon-card"><img src="assets/img/bali/ikon-lempuyang.webp" width="480" height="600" alt="Pura Lempuyang" loading="lazy" decoding="async"><span class="ikon-card__tag" aria-hidden="true">Pura</span><figcaption><strong>Pura Lempuyang</strong><span>Karangasem · "Gerbang Surga"</span></figcaption></figure></li>
+          <li><figure class="ikon-card"><img src="assets/img/bali/ikon-legong2.webp" width="480" height="600" alt="Tari Legong" loading="lazy" decoding="async"><span class="ikon-card__tag" aria-hidden="true">Budaya</span><figcaption><strong>Tari Legong</strong><span>Tarian klasik penuh ekspresi</span></figcaption></figure></li>
+          <li><figure class="ikon-card"><img src="assets/img/bali/ikon-kecak.webp" width="480" height="600" alt="Tari Kecak" loading="lazy" decoding="async"><span class="ikon-card__tag" aria-hidden="true">Budaya</span><figcaption><strong>Tari Kecak</strong><span>Paduan suara "cak" ratusan penari</span></figcaption></figure></li>
+          <li><figure class="ikon-card"><img src="assets/img/bali/ikon-tanahlot.webp" width="480" height="600" alt="Pura Tanah Lot" loading="lazy" decoding="async"><span class="ikon-card__tag" aria-hidden="true">Pantai</span><figcaption><strong>Pura Tanah Lot</strong><span>Tabanan · pura di atas batu karang</span></figcaption></figure></li>
+          <li><figure class="ikon-card"><img src="assets/img/bali/ikon-sawah.webp" width="480" height="600" alt="Sawah Terasering" loading="lazy" decoding="async"><span class="ikon-card__tag" aria-hidden="true">Alam</span><figcaption><strong>Sawah Terasering</strong><span>Sistem subak warisan dunia UNESCO</span></figcaption></figure></li>
+          <li><figure class="ikon-card"><img src="assets/img/bali/ikon-penjor1.webp" width="480" height="600" alt="Penjor Galungan" loading="lazy" decoding="async"><span class="ikon-card__tag" aria-hidden="true">Tradisi</span><figcaption><strong>Penjor Galungan</strong><span>Hiasan bambu saat hari raya</span></figcaption></figure></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ========== FAQ ========== -->
+    <section class="section deco-bg" id="harapan" aria-labelledby="harapan-title" style="padding-top:0">
+      <div class="container">
+        <div class="harapan-card reveal" data-lazy-bg>
+          <div>
+            <span class="badge" style="background:#FFD86B;color:#5B0A16">Baru</span>
+            <h2 id="harapan-title" style="margin-top:.75rem">Satu Kata <span>untuk Indonesia</span></h2>
+            <p>Tulis satu kata harapanmu. Semua kata dari peserta dirangkai jadi satu karya besar bertuliskan <strong>YOUTH CHARACTER SUMMIT 2026</strong> dan ditayangkan di layar acara.</p>
+            <a class="btn btn--light" href="harapan/" style="margin-top:1.25rem">Kirim kata harapanku <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
           </div>
-        </article>
+          <p class="harapan-words" aria-hidden="true">
+            <span style="font-size:2.6rem">maju</span><span style="font-size:1.4rem">jujur</span><span style="font-size:2rem">damai</span><span style="font-size:1rem">peduli</span><span style="font-size:1.7rem">bersatu</span><span style="font-size:1.2rem">berani</span><span style="font-size:2.2rem">hebat</span><span style="font-size:1rem">adil</span><span style="font-size:1.5rem">cerdas</span><span style="font-size:1.1rem">toleran</span><span style="font-size:1.9rem">sejahtera</span><span style="font-size:1.2rem">mandiri</span>
+          </p>
+        </div>
       </div>
     </section>
 
@@ -1712,23 +1961,6 @@
       </div>
     </section>
 
-    <!-- ========== FAQ ========== -->
-    <section class="section deco-bg" id="harapan" aria-labelledby="harapan-title" style="padding-top:0">
-      <div class="container">
-        <div class="harapan-card reveal" data-lazy-bg>
-          <div>
-            <span class="badge" style="background:#FFD86B;color:#5B0A16">Baru</span>
-            <h2 id="harapan-title" style="margin-top:.75rem">Satu Kata <span>untuk Indonesia</span></h2>
-            <p>Tulis satu kata harapanmu. Semua kata dari peserta dirangkai jadi satu karya besar bertuliskan <strong>YOUTH CHARACTER SUMMIT 2026</strong> dan ditayangkan di layar acara.</p>
-            <a class="btn btn--light" href="harapan/" style="margin-top:1.25rem">Kirim kata harapanku <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
-          </div>
-          <p class="harapan-words" aria-hidden="true">
-            <span style="font-size:2.6rem">maju</span><span style="font-size:1.4rem">jujur</span><span style="font-size:2rem">damai</span><span style="font-size:1rem">peduli</span><span style="font-size:1.7rem">bersatu</span><span style="font-size:1.2rem">berani</span><span style="font-size:2.2rem">hebat</span><span style="font-size:1rem">adil</span><span style="font-size:1.5rem">cerdas</span><span style="font-size:1.1rem">toleran</span><span style="font-size:1.9rem">sejahtera</span><span style="font-size:1.2rem">mandiri</span>
-          </p>
-        </div>
-      </div>
-    </section>
-
     <section class="section deco-bg" id="faq" aria-labelledby="faq-title" style="padding-top:0">
       <img class="sticker sticker--leaf" src="assets/svg/palm-leaf-teal.svg" alt="" width="220" height="300" loading="lazy">
       <div class="container faq-grid">
@@ -1753,6 +1985,10 @@
             <p class="faq__body">Ada dua jalur: 50 peserta lewat Golden Buzzer yang dipilih langsung oleh panitia/juri, dan 100 peserta lewat seleksi umum (vote, Twibbon &amp; video kampanye #AksiBaik, tes kuesioner via Zoom, lalu penjurian).</p>
           </details>
           <details class="faq">
+            <summary>Belum lolos, apakah masih ada kesempatan?<svg aria-hidden="true"><use href="#i-plus"/></svg></summary>
+            <p class="faq__body">Ada. Setelah pengumuman, peserta yang belum masuk finalis menerima kode wildcard lewat email. Aktifkan di halaman <a href="klaim/">Klaim Tiket</a> untuk mendapat prioritas di event YCS berikutnya (bukan jaminan lolos).</p>
+          </details>
+          <details class="faq">
             <summary>Apa itu YCS Squad?<svg aria-hidden="true"><use href="#i-plus"/></svg></summary>
             <p class="faq__body">YCS Squad adalah komunitas pendukung: teman, guru, keluarga, dan siapa pun yang ingin ikut menyebarkan semangat YCS 2026. Anggota Squad mendapat info live lebih dulu dan bingkai twibbon khusus. Untuk mendukung gerakan ini, cukup buat twibbon dan bergabung ke saluran WhatsApp resmi.</p>
           </details>
@@ -1768,6 +2004,24 @@
         </div>
       </div>
     </section>
+    <!-- ========== KLAIM WILDCARD (pasca) ========== -->
+    <section class="section" id="klaim-cta" data-fase="pasca" aria-labelledby="kc-title" style="padding-top:0">
+      <div class="container">
+        <div class="klaim-cta reveal">
+          <div>
+            <p class="eyebrow" style="color:var(--yellow-300)">Tiket wildcard</p>
+            <h2 id="kc-title">Belum lolos? <span class="hl">Klaim tiketmu.</span></h2>
+            <p>Peserta yang belum masuk finalis mendapat kode wildcard lewat email. Aktifkan sekarang untuk mendapat prioritas di event YCS berikutnya.</p>
+            <a class="btn btn--cta" href="klaim/"><svg aria-hidden="true"><use href="#i-ticket"/></svg>Klaim tiket wildcard</a>
+          </div>
+          <div class="mini-ticket" aria-hidden="true">
+            <div class="mini-ticket__main"><small>Youth Character Summit</small><strong>Wildcard</strong><p class="mini-ticket__code">XXXX-XXXX</p></div>
+            <div class="mini-ticket__stub">NEXT EVENT</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <!-- ========== FOOTER ========== -->
@@ -1785,7 +2039,9 @@
         <ul class="footer-links">
           <li><a href="https://events.stekom.ac.id/ycs2026">Panduan Peserta</a></li>
           <li><a href="#faq">FAQ</a></li>
-          <li><a href="#privasi">Kebijakan Privasi</a></li>
+          <li><a href="klaim/">Klaim Tiket</a></li>
+          <li><a href="survei/">Survei</a></li>
+          <li><a href="privasi/">Kebijakan Privasi</a></li>
           <li><a href="https://wa.me/6287848775292" target="_blank" rel="noopener">Kontak</a></li>
         </ul>
         <div class="footer-social">
@@ -1797,7 +2053,7 @@
       <div class="footer-legal">
         <details id="privasi">
           <summary>Kebijakan Privasi singkat YCS 2026</summary>
-          <p>Data pembuat twibbon (nama, sekolah, email) hanya dipakai panitia Universitas STEKOM untuk mengirim informasi seputar Youth Character Summit 2026 dan tidak dijual ke pihak lain. Foto twibbon diproses di perangkatmu dan tidak dikirim ke server. Untuk menghapus datamu, hubungi CS di WhatsApp 0878-4877-5292.</p>
+          <p>Data pembuat twibbon (nama, sekolah, email) hanya dipakai panitia Universitas STEKOM untuk mengirim informasi seputar Youth Character Summit 2026 dan tidak dijual ke pihak lain. Foto twibbon diproses di perangkatmu dan tidak dikirim ke server. Pengisian oleh pelajar di bawah 18 tahun memerlukan izin orang tua/wali. Untuk menghapus datamu, hubungi CS di WhatsApp 0878-4877-5292. <a href="privasi/">Baca kebijakan lengkap</a>.</p>
         </details>
         <details class="credits">
           <summary>Kredit foto Bali (Wikimedia Commons)</summary>
@@ -1812,11 +2068,19 @@
   <!-- ========== ACTION BAR ========== -->
   <nav class="action-bar is-hidden" id="action-bar" aria-label="Aksi cepat">
     <div class="action-bar__inner">
-      <a class="action-bar__btn action-bar__btn--tw" href="#twibbon">
+      <a class="action-bar__btn action-bar__btn--tw" href="#delegasi" data-fase="pasca">
+        <svg aria-hidden="true"><use href="#i-search"/></svg>
+        <span>Cari Finalis<small>Siapa saja yang lolos?</small></span>
+      </a>
+      <a class="action-bar__btn action-bar__btn--live" href="klaim/" data-fase="pasca">
+        <svg aria-hidden="true"><use href="#i-ticket"/></svg>
+        <span>Klaim Tiket<small>Untuk yang belum lolos</small></span>
+      </a>
+      <a class="action-bar__btn action-bar__btn--tw" href="#twibbon" data-fase="pra">
         <svg aria-hidden="true"><use href="#i-image"/></svg>
         <span>Twibbon<small>Yuk buat sekarang!</small></span>
       </a>
-      <a class="action-bar__btn action-bar__btn--live" href="#live">
+      <a class="action-bar__btn action-bar__btn--live" href="#live" data-fase="pra">
         <svg aria-hidden="true"><use href="#i-play"/></svg>
         <span>Tonton Live<small>Jangan sampai ketinggalan</small></span>
       </a>
@@ -1825,6 +2089,20 @@
       </button>
     </div>
   </nav>
+
+  <dialog class="share-dialog" id="share-dialog" aria-labelledby="share-title">
+    <form method="dialog">
+      <h2 id="share-title">Bagikan</h2>
+      <p class="share-dialog__text" id="share-text"></p>
+      <div class="share-dialog__grid">
+        <button type="button" data-act="wa"><svg aria-hidden="true" style="color:#128C7E"><use href="#i-whatsapp"/></svg>WhatsApp</button>
+        <button type="button" data-act="ig"><svg aria-hidden="true" style="color:#C13584"><use href="#i-instagram"/></svg>Instagram</button>
+        <button type="button" data-act="copy"><svg aria-hidden="true"><use href="#i-copy"/></svg>Salin link</button>
+        <button type="button" data-act="native" hidden><svg aria-hidden="true"><use href="#i-share"/></svg>Lainnya…</button>
+      </div>
+      <button class="icon-btn share-dialog__close" value="close" aria-label="Tutup"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </form>
+  </dialog>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -1836,34 +2114,19 @@
        KONFIGURASI — ubah di sini.
        ========================================================== */
     const CONFIG = {
-      // Data contoh hanya untuk statistik dan delegasi; pencatatan twibbon memakai backend asli.
-      demo: true,
       twibbonEndpoint: '/api/twibbon',
-      // TODO(backend): endpoint progres Road to Bali (GET → {current, target}).
-      roadEndpoint: null,
-      road: { current: 75000, target: 100000, milestones: [10000, 25000, 50000, 75000, 100000] },
-      // TODO(backend): endpoint daftar delegasi (GET → [{name, city, path}]).
-      delegatesEndpoint: null,
-      delegatesPageSize: 8,
-      delegates: [
-        { name: 'Aisyah Putri', city: 'Semarang', path: 'Seleksi Umum' },
-        { name: 'Raka Pratama', city: 'Grobogan', path: 'Golden Buzzer' },
-        { name: 'Salsabila Nur', city: 'Kendal', path: 'Seleksi Umum' },
-        { name: 'Dimas Arif', city: 'Pekalongan', path: 'Seleksi Umum' },
-        { name: 'Nadia Fadila', city: 'Jepara', path: 'Golden Buzzer' },
-        { name: 'Rizky Maulana', city: 'Tuban', path: 'Seleksi Umum' },
-        { name: 'Intan Permata', city: 'Sukoharjo', path: 'Seleksi Umum' },
-        { name: 'Fajar Nugroho', city: 'Semarang', path: 'Golden Buzzer' },
-        { name: 'Citra Ayuningtyas', city: 'Kudus', path: 'Seleksi Umum' },
-        { name: 'Bagas Saputra', city: 'Tegal', path: 'Seleksi Umum' },
-        { name: 'Laila Rahmawati', city: 'Yogyakarta', path: 'Golden Buzzer' },
-        { name: 'Yoga Firmansyah', city: 'Grobogan', path: 'Seleksi Umum' },
-      ],
+      configEndpoint: '/api/config',   // pengaturan dari panel admin (cache CDN 30 dtk)
+      statsEndpoint: '/api/stats',     // Road to Bali + leaderboard dari data twibbon
+      revealEndpoint: '/api/reveal',   // daftar finalis; ditolak server sebelum waktu pengumuman
+      nowEndpoint: '/api/now',         // jam server untuk countdown
+      finalisPageSize: 12,
+      // Cadangan bila /api/config tidak terjangkau (nilai sama dengan atribut data-countdown).
+      pengumuman: '2026-11-16T19:00:00+07:00',
+      linkLive: 'https://www.youtube.com/@universitasstekom/streams',
     };
 
     const doc = document.documentElement;
     doc.classList.add('js');
-    doc.classList.toggle('is-demo', CONFIG.demo);
 
     const $ = (s, el = document) => el.querySelector(s);
     const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -1906,11 +2169,21 @@
     mobileNav.addEventListener('click', (e) => { if (e.target.closest('a')) setMenu(false); });
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && menuBtn.getAttribute('aria-expanded') === 'true') { setMenu(false); menuBtn.focus(); }
+      if (e.key === 'Escape' && !moreMenu.hidden) { setMore(false); moreBtn.focus(); }
     });
 
+    /* ---------- Menu "Lainnya" (desktop) ---------- */
+    const moreBtn = $('.nav__more-btn');
+    const moreMenu = $('#nav-more');
+    const setMore = (open) => { moreBtn.setAttribute('aria-expanded', String(open)); moreMenu.hidden = !open; };
+    moreBtn.addEventListener('click', () => setMore(moreMenu.hidden));
+    moreMenu.addEventListener('click', (e) => { if (e.target.closest('a')) setMore(false); });
+    document.addEventListener('click', (e) => { if (!e.target.closest('.nav__more')) setMore(false); });
+    $('.nav__more').addEventListener('focusout', (e) => { if (!e.currentTarget.contains(e.relatedTarget)) setMore(false); });
+
     /* ---------- Scrollspy ---------- */
-    const navLinks = $$('.nav__link, .mobile-nav a');
-    const spyIds = ['beranda', 'live', 'twibbon', 'harapan', 'road-to-bali', 'leaderboard', 'delegasi', 'squad'];
+    const navLinks = $$('.nav__link, .nav__menu a, .mobile-nav a');
+    const spyIds = ['beranda', 'live', 'twibbon', 'road-to-bali', 'leaderboard', 'delegasi', 'harapan', 'faq'];
     const spyTargets = spyIds.map((id) => document.getElementById(id)).filter(Boolean);
     const setCurrent = (id) => navLinks.forEach((a) => {
       if (a.getAttribute('href') === '#' + id) a.setAttribute('aria-current', 'true');
@@ -1932,17 +2205,72 @@
       $$('.reveal').forEach((el) => el.classList.add('is-in'));
     }
 
-    /* ---------- Countdown ---------- */
+    /* ---------- Sumber kunjungan (?ref=) ---------- */
+    // Disimpan 30 hari sebagai sentuhan pertama; dikirim bersama twibbon untuk mengukur efektivitas blasting.
+    const sumber = (() => {
+      const dariUrl = (new URLSearchParams(location.search).get('ref') || '').toLowerCase().replace(/[^\w-]/g, '').slice(0, 40);
+      try {
+        const lama = JSON.parse(localStorage.getItem('ycs_ref') || 'null');
+        if (lama && Date.now() - lama.t < 30 * 864e5) return lama.v;
+        if (dariUrl) localStorage.setItem('ycs_ref', JSON.stringify({ v: dariUrl, t: Date.now() }));
+      } catch (e) { /* penyimpanan diblokir */ }
+      return dariUrl;
+    })();
+
+    /* ---------- Jam server & pengaturan ---------- */
+    let offset = 0;
+    const now = () => Date.now() + offset;
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    const offsetReady = (async () => {
+      try {
+        const t0 = Date.now();
+        const r = await fetch(CONFIG.nowEndpoint, { cache: 'no-store' });
+        const d = await r.json();
+        if (typeof d.now === 'number') offset = d.now - (t0 + Date.now()) / 2;
+      } catch (e) { /* pakai jam perangkat */ }
+    })();
+    let cfg = null;
+    const ambilConfig = () => fetch(CONFIG.configEndpoint, { headers: { Accept: 'application/json' }, cache: 'no-cache' })
+      .then((r) => r.json()).then((d) => { if (d && d.ok) cfg = d; return cfg; }).catch(() => cfg);
+
+    const fmtTgl = new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' });
+    const fmtTglPendek = new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Jakarta' });
+    const fmtJam = new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Jakarta' });
+    const jamWib = (d) => fmtJam.format(d).replace(':', '.');
+    const teksWaktu = (ms) => { const d = new Date(ms); return `${fmtTgl.format(d)} · ${jamWib(d)} WIB`; };
+
+    /* ---------- Fase halaman: pra (countdown) / pasca (reveal) ---------- */
+    // Urutan section per fase. DOM statis sudah berurutan "pra" agar tampilan tanpa JS tetap wajar.
+    const URUTAN = {
+      pra: ['beranda', 'live', 'twibbon', 'road', 'delegasi', 'promo', 'jejak', 'ikon-bali', 'harapan', 'komunitas', 'faq', 'klaim-cta'],
+      pasca: ['beranda', 'delegasi', 'klaim-cta', 'live', 'twibbon', 'road', 'promo', 'jejak', 'ikon-bali', 'harapan', 'komunitas', 'faq'],
+    };
+    let fase = 'pra';
+    function setFase(f) {
+      if (doc.dataset.fase === f) return;
+      fase = f;
+      doc.dataset.fase = f;
+      const main = $('#konten');
+      URUTAN[f].forEach((id) => { const el = document.getElementById(id); if (el) main.append(el); });
+      terapkanPromo();
+    }
+
     const cd = $('[data-countdown]');
-    const cdTarget = new Date(cd.dataset.countdown).getTime();
+    let target = new Date(cd.dataset.countdown).getTime();
     const cdEls = { d: $('[data-unit="d"]', cd), h: $('[data-unit="h"]', cd), m: $('[data-unit="m"]', cd), s: $('[data-unit="s"]', cd) };
     const pad = (n) => String(n).padStart(2, '0');
+    function tulisTarget() {
+      $$('[data-umum-teks]').forEach((el) => { el.textContent = teksWaktu(target); });
+      $$('[data-umum-tgl]').forEach((el) => { el.textContent = fmtTglPendek.format(new Date(target)); });
+      $('#countdown-sr').textContent = `Pengumuman 100 finalis pada ${fmtTgl.format(new Date(target))} pukul ${jamWib(new Date(target))} WIB.`;
+    }
+    let cdTimer = null, siap = false;
     function tick() {
-      const diff = cdTarget - Date.now();
+      const diff = target - now();
       if (diff <= 0) {
         Object.values(cdEls).forEach((el) => { el.textContent = '00'; });
-        $('.countdown-done').hidden = false;
-        clearInterval(cdTimer);
+        clearInterval(cdTimer); cdTimer = null;
+        if (siap && fase === 'pra') bukaReveal(true);
         return;
       }
       const s = Math.floor(diff / 1000);
@@ -1951,8 +2279,104 @@
       cdEls.m.textContent = pad(Math.floor((s % 3600) / 60));
       cdEls.s.textContent = pad(s % 60);
     }
-    const cdTimer = setInterval(tick, 1000);
-    tick();
+    const mulaiCountdown = () => { if (!cdTimer) cdTimer = setInterval(tick, 1000); tick(); };
+    mulaiCountdown();
+
+    // Ambil daftar finalis. Saat countdown habis di halaman: jeda acak 0–3 dtk agar puluhan ribu
+    // pengunjung tidak menembak server di milidetik yang sama; respons dilayani dari cache CDN.
+    let membuka = false;
+    async function bukaReveal(diHalaman) {
+      if (membuka) return;
+      membuka = true;
+      const wait = $('#cd-wait');
+      if (diHalaman) { wait.hidden = false; $('#cd-wait-text').textContent = 'Waktunya tiba! Membuka daftar finalis…'; await sleep(Math.random() * 3000); }
+      else { setFase('pasca'); tampilMuatFinalis(); }
+      for (let i = 0; i < 12; i++) {
+        try {
+          const r = await fetch(CONFIG.revealEndpoint, { headers: { Accept: 'application/json' }, cache: 'no-cache' });
+          const d = await r.json().catch(() => ({}));
+          if (r.ok && d.ok) {
+            terapkanFinalis(d.finalis || []);
+            wait.hidden = true;
+            setFase('pasca');
+            if (diHalaman) rayakan();
+            membuka = false;
+            return;
+          }
+          if (r.status === 425) {
+            // Bisa jadi panitia memundurkan jadwal; cek ulang pengaturan (respons 425 bisa berasal dari cache lama).
+            await ambilConfig();
+            const buka = cfg && cfg.pengumuman ? Date.parse(cfg.pengumuman) : 0;
+            if (buka - now() > 5000) { target = buka; tulisTarget(); wait.hidden = true; setFase('pra'); membuka = false; mulaiCountdown(); return; }
+            await sleep(Math.min(5, Number(r.headers.get('Retry-After')) || 2) * 1000 + Math.random() * 1000);
+            continue;
+          }
+        } catch (e) { /* jaringan sibuk: coba lagi */ }
+        await sleep(Math.min(15000, 1500 * (i + 1)) + Math.random() * 1000);
+      }
+      membuka = false;
+      if (diHalaman) {
+        $('#cd-wait-text').innerHTML = 'Server sedang ramai. <button class="btn btn--soft btn--sm" type="button" id="cd-reload">Muat ulang</button>';
+        $('#cd-reload').addEventListener('click', () => location.reload());
+      }
+      else tampilGagalFinalis();
+    }
+
+    function terapkanConfig() {
+      if (!cfg) return;
+      if (cfg.pengumuman) target = Date.parse(cfg.pengumuman);
+      tulisTarget();
+      if (cfg.linkLive) {
+        $('#cd-replay').href = cfg.linkLive;
+        $('#live-all').href = cfg.linkLive;
+      }
+      if (Array.isArray(cfg.live)) bangunLive(cfg.live);
+      terapkanPromo();
+    }
+    function terapkanPromo() {
+      if (!cfg) return;
+      const surveiBuka = !cfg.survei.buka || now() >= Date.parse(cfg.survei.buka);
+      const survei = cfg.survei.aktif && surveiBuka;
+      const dana = cfg.dana.aktif;
+      $$('[data-promo="survei"]').forEach((el) => { el.hidden = !survei; });
+      $$('[data-promo="dana"]').forEach((el) => { el.hidden = !dana; });
+      const pill = $('#promo-dana-sisa');
+      pill.hidden = !(dana && cfg.dana.sisa != null);
+      if (!pill.hidden) pill.textContent = `Tersisa ${nf.format(cfg.dana.sisa)}`;
+      $('#promo').hidden = !(survei || dana);
+    }
+
+    Promise.all([ambilConfig(), offsetReady]).then(() => {
+      if (!cfg) { target = Date.parse(CONFIG.pengumuman); tulisTarget(); }
+      terapkanConfig();
+      siap = true;
+      if (now() >= target) bukaReveal(false);
+      else { setFase('pra'); mulaiCountdown(); }
+      // Perbarui pengaturan berkala: perubahan jadwal/link/saklar dari admin ikut tampil tanpa muat ulang.
+      setInterval(async () => {
+        const lama = cfg && cfg.pengumuman;
+        await ambilConfig();
+        terapkanConfig();
+        if (fase === 'pra' && cfg && cfg.pengumuman !== lama) mulaiCountdown();
+      }, 60000);
+    });
+
+    /* ---------- Perayaan ---------- */
+    function rayakan() {
+      toast('Pengumuman sudah rilis! Selamat untuk para finalis YCS 2026.');
+      if (reduceMotion) return;
+      const box = document.createElement('div');
+      box.className = 'burst';
+      box.setAttribute('aria-hidden', 'true');
+      const warna = ['#FFC93C', '#EA580C', '#12707E', '#FFFFFF', '#FB923C', '#5CC3C9'];
+      for (let i = 0; i < 90; i++) {
+        const c = document.createElement('i');
+        c.style.cssText = `left:${Math.random() * 100}%;background:${warna[i % warna.length]};--dx:${(Math.random() - .5) * 40}vw;--r:${Math.random() * 900 - 450}deg;--t:${2.2 + Math.random() * 1.6}s;--d:${Math.random() * .6}s`;
+        box.append(c);
+      }
+      document.body.append(box);
+      setTimeout(() => box.remove(), 4500);
+    }
 
     /* ---------- Jadwal live ---------- */
     const icsStamp = (d) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
@@ -1980,12 +2404,53 @@
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
 
+    const IKON_PLATFORM = { youtube: '#i-youtube', instagram: '#i-instagram', tiktok: '#i-tiktok' };
+    const fmtHari = new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: 'numeric', month: 'short', timeZone: 'Asia/Jakarta' });
+    const fmtTgl2 = new Intl.DateTimeFormat('id-ID', { day: 'numeric', timeZone: 'Asia/Jakarta' });
+    const fmtBln = new Intl.DateTimeFormat('id-ID', { month: 'short', timeZone: 'Asia/Jakarta' });
+    // Bangun daftar live dari pengaturan admin (menggantikan jadwal statis di HTML).
+    function bangunLive(list) {
+      const ul = $('#live-list');
+      const kunci = JSON.stringify(list);
+      if (ul.dataset.kunci === kunci) return;
+      ul.dataset.kunci = kunci;
+      ul.textContent = '';
+      if (!list.length) {
+        ul.innerHTML = '<li class="live-empty">Jadwal live berikutnya segera diumumkan. Ikuti saluran WhatsApp YCS agar tidak ketinggalan.</li>';
+        return;
+      }
+      list.forEach((it) => {
+        const mulai = new Date(it.mulai), selesai = new Date(it.selesai);
+        const plat = it.platform || 'Live';
+        const li = document.createElement('li');
+        li.className = 'live-item';
+        Object.assign(li.dataset, { start: it.mulai, end: it.selesai, url: it.link, title: it.judul, platform: /live/i.test(plat) ? plat : plat + ' Live', cadangan: it.cadangan || '' });
+        li.innerHTML = `
+          <div class="live-date" aria-hidden="true"><strong></strong><span></span></div>
+          <div>
+            <p class="live-meta"><time></time> <span class="badge badge--soon" data-status>Segera</span></p>
+            <h3 class="live-title"></h3>
+            <p class="live-platform"><svg aria-hidden="true"><use href="${IKON_PLATFORM[plat.toLowerCase()] || '#i-play'}"/></svg><span></span></p>
+          </div>
+          <div class="live-action"></div>`;
+        $('.live-date strong', li).textContent = fmtTgl2.format(mulai);
+        $('.live-date span', li).textContent = fmtBln.format(mulai).replace('.', '');
+        const t = $('time', li);
+        t.dateTime = it.mulai;
+        t.textContent = `${fmtHari.format(mulai)} · ${jamWib(mulai)}–${jamWib(selesai)} WIB`;
+        $('.live-title', li).textContent = it.judul;
+        $('.live-platform span', li).textContent = li.dataset.platform;
+        ul.append(li);
+      });
+      renderLive();
+    }
+
     function renderLive() {
-      const now = Date.now();
+      const nowMs = now();
       $$('#live-list .live-item').forEach((item) => {
         const start = new Date(item.dataset.start).getTime();
         const end = new Date(item.dataset.end).getTime();
-        const state = now >= end ? 'done' : now >= start ? 'live' : 'soon';
+        const state = nowMs >= end ? 'done' : nowMs >= start ? 'live' : 'soon';
         if (item.dataset.state === state) return;
         item.dataset.state = state;
         item.classList.toggle('is-live', state === 'live');
@@ -2015,6 +2480,29 @@
           a.innerHTML = state === 'live' ? '<svg aria-hidden="true"><use href="#i-play"/></svg>Tonton' : 'Lihat rekaman';
           a.setAttribute('aria-label', (state === 'live' ? 'Tonton sekarang: ' : 'Lihat rekaman: ') + item.dataset.title + ' (tab baru)');
           slot.append(a);
+        }
+        if (state !== 'done') {
+          const salin = document.createElement('button');
+          salin.type = 'button';
+          salin.className = 'icon-btn';
+          salin.innerHTML = '<svg aria-hidden="true"><use href="#i-copy"/></svg>';
+          salin.setAttribute('aria-label', 'Salin link live: ' + item.dataset.title);
+          salin.addEventListener('click', () => salinTeks(item.dataset.url, 'Link live disalin.'));
+          const bagi = document.createElement('button');
+          bagi.type = 'button';
+          bagi.className = 'icon-btn';
+          bagi.innerHTML = '<svg aria-hidden="true"><use href="#i-share"/></svg>';
+          bagi.setAttribute('aria-label', 'Bagikan live: ' + item.dataset.title);
+          bagi.addEventListener('click', () => bagikan({ url: item.dataset.url, text: `Nonton "${item.dataset.title}" di ${item.dataset.platform}, ${$('time', item).textContent}.` }));
+          slot.append(salin, bagi);
+        }
+        $('.live-backup', item)?.remove();
+        if (state === 'live' && item.dataset.cadangan) {
+          const p = document.createElement('p');
+          p.className = 'live-backup';
+          p.innerHTML = 'Siaran tidak bisa dibuka? <a target="_blank" rel="noopener">Coba link cadangan</a>';
+          $('a', p).href = item.dataset.cadangan;
+          item.append(p);
         }
       });
       // Urutkan: live dulu, lalu yang akan datang, lalu selesai.
@@ -2065,14 +2553,8 @@
     selectTab(tabs[0]);
 
     /* ---------- Road to Bali ---------- */
-    async function loadRoad() {
-      let { current, target, milestones } = CONFIG.road;
-      if (CONFIG.roadEndpoint) {
-        try {
-          const r = await fetch(CONFIG.roadEndpoint, { headers: { Accept: 'application/json' } });
-          if (r.ok) ({ current, target } = { ...{ current, target }, ...(await r.json()) });
-        } catch (e) { /* tetap pakai data cadangan */ }
-      }
+    function gambarRoad(current, target) {
+      const milestones = [.1, .25, .5, .75, 1].map((f) => Math.round(target * f));
       const pct = Math.max(0, Math.min(100, (current / target) * 100));
       $('#road-current').textContent = nf.format(current);
       $('#road-target').textContent = nf.format(target);
@@ -2131,77 +2613,243 @@
       }, { threshold: .35 });
       io.observe($('#road-to-bali'));
     }
-    loadRoad();
 
-    /* ---------- Delegasi ---------- */
-    const dl = {
-      all: [], shown: CONFIG.delegatesPageSize,
-      grid: $('#dl-grid'), search: $('#dl-search'), city: $('#dl-city'),
-      more: $('#dl-more'), empty: $('#dl-empty'), count: $('#dl-count'),
-    };
-    const palette = ['#0E5A66', '#C2410C', '#12707E', '#9A3412', '#0B3B44', '#A16207'];
-    const initials = (n) => n.split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
-    const norm = (s) => s.toLocaleLowerCase('id').normalize('NFD').replace(/[̀-ͯ]/g, '');
-
-    function renderDelegates() {
-      const q = norm(dl.search.value.trim());
-      const c = dl.city.value;
-      const list = dl.all.filter((d) => (!c || d.city === c) && (!q || norm(d.name).includes(q) || norm(d.city).includes(q)));
-      const page = list.slice(0, dl.shown);
-      dl.grid.textContent = '';
-      page.forEach((d, i) => {
-        const li = document.createElement('li');
-        li.className = 'delegate';
-        const gb = d.path === 'Golden Buzzer';
-        li.innerHTML = `
-          <span class="avatar" aria-hidden="true"></span>
-          <p class="delegate__name"></p>
-          <p class="delegate__city"></p>
-          <span class="delegate__path${gb ? ' delegate__path--gb' : ''}"></span>`;
-        const av = $('.avatar', li);
-        av.textContent = initials(d.name);
-        av.style.background = palette[(d.name.length + i) % palette.length];
-        $('.delegate__name', li).textContent = d.name;
-        $('.delegate__city', li).textContent = d.city;
-        $('.delegate__path', li).textContent = gb ? '★ Golden Buzzer' : 'Seleksi Umum';
-        dl.grid.append(li);
-      });
-      dl.empty.hidden = list.length > 0;
-      dl.more.hidden = list.length <= dl.shown;
-      dl.count.textContent = list.length ? `Menampilkan ${page.length} dari ${list.length} delegasi` : '';
-    }
-
-    async function loadDelegates() {
-      dl.count.textContent = 'Memuat delegasi…';
-      let data = CONFIG.delegates;
-      if (CONFIG.delegatesEndpoint) {
-        try {
-          const r = await fetch(CONFIG.delegatesEndpoint, { headers: { Accept: 'application/json' } });
-          if (!r.ok) throw new Error(r.status);
-          data = await r.json();
-        } catch (e) {
-          dl.count.textContent = 'Daftar delegasi gagal dimuat. Muat ulang halaman untuk mencoba lagi.';
+    const lb = { data: { kota: [], provinsi: [] }, lebar: 5 };
+    function renderRank() {
+      [['#panel-kota', lb.data.kota], ['#panel-prov', lb.data.provinsi]].forEach(([sel, list]) => {
+        const ol = $(sel + ' .rank-list');
+        ol.textContent = '';
+        if (!list.length) {
+          ol.innerHTML = '<li class="rank-empty">Belum ada data daerah. Buat twibbon dan jadikan daerahmu yang pertama!</li>';
           return;
         }
-      }
-      dl.all = data;
-      [...new Set(data.map((d) => d.city))].sort((a, b) => a.localeCompare(b, 'id')).forEach((city) => {
-        dl.city.append(new Option(city, city));
+        list.slice(0, lb.lebar).forEach((x, i) => {
+          const li = document.createElement('li');
+          li.className = 'rank';
+          li.innerHTML = '<span class="rank__pos"></span><span class="rank__name"></span><span class="rank__val"></span>';
+          $('.rank__pos', li).textContent = i + 1;
+          $('.rank__name', li).textContent = x.nama;
+          $('.rank__val', li).textContent = nf.format(x.jumlah);
+          ol.append(li);
+        });
       });
-      renderDelegates();
+      const btn = $('#lb-more');
+      btn.hidden = Math.max(lb.data.kota.length, lb.data.provinsi.length) <= 5;
+      btn.textContent = lb.lebar > 5 ? 'Tampilkan 5 besar' : 'Tampilkan 10 besar';
+      btn.setAttribute('aria-expanded', String(lb.lebar > 5));
     }
-    let dlTimer;
-    dl.search.addEventListener('input', () => { clearTimeout(dlTimer); dlTimer = setTimeout(() => { dl.shown = CONFIG.delegatesPageSize; renderDelegates(); }, 150); });
-    dl.city.addEventListener('change', () => { dl.shown = CONFIG.delegatesPageSize; renderDelegates(); });
-    dl.more.addEventListener('click', () => {
-      const before = dl.grid.children.length;
-      dl.shown += CONFIG.delegatesPageSize;
-      renderDelegates();
-      dl.grid.children[before]?.setAttribute('tabindex', '-1');
-      dl.grid.children[before]?.focus();
+    $('#lb-more').addEventListener('click', () => { lb.lebar = lb.lebar > 5 ? 5 : 10; renderRank(); });
+
+    async function loadStats() {
+      let st = null;
+      try {
+        const r = await fetch(CONFIG.statsEndpoint, { headers: { Accept: 'application/json' }, cache: 'no-cache' });
+        const d = await r.json();
+        if (d.ok) st = d;
+      } catch (e) { /* tampilkan keadaan gagal di bawah */ }
+      if (!st) {
+        $('#road-current').textContent = '–';
+        $('#road-note').textContent = 'Jumlah dukungan belum bisa dimuat. Muat ulang halaman sebentar lagi.';
+        $$('.rank-list').forEach((ol) => { ol.innerHTML = '<li class="rank-empty">Leaderboard belum bisa dimuat. Coba lagi sebentar lagi.</li>'; });
+        return;
+      }
+      gambarRoad(st.road.current, st.road.target);
+      lb.data = { kota: st.kota || [], provinsi: st.provinsi || [] };
+      renderRank();
+      if (st.diperbarui) $('#lb-update').textContent = 'Diperbarui ' + jamWib(new Date(st.diperbarui)) + ' WIB · setiap ±5 menit';
+    }
+    loadStats();
+
+    /* ---------- Finalis ---------- */
+    const fin = {
+      all: [], shown: CONFIG.finalisPageSize, jalur: '',
+      grid: $('#dl-grid'), search: $('#dl-search'), prov: $('#dl-prov'),
+      more: $('#dl-more'), empty: $('#dl-empty'), count: $('#dl-count'),
+    };
+    const initials = (n) => n.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+    const norm = (s) => (s || '').toLocaleLowerCase('id').normalize('NFD').replace(/[̀-ͯ]/g, '');
+    // Foto yang gagal dimuat diganti inisial nama agar kartu tetap rapi.
+    function isiFoto(box, f, monoClass) {
+      box.textContent = '';
+      const mono = document.createElement('span');
+      mono.className = monoClass;
+      mono.setAttribute('aria-hidden', 'true');
+      mono.textContent = initials(f.nama);
+      box.append(mono);
+      if (!f.foto) return;
+      const img = new Image();
+      img.alt = 'Foto ' + f.nama;
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.width = 480; img.height = 600;
+      img.referrerPolicy = 'no-referrer';
+      img.onerror = () => img.remove();
+      img.src = f.foto;
+      box.append(img);
+    }
+    function renderFinalis() {
+      const q = norm(fin.search.value.trim());
+      const p = fin.prov.value;
+      const list = fin.all.filter((f) => (!p || f.provinsi === p) && (!fin.jalur || f.jalur === fin.jalur) &&
+        (!q || [f.nama, f.sekolah, f.kota, f.provinsi].some((v) => norm(v).includes(q))));
+      const page = list.slice(0, fin.shown);
+      fin.grid.textContent = '';
+      page.forEach((f) => {
+        const li = document.createElement('li');
+        li.className = 'fitem';
+        li.innerHTML = '<div class="fitem__photo"></div><div class="fitem__body"><p class="fitem__name"></p><p class="fitem__meta"></p></div>';
+        isiFoto($('.fitem__photo', li), f, 'fitem__mono');
+        if (f.jalur === 'Golden Buzzer') $('.fitem__photo', li).insertAdjacentHTML('afterbegin', '<span class="gb-tag">★ Golden Buzzer</span>');
+        $('.fitem__name', li).textContent = f.nama;
+        $('.fitem__meta', li).textContent = [f.sekolah, f.kota].filter(Boolean).join(' · ');
+        fin.grid.append(li);
+      });
+      fin.empty.hidden = list.length > 0 || !fin.all.length;
+      fin.more.hidden = list.length <= fin.shown;
+      fin.count.textContent = list.length ? `Menampilkan ${nf.format(page.length)} dari ${nf.format(list.length)} finalis` : '';
+    }
+    function tampilMuatFinalis() {
+      fin.count.textContent = 'Memuat daftar finalis…';
+      fin.grid.innerHTML = '<li class="finalis-skel"></li>'.repeat(6);
+    }
+    function tampilGagalFinalis() {
+      fin.grid.textContent = '';
+      fin.count.innerHTML = 'Daftar finalis belum bisa dimuat karena server sedang ramai. <button class="btn btn--soft btn--sm" type="button" id="dl-retry">Coba lagi</button>';
+      $('#dl-retry').addEventListener('click', () => bukaReveal(false));
+    }
+    function terapkanFinalis(list) {
+      fin.all = list;
+      fin.prov.length = 1;
+      [...new Set(list.map((f) => f.provinsi).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'id')).forEach((v) => fin.prov.append(new Option(v, v)));
+      $('#dl-sub').textContent = list.length ? `${nf.format(list.length)} pelajar terpilih dari ${nf.format(new Set(list.map((f) => f.provinsi).filter(Boolean)).size)} provinsi.` : 'Daftar finalis sedang disiapkan panitia. Muat ulang halaman beberapa saat lagi.';
+      renderFinalis();
+      bangunStage(list);
+    }
+    let finTimer;
+    fin.search.addEventListener('input', () => { clearTimeout(finTimer); finTimer = setTimeout(() => { fin.shown = CONFIG.finalisPageSize; renderFinalis(); }, 150); });
+    fin.prov.addEventListener('change', () => { fin.shown = CONFIG.finalisPageSize; renderFinalis(); });
+    $$('.chip[data-jalur]').forEach((c) => c.addEventListener('click', () => {
+      fin.jalur = c.dataset.jalur;
+      $$('.chip[data-jalur]').forEach((x) => x.setAttribute('aria-pressed', String(x === c)));
+      fin.shown = CONFIG.finalisPageSize;
+      renderFinalis();
+    }));
+    fin.more.addEventListener('click', () => {
+      const before = fin.grid.children.length;
+      fin.shown += CONFIG.finalisPageSize;
+      renderFinalis();
+      fin.grid.children[before]?.setAttribute('tabindex', '-1');
+      fin.grid.children[before]?.focus();
     });
-    $('#dl-reset').addEventListener('click', () => { dl.search.value = ''; dl.city.value = ''; dl.shown = CONFIG.delegatesPageSize; renderDelegates(); dl.search.focus(); });
-    loadDelegates();
+    $('#dl-reset').addEventListener('click', () => {
+      fin.search.value = ''; fin.prov.value = ''; fin.jalur = '';
+      $$('.chip[data-jalur]').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.jalur === '')));
+      fin.shown = CONFIG.finalisPageSize; renderFinalis(); fin.search.focus();
+    });
+
+    /* ---------- Panggung kartu finalis (hero) ---------- */
+    const stage = { cards: [], i: 0, timer: null, paused: reduceMotion, hover: false };
+    function tampilKartu(i, umumkan) {
+      const n = stage.cards.length;
+      if (!n) return;
+      stage.i = (i + n) % n;
+      stage.cards.forEach((c, k) => { c.classList.toggle('is-on', k === stage.i); c.setAttribute('aria-hidden', String(k !== stage.i)); });
+      const cnt = $('#stage-count');
+      cnt.setAttribute('aria-live', umumkan ? 'polite' : 'off');
+      cnt.textContent = `${stage.i + 1} / ${n}`;
+    }
+    function putar() {
+      clearInterval(stage.timer);
+      if (!stage.paused && !stage.hover && stage.cards.length > 1) stage.timer = setInterval(() => tampilKartu(stage.i + 1, false), 3500);
+    }
+    function bangunStage(list) {
+      const deck = $('#stage-deck');
+      deck.textContent = '';
+      // Utamakan finalis berfoto, acak, maksimal 24 kartu.
+      const pilih = [...list].sort(() => Math.random() - .5).sort((a, b) => (b.foto ? 1 : 0) - (a.foto ? 1 : 0)).slice(0, 24);
+      if (!pilih.length) {
+        deck.innerHTML = '<figure class="fcard is-on"><div class="fcard__photo"><span class="fcard__mono" aria-hidden="true">YCS</span></div><figcaption class="fcard__body"><p class="fcard__name">Daftar finalis segera tampil</p><p class="fcard__school">Muat ulang halaman beberapa saat lagi.</p></figcaption></figure>';
+        $('#stage-controls').hidden = true;
+        return;
+      }
+      pilih.forEach((f, k) => {
+        const fig = document.createElement('figure');
+        fig.className = 'fcard';
+        fig.style.setProperty('--tilt', ((k % 3) - 1) * 2.5 + 'deg');
+        fig.innerHTML = '<div class="fcard__photo"></div><figcaption class="fcard__body"><p class="fcard__name"></p><p class="fcard__school"></p><p class="fcard__region"></p></figcaption>';
+        isiFoto($('.fcard__photo', fig), f, 'fcard__mono');
+        if (f.jalur === 'Golden Buzzer') $('.fcard__photo', fig).insertAdjacentHTML('afterbegin', '<span class="gb-tag">★ Golden Buzzer</span>');
+        $('.fcard__name', fig).textContent = f.nama;
+        $('.fcard__school', fig).textContent = f.sekolah;
+        $('.fcard__region', fig).textContent = [f.kota, f.provinsi].filter(Boolean).join(', ');
+        deck.append(fig);
+      });
+      stage.cards = [...deck.children];
+      $('#stage-controls').hidden = stage.cards.length < 2;
+      syncToggle();
+      tampilKartu(0, false);
+      putar();
+    }
+    function syncToggle() {
+      const b = $('#stage-toggle');
+      b.setAttribute('aria-pressed', String(stage.paused));
+      b.setAttribute('aria-label', stage.paused ? 'Lanjutkan pergantian kartu' : 'Jeda pergantian kartu');
+      $('use', b).setAttribute('href', stage.paused ? '#i-play' : '#i-pause');
+    }
+    $('#stage-prev').addEventListener('click', () => { stage.paused = true; syncToggle(); putar(); tampilKartu(stage.i - 1, true); });
+    $('#stage-next').addEventListener('click', () => { stage.paused = true; syncToggle(); putar(); tampilKartu(stage.i + 1, true); });
+    $('#stage-toggle').addEventListener('click', () => { stage.paused = !stage.paused; syncToggle(); putar(); });
+    const stageEl = $('.stage');
+    stageEl.addEventListener('mouseenter', () => { stage.hover = true; putar(); });
+    stageEl.addEventListener('mouseleave', () => { stage.hover = false; putar(); });
+    stageEl.addEventListener('focusin', () => { stage.hover = true; putar(); });
+    stageEl.addEventListener('focusout', (e) => { if (!stageEl.contains(e.relatedTarget)) { stage.hover = false; putar(); } });
+
+    /* ---------- Bagikan & pengingat ---------- */
+    async function salinTeks(teks, pesan) {
+      try { await navigator.clipboard.writeText(teks); toast(pesan || 'Link disalin.'); }
+      catch (e) { window.prompt('Salin link ini:', teks); }
+    }
+    const shareDlg = $('#share-dialog');
+    let shareData = null;
+    const tautan = (ref, hash = '') => `${location.origin}${location.pathname}?ref=${ref}${hash}`;
+    const SHARE = {
+      pra: () => ({ url: tautan('share-countdown'), text: `Pengumuman finalis Youth Character Summit 2026: ${teksWaktu(target)}. Pantau countdown dan live-nya di sini!` }),
+      pasca: () => ({ url: tautan('share-finalis'), text: 'Pengumuman finalis YCS 2026 sudah rilis! Cek siapa saja yang melangkah ke Bali:' }),
+      live: () => ({ url: tautan('share-live', '#live'), text: 'Jadwal live Youth Character Summit 2026, jangan sampai ketinggalan:' }),
+      daftar: () => ({ url: tautan('share-daftar', '#delegasi'), text: 'Daftar finalis Youth Character Summit 2026. Ada nama temanmu?' }),
+    };
+    // HP: langsung buka lembar bagikan bawaan (sudah berisi WhatsApp/Instagram). Desktop: dialog pilihan.
+    function bagikan(data) {
+      shareData = data;
+      if (navigator.share && matchMedia('(pointer: coarse)').matches) {
+        navigator.share({ title: document.title, text: data.text, url: data.url }).catch(() => {});
+        return;
+      }
+      $('#share-text').textContent = data.text;
+      $('[data-act="native"]', shareDlg).hidden = !navigator.share;
+      if (shareDlg.showModal) shareDlg.showModal(); else salinTeks(data.url);
+    }
+    shareDlg.addEventListener('click', async (e) => {
+      if (e.target === shareDlg) { shareDlg.close(); return; }
+      const b = e.target.closest('[data-act]');
+      if (!b || !shareData) return;
+      const act = b.dataset.act;
+      if (act === 'wa') window.open('https://wa.me/?text=' + encodeURIComponent(shareData.text + ' ' + shareData.url), '_blank', 'noopener');
+      if (act === 'copy') await salinTeks(shareData.url, 'Link disalin. Tempel di mana pun kamu mau!');
+      if (act === 'ig') await salinTeks(shareData.url, 'Link disalin. Tempel di Story (stiker Link) atau bio Instagram-mu.');
+      if (act === 'native') navigator.share({ title: document.title, text: shareData.text, url: shareData.url }).catch(() => {});
+      shareDlg.close();
+    });
+    $$('[data-share-open]').forEach((b) => b.addEventListener('click', () => bagikan(SHARE[b.dataset.shareOpen]())));
+    $$('[data-remind]').forEach((b) => b.addEventListener('click', () => {
+      downloadIcs({ dataset: {
+        start: new Date(target).toISOString(), end: new Date(target + 90 * 60000).toISOString(),
+        title: 'Pengumuman 100 Finalis YCS 2026', platform: 'Live', url: (cfg && cfg.linkLive) || CONFIG.linkLive,
+      } });
+      $('span', b).textContent = 'Pengingat diunduh';
+      toast('File pengingat (.ics) diunduh. Buka untuk menambahkannya ke kalender.');
+    }));
 
     /* ---------- Twibbon ---------- */
     const tw = {
@@ -2445,6 +3093,8 @@
       const values = [
         ['tw-name', tw.name.value.trim().length >= 2, 'Isi nama minimal 2 karakter.'],
         ['tw-city', tw.city.value.trim().length >= 2, 'Isi nama sekolah minimal 2 karakter.'],
+        ['tw-prov', !!$('#tw-prov').value, 'Pilih provinsi asalmu.'],
+        ['tw-kota', !!$('#tw-kota').value, 'Pilih kota/kabupaten asalmu.'],
         ['tw-email', /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test($('#tw-email').value.trim()), 'Isi email yang valid, contoh: nama@email.com.'],
         ['tw-channel', channelClicked, 'Buka tautan saluran WhatsApp terlebih dahulu.'],
         ['tw-consent', $('#tw-consent').checked, 'Centang persetujuan penyimpanan data.']
@@ -2479,7 +3129,8 @@
     setTimeout(flushQueue, 3000);
 
     async function saveTwibbon() {
-      const data = {name: tw.name.value.trim(), school: tw.city.value.trim(), email: $('#tw-email').value.trim(), frame: tw.frame, consent: true, channelClicked: true, website: $('#tw-website').value};
+      const data = {name: tw.name.value.trim(), school: tw.city.value.trim(), email: $('#tw-email').value.trim(), frame: tw.frame, consent: true, channelClicked: true, website: $('#tw-website').value, province: $('#tw-prov').value, city: $('#tw-kota').value};
+      if (sumber) data.ref = sumber;
       const key = JSON.stringify(data);
       if (saved.has(key) || saving) return;
       if (!attempts.has(key)) attempts.set(key, crypto.randomUUID());
@@ -2534,6 +3185,18 @@
         }
       });
     }
+
+    // Daftar provinsi → kabupaten/kota (38 provinsi, 514 kab/kota) dimuat saat browser senggang.
+    const isiWilayah = () => fetch('assets/data/wilayah.json').then((r) => r.json()).then((data) => {
+      const prov = $('#tw-prov'), kota = $('#tw-kota');
+      Object.keys(data).forEach((p) => prov.append(new Option(p, p)));
+      prov.addEventListener('change', () => {
+        kota.length = 1;
+        (data[prov.value] || []).forEach((k) => kota.append(new Option(k, k)));
+        kota.disabled = !prov.value;
+      });
+    }).catch(() => { $('#tw-prov-error').textContent = 'Daftar wilayah gagal dimuat. Muat ulang halaman.'; });
+    (window.requestIdleCallback || ((fn) => setTimeout(fn, 1500)))(isiWilayah);
 
     // Gambar ulang setelah font siap agar teks bingkai memakai font yang benar.
     draw();

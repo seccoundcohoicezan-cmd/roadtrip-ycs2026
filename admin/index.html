@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Panel Admin — YCS 2026</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="Panel admin panitia Youth Character Summit 2026.">
+  <meta name="theme-color" content="#082C33">
+  <meta name="color-scheme" content="light dark">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <script>(function(){try{var t=localStorage.getItem('ycs-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}})();</script>
+  <link rel="stylesheet" href="/assets/css/halaman.css">
+  <style>
+    body { background: var(--bg); }
+    .login { flex: 1; display: grid; place-items: center; padding: var(--space-6) var(--space-4); background: var(--teal-950); position: relative; isolation: isolate; overflow: hidden; }
+    .login::before { content: ""; position: absolute; inset: 0; z-index: -1; background: url("/assets/svg/pattern-kawung.svg") center / 220px repeat; opacity: .07; }
+    .login .card { width: min(100%, 26rem); }
+    .login__brand { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-5); }
+    .login__brand svg { width: 2.75rem; height: 2.75rem; }
+    .login__brand strong { display: block; font-size: 1.125rem; }
+
+    .app { flex: 1; display: grid; grid-template-rows: auto 1fr; min-height: 100vh; }
+    .topbar { position: sticky; top: 0; z-index: 30; background: var(--teal-950); color: #fff; }
+    .topbar__inner { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); min-height: 3.75rem; padding: 0 var(--space-4); }
+    .topbar .p-brand strong { font-size: .9375rem; }
+    .topbar__tools { display: flex; align-items: center; gap: var(--space-2); }
+    .topbar .btn--ghost { color: #fff; border-color: rgb(255 255 255 / .3); }
+    .topbar .btn--ghost:hover { border-color: #fff; color: #fff; }
+    .shell { display: grid; grid-template-columns: minmax(0, 1fr); }
+    @media (min-width: 64rem) { .shell { grid-template-columns: 15rem minmax(0, 1fr); } }
+    .side { background: var(--surface); border-bottom: 1px solid var(--line); }
+    @media (min-width: 64rem) { .side { border-bottom: 0; border-right: 1px solid var(--line); min-height: calc(100vh - 3.75rem); } }
+    .side [role="tablist"] { display: flex; gap: .25rem; overflow-x: auto; padding: var(--space-2) var(--space-3); }
+    @media (min-width: 64rem) { .side [role="tablist"] { flex-direction: column; padding: var(--space-4) var(--space-3); position: sticky; top: 3.75rem; } }
+    .side [role="tab"] { display: flex; align-items: center; gap: var(--space-3); min-height: 44px; padding: .5rem .875rem; border: 0; border-radius: var(--radius-sm); background: transparent; font-weight: 700; font-size: .9375rem; color: var(--text-muted); cursor: pointer; white-space: nowrap; text-align: left; transition: background var(--dur) var(--ease), color var(--dur) var(--ease); }
+    .side [role="tab"] svg { width: 1.125rem; height: 1.125rem; flex: none; }
+    .side [role="tab"]:hover { background: var(--surface-soft); color: var(--text); }
+    .side [role="tab"][aria-selected="true"] { background: var(--surface-soft); color: var(--primary); box-shadow: inset 3px 0 0 var(--orange-500); }
+    .content { padding: clamp(1rem, 3vw, 2rem); min-width: 0; }
+    .content h1 { font-size: clamp(1.375rem, 3vw, 1.75rem); }
+    .content__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: var(--space-3); margin-bottom: var(--space-5); }
+
+    .tiles { display: grid; gap: var(--space-4); grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr)); }
+    .tile { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--space-4) var(--space-5); box-shadow: var(--shadow-sm); }
+    .tile__label { font-size: .8125rem; font-weight: 700; color: var(--text-muted); }
+    .tile__value { margin-top: .25rem; font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1.1; }
+    .tile__meta { margin-top: .375rem; font-size: .8125rem; color: var(--text-muted); }
+    .panel-grid { display: grid; gap: var(--space-4); margin-top: var(--space-5); }
+    @media (min-width: 64rem) { .panel-grid { grid-template-columns: 1fr 1fr; } }
+    .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--space-5); box-shadow: var(--shadow-sm); }
+    .panel h2 { font-size: 1.0625rem; }
+    .panel__sub { font-size: .875rem; color: var(--text-muted); margin-top: .25rem; }
+    .bars { list-style: none; margin: var(--space-4) 0 0; padding: 0; display: grid; gap: var(--space-2); }
+    .bars li { position: relative; display: flex; justify-content: space-between; gap: var(--space-3); padding: .5rem .75rem; border-radius: var(--radius-sm); font-size: .9375rem; overflow: hidden; isolation: isolate; }
+    .bars li::before { content: ""; position: absolute; inset: 0 auto 0 0; width: var(--w, 0%); background: var(--surface-soft); z-index: -1; border-radius: inherit; }
+    .bars strong { font-variant-numeric: tabular-nums; }
+    .kv { display: grid; gap: var(--space-2); margin-top: var(--space-4); font-size: .9375rem; }
+    .kv div { display: flex; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; padding-bottom: var(--space-2); border-bottom: 1px dashed var(--line); }
+    .kv dt { color: var(--text-muted); }
+    .kv dd { margin: 0; font-weight: 700; text-align: right; overflow-wrap: anywhere; }
+
+    .set-group { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--space-5); }
+    .set-group + .set-group { margin-top: var(--space-4); }
+    .set-group legend { font-weight: 800; font-size: 1.0625rem; padding: 0 .25rem; }
+    .set-grid { display: grid; gap: var(--space-4); margin-top: var(--space-3); }
+    @media (min-width: 48rem) { .set-grid { grid-template-columns: 1fr 1fr; } }
+    .switch { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); min-height: 48px; padding: .5rem .875rem; border: 1.5px solid var(--line); border-radius: var(--radius); cursor: pointer; }
+    .switch input { appearance: none; width: 3rem; height: 1.75rem; border-radius: var(--radius-pill); background: var(--line); position: relative; cursor: pointer; transition: background var(--dur) var(--ease); flex: none; margin: 0; }
+    .switch input::after { content: ""; position: absolute; top: .1875rem; left: .1875rem; width: 1.375rem; height: 1.375rem; border-radius: 50%; background: #fff; box-shadow: var(--shadow-sm); transition: transform var(--dur) var(--ease); }
+    .switch input:checked { background: var(--success); }
+    .switch input:checked::after { transform: translateX(1.25rem); }
+    .switch span { font-weight: 700; font-size: .9375rem; }
+    .switch small { display: block; font-weight: 500; color: var(--text-muted); }
+    .savebar { position: sticky; bottom: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; margin-top: var(--space-5); padding: var(--space-3) var(--space-4); border-radius: var(--radius); background: var(--teal-950); color: #fff; box-shadow: var(--shadow-lg); }
+    .savebar p { font-weight: 600; font-size: .9375rem; }
+
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+    table { border-collapse: collapse; width: 100%; font-size: .875rem; }
+    th, td { padding: .5rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
+    th { background: var(--surface-soft); font-weight: 800; white-space: nowrap; }
+    td .input, td .select { min-height: 40px; padding: .375rem .625rem; border-radius: var(--radius-sm); font-size: .875rem; min-width: 8rem; }
+    td input[type="checkbox"] { width: 1.25rem; height: 1.25rem; accent-color: var(--teal-700); }
+    .live-table { min-width: 64rem; }
+    .preview { min-width: 32rem; }
+    .preview td { white-space: nowrap; max-width: 14rem; overflow: hidden; text-overflow: ellipsis; }
+    .drop { display: grid; gap: var(--space-2); justify-items: center; text-align: center; padding: var(--space-5); border: 2px dashed var(--line); border-radius: var(--radius); background: var(--surface-soft); transition: border-color var(--dur) var(--ease); }
+    .drop.is-over { border-color: var(--primary); }
+    .drop svg { width: 2rem; height: 2rem; color: var(--primary); }
+    .seg { display: inline-flex; padding: .25rem; border-radius: var(--radius-pill); background: var(--surface-soft); gap: .25rem; }
+    .seg label { position: relative; }
+    .seg input { position: absolute; opacity: 0; inset: 0; }
+    .seg span { display: inline-flex; align-items: center; min-height: 40px; padding: 0 1rem; border-radius: var(--radius-pill); font-weight: 700; font-size: .875rem; cursor: pointer; }
+    .seg input:checked + span { background: var(--surface); box-shadow: var(--shadow-sm); color: var(--primary); }
+    .seg input:focus-visible + span { outline: 3px solid var(--focus); }
+    .export-grid { display: grid; gap: var(--space-3); grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr)); margin-top: var(--space-4); }
+    .export-grid .btn { justify-content: space-between; }
+    code { font-family: var(--font-mono); font-size: .875em; background: var(--surface-soft); padding: .1em .35em; border-radius: .3em; }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#konten">Langsung ke konten utama</a>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></g></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M4.9 4.9 7 7m10 10 2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></g></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path fill="currentColor" d="M7 4.5v15a1 1 0 0 0 1.5.9l12-7.5a1 1 0 0 0 0-1.8l-12-7.5A1 1 0 0 0 7 4.5Z"/></symbol>
+    <symbol id="i-db" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5.5" rx="8" ry="3"/><path d="M4 5.5v13c0 1.7 3.6 3 8 3s8-1.3 8-3v-13M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></g></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></g></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 16V4m-5 5 5-5 5 5M4 20h16"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 3v12m-5-5 5 5 5-5M4 21h16"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13"/></symbol>
+  </svg>
+
+  <!-- Login -->
+  <main class="login" id="v-login" hidden>
+    <form class="card" id="f-login" novalidate>
+      <div class="login__brand">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><g stroke="#FFC93C" stroke-width="3" stroke-linecap="round"><path d="M24 3v5M24 40v5M3 24h5M40 24h5M9.2 9.2l3.5 3.5M35.3 35.3l3.5 3.5M9.2 38.8l3.5-3.5M35.3 12.7l3.5-3.5"/></g><circle cx="24" cy="24" r="12.5" fill="#12707E"/><circle cx="24" cy="19.5" r="3.4" fill="#FFC93C"/><path d="M16.5 31c1.5-4.6 4.2-6.8 7.5-6.8s6 2.2 7.5 6.8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>
+        <div><strong>Panel Admin YCS 2026</strong><span class="small muted">Khusus panitia</span></div>
+      </div>
+      <h1 class="visually-hidden">Masuk panel admin</h1>
+      <div class="field">
+        <label for="sandi">Password</label>
+        <input class="input" type="password" id="sandi" required autocomplete="current-password" aria-describedby="sandi-error sandi-hint">
+        <p class="field__hint" id="sandi-hint">Password awal ada di tab <strong>Admin</strong> pada Google Sheet panitia.</p>
+        <p class="field__error" id="sandi-error" role="alert"></p>
+      </div>
+      <button class="btn btn--cta btn--block" type="submit" id="btn-login" style="margin-top:1.25rem">Masuk</button>
+      <p class="small muted" style="margin-top:1rem;text-align:center"><a href="/">← Kembali ke situs</a></p>
+    </form>
+  </main>
+
+  <!-- Aplikasi -->
+  <div class="app" id="v-app" hidden>
+    <header class="topbar">
+      <div class="topbar__inner">
+        <a class="p-brand" href="/" target="_blank" rel="noopener" aria-label="Buka situs YCS 2026 (tab baru)">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><g stroke="#FFC93C" stroke-width="3" stroke-linecap="round"><path d="M24 3v5M24 40v5M3 24h5M40 24h5M9.2 9.2l3.5 3.5M35.3 35.3l3.5 3.5M9.2 38.8l3.5-3.5M35.3 12.7l3.5-3.5"/></g><circle cx="24" cy="24" r="12.5" fill="#12707E"/><circle cx="24" cy="19.5" r="3.4" fill="#FFC93C"/><path d="M16.5 31c1.5-4.6 4.2-6.8 7.5-6.8s6 2.2 7.5 6.8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>
+          <span><strong>Admin YCS 2026</strong><span id="jam-server">—</span></span>
+        </a>
+        <div class="topbar__tools">
+          <button class="icon-btn theme-toggle" type="button" aria-label="Ganti tema terang/gelap" aria-pressed="false" hidden>
+            <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"/></svg>
+            <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></g></svg>
+          </button>
+          <button class="btn btn--ghost btn--sm" type="button" id="btn-keluar">Keluar</button>
+        </div>
+      </div>
+    </header>
+    <div class="shell">
+      <nav class="side" aria-label="Menu admin">
+        <div role="tablist" aria-orientation="vertical" id="tabs">
+          <button role="tab" id="t-ringkasan" aria-controls="p-ringkasan" aria-selected="true"><svg aria-hidden="true"><use href="#i-grid"/></svg>Ringkasan</button>
+          <button role="tab" id="t-pengaturan" aria-controls="p-pengaturan" aria-selected="false" tabindex="-1"><svg aria-hidden="true"><use href="#i-gear"/></svg>Pengaturan</button>
+          <button role="tab" id="t-live" aria-controls="p-live" aria-selected="false" tabindex="-1"><svg aria-hidden="true"><use href="#i-play"/></svg>Jadwal Live</button>
+          <button role="tab" id="t-data" aria-controls="p-data" aria-selected="false" tabindex="-1"><svg aria-hidden="true"><use href="#i-db"/></svg>Impor &amp; Ekspor</button>
+          <button role="tab" id="t-keamanan" aria-controls="p-keamanan" aria-selected="false" tabindex="-1"><svg aria-hidden="true"><use href="#i-lock"/></svg>Keamanan</button>
+        </div>
+      </nav>
+
+      <main class="content" id="konten" tabindex="-1">
+        <!-- Ringkasan -->
+        <section role="tabpanel" id="p-ringkasan" aria-labelledby="t-ringkasan" tabindex="0">
+          <div class="content__head">
+            <div><h1>Ringkasan</h1><p class="muted small" id="ring-update"></p></div>
+            <button class="btn btn--soft btn--sm" type="button" id="btn-segarkan">Segarkan data</button>
+          </div>
+          <div class="tiles" id="tiles"></div>
+          <div class="panel-grid">
+            <div class="panel">
+              <h2>Twibbon per sumber (<code>?ref=</code>)</h2>
+              <p class="panel__sub">Efektivitas link blasting. Pakai link seperti <code>/?ref=email-1</code> atau <code>/?ref=ig-bio</code>.</p>
+              <ul class="bars" id="bars-sumber"></ul>
+            </div>
+            <div class="panel">
+              <h2>Status situs</h2>
+              <p class="panel__sub">Yang sedang dilihat pengunjung.</p>
+              <dl class="kv" id="kv-status"></dl>
+            </div>
+          </div>
+        </section>
+
+        <!-- Pengaturan -->
+        <section role="tabpanel" id="p-pengaturan" aria-labelledby="t-pengaturan" tabindex="0" hidden>
+          <div class="content__head"><div><h1>Pengaturan</h1><p class="muted small">Waktu dalam WIB. Perubahan tampil di situs dalam ±1 menit.</p></div></div>
+          <form id="f-set" novalidate>
+            <fieldset class="set-group">
+              <legend>Pengumuman &amp; live</legend>
+              <div class="set-grid">
+                <div class="field"><label for="s-waktu_pengumuman">Waktu pengumuman (WIB)</label><input class="input" type="datetime-local" id="s-waktu_pengumuman" data-key="waktu_pengumuman" data-type="waktu" required><p class="field__hint">Countdown, reveal finalis, dan pembukaan klaim mengikuti waktu ini.</p></div>
+                <label class="switch" for="s-pakai_link_cadangan"><span>Pakai link cadangan<small>Nyalakan bila live utama bermasalah.</small></span><input type="checkbox" id="s-pakai_link_cadangan" data-key="pakai_link_cadangan" data-type="bool"></label>
+                <div class="field"><label for="s-link_live">Link live utama</label><input class="input" type="url" id="s-link_live" data-key="link_live" placeholder="https://"></div>
+                <div class="field"><label for="s-link_live_cadangan">Link live cadangan</label><input class="input" type="url" id="s-link_live_cadangan" data-key="link_live_cadangan" placeholder="https://"></div>
+              </div>
+            </fieldset>
+            <fieldset class="set-group">
+              <legend>Klaim wildcard</legend>
+              <div class="set-grid">
+                <label class="switch" for="s-klaim_aktif"><span>Klaim aktif<small>Halaman /klaim tetap tertutup sebelum waktu pengumuman.</small></span><input type="checkbox" id="s-klaim_aktif" data-key="klaim_aktif" data-type="bool"></label>
+                <div class="field"><label for="s-klaim_berlaku_hingga">Kode berlaku sampai (WIB)</label><input class="input" type="datetime-local" id="s-klaim_berlaku_hingga" data-key="klaim_berlaku_hingga" data-type="waktu"></div>
+                <div class="field"><label for="s-nama_event">Nama event berikutnya</label><input class="input" id="s-nama_event" data-key="nama_event" maxlength="120"></div>
+                <div class="field"><label for="s-link_event">Link event <span class="opt">(kosong = Coming Soon)</span></label><input class="input" type="url" id="s-link_event" data-key="link_event" placeholder="https://"></div>
+              </div>
+            </fieldset>
+            <fieldset class="set-group">
+              <legend>Dana Kaget</legend>
+              <div class="set-grid">
+                <label class="switch" for="s-dana_aktif"><span>Form Dana Kaget aktif<small>Saklar utama.</small></span><input type="checkbox" id="s-dana_aktif" data-key="dana_aktif" data-type="bool"></label>
+                <label class="switch" for="s-dana_tampilkan_sisa"><span>Tampilkan "Tersisa N"<small>Indikator sisa kuota di halaman.</small></span><input type="checkbox" id="s-dana_tampilkan_sisa" data-key="dana_tampilkan_sisa" data-type="bool"></label>
+                <div class="field"><label for="s-dana_kode_akses">Kode akses</label><input class="input" id="s-dana_kode_akses" data-key="dana_kode_akses" maxlength="40" autocomplete="off" style="font-family:var(--font-mono);letter-spacing:.1em;text-transform:uppercase"></div>
+                <div class="field"><label for="s-dana_kuota">Kuota pengajuan</label><input class="input" type="number" min="0" step="1" id="s-dana_kuota" data-key="dana_kuota" data-type="angka"><p class="field__hint" id="dana-terpakai"></p></div>
+              </div>
+            </fieldset>
+            <fieldset class="set-group">
+              <legend>Road to Bali &amp; survei</legend>
+              <div class="set-grid">
+                <div class="field"><label for="s-road_target">Target dukungan</label><input class="input" type="number" min="1" step="1" id="s-road_target" data-key="road_target" data-type="angka"></div>
+                <div class="field"><label for="s-road_tambahan">Dukungan tambahan</label><input class="input" type="number" min="0" step="1" id="s-road_tambahan" data-key="road_tambahan" data-type="angka"><p class="field__hint">Ditambahkan ke jumlah twibbon (mis. dukungan offline).</p></div>
+                <label class="switch" for="s-survei_aktif"><span>Survei aktif</span><input type="checkbox" id="s-survei_aktif" data-key="survei_aktif" data-type="bool"></label>
+                <div class="field"><label for="s-survei_buka">Survei dibuka (WIB) <span class="opt">(kosong = saat pengumuman)</span></label><input class="input" type="datetime-local" id="s-survei_buka" data-key="survei_buka" data-type="waktu"></div>
+              </div>
+            </fieldset>
+            <div class="savebar"><p id="set-status" role="status">Tidak ada perubahan.</p><button class="btn btn--cta btn--sm" type="submit" id="btn-simpan-set">Simpan pengaturan</button></div>
+          </form>
+        </section>
+
+        <!-- Jadwal live -->
+        <section role="tabpanel" id="p-live" aria-labelledby="t-live" tabindex="0" hidden>
+          <div class="content__head">
+            <div><h1>Jadwal Live</h1><p class="muted small">Status Segera/Live/Selesai dihitung otomatis dari jam server.</p></div>
+            <button class="btn btn--soft btn--sm" type="button" id="btn-tambah-live"><svg aria-hidden="true"><use href="#i-plus"/></svg>Tambah jadwal</button>
+          </div>
+          <div class="table-wrap" role="region" aria-label="Tabel jadwal live" tabindex="0">
+            <table class="live-table">
+              <thead><tr><th scope="col">Judul</th><th scope="col">Platform</th><th scope="col">Mulai (WIB)</th><th scope="col">Selesai (WIB)</th><th scope="col">Link</th><th scope="col">Link cadangan</th><th scope="col">Tampil</th><th scope="col"><span class="visually-hidden">Hapus</span></th></tr></thead>
+              <tbody id="live-body"></tbody>
+            </table>
+          </div>
+          <div class="savebar"><p id="live-status" role="status">Tidak ada perubahan.</p><button class="btn btn--cta btn--sm" type="button" id="btn-simpan-live">Simpan jadwal</button></div>
+        </section>
+
+        <!-- Data -->
+        <section role="tabpanel" id="p-data" aria-labelledby="t-data" tabindex="0" hidden>
+          <div class="content__head"><div><h1>Impor &amp; Ekspor</h1><p class="muted small">CSV dari Excel/Google Sheets (pemisah koma atau titik koma).</p></div></div>
+          <div class="panel-grid" style="margin-top:0">
+            <form class="panel" id="f-impor" novalidate>
+              <h2>Impor data</h2>
+              <p class="panel__sub">Finalis: kolom <code>nama, sekolah, kota, provinsi, jalur, foto</code>. Kode wildcard: kolom <code>email, nama</code> (opsional <code>kode, berlaku</code>; kode kosong dibuat otomatis).</p>
+              <div class="field" style="margin-top:1rem">
+                <span class="label" id="jenis-label">Jenis data</span>
+                <div class="seg" role="radiogroup" aria-labelledby="jenis-label">
+                  <label><input type="radio" name="jenis" value="finalis" checked><span>Finalis</span></label>
+                  <label><input type="radio" name="jenis" value="kode"><span>Kode wildcard</span></label>
+                </div>
+              </div>
+              <label class="drop" id="drop" for="csv" style="margin-top:1rem">
+                <svg aria-hidden="true"><use href="#i-upload"/></svg>
+                <strong id="drop-label">Pilih atau seret file CSV</strong>
+                <span class="small muted">Maks. 5.000 baris</span>
+                <input type="file" id="csv" accept=".csv,text/csv" class="visually-hidden">
+              </label>
+              <p class="small" style="margin-top:.5rem"><a href="#" id="unduh-template">Unduh template CSV</a></p>
+              <div id="pratinjau" hidden style="margin-top:1rem">
+                <p class="small muted" id="pratinjau-info"></p>
+                <div class="table-wrap" role="region" aria-label="Pratinjau CSV" tabindex="0" style="margin-top:.5rem"><table class="preview" id="pratinjau-tabel"></table></div>
+                <div class="field" style="margin-top:1rem">
+                  <span class="label" id="mode-label">Mode</span>
+                  <div class="seg" role="radiogroup" aria-labelledby="mode-label">
+                    <label><input type="radio" name="mode" value="tambah" checked><span>Tambahkan</span></label>
+                    <label><input type="radio" name="mode" value="ganti"><span>Ganti semua</span></label>
+                  </div>
+                </div>
+              </div>
+              <p class="alert" id="impor-status" role="status" style="margin-top:1rem"></p>
+              <button class="btn btn--cta btn--sm" type="submit" id="btn-impor" style="margin-top:1rem" disabled>Impor</button>
+            </form>
+            <div class="panel">
+              <h2>Unduh data (CSV)</h2>
+              <p class="panel__sub">Setiap unduhan dicatat di tab Log Admin. Simpan file di tempat aman: berisi data pribadi.</p>
+              <div class="export-grid" id="ekspor">
+                <button class="btn btn--ghost btn--sm" type="button" data-ekspor="twibbon">Twibbon <svg aria-hidden="true"><use href="#i-download"/></svg></button>
+                <button class="btn btn--ghost btn--sm" type="button" data-ekspor="kode">Kode wildcard <svg aria-hidden="true"><use href="#i-download"/></svg></button>
+                <button class="btn btn--ghost btn--sm" type="button" data-ekspor="dana">Dana Kaget <svg aria-hidden="true"><use href="#i-download"/></svg></button>
+                <button class="btn btn--ghost btn--sm" type="button" data-ekspor="survei">Survei <svg aria-hidden="true"><use href="#i-download"/></svg></button>
+                <button class="btn btn--ghost btn--sm" type="button" data-ekspor="finalis">Finalis <svg aria-hidden="true"><use href="#i-download"/></svg></button>
+              </div>
+              <p class="alert alert--info" id="ekspor-status" role="status" style="margin-top:1rem"></p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Keamanan -->
+        <section role="tabpanel" id="p-keamanan" aria-labelledby="t-keamanan" tabindex="0" hidden>
+          <div class="content__head"><div><h1>Keamanan</h1><p class="muted small">Sesi admin berlaku 6 jam. 10 kali salah password mengunci login selama 15 menit.</p></div></div>
+          <form class="panel" id="f-sandi" novalidate style="max-width:32rem">
+            <h2>Ganti password</h2>
+            <div class="field" style="margin-top:1rem"><label for="sandi-lama">Password saat ini</label><input class="input" type="password" id="sandi-lama" autocomplete="current-password" required></div>
+            <div class="field"><label for="sandi-baru">Password baru</label><input class="input" type="password" id="sandi-baru" autocomplete="new-password" minlength="10" required aria-describedby="sandi-baru-hint"><p class="field__hint" id="sandi-baru-hint">Minimal 10 karakter. Gunakan kalimat yang mudah diingat tapi sulit ditebak.</p></div>
+            <p class="alert" id="sandi-status" role="status" style="margin-top:1rem"></p>
+            <button class="btn btn--cta btn--sm" type="submit" id="btn-sandi" style="margin-top:1rem">Ganti password</button>
+          </form>
+          <div class="panel" style="max-width:32rem;margin-top:1rem">
+            <h2>Data mentah</h2>
+            <p class="panel__sub">Semua data tersimpan di Google Sheet panitia (tab Pengaturan, Jadwal Live, Finalis, Kode Wildcard, Dana Kaget, Survei, Log Admin). Mengubah sel langsung juga berlaku di situs.</p>
+            <a class="btn btn--soft btn--sm" style="margin-top:1rem" href="https://docs.google.com/spreadsheets/d/1SKSCKrg_Laux39Xdu1_99tIv_NsgiJcASi27mnVe5ME/edit" target="_blank" rel="noopener">Buka Google Sheet</a>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="/assets/js/halaman.js"></script>
+  <script>
+  (() => {
+    'use strict';
+    const {$, $$, post, toast, nf, waktu, sibuk} = window.YCS;
+    const KEY = 'ycs_admin_token';
+    let token = sessionStorage.getItem(KEY) || '';
+    let data = null, csvRows = null;
+    const PLATFORM = ['YouTube', 'Instagram', 'TikTok', 'Zoom', 'Lainnya'];
+    const ERR = {sandi_salah: 'Password salah.', terlalu_banyak: 'Terlalu banyak percobaan salah. Login dikunci 15 menit.', sesi_habis: 'Sesi berakhir. Silakan masuk lagi.', busy: 'Server sibuk, coba lagi.', connection: 'Koneksi ke server gagal.', nilai_tidak_valid: 'Ada nilai yang tidak valid.', baris_tidak_valid: 'Ada baris jadwal yang tidak valid.', sandi_lemah: 'Password baru minimal 10 karakter.', kolom_nama: 'CSV finalis harus punya kolom "nama".', kolom_email: 'CSV kode harus punya kolom "email".', validation: 'Data tidak valid.'};
+    const pesan = (d) => ERR[d.error] || 'Terjadi kesalahan (' + (d.error || 'tidak diketahui') + ').';
+    const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+    const keInput = (s) => (s || '').replace(' ', 'T').slice(0, 16);
+    const dariInput = (s) => (s || '').replace('T', ' ');
+
+    async function api(aksi, body = {}) {
+      const d = await post('/api/admin', {aksi, token, ...body}, 60000);
+      if (d.error === 'sesi_habis') { keluar(true); }
+      return d;
+    }
+    function keluar(habis) {
+      token = '';
+      sessionStorage.removeItem(KEY);
+      $('#v-app').hidden = true;
+      $('#v-login').hidden = false;
+      if (habis) $('#sandi-error').textContent = ERR.sesi_habis;
+      $('#sandi').focus();
+    }
+
+    /* ---------- Login ---------- */
+    $('#f-login').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const s = $('#sandi').value;
+      if (!s) { $('#sandi-error').textContent = 'Masukkan password.'; return; }
+      const btn = $('#btn-login');
+      sibuk(btn, true);
+      const d = await post('/api/admin', {aksi: 'admin-login', sandi: s});
+      sibuk(btn, false);
+      if (!d.ok) { $('#sandi-error').textContent = pesan(d); $('#sandi').setAttribute('aria-invalid', 'true'); return; }
+      token = d.token;
+      sessionStorage.setItem(KEY, token);
+      $('#sandi').value = '';
+      $('#sandi-error').textContent = '';
+      masuk();
+    });
+    $('#btn-keluar').addEventListener('click', async () => { await api('admin-keluar'); keluar(); toast('Kamu sudah keluar.'); });
+
+    async function masuk() {
+      $('#v-login').hidden = true;
+      $('#v-app').hidden = false;
+      await muat();
+    }
+    async function muat() {
+      $('#ring-update').textContent = 'Memuat…';
+      const d = await api('admin-data');
+      if (!d.ok) { if (d.error !== 'sesi_habis') $('#ring-update').textContent = pesan(d); return; }
+      data = d;
+      renderRingkasan();
+      renderPengaturan();
+      renderLive();
+    }
+    $('#btn-segarkan').addEventListener('click', muat);
+
+    /* ---------- Tabs ---------- */
+    const tabs = $$('[role="tab"]');
+    function pilih(tab, focus) {
+      tabs.forEach((t) => { const on = t === tab; t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1; $('#' + t.getAttribute('aria-controls')).hidden = !on; });
+      if (focus) tab.focus();
+    }
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => pilih(t));
+      t.addEventListener('keydown', (e) => {
+        const dir = ['ArrowDown', 'ArrowRight'].includes(e.key) ? 1 : ['ArrowUp', 'ArrowLeft'].includes(e.key) ? -1 : 0;
+        if (dir) { e.preventDefault(); pilih(tabs[(i + dir + tabs.length) % tabs.length], true); }
+      });
+    });
+
+    /* ---------- Ringkasan ---------- */
+    const cfgVal = (k) => (data.pengaturan.find((x) => x.kunci === k) || {}).nilai || '';
+    function renderRingkasan() {
+      const r = data.ringkasan;
+      const tiles = [
+        ['Twibbon dibuat', nf.format(r.twibbon.total), `${nf.format(r.twibbon.hariIni)} hari ini`],
+        ['Klaim wildcard', `${nf.format(r.klaim.sudah)} / ${nf.format(r.klaim.total)}`, `${nf.format(r.klaim.belum)} belum · ${nf.format(r.klaim.hangus)} hangus`],
+        ['Dana Kaget', `${nf.format(r.dana.terpakai)} / ${nf.format(r.dana.kuota)}`, `Sisa ${nf.format(r.dana.sisa)} · ${/^YA$/i.test(cfgVal('dana_aktif')) ? 'aktif' : 'nonaktif'}`],
+        ['Respons survei', nf.format(r.survei), /^YA$/i.test(cfgVal('survei_aktif')) ? 'Survei aktif' : 'Survei nonaktif'],
+        ['Finalis terdaftar', nf.format(r.finalis), r.finalis ? 'Siap untuk reveal' : 'Belum diimpor']
+      ];
+      $('#tiles').innerHTML = tiles.map(([l, v, m]) => `<div class="tile"><p class="tile__label">${esc(l)}</p><p class="tile__value">${esc(v)}</p><p class="tile__meta">${esc(m)}</p></div>`).join('');
+      const max = Math.max(1, ...r.twibbon.sumber.map((x) => x.jumlah));
+      $('#bars-sumber').innerHTML = r.twibbon.sumber.length ? r.twibbon.sumber.map((x) => `<li style="--w:${(x.jumlah / max * 100).toFixed(1)}%"><span>${esc(x.nama)}</span><strong>${nf.format(x.jumlah)}</strong></li>`).join('') : '<li>Belum ada data twibbon.</li>';
+      const umum = Date.parse(cfgVal('waktu_pengumuman').replace(' ', 'T') + ':00+07:00');
+      const sekarang = Date.parse(data.sekarang);
+      const kv = [
+        ['Fase beranda', sekarang >= umum ? 'Setelah pengumuman (reveal)' : 'Sebelum pengumuman (countdown)'],
+        ['Waktu pengumuman', isNaN(umum) ? 'Belum diatur' : waktu(new Date(umum).toISOString())],
+        ['Link live aktif', /^YA$/i.test(cfgVal('pakai_link_cadangan')) ? 'Cadangan: ' + cfgVal('link_live_cadangan') : cfgVal('link_live')],
+        ['Tombol event wildcard', cfgVal('link_event') || 'Coming Soon'],
+        ['Kode akses Dana Kaget', cfgVal('dana_kode_akses') || '—']
+      ];
+      $('#kv-status').innerHTML = kv.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('');
+      $('#ring-update').textContent = 'Data per ' + waktu(data.sekarang);
+      $('#jam-server').textContent = 'Jam server ' + data.sekarang.slice(11, 16) + ' WIB';
+      $('#dana-terpakai').textContent = `${nf.format(r.dana.terpakai)} pengajuan masuk.`;
+    }
+
+    /* ---------- Pengaturan ---------- */
+    const setInputs = () => $$('#f-set [data-key]');
+    function renderPengaturan() {
+      setInputs().forEach((el) => {
+        const v = cfgVal(el.dataset.key);
+        if (el.dataset.type === 'bool') el.checked = /^YA$/i.test(v);
+        else if (el.dataset.type === 'waktu') el.value = keInput(v);
+        else el.value = v;
+      });
+      $('#set-status').textContent = 'Tidak ada perubahan.';
+    }
+    function nilaiSet() {
+      const out = {};
+      setInputs().forEach((el) => { out[el.dataset.key] = el.dataset.type === 'bool' ? (el.checked ? 'YA' : 'TIDAK') : el.dataset.type === 'waktu' ? dariInput(el.value) : el.value.trim(); });
+      return out;
+    }
+    $('#f-set').addEventListener('input', () => { $('#set-status').textContent = 'Ada perubahan yang belum disimpan.'; });
+    $('#f-set').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nilai = nilaiSet();
+      const ubah = {};
+      Object.keys(nilai).forEach((k) => { if (nilai[k] !== cfgVal(k)) ubah[k] = nilai[k]; });
+      if (!Object.keys(ubah).length) { $('#set-status').textContent = 'Tidak ada perubahan.'; return; }
+      if (ubah.dana_aktif === 'YA' && !nilai.dana_kode_akses) { $('#set-status').textContent = 'Isi kode akses sebelum mengaktifkan Dana Kaget.'; $('#s-dana_kode_akses').focus(); return; }
+      if ('waktu_pengumuman' in ubah && !confirm('Ubah waktu pengumuman menjadi ' + ubah.waktu_pengumuman + ' WIB? Countdown dan reveal di situs ikut berubah.')) return;
+      const btn = $('#btn-simpan-set');
+      sibuk(btn, true);
+      const d = await api('admin-simpan-pengaturan', {nilai: ubah});
+      sibuk(btn, false);
+      if (!d.ok) { $('#set-status').textContent = pesan(d) + (d.kunci ? ' (' + d.kunci.join(', ') + ')' : ''); return; }
+      toast('Pengaturan tersimpan. Situs diperbarui dalam ±1 menit.');
+      await muat();
+      $('#set-status').textContent = 'Tersimpan.';
+    });
+
+    /* ---------- Jadwal live ---------- */
+    function barisLive(r = ['', 'YouTube', '', '', '', '', 'YA']) {
+      const tr = document.createElement('tr');
+      const plat = PLATFORM.includes(r[1]) ? r[1] : 'Lainnya';
+      tr.innerHTML = `
+        <td><input class="input" aria-label="Judul" value="${esc(r[0])}" maxlength="120" style="min-width:14rem"></td>
+        <td><select class="select" aria-label="Platform">${PLATFORM.map((p) => `<option${p === plat ? ' selected' : ''}>${p}</option>`).join('')}</select></td>
+        <td><input class="input" type="datetime-local" aria-label="Mulai (WIB)" value="${esc(keInput(r[2]))}"></td>
+        <td><input class="input" type="datetime-local" aria-label="Selesai (WIB)" value="${esc(keInput(r[3]))}"></td>
+        <td><input class="input" type="url" aria-label="Link" value="${esc(r[4])}" placeholder="https://" style="min-width:12rem"></td>
+        <td><input class="input" type="url" aria-label="Link cadangan" value="${esc(r[5])}" placeholder="https://" style="min-width:12rem"></td>
+        <td><input type="checkbox" aria-label="Tampilkan di situs"${/^YA$/i.test(r[6]) || r[6] === '' ? ' checked' : ''}></td>
+        <td><button class="icon-btn" type="button" aria-label="Hapus baris" data-hapus style="color:var(--error)"><svg aria-hidden="true"><use href="#i-trash"/></svg></button></td>`;
+      return tr;
+    }
+    function renderLive() {
+      const body = $('#live-body');
+      body.textContent = '';
+      data.live.forEach((r) => body.append(barisLive(r)));
+      if (!data.live.length) body.append(barisLive());
+      $('#live-status').textContent = 'Tidak ada perubahan.';
+    }
+    $('#btn-tambah-live').addEventListener('click', () => { const tr = barisLive(); $('#live-body').append(tr); $('input', tr).focus(); $('#live-status').textContent = 'Ada perubahan yang belum disimpan.'; });
+    $('#live-body').addEventListener('click', (e) => { const b = e.target.closest('[data-hapus]'); if (b) { b.closest('tr').remove(); $('#live-status').textContent = 'Ada perubahan yang belum disimpan.'; } });
+    $('#live-body').addEventListener('input', () => { $('#live-status').textContent = 'Ada perubahan yang belum disimpan.'; });
+    $('#btn-simpan-live').addEventListener('click', async () => {
+      const baris = $$('#live-body tr').map((tr) => {
+        const f = $$('input, select', tr);
+        return [f[0].value.trim(), f[1].value, dariInput(f[2].value), dariInput(f[3].value), f[4].value.trim(), f[5].value.trim(), f[6].checked ? 'YA' : 'TIDAK'];
+      }).filter((r) => r[0]);
+      const salah = baris.find((r) => !r[2] || !r[3] || r[3] <= r[2]);
+      if (salah) { $('#live-status').textContent = `Periksa waktu "${salah[0]}": selesai harus setelah mulai.`; return; }
+      const btn = $('#btn-simpan-live');
+      sibuk(btn, true);
+      const d = await api('admin-simpan-live', {baris});
+      sibuk(btn, false);
+      if (!d.ok) { $('#live-status').textContent = pesan(d) + (d.judul ? ` ("${d.judul}")` : ''); return; }
+      toast('Jadwal live tersimpan.');
+      await muat();
+      $('#live-status').textContent = 'Tersimpan.';
+    });
+
+    /* ---------- Impor CSV ---------- */
+    function parseCsv(text) {
+      text = text.replace(/^﻿/, '');
+      const first = text.split(/\r?\n/)[0] || '';
+      const sep = (first.match(/;/g) || []).length > (first.match(/,/g) || []).length ? ';' : ',';
+      const rows = []; let row = [], cell = '', q = false;
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        if (q) { if (c === '"' && text[i + 1] === '"') { cell += '"'; i++; } else if (c === '"') q = false; else cell += c; }
+        else if (c === '"') q = true;
+        else if (c === sep) { row.push(cell); cell = ''; }
+        else if (c === '\n' || c === '\r') { if (c === '\r' && text[i + 1] === '\n') i++; row.push(cell); rows.push(row); row = []; cell = ''; }
+        else cell += c;
+      }
+      if (cell || row.length) { row.push(cell); rows.push(row); }
+      return rows.filter((r) => r.some((x) => x.trim()));
+    }
+    const jenis = () => $('input[name="jenis"]:checked').value;
+    async function bacaFile(file) {
+      const st = $('#impor-status');
+      st.className = 'alert'; st.textContent = '';
+      if (!file) return;
+      if (file.size > 2e6) { st.className = 'alert alert--err'; st.textContent = 'File terlalu besar (maks. 2 MB).'; return; }
+      csvRows = parseCsv(await file.text());
+      if (csvRows.length < 2) { st.className = 'alert alert--err'; st.textContent = 'CSV kosong atau hanya berisi header.'; csvRows = null; $('#btn-impor').disabled = true; return; }
+      if (csvRows.length > 5001) { st.className = 'alert alert--err'; st.textContent = 'Maksimal 5.000 baris per impor. Pecah file menjadi beberapa bagian.'; csvRows = null; $('#btn-impor').disabled = true; return; }
+      $('#drop-label').textContent = file.name;
+      $('#pratinjau').hidden = false;
+      $('#pratinjau-info').textContent = `${nf.format(csvRows.length - 1)} baris data. Pratinjau 5 baris pertama:`;
+      $('#pratinjau-tabel').innerHTML = '<thead><tr>' + csvRows[0].map((h) => `<th scope="col">${esc(h)}</th>`).join('') + '</tr></thead><tbody>' + csvRows.slice(1, 6).map((r) => '<tr>' + r.map((c) => `<td>${esc(c)}</td>`).join('') + '</tr>').join('') + '</tbody>';
+      $('#btn-impor').disabled = false;
+    }
+    $('#csv').addEventListener('change', (e) => bacaFile(e.target.files[0]));
+    const drop = $('#drop');
+    ['dragenter', 'dragover'].forEach((t) => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('is-over'); }));
+    ['dragleave', 'drop'].forEach((t) => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('is-over'); }));
+    drop.addEventListener('drop', (e) => bacaFile(e.dataTransfer.files[0]));
+    $('#f-impor').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!csvRows) return;
+      const mode = $('input[name="mode"]:checked').value, j = jenis();
+      if (mode === 'ganti' && !confirm(`Semua data ${j === 'kode' ? 'kode wildcard' : 'finalis'} yang ada akan DIHAPUS dan diganti isi file ini. Lanjutkan?`)) return;
+      const btn = $('#btn-impor'), st = $('#impor-status');
+      sibuk(btn, true);
+      const d = await api('admin-impor', {jenis: j, mode, baris: csvRows});
+      sibuk(btn, false);
+      if (!d.ok) { st.className = 'alert alert--err'; st.textContent = pesan(d); return; }
+      st.className = 'alert alert--ok';
+      st.textContent = `${nf.format(d.jumlah)} baris diimpor` + (d.dilewati ? `, ${nf.format(d.dilewati)} dilewati (email tidak valid/duplikat atau nama kosong).` : '.') + (j === 'kode' ? ' Unduh "Kode wildcard" untuk mengirim email blasting.' : '');
+      csvRows = null; $('#csv').value = ''; $('#pratinjau').hidden = true; $('#drop-label').textContent = 'Pilih atau seret file CSV'; btn.disabled = true;
+      muat();
+    });
+    function unduh(nama, rows) {
+      const csv = '﻿' + rows.map((r) => r.map((c) => /[",;\n]/.test(c) ? '"' + String(c).replace(/"/g, '""') + '"' : c).join(',')).join('\r\n');
+      const url = URL.createObjectURL(new Blob([csv], {type: 'text/csv;charset=utf-8'}));
+      const a = Object.assign(document.createElement('a'), {href: url, download: nama});
+      document.body.append(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+    $('#unduh-template').addEventListener('click', (e) => {
+      e.preventDefault();
+      if (jenis() === 'kode') unduh('template-kode-wildcard.csv', [['email', 'nama', 'kode', 'berlaku'], ['nama@email.com', 'Nama Peserta', '', '2026-12-31 23:59']]);
+      else unduh('template-finalis.csv', [['nama', 'sekolah', 'kota', 'provinsi', 'jalur', 'foto'], ['Nama Finalis', 'SMAN 1 Semarang', 'Kota Semarang', 'Jawa Tengah', 'Seleksi Umum', 'https://drive.google.com/file/d/ID_FOTO/view']]);
+    });
+
+    /* ---------- Ekspor ---------- */
+    $('#ekspor').addEventListener('click', async (e) => {
+      const b = e.target.closest('[data-ekspor]');
+      if (!b) return;
+      const j = b.dataset.ekspor, st = $('#ekspor-status');
+      sibuk(b, true);
+      let rows = [], dari = 0, header = null;
+      while (dari !== null) {
+        st.textContent = `Mengambil data ${j}… ${nf.format(rows.length)} baris`;
+        const d = await api('admin-ekspor', {jenis: j, dari});
+        if (!d.ok) { st.textContent = pesan(d); sibuk(b, false); return; }
+        header = header || d.header;
+        rows = rows.concat(d.baris);
+        dari = d.berikutnya;
+      }
+      sibuk(b, false);
+      unduh(`ycs2026-${j}-${new Date().toISOString().slice(0, 10)}.csv`, [header, ...rows]);
+      st.textContent = `${nf.format(rows.length)} baris ${j} diunduh.`;
+    });
+
+    /* ---------- Ganti password ---------- */
+    $('#f-sandi').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const st = $('#sandi-status');
+      const baru = $('#sandi-baru').value;
+      if (baru.length < 10) { st.className = 'alert alert--err'; st.textContent = ERR.sandi_lemah; return; }
+      const btn = $('#btn-sandi');
+      sibuk(btn, true);
+      const d = await api('admin-ganti-sandi', {sandi: $('#sandi-lama').value, sandiBaru: baru});
+      sibuk(btn, false);
+      st.className = 'alert ' + (d.ok ? 'alert--ok' : 'alert--err');
+      st.textContent = d.ok ? 'Password diganti. Isi sel B2 di tab Admin juga sudah dikosongkan.' : pesan(d);
+      if (d.ok) e.target.reset();
+    });
+
+    if (token) masuk(); else { $('#v-login').hidden = false; }
+  })();
+  </script>
+</body>
+</html>
