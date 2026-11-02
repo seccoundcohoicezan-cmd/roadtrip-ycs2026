@@ -81,6 +81,17 @@ function seed(p, res) {
     let n = 0;
     while (n < p.twibbon) daerah.forEach(([k, pr, w]) => { for (let i = 0; i < w && n < p.twibbon; i++, n++) tw.rows.push([new Date(), 'id-' + n, 'N' + n, 'S', `e${n}@x.id`, 'squad', 'Ya', 'Ya', ['web-ycs2026', 'email-1', 'ig-bio'][n % 3], k, pr]); });
   }
+  if (p.kata) {
+    const kt = s['Satu Kata'];
+    const depan = ['Fauzan', 'Sinta', 'Raka', 'Nadia', 'Bagas', 'Aisyah', 'Dimas', 'Citra', 'Yoga', 'Laila', 'Rizky', 'Intan', 'Putu', 'Made', 'Kadek', 'Wayan', 'Siti', 'Budi', 'Ayu', 'Gilang'];
+    const belakang = ['Rahman', 'Pratama', 'Lestari', 'Saputra', 'Wulandari', 'Hidayat', 'Purnama', '', 'Santoso', 'Anggraini'];
+    const kata = ['sejahtera', 'maju', 'damai', 'berani', 'jujur', 'bersatu', 'hebat', 'peduli', 'cerdas', 'toleran', 'mandiri', 'adil', 'gotong-royong', 'kreatif', 'berkarakter'];
+    const prov = ['Jawa Tengah', 'Bali', 'Jawa Timur', 'DI Yogyakarta', 'Jawa Barat', 'Sulawesi Selatan', 'DKI Jakarta'];
+    for (let i = 0; i < p.kata; i++) {
+      const nama = depan[i % depan.length] + ' ' + belakang[(i * 7) % belakang.length];
+      kt.rows.push(['2026-11-01 10:00', 'k-' + i, kata[(i * 3) % kata.length], prov[(i * 5) % prov.length], 'web', 'YA', nama.trim(), 'SMA ' + (i % 30 + 1), `w${i}@mail.com`, 'Ya']);
+    }
+  }
   app.cache.clear();
   res.setHeader('Content-Type', 'application/json');
   res.end(JSON.stringify({ok: true, sandi: s.Admin.rows[1][1], kodeAkses: peng.find((x) => x[0] === 'dana_kode_akses')[1]}));
