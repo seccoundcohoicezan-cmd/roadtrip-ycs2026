@@ -712,38 +712,57 @@
     @keyframes pop-ok { from { transform: scale(.3); opacity: 0; } }
     .dk-state p { color: var(--text-muted); max-width: 26rem; }
 
-    /* ============ Satu Kata: kirim gratis, hasil terkunci sampai ikut saluran ============ */
-    .sk { align-items: stretch; }
-    .sk__form { display: grid; align-content: center; gap: var(--space-3); }
-    .sk__row { display: flex; gap: var(--space-2); margin-top: var(--space-2); }
-    .sk__input { flex: 1; min-width: 0; min-height: 3.5rem; border: 0; font-size: 1.25rem; font-weight: 700; color: var(--ink); background: #fff; }
-    .sk__select { min-height: 2.75rem; border: 1px solid rgb(255 255 255 / .35); background-color: rgb(255 255 255 / .12); color: #fff; }
-    .sk__select option { color: var(--ink); }
-    .sk__msg { min-height: 1.5rem; font-weight: 700; color: #FFE9EC; }
-    .sk__msg.is-ok { color: #FFD86B; }
-    .sk__count { font-size: .9375rem; color: #FFE9EC; }
-    .sk__count strong { font-size: 1.375rem; color: #fff; }
-    .sk__result { position: relative; min-height: 18rem; border-radius: 1.25rem; background: rgb(0 0 0 / .18); overflow: hidden; display: grid; }
-    .sk__cloud { display: flex; flex-wrap: wrap; align-content: center; justify-content: center; gap: .25rem .75rem; padding: var(--space-5); font-weight: 800; line-height: 1.05; transition: filter 500ms var(--ease); }
-    .sk__cloud span { color: #fff; }
-    .sk__cloud span:nth-child(3n) { color: #FFD86B; }
-    .sk__cloud span:nth-child(3n+2) { color: #FFC2CB; }
-    .sk__cloud .is-mine { padding: 0 .375rem; border-radius: .375rem; background: #FFD86B; color: #7A0A1C !important; }
-    .sk.is-locked .sk__cloud { filter: blur(9px); user-select: none; pointer-events: none; }
-    .sk__lock { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: var(--space-2); padding: var(--space-5); text-align: center; background: radial-gradient(closest-side, rgb(110 8 25 / .55), transparent); }
-    .sk:not(.is-locked) .sk__lock { display: none; }
-    .sk__lock-ico { display: grid; place-items: center; width: 3.5rem; height: 3.5rem; border-radius: 50%; background: #fff; color: #9B0D23; box-shadow: 0 12px 30px -10px rgb(0 0 0 / .5); }
-    .sk__lock-ico svg { width: 1.5rem; height: 1.5rem; }
-    .sk__lock strong { font-size: 1.25rem; }
-    .sk__lock p { max-width: 20rem; color: #FFE9EC; font-size: .9375rem; margin: 0; }
-    .sk__lock small { color: #FFC2CB; }
-    .btn--wa { background: #25D366; color: #073B1F; }
-    .btn--wa:hover { background: #1EBE5A; }
-    .sk__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); justify-content: center; padding: 0 var(--space-4) var(--space-4); }
-    .sk.is-locked .sk__actions { display: none; }
-    .btn--ghost-light { background: transparent; color: #fff; border-color: rgb(255 255 255 / .6); }
-    .btn--ghost-light:hover { background: rgb(255 255 255 / .12); }
-    .sk__empty { align-self: center; padding: var(--space-5); text-align: center; color: #FFE9EC; }
+    /* ============ Festival Satu Kata: 1 data = 1 warga kecil di plaza Bali ============ */
+    .fest-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: var(--space-3); }
+    .fest-head .sec-sub { max-width: 40rem; }
+    .fest-count { font-weight: 700; color: var(--text-muted); }
+    .fest-count strong { display: block; font-size: clamp(1.75rem, 4vw, 2.5rem); line-height: 1; color: var(--cta); font-variant-numeric: tabular-nums; }
+    .fest { position: relative; margin-top: var(--space-5); }
+    .fest__stage { position: relative; overflow: hidden; aspect-ratio: 4 / 5; border-radius: 1.5rem; background: #BFE6F7; box-shadow: var(--shadow-lg); }
+    @media (min-width: 40rem) { .fest__stage { aspect-ratio: 16 / 10; } }
+    @media (min-width: 64rem) { .fest__stage { aspect-ratio: 16 / 9; } }
+    .fest__stage > canvas { position: absolute; inset: 0; width: 100%; height: 100%; transition: filter 700ms var(--ease); }
+    .fest.is-locked .fest__stage > canvas { filter: blur(7px) saturate(1.15); }
+    .fest__balon { position: absolute; z-index: 3; left: 0; top: 0; display: flex; gap: .75rem; align-items: center; min-width: 11.5rem; max-width: 17rem; padding: .625rem 1rem .625rem .625rem; border: 3px solid #FFC93C; border-radius: 1.125rem; background: #FFFBF3; color: var(--ink); box-shadow: 0 14px 30px -12px rgb(0 0 0 / .5); transform: translate(-50%, calc(-100% - 18px)) scale(.9); opacity: 0; transition: opacity 300ms var(--ease), transform 300ms var(--ease); pointer-events: none; }
+    .fest__balon.is-on { opacity: 1; transform: translate(-50%, calc(-100% - 18px)); }
+    .fest__balon::after { content: ""; position: absolute; left: var(--ekor, 50%); bottom: -11px; width: 18px; height: 18px; background: #FFFBF3; border-right: 3px solid #FFC93C; border-bottom: 3px solid #FFC93C; transform: translateX(-50%) rotate(45deg); }
+    .fest.is-locked .fest__balon { display: none; }
+    .fest__ava { display: grid; place-items: center; width: 3.25rem; height: 3.25rem; flex: none; overflow: hidden; border-radius: 50%; background: #FFD86B; }
+    .fest__ava canvas { width: 100%; height: 100%; max-width: none; }
+    .fest__balon strong { display: block; font-size: 1rem; line-height: 1.2; }
+    .fest__balon em { display: block; font-family: var(--font-brush); font-style: normal; font-size: 1.375rem; line-height: 1.15; color: var(--orange-600); overflow-wrap: anywhere; }
+    .fest__balon small { display: block; font-size: .75rem; color: var(--ink-muted); }
+    .fest__kamu { position: absolute; top: -.75rem; right: -.5rem; padding: .125rem .5rem; border-radius: var(--radius-pill); background: var(--cta); color: #fff; font-size: .6875rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+    .fest__kamu[hidden] { display: none; }
+    .fest__alat { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; margin-top: var(--space-3); }
+    @media (min-width: 48rem) { .fest__alat { position: absolute; z-index: 4; left: 1rem; right: 1rem; bottom: 1rem; margin: 0; padding: .5rem; border-radius: var(--radius-pill); background: rgb(255 255 255 / .92); backdrop-filter: blur(8px); box-shadow: var(--shadow); } }
+    .fest.is-locked .fest__alat { display: none; }
+    .fest__cari { display: flex; flex: 1 1 18rem; gap: var(--space-2); }
+    .fest__cari .input { min-height: 2.75rem; border-radius: var(--radius-pill); }
+    .fest__info { flex-basis: 100%; min-height: 1.25rem; padding: 0 .75rem; font-size: .8125rem; font-weight: 600; color: var(--text-muted); }
+    .fest__info:empty { display: none; }
+    .fest__gerbang { position: relative; z-index: 5; margin: -3rem .75rem 0; padding: clamp(1.25rem, 4vw, 1.75rem); border-radius: 1.5rem; background: var(--surface); color: var(--text); box-shadow: 0 30px 60px -24px rgb(8 44 51 / .55); }
+    @media (min-width: 64rem) { .fest.is-locked .fest__stage { min-height: 50rem; } }
+    @media (min-width: 64rem) { .fest__gerbang { position: absolute; top: 50%; left: 50%; width: min(34rem, 92%); max-height: 92%; margin: 0; overflow: auto; transform: translate(-50%, -50%); } }
+    .fest:not(.is-locked) .fest__gerbang { display: none; }
+    .fest__gerbang h3 { display: flex; align-items: center; gap: .5rem; font-size: 1.375rem; }
+    .fest__gerbang h3 svg { width: 1.25rem; height: 1.25rem; color: var(--cta); }
+    .fest__gerbang > p { margin-top: .25rem; font-size: .9375rem; color: var(--text-muted); }
+    .fest__fields { display: grid; gap: var(--space-3); margin-top: var(--space-4); }
+    @media (min-width: 36rem) { .fest__fields { grid-template-columns: 1fr 1fr; } .fest__fields .field--wide { grid-column: 1 / -1; } }
+    .fest__kata { min-height: 3.5rem; font-size: 1.25rem; font-weight: 800; }
+    .fest-wa { display: grid; grid-template-columns: auto 1fr auto; gap: var(--space-3); align-items: center; margin-top: var(--space-4); padding: var(--space-3) var(--space-4); border: 2px dashed #25D366; border-radius: var(--radius); background: #F0FDF4; color: #14532D; text-decoration: none; transition: background var(--dur) var(--ease); }
+    .fest-wa:hover { background: #DCFCE7; }
+    .fest-wa__ico { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 50%; background: #25D366; color: #fff; }
+    .fest-wa__ico svg { width: 1.375rem; height: 1.375rem; }
+    .fest-wa small { display: block; font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #15803D; }
+    .fest-wa strong { display: block; }
+    .fest-wa span span { display: block; font-size: .8125rem; color: #166534; }
+    .fest-wa__cek { display: grid; place-items: center; width: 1.75rem; height: 1.75rem; border-radius: 50%; border: 2px solid #86EFAC; color: transparent; }
+    .fest-wa__cek svg { width: 1rem; height: 1rem; }
+    .fest-wa.is-done { border-style: solid; }
+    .fest-wa.is-done .fest-wa__cek { background: #16A34A; border-color: #16A34A; color: #fff; }
+    :root[data-theme="dark"] .fest-wa { background: #0F3B23; color: #DCFCE7; }
 
     /* ============ Forms (shared) ============ */
     .field { display: grid; gap: .375rem; }
@@ -1489,7 +1508,7 @@
           <ul class="keydates">
             <li>
               <svg aria-hidden="true"><use href="#i-calendar"/></svg>
-              <div><span>Kampanye</span><strong>Kirim Satu Kata</strong></div>
+              <div><span>Kampanye</span><strong>Festival Satu Kata</strong></div>
             </li>
             <li>
               <svg aria-hidden="true"><use href="#i-megaphone"/></svg>
@@ -1501,7 +1520,7 @@
             </li>
           </ul>
           <p class="countdown-card__foot" data-fase="pra">
-            Sambil menunggu, <a href="#satu-kata">kirim satu kata untuk Indonesia</a>, gratis.
+            Sambil menunggu, <a href="#satu-kata">masuk ke Festival Satu Kata</a> dan temukan namamu.
           </p>
         </div>
       </div>
@@ -1829,43 +1848,63 @@
       </div>
     </section>
 
-    <!-- ========== SATU KATA (kirim gratis, hasil terkunci sampai ikut saluran WA) ========== -->
+    <!-- ========== FESTIVAL SATU KATA (1 data = 1 warga; hasil terbuka setelah mengirim data + kata) ========== -->
     <section class="section deco-bg" id="satu-kata" aria-labelledby="sk-title">
       <div class="container">
-        <div class="harapan-card sk is-locked reveal" id="sk" data-lazy-bg>
-          <div class="sk__form">
-            <span class="badge" style="background:#FFD86B;color:#5B0A16;justify-self:start">#SatuKataUntukIndonesia</span>
-            <h2 id="sk-title">Satu Kata <span>untuk Indonesia</span></h2>
-            <p>Kirim satu kata harapanmu, <strong>gratis</strong>. Semua kata dirangkai jadi satu karya besar dan ditayangkan di layar acara YCS 2026.</p>
-            <form id="sk-form" novalidate>
-              <label class="visually-hidden" for="sk-kata">Satu kata harapanmu</label>
-              <div class="sk__row">
-                <input class="input sk__input" id="sk-kata" maxlength="20" placeholder="Contoh: berani" autocomplete="off" autocapitalize="none" spellcheck="false" aria-describedby="sk-msg">
-                <button class="btn btn--light" type="submit" id="sk-kirim">Kirim</button>
-              </div>
-              <label class="visually-hidden" for="sk-prov">Provinsi (opsional)</label>
-              <select class="select sk__select" id="sk-prov" style="margin-top:.5rem"><option value="">Dari provinsi mana? (opsional)</option></select>
-              <div hidden><label for="sk-website">Website</label><input id="sk-website" tabindex="-1" autocomplete="off"></div>
-              <p class="sk__msg" id="sk-msg" role="status"></p>
+        <div class="fest-head reveal">
+          <div>
+            <span class="badge" style="background:#FFD86B;color:#5B0A16">#SatuKataUntukIndonesia</span>
+            <h2 class="sec-title" id="sk-title" style="margin-top:.5rem">Festival <span class="scribble">Satu Kata</span></h2>
+            <p class="sec-sub">Satu orang, satu kata. Kirim data dan satu kata harapanmu, lalu masuklah ke Festival YCS di Bali: kamu hidup sebagai satu warga festival bersama ribuan pelajar se-Indonesia.</p>
+          </div>
+          <p class="fest-count"><strong id="fest-total">0</strong> warga festival</p>
+        </div>
+
+        <div class="fest is-locked" id="fest">
+          <div class="fest__stage">
+            <canvas id="fest-canvas" role="img" aria-label="Ilustrasi Festival YCS di Bali. Setiap orang kecil adalah satu pelajar yang sudah mengirim kata."></canvas>
+            <div class="fest__balon" id="fest-balon" aria-hidden="true">
+              <span class="fest__ava" id="fest-ava"></span>
+              <span><strong id="fest-nama"></strong><em id="fest-kata"></em><small id="fest-prov"></small></span>
+              <span class="fest__kamu" id="fest-kamu" hidden>Ini kamu!</span>
+            </div>
+          </div>
+          <div class="fest__alat" id="fest-alat">
+            <form class="fest__cari" id="fest-cari" role="search">
+              <label class="visually-hidden" for="fest-q">Cari nama di festival</label>
+              <input class="input" id="fest-q" placeholder="Cari namamu atau temanmu…" autocomplete="off">
+              <button class="btn btn--primary btn--sm" type="submit"><svg aria-hidden="true"><use href="#i-search"/></svg>Temukan</button>
             </form>
-            <p class="sk__count"><strong id="sk-total">–</strong> kata sudah terkumpul</p>
+            <button class="btn btn--cta btn--sm" type="button" id="fest-unduh"><svg aria-hidden="true"><use href="#i-download"/></svg>Unduh kartu</button>
+            <button class="btn btn--soft btn--sm" type="button" data-share-open="kata"><svg aria-hidden="true"><use href="#i-share"/></svg>Ajak teman</button>
+            <p class="fest__info" id="fest-info" role="status"></p>
           </div>
-          <div class="sk__result">
-            <div class="sk__cloud" id="sk-cloud" aria-hidden="true">
-              <span style="font-size:2.6rem">maju</span><span style="font-size:1.4rem">jujur</span><span style="font-size:2rem">damai</span><span style="font-size:1rem">peduli</span><span style="font-size:1.7rem">bersatu</span><span style="font-size:1.2rem">berani</span><span style="font-size:2.2rem">hebat</span><span style="font-size:1rem">adil</span><span style="font-size:1.5rem">cerdas</span><span style="font-size:1.1rem">toleran</span><span style="font-size:1.9rem">sejahtera</span><span style="font-size:1.2rem">mandiri</span>
+
+          <form class="fest__gerbang" id="fest-form" novalidate>
+            <h3><svg aria-hidden="true"><use href="#i-lock"/></svg>Festival masih terkunci</h3>
+            <p>Isi datamu dan kirim satu kata harapan untuk masuk. Kamu akan muncul sebagai satu warga di festival dan bisa menemukan namamu.</p>
+            <div class="fest__fields">
+              <div class="field field--wide"><label for="fk-nama">Nama</label><input class="input" id="fk-nama" required minlength="2" maxlength="60" autocomplete="name" placeholder="Contoh: Fauzan Rahman" aria-describedby="fk-nama-error"><p class="field__error" id="fk-nama-error"></p></div>
+              <div class="field field--wide"><label for="fk-sekolah">Sekolah</label><input class="input" id="fk-sekolah" required minlength="2" maxlength="100" placeholder="Contoh: SMAN 1 Semarang" aria-describedby="fk-sekolah-error"><p class="field__error" id="fk-sekolah-error"></p></div>
+              <div class="field"><label for="fk-prov">Provinsi</label><select class="select" id="fk-prov" required aria-describedby="fk-prov-error"><option value="">Pilih provinsi</option></select><p class="field__error" id="fk-prov-error"></p></div>
+              <div class="field"><label for="fk-email">Email</label><input class="input" type="email" id="fk-email" required maxlength="254" autocomplete="email" inputmode="email" placeholder="nama@email.com" aria-describedby="fk-email-error"><p class="field__error" id="fk-email-error"></p></div>
+              <div class="field field--wide"><label for="fk-kata">Satu kata harapanmu untuk Indonesia</label><input class="input fest__kata" id="fk-kata" required maxlength="20" placeholder="Contoh: sejahtera" autocomplete="off" autocapitalize="none" spellcheck="false" aria-describedby="fk-kata-error"><p class="field__error" id="fk-kata-error"></p></div>
             </div>
-            <div class="sk__lock" id="sk-lock">
-              <span class="sk__lock-ico" aria-hidden="true"><svg><use href="#i-lock"/></svg></span>
-              <strong>Hasilnya masih terkunci</strong>
-              <p>Penasaran kata apa yang paling banyak dikirim? Ikuti Saluran WhatsApp YCS untuk membuka awan kata lengkap dan mengunduh kartu katamu.</p>
-              <a class="btn btn--wa" id="sk-buka" href="https://whatsapp.com/channel/0029Vb5vVIaId7nEqecJ1I1G" target="_blank" rel="noopener" data-saluran><svg aria-hidden="true"><use href="#i-whatsapp"/></svg>Ikuti saluran &amp; buka hasil</a>
-              <small>Ketuk, ikuti saluran, lalu kembali ke halaman ini.</small>
-            </div>
-            <div class="sk__actions">
-              <button class="btn btn--light btn--sm" type="button" id="sk-unduh"><svg aria-hidden="true"><use href="#i-download"/></svg>Unduh kartu kata</button>
-              <button class="btn btn--ghost-light btn--sm" type="button" data-share-open="kata"><svg aria-hidden="true"><use href="#i-share"/></svg>Ajak teman</button>
-            </div>
-          </div>
+            <a class="fest-wa" id="fk-wa" href="https://whatsapp.com/channel/0029Vb5vVIaId7nEqecJ1I1G" target="_blank" rel="noopener" data-saluran aria-describedby="fk-wa-error">
+              <span class="fest-wa__ico" aria-hidden="true"><svg><use href="#i-whatsapp"/></svg></span>
+              <span><small>Syarat wajib</small><strong>Ikuti Saluran WhatsApp YCS</strong><span id="fk-wa-state">Ketuk kartu ini, syarat langsung tercentang</span></span>
+              <span class="fest-wa__cek" aria-hidden="true"><svg><use href="#i-check"/></svg></span>
+            </a>
+            <p class="field__error" id="fk-wa-error"></p>
+            <label class="check" for="fk-setuju" style="margin-top:1rem">
+              <input type="checkbox" id="fk-setuju" required aria-describedby="fk-setuju-error">
+              <span>Saya setuju data disimpan panitia sesuai <a href="privasi/" target="_blank">Kebijakan Privasi</a>. Nama panggilan, provinsi, dan kataku tampil di festival; email tidak pernah ditampilkan. Jika di bawah 18 tahun, saya sudah mendapat izin orang tua/wali.</span>
+            </label>
+            <p class="field__error" id="fk-setuju-error"></p>
+            <div hidden><label for="fk-website">Website</label><input id="fk-website" tabindex="-1" autocomplete="off"></div>
+            <p class="dk-alert" id="fk-alert" role="alert"></p>
+            <button class="btn btn--cta btn--block" type="submit" id="fk-kirim" style="margin-top:1rem">Kirim &amp; masuk festival <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+          </form>
         </div>
       </div>
     </section>
@@ -2008,7 +2047,7 @@
   <nav class="orb" id="orb" aria-label="Menu cepat">
     <span class="orb__hint" aria-hidden="true">Menu cepat</span>
     <ul class="orb__menu" id="orb-menu">
-      <li class="orb__item orb__item--tw"><a class="orb__link" href="#satu-kata" tabindex="-1"><svg aria-hidden="true"><use href="#i-chat"/></svg><span class="orb__label">Satu Kata<small>Kirim gratis</small></span></a></li>
+      <li class="orb__item orb__item--tw"><a class="orb__link" href="#satu-kata" tabindex="-1"><svg aria-hidden="true"><use href="#i-chat"/></svg><span class="orb__label">Satu Kata<small>Masuk festival</small></span></a></li>
       <li class="orb__item orb__item--live"><a class="orb__link" href="#live" id="orb-live" tabindex="-1"><svg aria-hidden="true"><use href="#i-play"/></svg><span class="orb__label">Tonton Live<small id="orb-live-sub">Jadwal siaran</small></span></a></li>
       <li class="orb__item orb__item--dana"><a class="orb__link" href="#dana" tabindex="-1"><svg aria-hidden="true"><use href="#i-gift"/></svg><span class="orb__label">Klaim Dana Kaget<small id="orb-dana-sub">Pakai kode akses</small></span></a></li>
       <li class="orb__item orb__item--wild"><a class="orb__link" href="klaim/" tabindex="-1"><svg aria-hidden="true"><use href="#i-ticket"/></svg><span class="orb__label">Klaim Wildcard<small id="orb-wild-sub">Untuk yang belum lolos</small></span></a></li>
@@ -2066,6 +2105,7 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+  <script src="assets/js/festival.js"></script>
   <script>
   (() => {
     'use strict';
@@ -2721,7 +2761,7 @@
       pasca: () => ({ url: tautan('share-finalis'), text: 'Pengumuman finalis YCS 2026 sudah rilis! Cek siapa saja yang melangkah ke Bali:' }),
       live: () => ({ url: tautan('share-live', '#live'), text: 'Jadwal live Youth Character Summit 2026, jangan sampai ketinggalan:' }),
       daftar: () => ({ url: tautan('share-daftar', '#delegasi'), text: 'Daftar finalis Youth Character Summit 2026. Ada nama temanmu?' }),
-      kata: () => ({ url: tautan('share-kata', '#satu-kata'), text: kataSaya ? `Aku kirim kata "${kataSaya}" untuk Indonesia. Kata apa yang paling banyak dikirim? Kirim katamu & buka hasilnya:` : 'Kirim satu kata untuk Indonesia, gratis! Penasaran hasilnya? Buka di sini:' }),
+      kata: () => ({ url: tautan('share-kata', '#satu-kata'), text: kataSaya ? `Aku sudah masuk Festival Satu Kata YCS 2026 dengan kata "${kataSaya}". Cari namaku, lalu masuk juga:` : 'Masuk ke Festival Satu Kata YCS 2026: kirim satu kata dan temukan dirimu di antara ribuan pelajar!' }),
     };
     // HP: langsung buka lembar bagikan bawaan (sudah berisi WhatsApp/Instagram). Desktop: dialog pilihan.
     function bagikan(data) {
@@ -2757,7 +2797,8 @@
 
     /* ---------- Wilayah (provinsi) ---------- */
     const isiProvinsi = () => fetch('assets/data/wilayah.json').then((r) => r.json()).then((data) => {
-      Object.keys(data).forEach((pv) => { $('#dk-prov').append(new Option(pv, pv)); $('#sk-prov').append(new Option(pv, pv)); });
+      Object.keys(data).forEach((pv) => { $('#dk-prov').append(new Option(pv, pv)); $('#fk-prov').append(new Option(pv, pv)); });
+      isiIdentitas();
     }).catch(() => {});
     (window.requestIdleCallback || ((fn) => setTimeout(fn, 1200)))(isiProvinsi);
     const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3 | 8)).toString(16); }));
@@ -2847,6 +2888,8 @@
         return;
       }
       dkSelesai = true;
+      simpanIdentitas({ nama: $('#dk-nama').value.trim(), sekolah: $('#dk-sekolah').value.trim(), provinsi: $('#dk-prov').value, email: $('#dk-email').value.trim() });
+      isiIdentitas();
       if (d.sisa != null) setKuotaDana(d.sisa, cfg && cfg.dana.kuota);
       dkShow('dk-sukses');
       $('#dk-sukses-judul').focus();
@@ -2854,129 +2897,186 @@
     const kodeUrl = new URLSearchParams(location.search).get('kode');
     if (kodeUrl) { $('#dk-kode').value = kodeUrl.slice(0, 40); setTimeout(() => bukaDanaDenganKode(kodeUrl.slice(0, 40)), 600); }
 
-    /* ---------- Satu Kata: kirim gratis, hasil dibuka dengan ikut saluran ---------- */
-    const sk = $('#sk');
+    /* ---------- Festival Satu Kata: 1 data = 1 warga di plaza Bali ---------- */
+    const fest = $('#fest');
+    const balon = $('#fest-balon');
     let kataSaya = '';
-    let dataKata = [];
-    try { kataSaya = localStorage.getItem('ycs_kata_saya') || ''; } catch (e) {}
-    const terbuka = () => { try { return localStorage.getItem('ycs_kata_buka') === '1'; } catch (e) { return false; } };
-    const setTerbuka = () => { try { localStorage.setItem('ycs_kata_buka', '1'); } catch (e) {} sk.classList.remove('is-locked'); $('#sk-cloud').setAttribute('aria-hidden', 'false'); if (typeof gambarAwan === 'function' && dataKata) gambarAwan(); };
-    if (terbuka()) setTerbuka();
-    function gambarAwan() {
-      const box = $('#sk-cloud');
-      let list = dataKata.slice(0, 70);
-      if (kataSaya && !list.some(([k]) => k === kataSaya)) list = [[kataSaya, 1], ...list];
-      if (!list.length) {
-        if (sk.classList.contains('is-locked')) return; // biarkan kata contoh yang buram sebagai pemancing rasa penasaran
-        box.innerHTML = '<p class="sk__empty">Belum ada kata. Jadilah yang pertama!</p>';
-        return;
-      }
-      const max = Math.max(...list.map(([, n]) => n)), min = Math.min(...list.map(([, n]) => n));
-      // Urutan diacak tetap (bukan per muatan) supaya kata besar tidak menumpuk di depan.
-      const acak = list.map((x, i) => [x, (i * 7919) % 97]).sort((a, b) => a[1] - b[1]).map(([x]) => x);
-      box.textContent = '';
-      acak.forEach(([k, n]) => {
-        const sp = document.createElement('span');
-        const t = max === min ? .5 : (Math.sqrt(n) - Math.sqrt(min)) / (Math.sqrt(max) - Math.sqrt(min));
-        sp.style.fontSize = (1 + t * 2.1).toFixed(2) + 'rem';
-        sp.textContent = k;
-        if (k === kataSaya) sp.className = 'is-mine';
-        box.append(sp);
-      });
+    let saya = null;
+    let balonWarga = null, balonSampai = 0;
+    let festApi = null;
+    try { saya = JSON.parse(localStorage.getItem('ycs_fest') || 'null'); } catch (e) { saya = null; }
+    if (saya) kataSaya = saya.k;
+
+    // Identitas tersimpan di perangkat agar form Dana Kaget & Festival tidak perlu diketik ulang.
+    function isiIdentitas() {
+      let d = null;
+      try { d = JSON.parse(localStorage.getItem('ycs_identitas') || 'null'); } catch (e) {}
+      if (!d) return;
+      [['nama', ['#fk-nama', '#dk-nama']], ['sekolah', ['#fk-sekolah', '#dk-sekolah']], ['email', ['#fk-email', '#dk-email']], ['provinsi', ['#fk-prov', '#dk-prov']]]
+        .forEach(([k, sels]) => sels.forEach((sel) => { const el = $(sel); if (el && !el.value && d[k]) el.value = d[k]; }));
     }
-    async function muatKata() {
+    const simpanIdentitas = (d) => { try { localStorage.setItem('ycs_identitas', JSON.stringify(d)); } catch (e) {} };
+
+    function bukaFestival() {
+      fest.classList.remove('is-locked');
+      $('#fest-canvas').setAttribute('aria-label', 'Festival YCS di Bali. Gunakan kolom pencarian untuk menemukan namamu.');
+    }
+    if (saya) bukaFestival();
+    if (window.YCSFestival) festApi = window.YCSFestival($('#fest-canvas'), { onFrame: () => posisikanBalon() });
+
+    function posisikanBalon() {
+      if (!festApi || !balonWarga) return;
+      const p = festApi.posisi(balonWarga);
+      if (!p) return;
+      const bw = balon.offsetWidth || 220;
+      const x = Math.max(bw / 2 + 8, Math.min(p.W - bw / 2 - 8, p.x));
+      balon.style.left = x + 'px';
+      balon.style.top = Math.max(balon.offsetHeight + 24, p.y) + 'px';
+      balon.style.setProperty('--ekor', `calc(50% + ${p.x - x}px)`);
+    }
+    // Satu balon dalam satu waktu: harapan tampil bergantian, tidak saling menumpuk.
+    function tampilBalon(w, lama) {
+      balon.classList.remove('is-on');
+      setTimeout(() => {
+        balonWarga = w;
+        balonSampai = Date.now() + (lama || 3000);
+        festApi.gambarAvatar($('#fest-ava'), w);
+        $('#fest-nama').textContent = w.n;
+        $('#fest-kata').textContent = w.k;
+        $('#fest-prov').textContent = w.p || '';
+        $('#fest-kamu').hidden = !(saya && w.n === saya.n && w.k === saya.k);
+        posisikanBalon();
+        balon.classList.add('is-on');
+      }, balonWarga ? 280 : 0);
+    }
+    setInterval(() => {
+      if (!festApi || fest.classList.contains('is-locked') || Date.now() < balonSampai || document.hidden) return;
+      const list = festApi.tampil;
+      if (!list.length) return;
+      // Utamakan warga yang terlihat jelas (barisan depan) agar balon terbaca.
+      const kandidat = list.slice(0, Math.max(8, Math.ceil(list.length * 0.6)));
+      let w = kandidat[Math.floor(Math.random() * kandidat.length)];
+      if (w === balonWarga && kandidat.length > 1) w = kandidat[(kandidat.indexOf(w) + 1) % kandidat.length];
+      tampilBalon(w, 3000);
+    }, 600);
+
+    async function muatFestival() {
       try {
         const r = await fetch(CONFIG.kataEndpoint, { headers: { Accept: 'application/json' }, cache: 'no-cache' });
         const d = await r.json();
         if (!d.ok) return;
-        dataKata = d.kata || [];
-        $('#sk-total').textContent = nf.format(d.total || 0);
-        gambarAwan();
-      } catch (e) { /* tetap tampilkan contoh */ }
+        const list = (d.orang || []).map(([n, k, pv]) => ({ n, k, p: pv }));
+        if (saya && !list.some((e) => e.n === saya.n && e.k === saya.k)) list.unshift(saya);
+        if (festApi) festApi.setWarga(list);
+        $('#fest-total').textContent = nf.format(Math.max(d.total || 0, list.length));
+      } catch (e) { /* tetap tampil latar festival */ }
     }
-    muatKata();
-    $('#sk-form').addEventListener('submit', async (e) => {
+    muatFestival();
+    setInterval(() => { if (!document.hidden && !fest.classList.contains('is-locked')) muatFestival(); }, 90000);
+
+    let waKlik = false;
+    try { waKlik = sessionStorage.getItem('ycs_wa') === '1'; } catch (e) {}
+    const tandaiWa = () => { $('#fk-wa').classList.add('is-done'); $('#fk-wa-state').textContent = 'Syarat terpenuhi. Jangan lupa tekan Ikuti di saluran.'; $('#fk-wa-error').textContent = ''; };
+    if (waKlik) tandaiWa();
+    $('#fk-wa').addEventListener('click', () => { waKlik = true; try { sessionStorage.setItem('ycs_wa', '1'); } catch (e) {} tandaiWa(); });
+
+    // Pesan error hilang begitu kolomnya diperbaiki.
+    $('#fest-form').addEventListener('input', (e) => { const err = e.target.id && $('#' + e.target.id + '-error'); if (err) { err.textContent = ''; e.target.removeAttribute('aria-invalid'); } $('#fk-alert').textContent = ''; });
+    $('#dk-step1').addEventListener('input', (e) => { const err = e.target.id && $('#' + e.target.id + '-error'); if (err) { err.textContent = ''; e.target.removeAttribute('aria-invalid'); } });
+    $('#fest-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const msg = $('#sk-msg');
-      const kata = $('#sk-kata').value.trim();
-      msg.classList.remove('is-ok');
-      if (!/^[A-Za-zÀ-ɏ-]{2,20}$/.test(kata)) { msg.textContent = 'Tulis satu kata saja (2–20 huruf, tanpa spasi atau angka).'; $('#sk-kata').focus(); return; }
-      const btn = $('#sk-kirim');
+      const kata = $('#fk-kata').value.trim();
+      const cek = [
+        ['fk-nama', $('#fk-nama').value.trim().length >= 2, 'Isi nama minimal 2 karakter.'],
+        ['fk-sekolah', $('#fk-sekolah').value.trim().length >= 2, 'Isi nama sekolah.'],
+        ['fk-prov', !!$('#fk-prov').value, 'Pilih provinsi.'],
+        ['fk-email', /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test($('#fk-email').value.trim()), 'Isi email yang valid, contoh: nama@email.com.'],
+        ['fk-kata', /^[A-Za-zÀ-ɏ-]{2,20}$/.test(kata), 'Tulis satu kata saja (2–20 huruf, tanpa spasi atau angka).'],
+        ['fk-wa', waKlik, 'Ketuk kartu Saluran WhatsApp terlebih dahulu.'],
+        ['fk-setuju', $('#fk-setuju').checked, 'Centang persetujuan untuk melanjutkan.'],
+      ];
+      let first = null;
+      cek.forEach(([id, ok, msg]) => { $('#' + id + '-error').textContent = ok ? '' : msg; $('#' + id).setAttribute('aria-invalid', String(!ok)); if (!ok && !first) first = $('#' + id); });
+      if (first) { first.focus(); return; }
+      const ident = { nama: $('#fk-nama').value.trim(), sekolah: $('#fk-sekolah').value.trim(), provinsi: $('#fk-prov').value, email: $('#fk-email').value.trim() };
+      const btn = $('#fk-kirim');
       sibuk(btn, true);
-      const d = await kirimJson(CONFIG.kataEndpoint, { aksi: 'kirim', kata, provinsi: $('#sk-prov').value, requestId: uuid(), perangkat, ref: sumber, website: $('#sk-website').value });
+      const d = await kirimJson(CONFIG.kataEndpoint, { aksi: 'kirim', kata, ...ident, channelClicked: true, consent: true, requestId: uuid(), perangkat, ref: sumber, website: $('#fk-website').value });
       sibuk(btn, false);
       if (!d.ok) {
-        msg.textContent = { kata_ditolak: 'Kata ini tidak bisa ditampilkan. Coba kata positif lain, ya.', terlalu_banyak: 'Kamu sudah mengirim banyak kata. Coba lagi nanti.', validation: 'Tulis satu kata saja, tanpa spasi.' }[d.error] || 'Koneksi bermasalah. Coba kirim lagi.';
+        $('#fk-alert').textContent = { kata_ditolak: 'Kata ini tidak bisa ditampilkan. Coba kata positif lain, ya.', nama_ditolak: 'Nama ini tidak bisa ditampilkan. Gunakan nama aslimu.', terlalu_banyak: 'Terlalu banyak kiriman dari jaringan ini. Coba lagi nanti.', validation: 'Ada data yang belum sesuai. Periksa lagi isianmu.' }[d.error] || 'Koneksi bermasalah. Coba kirim lagi.';
         return;
       }
-      kataSaya = d.kata;
-      try { localStorage.setItem('ycs_kata_saya', kataSaya); } catch (er) {}
-      $('#sk-kata').value = '';
-      $('#sk-total').textContent = nf.format((Number(($('#sk-total').textContent || '0').replace(/\D/g, '')) || 0) + (d.duplicate ? 0 : 1));
-      const sama = dataKata.find(([k]) => k === kataSaya);
-      if (sama) sama[1]++; else dataKata.push([kataSaya, 1]);
-      gambarAwan();
-      msg.classList.add('is-ok');
-      msg.textContent = terbuka() ? `Kata "${kataSaya}" sudah masuk! Lihat di awan kata.` : `Kata "${kataSaya}" sudah masuk! Buka hasilnya untuk melihat posisinya.`;
-      if (!terbuka()) $('#sk-buka').focus();
+      saya = d.entri;
+      kataSaya = saya.k;
+      try { localStorage.setItem('ycs_fest', JSON.stringify(saya)); } catch (er) {}
+      simpanIdentitas(ident);
+      isiIdentitas();
+      bukaFestival();
+      const w = festApi ? festApi.tambah(saya) : null;
+      $('#fest-total').textContent = nf.format(Math.max(festApi ? festApi.jumlah : 1, Number(($('#fest-total').textContent || '0').replace(/\D/g, '')) + (d.sudah ? 0 : 1)));
+      $('#fest-info').textContent = d.sudah ? `Kamu sudah ada di festival sebagai "${saya.n}" dengan kata "${saya.k}".` : `Selamat datang di festival, ${saya.n}! Itu kamu yang ditandai.`;
+      document.getElementById('satu-kata').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+      if (w) setTimeout(() => { festApi.sorot(w, 10000); tampilBalon(w, 9000); }, 500);
     });
-    // Klik tombol saluran = membuka saluran di tab baru, lalu hasil terbuka (sama seperti syarat unduh twibbon sebelumnya).
-    $('#sk-buka').addEventListener('click', () => { setTimeout(setTerbuka, 600); toast('Terima kasih! Jangan lupa tekan "Ikuti" di saluran. Hasil sudah terbuka.'); });
 
-    // Kartu kata 1080×1350 untuk diunduh & dibagikan.
-    $('#sk-unduh').addEventListener('click', async () => {
+    let hasilCari = [], posCari = 0, qTerakhir = '';
+    $('#fest-cari').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const q = $('#fest-q').value.trim();
+      const info = $('#fest-info');
+      if (q.length < 2) { info.textContent = 'Ketik minimal 2 huruf nama.'; return; }
+      if (q !== qTerakhir) { hasilCari = festApi ? festApi.cari(q) : []; posCari = 0; qTerakhir = q; }
+      if (!hasilCari.length) { info.textContent = `"${q}" belum ada di festival. Ajak dia kirim satu kata!`; return; }
+      const w = hasilCari[posCari % hasilCari.length];
+      info.textContent = `Ketemu: ${w.n} (${w.k})` + (hasilCari.length > 1 ? ` · ${posCari % hasilCari.length + 1} dari ${hasilCari.length}, tekan Temukan lagi untuk berikutnya` : '');
+      posCari++;
+      festApi.sorot(w, 10000);
+      tampilBalon(w, 9000);
+    });
+
+    // Kartu festival 1080×1350: potongan panggung + kata milikmu.
+    $('#fest-unduh').addEventListener('click', async () => {
       if (document.fonts) await Promise.all([document.fonts.load('400 80px "Permanent Marker"'), document.fonts.load('800 60px "Plus Jakarta Sans"')]).catch(() => {});
       const W = 1080, H = 1350, c = document.createElement('canvas');
       c.width = W; c.height = H;
       const x = c.getContext('2d');
       const g = x.createLinearGradient(0, 0, W, H);
-      g.addColorStop(0, '#6E0819'); g.addColorStop(.55, '#C8102E'); g.addColorStop(1, '#E0571F');
+      g.addColorStop(0, '#0B3B44'); g.addColorStop(1, '#082C33');
       x.fillStyle = g; x.fillRect(0, 0, W, H);
       x.textAlign = 'center';
-      x.fillStyle = '#FFD86B'; x.font = '800 34px "Plus Jakarta Sans", sans-serif';
-      x.fillText('#SATUKATAUNTUKINDONESIA', W / 2, 110);
-      x.fillStyle = '#fff'; x.font = '400 70px "Permanent Marker", cursive';
-      x.fillText('Satu Kata untuk Indonesia', W / 2, 205, W - 120);
-      if (kataSaya) {
-        x.fillStyle = 'rgba(255,255,255,.85)'; x.font = '700 36px "Plus Jakarta Sans", sans-serif';
-        x.fillText('Kataku', W / 2, 300);
-        x.font = '800 120px "Plus Jakarta Sans", sans-serif';
-        const lebar = Math.min(W - 160, x.measureText(kataSaya).width + 90);
-        x.fillStyle = "#FFD86B"; x.beginPath(); if (x.roundRect) x.roundRect((W - lebar) / 2, 320, lebar, 160, 36); else x.rect((W - lebar) / 2, 320, lebar, 160); x.fill();
-        x.fillStyle = '#7A0A1C'; x.fillText(kataSaya, W / 2, 445, W - 220);
+      x.fillStyle = '#FFD86B'; x.font = '800 32px "Plus Jakarta Sans", sans-serif';
+      x.fillText('#SATUKATAUNTUKINDONESIA', W / 2, 90);
+      x.fillStyle = '#fff'; x.font = '400 66px "Permanent Marker", cursive';
+      x.fillText('Festival Satu Kata YCS 2026', W / 2, 175, W - 100);
+      const saw = saya && festApi ? festApi.tampil.find((w) => w.n === saya.n && w.k === saya.k) : null;
+      if (saw) festApi.sorot(saw, 4000);
+      await new Promise((r) => setTimeout(r, 120));
+      const src = $('#fest-canvas');
+      const tw = W - 100, th = 620, r = Math.max(tw / src.width, th / src.height);
+      x.save();
+      x.beginPath(); if (x.roundRect) x.roundRect(50, 220, tw, th, 36); else x.rect(50, 220, tw, th); x.clip();
+      x.drawImage(src, 50 + (tw - src.width * r) / 2, 220 + (th - src.height * r) / 2, src.width * r, src.height * r);
+      x.restore();
+      if (saya) {
+        x.fillStyle = 'rgba(255,255,255,.8)'; x.font = '700 34px "Plus Jakarta Sans", sans-serif';
+        x.fillText(`${saya.n} · ${saya.p}`, W / 2, 935);
+        x.font = '800 116px "Plus Jakarta Sans", sans-serif';
+        const lebar = Math.min(W - 140, x.measureText(saya.k).width + 90);
+        x.fillStyle = '#FFC93C'; x.beginPath(); if (x.roundRect) x.roundRect((W - lebar) / 2, 970, lebar, 150, 36); else x.rect((W - lebar) / 2, 970, lebar, 150); x.fill();
+        x.fillStyle = '#082C33'; x.fillText(saya.k, W / 2, 1088, W - 200);
       }
-      // Awan kata: penempatan spiral sederhana dengan deteksi tabrakan kotak.
-      const top = (kataSaya ? 560 : 330), bawah = H - 170, cx = W / 2, cy = (top + bawah) / 2;
-      const kotak = [];
-      const list = dataKata.filter(([k]) => k !== kataSaya).slice(0, 45);
-      const max = Math.max(1, ...list.map(([, n]) => n));
-      const warna = ['#FFFFFF', '#FFD86B', '#FFC2CB'];
-      list.forEach(([k, n], i) => {
-        const fs = Math.round(30 + Math.sqrt(n / max) * 62);
-        x.font = `800 ${fs}px "Plus Jakarta Sans", sans-serif`;
-        const w = x.measureText(k).width + 18, h = fs * 1.05;
-        for (let t = 0; t < 900; t++) {
-          const a = t * .35, r = 6 * a;
-          const px = cx + r * Math.cos(a) * 1.4 - w / 2, py = cy + r * Math.sin(a) - h / 2;
-          if (px < 50 || px + w > W - 50 || py < top || py + h > bawah) continue;
-          if (kotak.some((b) => px < b[0] + b[2] && px + w > b[0] && py < b[1] + b[3] && py + h > b[1])) continue;
-          kotak.push([px, py, w, h]);
-          x.fillStyle = warna[i % 3];
-          x.fillText(k, px + w / 2, py + h * .8);
-          break;
-        }
-      });
       x.fillStyle = 'rgba(255,255,255,.9)'; x.font = '700 30px "Plus Jakarta Sans", sans-serif';
-      x.fillText('Youth Character Summit 2026', W / 2, H - 95);
-      x.fillStyle = 'rgba(255,255,255,.7)'; x.font = '600 26px "Plus Jakarta Sans", sans-serif';
-      x.fillText(location.host + '/#satu-kata', W / 2, H - 55);
+      x.fillText(`Aku salah satu dari ${$('#fest-total').textContent} warga festival`, W / 2, 1200);
+      x.fillStyle = 'rgba(255,255,255,.65)'; x.font = '600 26px "Plus Jakarta Sans", sans-serif';
+      x.fillText(location.host + '/#satu-kata', W / 2, 1260);
       c.toBlob((blob) => {
         if (!blob) return;
         const url = URL.createObjectURL(blob);
-        const a = Object.assign(document.createElement('a'), { href: url, download: `satu-kata-ycs2026${kataSaya ? '-' + kataSaya : ''}.png` });
+        const a = Object.assign(document.createElement('a'), { href: url, download: `festival-ycs2026${saya ? '-' + saya.k : ''}.png` });
         document.body.append(a); a.click(); a.remove();
         setTimeout(() => URL.revokeObjectURL(url), 2000);
-        toast('Kartu kata diunduh. Bagikan ke story dan ajak temanmu!');
+        toast('Kartu festival diunduh. Bagikan ke story dan ajak temanmu masuk!');
       }, 'image/png');
     });
 

@@ -168,24 +168,27 @@ test('pop-up informasi: hanya tampil di config bila aktif, link tujuan divalidas
   assert.equal(pop.link, '/dana-kaget/');
 });
 
-test('Satu Kata: satu kata saja, kata kasar ditolak, dedup, awan kata + statistik provinsi', () => {
+test('Satu Kata: wajib identitas + saluran, 1 email = 1 orang, kata kasar ditolak, warga festival publik tanpa email', () => {
   const app = muat({now: Date.parse('2026-11-10T09:00:00+07:00')});
   app.get('siapkan');
-  const kirim = (kata, extra = {}) => app.post({aksi: 'kata-kirim', kata, requestId: crypto.randomUUID(), ipHash: 'ip-' + kata, ...extra});
-  assert.equal(kirim('dua kata').error, 'validation');
-  assert.equal(kirim('Anjing').error, 'kata_ditolak');
-  assert.equal(kirim('goblokk').error, 'kata_ditolak');
-  assert.equal(kirim('Berani!', {provinsi: 'Jawa Tengah'}).kata, 'berani');
-  kirim('berani', {provinsi: 'Jawa Tengah'}); kirim('jujur', {provinsi: 'Bali'});
-  const id = crypto.randomUUID();
-  app.post({aksi: 'kata-kirim', kata: 'damai', requestId: id});
-  assert.equal(app.post({aksi: 'kata-kirim', kata: 'damai', requestId: id}).duplicate, true);
+  let i = 0;
+  const id = (extra = {}) => ({aksi: 'kata-kirim', nama: 'Fauzan Rahman', sekolah: 'SMAN 1', email: `f${++i}@mail.com`, provinsi: 'Jawa Tengah', channelClicked: true, consent: true, requestId: crypto.randomUUID(), ipHash: 'ip' + i, ...extra});
+  assert.equal(app.post(id({kata: 'berani', channelClicked: false})).error, 'validation', 'wajib klik saluran');
+  assert.equal(app.post(id({kata: 'berani', email: 'bukan'})).error, 'validation');
+  assert.equal(app.post(id({kata: 'dua kata'})).error, 'validation');
+  assert.equal(app.post(id({kata: 'Anjing'})).error, 'kata_ditolak');
+  const r = app.post(id({kata: 'Sejahtera!', email: 'fauzan@mail.com'}));
+  assert.deepEqual(r.entri, {n: 'Fauzan R.', k: 'sejahtera', p: 'Jawa Tengah'});
+  const lagi = app.post(id({kata: 'maju', email: 'FAUZAN@mail.com'}));
+  assert.equal(lagi.sudah, true, 'email sama = orang yang sama');
+  assert.equal(lagi.entri.k, 'sejahtera');
+  app.post(id({kata: 'sejahtera', nama: 'sinta', provinsi: 'Bali'}));
   const k = app.get('kata');
-  assert.equal(k.total, 4);
-  assert.deepEqual(k.kata[0], ['berani', 2]);
-  const st = app.get('stats');
-  assert.equal(st.road.current, 4);
-  assert.deepEqual(st.provinsi[0], {nama: 'Jawa Tengah', jumlah: 2});
+  assert.equal(k.total, 2);
+  assert.deepEqual(k.kata[0], ['sejahtera', 2]);
+  assert.deepEqual(k.orang[0], ['Sinta', 'sejahtera', 'Bali'], 'terbaru lebih dulu');
+  assert.ok(!JSON.stringify(k).includes('@'), 'email tidak bocor');
+  assert.equal(app.get('stats').road.current, 2);
 });
 
 test('Dana Kaget: identitas cukup nama, sekolah, provinsi, email', () => {

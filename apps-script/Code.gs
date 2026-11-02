@@ -4,7 +4,7 @@ const HEADERS_LAMA = ['Waktu', 'ID permintaan', 'Nama', 'Sekolah', 'Email', 'Bin
 const HEADERS = HEADERS_LAMA.concat(['Kota/Kabupaten', 'Provinsi']);
 const REKAP_NAME = 'Rekap';
 const REKAP_VERSI = '3';
-const SKEMA_VERSI = '4';
+const SKEMA_VERSI = '5';
 const WIB = 7 * 3600 * 1000;
 
 const TAB = {
@@ -18,7 +18,7 @@ const KOLOM = {
   kode: ['Kode', 'Email', 'Nama', 'Status', 'Berlaku hingga (WIB)', 'Waktu klaim', 'Percobaan salah', 'Catatan'],
   dana: ['Waktu', 'ID permintaan', 'Nama', 'Email', 'Nomor WhatsApp', 'Sekolah', 'Kota/Kabupaten', 'Provinsi', 'Sumber'],
   survei: ['Waktu', 'ID permintaan', 'Destinasi pilihan', 'Kegiatan favorit', 'Waktu ideal', 'Status', 'Provinsi', 'Destinasi impian lain', 'Email', 'Sumber'],
-  kata: ['Waktu', 'ID permintaan', 'Kata', 'Provinsi', 'Sumber', 'Tampil'],
+  kata: ['Waktu', 'ID permintaan', 'Kata', 'Provinsi', 'Sumber', 'Tampil', 'Nama', 'Sekolah', 'Email', 'Klik saluran WhatsApp'],
   log: ['Waktu', 'Aksi', 'Detail']
 };
 const STATUS_KODE = {belum: 'belum klaim', sudah: 'sudah klaim', hangus: 'hangus'};
@@ -262,6 +262,9 @@ function siapkanSkema_(ss) {
   if (live.getLastRow() < 2 && !props.getProperty('live_diisi')) live.getRange(2, 1, LIVE_AWAL.length, 7).setNumberFormat('@').setValues(LIVE_AWAL);
   props.setProperty('live_diisi', '1');
   ['finalis', 'kode', 'dana', 'survei', 'kata', 'log'].forEach(k => tab_(ss, k));
+  // Tab Satu Kata lama (6 kolom) mendapat kolom identitas di belakang; data lama tidak bergeser.
+  const kt = tab_(ss, 'kata');
+  kt.getRange(1, 1, 1, KOLOM.kata.length).setValues([KOLOM.kata]).setFontWeight('bold').setFontColor('#FFFFFF').setBackground('#0E5A66');
   if (!props.getProperty('ADMIN_HASH')) {
     const sandi = acak_(4) + '-' + acak_(4) + '-' + acak_(4);
     aturSandi_(sandi);
@@ -372,18 +375,38 @@ function kataDiblokir_(k, cfg) {
   const ekstra = String(cfg.kata_blokir || '').toLowerCase().split(',').map(x => x.trim()).filter(Boolean);
   return KATA_KASAR.concat(ekstra).some(b => k === b || (b.length >= 4 && k.indexOf(b) >= 0));
 }
+// Nama publik: nama depan + inisial nama kedua (mis. "Fauzan R."). Email tidak pernah ditampilkan.
+function namaTampil_(nama) {
+  const k = String(nama || '').trim().split(/\s+/).filter(Boolean);
+  if (!k.length) return 'Sahabat YCS';
+  const besar = w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+  return besar(k[0]).slice(0, 20) + (k[1] ? ' ' + k[1].charAt(0).toUpperCase() + '.' : '');
+}
+function entriKata_(r) {
+  return {n: namaTampil_(r[6]), k: String(r[2] || ''), p: String(r[3] || '')};
+}
+// Satu Kata = satu orang: wajib identitas (seperti twibbon dulu) + klik saluran WhatsApp; satu email satu kata.
 function kataKirim_(p) {
   const cfg = bacaPengaturan_();
   const kata = teks_(p.kata, 30).toLowerCase().replace(/[^a-z\u00c0-\u024f-]/g, '');
+  const nama = teks_(p.nama, 60), sekolah = teks_(p.sekolah, 100), email = teks_(p.email, 254).toLowerCase();
   const prov = teks_(p.provinsi, 40), ref = teks_(p.ref, 40).replace(/[^\w-]/g, '');
-  if (!/^[a-z\u00c0-\u024f-]{2,20}$/.test(kata) || /\s/.test(teks_(p.kata, 30)) || !/^[a-f0-9-]{36}$/i.test(p.requestId || '') || p.website) return {ok: false, error: 'validation'};
+  if (!/^[a-z\u00c0-\u024f-]{2,20}$/.test(kata) || /\s/.test(teks_(p.kata, 30)) || nama.length < 2 || sekolah.length < 2 || !emailValid_(email) || !prov || p.channelClicked !== true || p.consent !== true || !/^[a-f0-9-]{36}$/i.test(p.requestId || '') || p.website) return {ok: false, error: 'validation'};
   if (kataDiblokir_(kata, cfg)) return {ok: false, error: 'kata_ditolak'};
+  if (namaTampil_(nama).toLowerCase().split(/[\s.]+/).some(w => w.length > 1 && KATA_KASAR.indexOf(w) >= 0)) return {ok: false, error: 'nama_ditolak'};
   if (batasKirim_('kata', p, 10)) return {ok: false, error: 'terlalu_banyak'};
   return kunci_(LockService.getScriptLock(), () => {
     const sheet = tab_(ss_(), 'kata');
-    if (sheet.getLastRow() > 1 && sheet.getRange(2, 2, sheet.getLastRow() - 1, 1).createTextFinder(p.requestId).matchEntireCell(true).findNext()) return {ok: true, kata: kata, duplicate: true};
-    sheet.appendRow([teksWib_(Date.now()), p.requestId, kata, cleanCell_(prov), ref || 'web', 'YA']);
-    return {ok: true, kata: kata};
+    const last = sheet.getLastRow();
+    if (last > 1) {
+      const dup = sheet.getRange(2, 2, last - 1, 1).createTextFinder(p.requestId).matchEntireCell(true).findNext()
+        || sheet.getRange(2, 9, last - 1, 1).createTextFinder(email).matchEntireCell(true).matchCase(false).findNext();
+      if (dup) return {ok: true, sudah: true, entri: entriKata_(sheet.getRange(dup.getRow(), 1, 1, 10).getValues()[0])};
+    }
+    const baris = [teksWib_(Date.now()), p.requestId, kata, cleanCell_(prov), ref || 'web', 'YA', cleanCell_(nama), cleanCell_(sekolah), cleanCell_(email), 'Ya'];
+    sheet.appendRow(baris);
+    cache_().remove('kata');
+    return {ok: true, entri: entriKata_(baris)};
   });
 }
 function kataPublik_() {
@@ -394,16 +417,20 @@ function kataPublik_() {
   const n = sheet.getLastRow() - 1;
   const hit = {};
   let total = 0;
-  if (n > 0) sheet.getRange(2, 1, n, 6).getValues().forEach(r => {
+  const orang = [];
+  if (n > 0) sheet.getRange(2, 1, n, 10).getValues().forEach(r => {
     if (String(r[5]).toUpperCase() === 'TIDAK') return;
     const k = String(r[2] || '').trim().toLowerCase();
     if (!k) return;
     total++;
     hit[k] = (hit[k] || 0) + 1;
+    const e = entriKata_(r);
+    orang.push([e.n, e.k, e.p]);
   });
   const kata = Object.keys(hit).map(k => [k, hit[k]]).sort((a, b) => b[1] - a[1]).slice(0, 150);
-  const out = {ok: true, total: total, kata: kata, diperbarui: isoWib_(Date.now())};
-  c.put('kata', JSON.stringify(out), 60);
+  // Warga festival: maksimal 2.000 terbaru (terbaru lebih dulu).
+  const out = {ok: true, total: total, kata: kata, orang: orang.reverse().slice(0, 2000), diperbarui: isoWib_(Date.now())};
+  try { c.put('kata', JSON.stringify(out), 60); } catch (e) { /* lebih dari batas cache: dilayani dari CDN */ }
   return out;
 }
 function urlFoto_(u) {
