@@ -89,7 +89,7 @@ function seed(p, res) {
     const prov = ['Jawa Tengah', 'Bali', 'Jawa Timur', 'DI Yogyakarta', 'Jawa Barat', 'Sulawesi Selatan', 'DKI Jakarta'];
     for (let i = 0; i < p.kata; i++) {
       const nama = depan[i % depan.length] + ' ' + belakang[(i * 7) % belakang.length];
-      kt.rows.push(['2026-11-01 10:00', 'k-' + i, kata[(i * 3) % kata.length], prov[(i * 5) % prov.length], 'web', 'YA', nama.trim(), 'SMA ' + (i % 30 + 1), `w${i}@mail.com`, 'Ya']);
+      kt.rows.push(['2026-11-01 10:00', 'k-' + i, kata[(i * 3) % kata.length], prov[(i * 5) % prov.length], 'web', 'YA', nama.trim(), 'SMA ' + (i % 30 + 1), `w${i}@mail.com`, 'Ya', (i % 10) + 1]);
     }
   }
   app.cache.clear();

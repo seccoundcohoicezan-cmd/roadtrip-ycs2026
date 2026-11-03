@@ -1,5 +1,5 @@
 const {upstreamGet, postHandler, send} = require('./_lib');
-const kirim = postHandler({kirim: 'kata-kirim'}, ['kata', 'nama', 'sekolah', 'email', 'provinsi', 'channelClicked', 'consent', 'ref', 'requestId', 'website', 'perangkat']);
+const kirim = postHandler({kirim: 'kata-kirim'}, ['kata', 'karakter', 'nama', 'sekolah', 'email', 'provinsi', 'channelClicked', 'consent', 'ref', 'requestId', 'website', 'perangkat']);
 // GET: awan kata Satu Kata (cache CDN 1 menit). POST: kirim satu kata.
 module.exports = async function handler(req, res) {
   if (req.method === 'POST') return kirim(req, res);
