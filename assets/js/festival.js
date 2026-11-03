@@ -18,7 +18,30 @@
     { id: 8, nama: 'Bugis (Baju Bodo)', kepala: 'sanggul-emas', wk: '#1A1A1A', wk2: '#E8B923', rambut: 'sanggul', atas: { warna: '#EC4899', model: 'bodo' }, bawah: { tipe: 'kain', warna: '#6D28D9', warna2: '#22C55E', pola: 'kotak' } },
     { id: 9, nama: 'Melayu (Teluk Belanga)', kepala: 'songkok', wk: '#111111', wk2: '#111111', rambut: 'pendek', atas: { warna: '#0F766E', model: 'kurung' }, bawah: { tipe: 'celana', warna: '#0F766E' }, samping: { warna: '#C9A227', warna2: '#8A6D12' } },
     { id: 10, nama: 'Papua (Bulu Cenderawasih)', kepala: 'mahkota', wk: '#F59E0B', wk2: '#DC2626', rambut: 'pendek', atas: { warna: '#B45309', model: 'rompi', aksen: '#FDE047', aksen2: '#DC2626', dalam: null }, bawah: { tipe: 'rumbai', warna: '#B08A4A', warna2: '#7C5A2A' }, noken: '#8B5E34' },
+    { id: 11, nama: 'Aceh (Ulee Balang)', kepala: 'meukeutop', wk: '#B91C1C', wk2: '#E8B923', rambut: 'pendek', atas: { warna: '#111111', model: 'beskap', aksen: '#E8B923' }, bawah: { tipe: 'celana', warna: '#111111' }, samping: { warna: '#C9A227', warna2: '#7F1D1D' } },
+    { id: 12, nama: 'Betawi (Sadariah)', kepala: 'peci', wk: '#111111', wk2: '#111111', rambut: 'pendek', atas: { warna: '#FFFFFF', model: 'kemeja' }, bawah: { tipe: 'celana', warna: '#1F2937' }, selempang: ['#15803D', '#B91C1C', '#FDE047'] },
+    { id: 13, nama: 'Sunda (Pangsi)', kepala: 'iket', wk: '#6B4423', wk2: '#E9D8B4', rambut: 'pendek', atas: { warna: '#111111', model: 'kurung' }, bawah: { tipe: 'celana', warna: '#111111' }, sabuk: '#B45309' },
+    { id: 14, nama: 'Madura (Sakera)', kepala: 'odheng', wk: '#B91C1C', wk2: '#111111', rambut: 'pendek', atas: { warna: '#FFFFFF', model: 'kemeja', pola: 'garis', warna2: '#DC2626' }, bawah: { tipe: 'celana', warna: '#111111' }, sabuk: '#7C2D12' },
+    { id: 15, nama: 'Lampung (Tulang Bawang)', kepala: 'siger', wk: '#E8B923', wk2: '#B45309', rambut: 'sanggul', atas: { warna: '#FFFFFF', model: 'kurung', aksen: '#E8B923' }, bawah: { tipe: 'kain', warna: '#B91C1C', warna2: '#E8B923', pola: 'songket' } },
+    { id: 16, nama: 'Palembang (Aesan Gede)', kepala: 'siger', wk: '#E8B923', wk2: '#B91C1C', rambut: 'sanggul', atas: { warna: '#991B1B', model: 'kurung', aksen: '#E8B923' }, bawah: { tipe: 'kain', warna: '#C9A227', warna2: '#7F1D1D', pola: 'songket' } },
+    { id: 17, nama: 'Sasak (Pegon)', kepala: 'iket', wk: '#111111', wk2: '#E8B923', rambut: 'pendek', atas: { warna: '#111111', model: 'beskap', aksen: '#E8B923' }, bawah: { tipe: 'kain', warna: '#111111', warna2: '#C9A227', pola: 'songket' } },
+    { id: 18, nama: 'NTT (Tenun Ikat)', kepala: 'langga', wk: '#D6B370', wk2: '#7C5A2A', rambut: 'pendek', atas: { warna: '#FFFFFF', model: 'kemeja' }, bawah: { tipe: 'kain', warna: '#7F1D1D', warna2: '#111111', pola: 'garis' }, selempang: ['#7F1D1D', '#111111', '#FDE047'] },
+    { id: 19, nama: 'Banjar (Bagajah Gamuling)', kepala: 'sanggul-emas', wk: '#1A1A1A', wk2: '#E8B923', rambut: 'sanggul', atas: { warna: '#EAB308', model: 'kurung', aksen: '#B45309' }, bawah: { tipe: 'kain', warna: '#CA8A04', warna2: '#7C2D12', pola: 'songket' } },
+    { id: 20, nama: 'Minahasa (Laku Tepu)', kepala: 'peci', wk: '#CA8A04', wk2: '#CA8A04', rambut: 'pendek', atas: { warna: '#EAB308', model: 'kurung' }, bawah: { tipe: 'celana', warna: '#CA8A04' }, sabuk: '#7C2D12' },
+    { id: 21, nama: 'Gorontalo (Biliu)', kepala: 'sanggul-emas', wk: '#1A1A1A', wk2: '#E8B923', rambut: 'sanggul', atas: { warna: '#7C3AED', model: 'kurung', aksen: '#E8B923' }, bawah: { tipe: 'kain', warna: '#6D28D9', warna2: '#E8B923', pola: 'songket' } },
+    { id: 22, nama: 'Maluku (Baju Cele)', kepala: 'peci', wk: '#111111', wk2: '#111111', rambut: 'pendek', atas: { warna: '#DC2626', model: 'kemeja', pola: 'kotak', warna2: '#FFFFFF' }, bawah: { tipe: 'celana', warna: '#111111' } },
+    { id: 23, nama: 'Buton (Babu Nggawi)', kepala: 'sanggul-emas', wk: '#1A1A1A', wk2: '#E8B923', rambut: 'sanggul', atas: { warna: '#111111', model: 'kurung', aksen: '#E8B923' }, bawah: { tipe: 'kain', warna: '#111111', warna2: '#C9A227', pola: 'songket' } },
+    { id: 24, nama: 'Jambi (Kurung Tanggung)', kepala: 'tengkuluk', wk: '#B91C1C', wk2: '#E8B923', rambut: 'sanggul', atas: { warna: '#B91C1C', model: 'kurung', aksen: '#E8B923' }, bawah: { tipe: 'kain', warna: '#7F1D1D', warna2: '#E8B923', pola: 'songket' } },
   ];
+  // Karakter bawaan per provinsi (otomatis terpilih saat provinsi diisi; tetap bisa diganti).
+  const MODEL_PROVINSI = {
+    'Aceh': 11, 'Sumatera Utara': 6, 'Sumatera Barat': 5, 'Riau': 9, 'Kepulauan Riau': 9, 'Jambi': 24, 'Sumatera Selatan': 16,
+    'Kepulauan Bangka Belitung': 9, 'Bengkulu': 16, 'Lampung': 15, 'DKI Jakarta': 12, 'Jawa Barat': 13, 'Banten': 13,
+    'Jawa Tengah': 3, 'DI Yogyakarta': 4, 'Jawa Timur': 14, 'Bali': 1, 'Nusa Tenggara Barat': 17, 'Nusa Tenggara Timur': 18,
+    'Kalimantan Barat': 7, 'Kalimantan Tengah': 7, 'Kalimantan Selatan': 19, 'Kalimantan Timur': 7, 'Kalimantan Utara': 7,
+    'Sulawesi Utara': 20, 'Gorontalo': 21, 'Sulawesi Tengah': 21, 'Sulawesi Barat': 8, 'Sulawesi Selatan': 8, 'Sulawesi Tenggara': 23,
+    'Maluku': 22, 'Maluku Utara': 22, 'Papua': 10, 'Papua Barat': 10, 'Papua Barat Daya': 10, 'Papua Selatan': 10, 'Papua Tengah': 10, 'Papua Pegunungan': 10,
+  };
 
   function hash(s) {
     let h = 2166136261;
@@ -30,7 +53,7 @@
   // Ciri warga: karakter adat pilihan (e.m, 1..10) + warna kulit/gerak dari nama + kata (selalu sama untuk orang yang sama).
   function ciri(e) {
     const h = hash((e.n || '') + '|' + (e.k || ''));
-    const m = Number(e.m) >= 1 && Number(e.m) <= MODEL.length ? Number(e.m) : (h % MODEL.length) + 1;
+    const m = Number(e.m) >= 1 && Number(e.m) <= MODEL.length ? Number(e.m) : (MODEL_PROVINSI[e.p] || (h % MODEL.length) + 1);
     return { model: m, kulit: pilih(KULIT, h, 3), lambai: ((h >>> 23) % 5) === 0, fase: ((h >>> 9) % 628) / 100, lompat: ((h >>> 26) % 3) === 0 };
   }
   const kunciCiri = (c) => [c.model, c.kulit, c.lambai].join();
@@ -103,6 +126,7 @@
     } else {
       x.fillStyle = A.warna;
       rrect(x, () => x.fill(), -H * 0.19, -H * 0.7, H * 0.38, A.model === 'kebaya' || A.model === 'kurung' ? H * 0.34 : H * 0.3, H * 0.07);
+      if (A.pola) { x.beginPath(); if (x.roundRect) x.roundRect(-H * 0.19, -H * 0.7, H * 0.38, H * 0.3, H * 0.07); else x.rect(-H * 0.19, -H * 0.7, H * 0.38, H * 0.3); motif(x, A.pola, A.warna, A.warna2, -H * 0.2, -H * 0.71, H * 0.4, H * 0.32, H); }
       if (A.warna === '#FFFFFF') { x.strokeStyle = 'rgba(0,0,0,.16)'; x.lineWidth = H * 0.018; rrect(x, () => x.stroke(), -H * 0.19, -H * 0.7, H * 0.38, H * 0.3, H * 0.07); }
       if (A.model === 'kebaya') { x.fillStyle = 'rgba(255,255,255,.55)'; x.beginPath(); x.moveTo(-H * 0.06, -H * 0.7); x.lineTo(0, -H * 0.52); x.lineTo(H * 0.06, -H * 0.7); x.fill(); }
       if (A.model === 'beskap') { x.fillStyle = A.aksen; for (let i = 0; i < 3; i++) { x.beginPath(); x.arc(H * 0.05, -H * 0.64 + i * H * 0.08, H * 0.016, 0, Math.PI * 2); x.fill(); } }
@@ -127,7 +151,13 @@
       case 'sortali': x.fillStyle = wk; x.fillRect(-kepalaR * 1.06, kepalaY - kepalaR * 0.7, kepalaR * 2.12, kepalaR * 0.32); x.fillStyle = wk2; x.beginPath(); x.moveTo(0, kepalaY - kepalaR * 1.25); x.lineTo(kepalaR * 0.22, kepalaY - kepalaR * 0.7); x.lineTo(-kepalaR * 0.22, kepalaY - kepalaR * 0.7); x.fill(); break;
       case 'bulu': x.fillStyle = wk; x.fillRect(-kepalaR * 1.05, kepalaY - kepalaR * 0.7, kepalaR * 2.1, kepalaR * 0.25); for (let i = -1; i <= 1; i++) { x.fillStyle = i ? wk2 : wk; x.beginPath(); x.ellipse(i * kepalaR * 0.45, kepalaY - kepalaR * 1.45, kepalaR * 0.16, kepalaR * 0.75, i * 0.35, 0, Math.PI * 2); x.fill(); } break;
       case 'sanggul-emas': x.fillStyle = wk2; x.fillRect(-kepalaR * 0.6, kepalaY - kepalaR * 1.2, kepalaR * 1.2, kepalaR * 0.14); x.beginPath(); x.arc(kepalaR * 0.5, kepalaY - kepalaR * 1.0, kepalaR * 0.14, 0, Math.PI * 2); x.fill(); break;
-      case 'songkok': x.fillStyle = wk; x.fillRect(-kepalaR * 0.95, kepalaY - kepalaR * 1.25, kepalaR * 1.9, kepalaR * 0.75); break;
+      case 'songkok': case 'peci': x.fillStyle = wk; x.fillRect(-kepalaR * 0.95, kepalaY - kepalaR * 1.25, kepalaR * 1.9, kepalaR * 0.75); break;
+      case 'meukeutop': for (let i = 0; i < 4; i++) { x.fillStyle = [wk, wk2, '#15803D', '#111111'][i]; x.fillRect(-kepalaR * (0.95 - i * 0.12), kepalaY - kepalaR * (1.1 + i * 0.32), kepalaR * (1.9 - i * 0.24), kepalaR * 0.34); } x.fillStyle = wk2; x.beginPath(); x.arc(0, kepalaY - kepalaR * 2.35, kepalaR * 0.18, 0, Math.PI * 2); x.fill(); break;
+      case 'iket': x.fillStyle = wk; x.beginPath(); x.moveTo(-kepalaR * 1.1, kepalaY - kepalaR * 0.35); x.lineTo(-kepalaR * 0.9, kepalaY - kepalaR * 1.15); x.lineTo(kepalaR * 0.9, kepalaY - kepalaR * 1.15); x.lineTo(kepalaR * 1.1, kepalaY - kepalaR * 0.35); x.closePath(); x.fill(); x.fillStyle = wk2; x.fillRect(-kepalaR * 1.05, kepalaY - kepalaR * 0.55, kepalaR * 2.1, kepalaR * 0.1); x.beginPath(); x.moveTo(kepalaR * 0.6, kepalaY - kepalaR * 1.1); x.lineTo(kepalaR * 1.25, kepalaY - kepalaR * 1.55); x.lineTo(kepalaR * 0.95, kepalaY - kepalaR * 0.95); x.fill(); break;
+      case 'odheng': x.fillStyle = wk; x.fillRect(-kepalaR * 1.08, kepalaY - kepalaR * 0.95, kepalaR * 2.16, kepalaR * 0.5); x.fillStyle = wk2; x.beginPath(); x.moveTo(kepalaR * 0.3, kepalaY - kepalaR * 0.95); x.lineTo(kepalaR * 0.55, kepalaY - kepalaR * 1.55); x.lineTo(kepalaR * 0.8, kepalaY - kepalaR * 0.95); x.fill(); break;
+      case 'siger': x.fillStyle = wk; x.beginPath(); x.moveTo(-kepalaR * 1.3, kepalaY - kepalaR * 0.6); for (let i = 0; i <= 8; i++) { const xx = -kepalaR * 1.3 + i * kepalaR * 0.325; x.lineTo(xx, kepalaY - kepalaR * (i % 2 ? 1.25 : 1.85 - Math.abs(i - 4) * 0.12)); } x.lineTo(kepalaR * 1.3, kepalaY - kepalaR * 0.6); x.closePath(); x.fill(); x.fillStyle = wk2; x.fillRect(-kepalaR * 1.2, kepalaY - kepalaR * 0.75, kepalaR * 2.4, kepalaR * 0.12); break;
+      case 'langga': x.fillStyle = wk; x.beginPath(); x.ellipse(0, kepalaY - kepalaR * 0.75, kepalaR * 1.6, kepalaR * 0.3, 0, 0, Math.PI * 2); x.fill(); x.fillStyle = wk2; x.beginPath(); x.moveTo(-kepalaR * 0.55, kepalaY - kepalaR * 0.8); x.lineTo(0, kepalaY - kepalaR * 2.4); x.lineTo(kepalaR * 0.55, kepalaY - kepalaR * 0.8); x.fill(); break;
+      case 'tengkuluk': x.fillStyle = wk; x.beginPath(); x.arc(0, kepalaY - kepalaR * 0.3, kepalaR * 1.12, Math.PI * 0.95, Math.PI * 2.05); x.fill(); x.beginPath(); x.moveTo(-kepalaR * 0.4, kepalaY - kepalaR * 1.2); x.lineTo(kepalaR * 1.5, kepalaY - kepalaR * 1.7); x.lineTo(kepalaR * 1.0, kepalaY - kepalaR * 0.9); x.fill(); x.fillStyle = wk2; x.fillRect(-kepalaR * 1.05, kepalaY - kepalaR * 0.45, kepalaR * 2.1, kepalaR * 0.1); break;
       case 'mahkota': for (let i = -3; i <= 3; i++) { x.fillStyle = [wk, wk2, '#22C55E', '#FDE047'][(i + 4) % 4]; x.beginPath(); x.ellipse(i * kepalaR * 0.32, kepalaY - kepalaR * 1.55, kepalaR * 0.13, kepalaR * 0.8, i * 0.22, 0, Math.PI * 2); x.fill(); } x.fillStyle = '#7C2D12'; x.fillRect(-kepalaR * 1.05, kepalaY - kepalaR * 0.8, kepalaR * 2.1, kepalaR * 0.28); break;
     }
     x.fillStyle = '#1F1A17';
@@ -540,6 +570,7 @@
   }
   // Gambar karakter adat utuh (untuk pilihan karakter di form).
   YCSFestival.MODEL = MODEL.map((m) => ({ id: m.id, nama: m.nama }));
+  YCSFestival.modelProvinsi = (prov) => MODEL_PROVINSI[prov] || 0;
   YCSFestival.gambarModel = (el, id, kulit = '#E0AC7E') => {
     const c = document.createElement('canvas');
     c.width = 96; c.height = 128;
