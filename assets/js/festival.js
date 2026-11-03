@@ -4,6 +4,15 @@
   'use strict';
   const LATAR = { kecil: '/assets/img/festival/latar-900.webp', besar: '/assets/img/festival/latar-1600.webp' };
   // Lapisan teks "Youth Character Summit 2026" (dipotong dari latar, latar transparan) agar cahaya bisa datang dari belakangnya.
+  // 6 gelembung nilai karakter (dipotong dari latar; posisi relatif terhadap gambar latar 1654×588).
+  const GELEMBUNG = [
+    { k: 'Pendidikan', t: 'Belajar tanpa batas', x: 0.2201, y: 0.2194, r: 0.0387 },
+    { k: 'Lingkungan', t: 'Jaga alam Indonesia', x: 0.1391, y: 0.3827, r: 0.0387 },
+    { k: 'Kolaborasi', t: 'Bersama lebih kuat', x: 0.2703, y: 0.4575, r: 0.0387 },
+    { k: 'Wawasan Global', t: 'Berpikir mendunia', x: 0.7557, y: 0.2211, r: 0.0393 },
+    { k: 'Kepedulian', t: 'Peduli sesama', x: 0.8585, y: 0.3367, r: 0.0333 },
+    { k: 'Inovasi', t: 'Ide untuk negeri', x: 0.7920, y: 0.4864, r: 0.0363 },
+  ];
   const JUDUL = { kecil: '/assets/img/festival/judul-900.webp', besar: '/assets/img/festival/judul-1600.webp', x: 440 / 1654, y: 20 / 588, w: 780 / 1654, h: 272 / 588 };
   const KULIT = ['#F2C9A0', '#E0AC7E', '#C68A5C', '#A8693F', '#8A5530'];
   // 10 karakter baju adat Nusantara (digambar dengan kode: ringan, tanpa unduhan gambar).
@@ -196,6 +205,12 @@
     const burung = Array.from({ length: 3 }, (_, i) => ({ y: 0.1 + i * 0.07, v: 0.018 + i * 0.006, off: i * 0.37 }));
     latar.onload = () => { siapLatar = true; ukur(); };
     latar.src = (canvas.clientWidth > 700 ? LATAR.besar : LATAR.kecil);
+    const gelImg = new Image();
+    let siapGel = false;
+    gelImg.onload = () => { siapGel = true; };
+    gelImg.src = '/assets/img/festival/gelembung.webp';
+    const gelState = GELEMBUNG.map((g, i) => ({ ...g, i, fase: i * 1.7, pop: -9, hover: 0 }));
+    let gelLabel = null;
     const judulImg = new Image();
     let siapJudul = false;
     judulImg.onload = () => { siapJudul = true; };
@@ -283,6 +298,7 @@
       ctx.clearRect(0, 0, W, H);
       gambarLatar();
       gambarSuasana(t);
+      gambarGelembung(t);
       gambarJudul(t);
       const b = tinggiDasar();
       const urut = warga.slice().sort((p, q) => p.y - q.y);
@@ -428,6 +444,61 @@
         ctx.restore();
       }
     }
+    // Gelembung mengambang pelan; diketuk = memantul, bercahaya, dan menampilkan nilainya.
+    const posGel = (g, t) => {
+      const d = t / 1000, ih = area.imgH;
+      const bob = gerakMinim ? 0 : Math.sin(d * 0.9 + g.fase) * ih * 0.012;
+      const geser = gerakMinim ? 0 : Math.cos(d * 0.6 + g.fase) * W * 0.004;
+      const u = (t - g.pop) / 700;
+      const pantul = u >= 0 && u < 1 ? Math.sin(u * Math.PI) * 0.22 * (1 - u) + Math.sin(u * Math.PI * 3) * 0.05 * (1 - u) : 0;
+      const k = 1 + pantul + g.hover * 0.06 + (gerakMinim ? 0 : Math.sin(d * 1.3 + g.fase) * 0.015);
+      return { x: g.x * W + geser, y: g.y * ih + bob, r: g.r * W * k };
+    };
+    function gambarGelembung(t) {
+      if (!siapGel) return;
+      const sel = gelImg.width / GELEMBUNG.length;
+      for (const g of gelState) {
+        const p = posGel(g, t);
+        const u = (t - g.pop) / 900;
+        if (u >= 0 && u < 1) {
+          ctx.save(); ctx.globalCompositeOperation = 'lighter';
+          const gl = ctx.createRadialGradient(p.x, p.y, p.r * 0.6, p.x, p.y, p.r * (1.4 + u));
+          gl.addColorStop(0, `rgba(255,245,200,${0.55 * (1 - u)})`); gl.addColorStop(1, 'rgba(255,245,200,0)');
+          ctx.fillStyle = gl; ctx.beginPath(); ctx.arc(p.x, p.y, p.r * (1.4 + u), 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = `rgba(255,255,255,${0.8 * (1 - u)})`; ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.r * (1 + u * 0.9), 0, Math.PI * 2); ctx.stroke();
+          for (let j = 0; j < 8; j++) { const a = j * Math.PI / 4 + g.i; const rr = p.r * (1.05 + u * 1.1); ctx.fillStyle = `rgba(255,250,220,${1 - u})`; ctx.beginPath(); ctx.arc(p.x + Math.cos(a) * rr, p.y + Math.sin(a) * rr, 2.2 * (1 - u) + 0.8, 0, Math.PI * 2); ctx.fill(); }
+          ctx.restore();
+        }
+        ctx.drawImage(gelImg, g.i * sel, 0, sel, gelImg.height, p.x - p.r, p.y - p.r, p.r * 2, p.r * 2);
+      }
+      if (gelLabel && t < gelLabel.sampai) {
+        const g = gelLabel.g, p = posGel(g, t), a = Math.min(1, (gelLabel.sampai - t) / 300, (t - g.pop) / 200);
+        const fs = Math.max(12, Math.min(18, W / 70));
+        ctx.save(); ctx.globalAlpha = Math.max(0, a);
+        ctx.font = `800 ${fs}px "Plus Jakarta Sans", sans-serif`;
+        const w1 = ctx.measureText(g.k).width; ctx.font = `600 ${fs * 0.8}px "Plus Jakarta Sans", sans-serif`;
+        const w2 = ctx.measureText(g.t).width, bw = Math.max(w1, w2) + fs * 1.4, bh = fs * 2.7;
+        let bx = p.x - bw / 2; bx = Math.max(6, Math.min(W - bw - 6, bx));
+        const by = p.y + p.r + 8;
+        ctx.fillStyle = 'rgba(8,44,51,.88)'; ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(bx, by, bw, bh, fs * 0.6); else ctx.rect(bx, by, bw, bh); ctx.fill();
+        ctx.textAlign = 'center'; ctx.fillStyle = '#FFC93C'; ctx.font = `800 ${fs}px "Plus Jakarta Sans", sans-serif`; ctx.fillText(g.k, bx + bw / 2, by + fs * 1.15);
+        ctx.fillStyle = '#fff'; ctx.font = `600 ${fs * 0.8}px "Plus Jakarta Sans", sans-serif`; ctx.fillText(g.t, bx + bw / 2, by + fs * 2.15);
+        ctx.restore();
+      }
+    }
+    function gelembungDi(x, y) {
+      const t = performance.now();
+      return gelState.find((g) => { const p = posGel(g, t); return Math.hypot(x - p.x, y - p.y) <= p.r * 1.1; });
+    }
+    function sentuhGelembung(g) {
+      const t = performance.now();
+      g.pop = t;
+      gelLabel = { g, sampai: t + 2600 };
+      mulai();
+      if (opsi.onGelembung) opsi.onGelembung(g.k);
+    }
+
     function cahaya(w) { efek.length = 0; efek.push({ w, t0: performance.now() }); mulai(); }
 
     /* ---------- Balon kata: banyak sekaligus, tidak pernah saling menutupi ---------- */
@@ -492,7 +563,9 @@
       }
     }
 
+    let tPopAuto = performance.now() + 4000;
     function putar(t) {
+      if (!gerakMinim && t > tPopAuto) { tPopAuto = t + 9000 + Math.random() * 5000; const g = gelState[Math.floor(Math.random() * gelState.length)]; g.pop = t; }
       raf = 0;
       if (!terlihat || document.hidden) { tLalu = 0; return; }
       if (t - tAkhir > 30) { tAkhir = t; gambar(t); }
@@ -500,9 +573,17 @@
     }
     const mulai = () => { if (!raf) raf = requestAnimationFrame(putar); };
 
+    canvas.addEventListener('pointermove', (ev) => {
+      const r = canvas.getBoundingClientRect();
+      const g = gelembungDi(ev.clientX - r.left, ev.clientY - r.top);
+      gelState.forEach((x) => { x.hover = x === g ? 1 : 0; });
+      canvas.style.cursor = g ? 'pointer' : '';
+    });
     canvas.addEventListener('click', (ev) => {
-      if (!balonAktif) return;
       const r = canvas.getBoundingClientRect(), x = ev.clientX - r.left, y = ev.clientY - r.top;
+      const g = gelembungDi(x, y);
+      if (g) { sentuhGelembung(g); return; }
+      if (!balonAktif) return;
       let pilih = null, terbaik = Infinity;
       for (const w of warga) {
         const l = w.layar;
