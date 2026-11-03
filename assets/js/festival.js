@@ -3,6 +3,8 @@
 (() => {
   'use strict';
   const LATAR = { kecil: '/assets/img/festival/latar-900.webp', besar: '/assets/img/festival/latar-1600.webp' };
+  // Lapisan teks "Youth Character Summit 2026" (dipotong dari latar, latar transparan) agar cahaya bisa datang dari belakangnya.
+  const JUDUL = { kecil: '/assets/img/festival/judul-900.webp', besar: '/assets/img/festival/judul-1600.webp', x: 440 / 1654, y: 20 / 588, w: 780 / 1654, h: 272 / 588 };
   const KULIT = ['#F2C9A0', '#E0AC7E', '#C68A5C', '#A8693F', '#8A5530'];
   const BAJU = ['#FFFFFF', '#FFFFFF', '#F4F1EA', '#0E5A66', '#C2410C', '#FFC93C', '#7C3AED', '#DC2626', '#15803D', '#2563EB', '#DB2777', '#F59E0B'];
   const BAWAH = ['#374151', '#1F2937', '#6B4F2A', '#7F1D1D', '#14532D', '#1E3A8A', '#9A3412'];
@@ -108,6 +110,11 @@
     const burung = Array.from({ length: 3 }, (_, i) => ({ y: 0.1 + i * 0.07, v: 0.018 + i * 0.006, off: i * 0.37 }));
     latar.onload = () => { siapLatar = true; ukur(); };
     latar.src = (canvas.clientWidth > 700 ? LATAR.besar : LATAR.kecil);
+    const judulImg = new Image();
+    let siapJudul = false;
+    judulImg.onload = () => { siapJudul = true; };
+    judulImg.src = (canvas.clientWidth > 700 ? JUDUL.besar : JUDUL.kecil);
+    const kilap = document.createElement('canvas');
 
     function ukur() {
       const w = canvas.clientWidth, h = canvas.clientHeight;
@@ -190,6 +197,7 @@
       ctx.clearRect(0, 0, W, H);
       gambarLatar();
       gambarSuasana(t);
+      gambarJudul(t);
       const b = tinggiDasar();
       const urut = warga.slice().sort((p, q) => p.y - q.y);
       for (const w of urut) {
@@ -217,33 +225,68 @@
     }
 
     // Titik pusat teks "Youth Character Summit 2026" pada gambar latar.
-    const judul = () => ({ x: W * 0.5, y: area.imgH * 0.27, r: area.imgH * 0.24 });
+    const kotakJudul = () => ({ x: W * JUDUL.x, y: area.imgH * JUDUL.y, w: W * JUDUL.w, h: area.imgH * JUDUL.h });
+    const judul = () => { const k = kotakJudul(); return { x: k.x + k.w / 2, y: k.y + k.h * 0.5, r: area.imgH * 0.24, bawah: k.y + k.h * 0.86 }; };
+    // Kekuatan pemicu saat ini (0..1): naik cepat lalu meredup halus.
+    const pemicu = (t) => { const e = efek[0]; if (!e) return 0; const u = (t - e.t0) / 1800; return u < 0 || u > 1 ? 0 : (u < 0.15 ? u / 0.15 : Math.pow(1 - (u - 0.15) / 0.85, 2)); };
+
+    // Teks judul digambar ulang DI ATAS sinar, lalu kilap tipis menyapu dari dalam huruf.
+    function gambarJudul(t) {
+      if (gerakMinim || !siapJudul) return;
+      const k = kotakJudul();
+      ctx.drawImage(judulImg, k.x, k.y, k.w, k.h);
+      const e = efek[0];
+      const uE = e ? (t - e.t0) / 1800 : 9;
+      const siklus = (t / 1000) % 7;
+      let pos = -1;
+      if (uE >= 0 && uE < 0.45) pos = uE / 0.45;
+      else if (siklus < 1.6) pos = siklus / 1.6;
+      if (pos < 0) return;
+      const cw = Math.max(1, Math.round(k.w * dpr)), ch = Math.max(1, Math.round(k.h * dpr));
+      if (kilap.width !== cw || kilap.height !== ch) { kilap.width = cw; kilap.height = ch; }
+      const x = kilap.getContext('2d');
+      x.globalCompositeOperation = 'source-over';
+      x.clearRect(0, 0, cw, ch);
+      x.drawImage(judulImg, 0, 0, cw, ch);
+      x.globalCompositeOperation = 'source-in';
+      const bx = -cw * 0.4 + pos * cw * 1.8;
+      const g = x.createLinearGradient(bx - cw * 0.18, 0, bx + cw * 0.18, ch * 0.4);
+      const kuat = uE >= 0 && uE < 0.45 ? 0.75 : 0.38;
+      g.addColorStop(0, 'rgba(255,248,220,0)'); g.addColorStop(0.5, `rgba(255,248,220,${kuat})`); g.addColorStop(1, 'rgba(255,248,220,0)');
+      x.fillStyle = g; x.fillRect(0, 0, cw, ch);
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.drawImage(kilap, k.x, k.y, k.w, k.h);
+      ctx.restore();
+    }
 
     /* ---------- Suasana langit: sinar berputar, judul berpendar, kilau, burung (ringan) ---------- */
     function gambarSuasana(t) {
       if (gerakMinim) return;
-      const j = judul(), d = t / 1000;
+      const j = judul(), d = t / 1000, p = pemicu(t);
       ctx.save();
-      ctx.beginPath(); ctx.rect(0, 0, W, area.imgH * 0.78); ctx.clip();
+      ctx.beginPath(); ctx.rect(0, 0, W, area.imgH * 0.8); ctx.clip();
       ctx.globalCompositeOperation = 'lighter';
-      const panjang = area.imgH * 1.1;
-      for (let i = 0; i < 12; i++) {
-        const a = d * 0.06 + i * Math.PI / 6;
-        const g = ctx.createRadialGradient(j.x, j.y, j.r * 0.4, j.x, j.y, panjang);
-        g.addColorStop(0, 'rgba(255,240,190,.16)'); g.addColorStop(1, 'rgba(255,240,190,0)');
-        ctx.fillStyle = g;
-        ctx.beginPath(); ctx.moveTo(j.x, j.y);
-        ctx.arc(j.x, j.y, panjang, a - 0.07, a + 0.07); ctx.closePath(); ctx.fill();
+      // Sinar halus dari BELAKANG judul (judul digambar ulang di atasnya), makin terang saat dipicu.
+      const panjang = area.imgH * 1.05;
+      for (let i = 0; i < 10; i++) {
+        const a = d * 0.035 + i * Math.PI / 5;
+        for (const [lebar, alfa] of [[0.13, 0.045], [0.06, 0.07]]) {
+          const g = ctx.createRadialGradient(j.x, j.y, j.r * 0.2, j.x, j.y, panjang);
+          g.addColorStop(0, `rgba(255,244,205,${alfa * (1 + p * 2.2)})`); g.addColorStop(0.55, `rgba(255,244,205,${alfa * 0.35 * (1 + p * 2)})`); g.addColorStop(1, 'rgba(255,244,205,0)');
+          ctx.fillStyle = g;
+          ctx.beginPath(); ctx.moveTo(j.x, j.y); ctx.arc(j.x, j.y, panjang, a - lebar, a + lebar); ctx.closePath(); ctx.fill();
+        }
       }
-      const denyut = 0.12 + 0.07 * Math.sin(d * 1.6);
-      const gl = ctx.createRadialGradient(j.x, j.y, 0, j.x, j.y, j.r * 1.4);
-      gl.addColorStop(0, `rgba(255,236,170,${denyut})`); gl.addColorStop(1, 'rgba(255,236,170,0)');
-      ctx.fillStyle = gl; ctx.fillRect(j.x - j.r * 1.5, j.y - j.r * 1.5, j.r * 3, j.r * 3);
+      const denyut = 0.14 + 0.05 * Math.sin(d * 1.3) + p * 0.45;
+      const gl = ctx.createRadialGradient(j.x, j.y, 0, j.x, j.y, j.r * (1.5 + p * 0.6));
+      gl.addColorStop(0, `rgba(255,238,180,${denyut})`); gl.addColorStop(0.6, `rgba(255,238,180,${denyut * 0.3})`); gl.addColorStop(1, 'rgba(255,238,180,0)');
+      ctx.fillStyle = gl; ctx.fillRect(j.x - j.r * 2.2, j.y - j.r * 2.2, j.r * 4.4, j.r * 4.4);
       for (const k of kilau) {
         const a = Math.max(0, Math.sin(d * k.k + k.f));
         if (a < 0.05) continue;
         const x = k.x * W, y = k.y * area.imgH * 0.62, r = (2 + 4 * a) * k.s * (W / 1200 + 0.4);
-        ctx.fillStyle = `rgba(255,250,220,${0.75 * a})`;
+        ctx.fillStyle = `rgba(255,250,220,${0.5 * a})`;
         ctx.beginPath(); ctx.moveTo(x, y - r * 2); ctx.lineTo(x + r * 0.4, y - r * 0.4); ctx.lineTo(x + r * 2, y); ctx.lineTo(x + r * 0.4, y + r * 0.4);
         ctx.lineTo(x, y + r * 2); ctx.lineTo(x - r * 0.4, y + r * 0.4); ctx.lineTo(x - r * 2, y); ctx.lineTo(x - r * 0.4, y - r * 0.4); ctx.closePath(); ctx.fill();
       }
@@ -264,40 +307,36 @@
         if (u > 1) { efek.splice(i, 1); continue; }
         const l = e.w.layar;
         if (!l) continue;
-        const j = judul(), tx = l.x, ty = l.y + l.h * 0.15;
+        const j0 = judul(), j = { x: j0.x, y: j0.bawah }, tx = l.x, ty = l.y + l.h * 0.15;
         ctx.save();
         ctx.globalCompositeOperation = 'lighter';
-        // 1) judul menyala
-        const nyala = Math.max(0, 1 - u / 0.45);
-        if (nyala > 0) {
-          const g = ctx.createRadialGradient(j.x, j.y, 0, j.x, j.y, j.r * (1.2 + u * 2));
-          g.addColorStop(0, `rgba(255,245,200,${0.85 * nyala})`); g.addColorStop(0.5, `rgba(255,214,107,${0.45 * nyala})`); g.addColorStop(1, 'rgba(255,214,107,0)');
-          ctx.fillStyle = g; ctx.fillRect(0, 0, W, area.imgH);
-        }
+        // 1) judul menyala dari dalam: lihat pemicu() di gambarSuasana & kilap di gambarJudul
         // 2) berkas cahaya melengkung dari judul ke kepala warga
-        const p = Math.min(1, Math.max(0, (u - 0.12) / 0.5));
+        const p = Math.min(1, Math.max(0, (u - 0.18) / 0.5));
+        const halus = (q) => q * q * (3 - 2 * q);
         if (p > 0 && u < 0.95) {
           const cx = (j.x + tx) / 2 + (tx > j.x ? -1 : 1) * W * 0.06, cy = Math.min(j.y, ty) + (ty - j.y) * 0.25;
           const titik = (q) => ({ x: (1 - q) * (1 - q) * j.x + 2 * (1 - q) * q * cx + q * q * tx, y: (1 - q) * (1 - q) * j.y + 2 * (1 - q) * q * cy + q * q * ty });
-          const pudar = u > 0.7 ? 1 - (u - 0.7) / 0.25 : 1;
+          const pudar = (u > 0.7 ? 1 - (u - 0.7) / 0.25 : 1) * Math.min(1, (u - 0.18) / 0.1);
           ctx.lineCap = 'round';
-          for (const [lebar, warna] of [[14, `rgba(255,200,80,${0.22 * pudar})`], [6, `rgba(255,236,160,${0.6 * pudar})`], [2.5, `rgba(255,255,255,${0.95 * pudar})`]]) {
+          for (const [lebar, warna] of [[16, `rgba(255,214,120,${0.1 * pudar})`], [7, `rgba(255,236,170,${0.28 * pudar})`], [2, `rgba(255,252,235,${0.7 * pudar})`]]) {
             ctx.strokeStyle = warna; ctx.lineWidth = lebar * (W / 1200 + 0.5);
             ctx.beginPath();
-            for (let q = Math.max(0, p - 0.45); q <= p + 0.001; q += 0.02) { const pt = titik(q); if (q === Math.max(0, p - 0.45)) ctx.moveTo(pt.x, pt.y); else ctx.lineTo(pt.x, pt.y); }
+            const ph = halus(p), awal = Math.max(0, ph - 0.4);
+            for (let q = awal; q <= ph + 0.001; q += 0.015) { const pt = titik(q); if (q === awal) ctx.moveTo(pt.x, pt.y); else ctx.lineTo(pt.x, pt.y); }
             ctx.stroke();
           }
-          const ujung = titik(p);
-          const gu = ctx.createRadialGradient(ujung.x, ujung.y, 0, ujung.x, ujung.y, 26);
-          gu.addColorStop(0, `rgba(255,255,255,${pudar})`); gu.addColorStop(1, 'rgba(255,220,120,0)');
-          ctx.fillStyle = gu; ctx.beginPath(); ctx.arc(ujung.x, ujung.y, 26, 0, Math.PI * 2); ctx.fill();
+          const ujung = titik(halus(p));
+          const gu = ctx.createRadialGradient(ujung.x, ujung.y, 0, ujung.x, ujung.y, 18);
+          gu.addColorStop(0, `rgba(255,252,235,${0.8 * pudar})`); gu.addColorStop(1, 'rgba(255,220,120,0)');
+          ctx.fillStyle = gu; ctx.beginPath(); ctx.arc(ujung.x, ujung.y, 18, 0, Math.PI * 2); ctx.fill();
         }
         // 3) ledakan cahaya kecil di sekitar warga
         if (u > 0.6) {
           const v = (u - 0.6) / 0.4;
-          ctx.strokeStyle = `rgba(255,214,107,${0.9 * (1 - v)})`; ctx.lineWidth = 3;
+          ctx.strokeStyle = `rgba(255,214,107,${0.55 * (1 - v)})`; ctx.lineWidth = 2;
           ctx.beginPath(); ctx.arc(tx, ty, l.h * (0.3 + v * 1.1), 0, Math.PI * 2); ctx.stroke();
-          ctx.fillStyle = `rgba(255,250,215,${1 - v})`;
+          ctx.fillStyle = `rgba(255,250,215,${0.7 * (1 - v)})`;
           for (let k = 0; k < 10; k++) { const a = k * Math.PI / 5 + e.t0; const rr = l.h * (0.35 + v * 1.3); ctx.beginPath(); ctx.arc(tx + Math.cos(a) * rr, ty + Math.sin(a) * rr * 0.8, 2.5 * (1 - v) + 1, 0, Math.PI * 2); ctx.fill(); }
         }
         ctx.restore();
