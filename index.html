@@ -1234,6 +1234,7 @@
     .promo--dana .promo__icon { background: rgb(255 255 255 / .16); }
     .promo__pill { display: inline-block; margin-top: .375rem; padding: .125rem .5rem; border-radius: var(--radius-pill); background: var(--yellow-400); color: var(--teal-950); font-size: .75rem; font-weight: 800; }
 
+    .rank-ajak { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .75rem; margin-top: var(--space-3); padding: var(--space-4); border: 1px dashed var(--line); border-radius: var(--radius); font-size: .875rem; color: var(--text-muted); }
     .rank-empty { padding: var(--space-5) var(--space-3); margin-top: var(--space-3); text-align: center; color: var(--text-muted); border: 1px dashed var(--line); border-radius: var(--radius); font-size: .9375rem; }
 
     /* Dialog bagikan */
@@ -2648,6 +2649,8 @@
           $('.rank__val', li).textContent = nf.format(x.jumlah);
           ol.append(li);
         });
+        // Daftar masih pendek: ajak provinsi lain ikut, supaya kartu tidak terlihat kosong.
+        if (list.length < 5) ol.insertAdjacentHTML('beforeend', `<li class="rank-ajak"><span>${5 - list.length} posisi masih kosong. Provinsimu belum masuk?</span><a class="btn btn--soft btn--sm" href="#satu-kata">Kirim Satu Kata</a></li>`);
       });
       const btn = $('#lb-more');
       btn.hidden = lb.data.provinsi.length <= 5;
