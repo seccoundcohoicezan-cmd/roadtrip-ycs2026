@@ -229,6 +229,7 @@
     .btn--live:hover { --btn-bg: #B91C1C; }
     .btn--sm { min-height: 2.75rem; padding: .5rem 1rem; font-size: .875rem; }
     .btn--block { width: 100%; }
+    .btn[hidden] { display: none; }
     .btn[disabled], .btn[aria-disabled="true"] { opacity: .6; cursor: not-allowed; transform: none; }
 
     .link-arrow {
@@ -729,12 +730,21 @@
     .fest-b.is-pin em { font-size: 1.375rem; }
     .fest-b small { display: block; font-size: .6875rem; color: var(--ink-muted); }
     .fest-b__tag { position: absolute; top: -.7rem; right: -.4rem; padding: .1rem .5rem; border-radius: var(--radius-pill); background: var(--cta); color: #fff; font-size: .6875rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
-    .fest__alat { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; margin-top: var(--space-3); }
-    @media (min-width: 48rem) { .fest__alat { padding: .5rem; border: 1px solid var(--line); border-radius: var(--radius-pill); background: var(--surface); box-shadow: var(--shadow-sm); } }
+    /* Bilah alat menempel di bawah panggung: satu kartu utuh, rapi. */
+    .fest:not(.is-locked) .fest__stage { border-radius: 1.5rem 1.5rem 0 0; box-shadow: none; }
+    .fest:not(.is-locked) { border-radius: 1.5rem; box-shadow: var(--shadow-lg); }
+    .fest__alat { display: grid; gap: .75rem; padding: 1rem; border: 1px solid var(--line); border-top: 0; border-radius: 0 0 1.5rem 1.5rem; background: var(--surface); }
+    @media (min-width: 48rem) { .fest__alat { grid-template-columns: minmax(0, 1fr) auto; align-items: center; padding: 1rem 1.25rem; } }
     .fest.is-locked .fest__alat { display: none; }
-    .fest__cari { display: flex; flex: 1 1 18rem; gap: var(--space-2); }
-    .fest__cari .input { min-height: 2.75rem; border-radius: var(--radius-pill); }
-    .fest__info { flex-basis: 100%; min-height: 1.25rem; padding: 0 .75rem; font-size: .8125rem; font-weight: 600; color: var(--text-muted); }
+    .fest__cari { position: relative; display: flex; min-width: 0; }
+    .fest__cari > svg { position: absolute; left: .875rem; top: 50%; translate: 0 -50%; width: 1.125rem; height: 1.125rem; color: var(--text-muted); pointer-events: none; }
+    .fest__cari .input { flex: 1; min-width: 0; min-height: 2.875rem; padding-left: 2.625rem; border-radius: .875rem 0 0 .875rem; border-right: 0; }
+    .fest__cari .btn { min-height: 2.875rem; border-radius: 0 .875rem .875rem 0; padding: 0 1.125rem; box-shadow: none; }
+    .fest__aksi { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+    .fest__aksi .btn { min-height: 2.875rem; border-radius: .875rem; box-shadow: none; }
+    @media (min-width: 48rem) { .fest__aksi { display: flex; } }
+    .fest__info { grid-column: 1 / -1; display: flex; gap: .5rem; align-items: flex-start; margin: 0; padding-top: .75rem; border-top: 1px dashed var(--line); font-size: .8125rem; color: var(--text-muted); }
+    .fest__info::before { content: "i"; display: grid; place-items: center; width: 1.125rem; height: 1.125rem; flex: none; margin-top: .0625rem; border-radius: 50%; background: var(--surface-soft); color: var(--primary); font-size: .6875rem; font-weight: 800; font-style: normal; }
     .fest__info:empty { display: none; }
     @media (max-width: 39.99rem) { .fest.is-locked .fest__stage { aspect-ratio: 16 / 11; } .fest__gerbang h3 { font-size: 1.1875rem; } }
     .orb.is-sembunyi { opacity: 0; pointer-events: none; transform: scale(.6); }
@@ -806,7 +816,7 @@
 
     /* ============ Road / Leaderboard / Delegates ============ */
     .trio { display: grid; gap: var(--space-5); }
-    @media (min-width: 64rem) { .trio { grid-template-columns: 1.45fr 1fr; align-items: start; } }
+    @media (min-width: 64rem) { .trio { grid-template-columns: 1.45fr 1fr; align-items: stretch; } }
 
     .road {
       position: relative; overflow: hidden; color: var(--ink);
@@ -1296,10 +1306,16 @@
 
     /* Road to Bali ringkas: progres bar + titik target, tanpa peta besar */
     .road__progress { padding-top: var(--space-5); }
-    .road .meter { position: relative; height: 1.125rem; overflow: visible; background: rgb(14 90 102 / .14); }
-    .road .meter__fill { position: relative; min-width: 1.125rem; }
-    .road__van { position: absolute; right: -1rem; top: 50%; translate: 0 -50%; display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 50%; background: #fff; box-shadow: var(--shadow); font-size: 0; }
+    .road .meter { position: relative; height: .75rem; margin: 1rem 1rem 0 0; overflow: visible; background: rgb(14 90 102 / .12); }
+    .road .meter__fill { position: relative; min-width: .75rem; }
+    .road__van { position: absolute; right: -1.125rem; top: 50%; translate: 0 -50%; display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 50%; background: #fff; box-shadow: 0 4px 12px -4px rgb(8 44 51 / .35); font-size: 0; }
     .road__van svg { width: 1.375rem; height: 1.375rem; }
+    .road__angka { display: flex; align-items: baseline; gap: .5rem; margin-top: var(--space-4); }
+    .road__angka strong { font-size: clamp(1.75rem, 3vw, 2.25rem); line-height: 1; color: var(--teal-900); font-variant-numeric: tabular-nums; }
+    .road__angka span { font-size: .9375rem; color: #33464D; }
+    .road__target { font-size: .8125rem; color: #4A5B62; }
+    .road__target strong { color: var(--teal-900); }
+    .road .panel__foot, .panel__foot { margin-top: auto; }
     .road__ticks { position: relative; height: 2.25rem; margin-top: .5rem; list-style: none; font-size: .75rem; font-weight: 700; color: #4A5B62; }
     .road__ticks li { position: absolute; top: 0; translate: -50% 0; display: grid; justify-items: center; white-space: nowrap; }
     .road__ticks li::before { content: ""; width: 2px; height: .5rem; margin-bottom: .125rem; border-radius: 1px; background: rgb(14 90 102 / .35); }
@@ -1559,12 +1575,15 @@
           </div>
           <div class="fest__alat" id="fest-alat">
             <form class="fest__cari" id="fest-cari" role="search">
+              <svg aria-hidden="true"><use href="#i-search"/></svg>
               <label class="visually-hidden" for="fest-q">Cari nama di festival</label>
-              <input class="input" id="fest-q" placeholder="Cari namamu atau temanmu…" autocomplete="off">
-              <button class="btn btn--primary btn--sm" type="submit"><svg aria-hidden="true"><use href="#i-search"/></svg>Temukan</button>
+              <input class="input" id="fest-q" type="search" placeholder="Cari namamu atau temanmu…" autocomplete="off" enterkeyhint="search">
+              <button class="btn btn--primary btn--sm" type="submit">Temukan</button>
             </form>
-            <button class="btn btn--cta btn--sm" type="button" id="fest-unduh"><svg aria-hidden="true"><use href="#i-download"/></svg>Unduh kartu</button>
-            <button class="btn btn--soft btn--sm" type="button" data-share-open="kata"><svg aria-hidden="true"><use href="#i-share"/></svg>Ajak teman</button>
+            <div class="fest__aksi">
+              <button class="btn btn--soft btn--sm" type="button" id="fest-unduh"><svg aria-hidden="true"><use href="#i-download"/></svg>Unduh kartu</button>
+              <button class="btn btn--soft btn--sm" type="button" data-share-open="kata"><svg aria-hidden="true"><use href="#i-share"/></svg>Ajak teman</button>
+            </div>
             <p class="fest__info" id="fest-info" role="status"></p>
           </div>
 
@@ -1756,11 +1775,12 @@
           </div>
 
           <div class="road__progress">
+            <p class="road__angka"><strong id="road-current">–</strong><span>dukungan terkumpul</span></p>
             <div class="meter" role="progressbar" aria-labelledby="road-title" aria-valuemin="0" aria-valuemax="100000" aria-valuenow="0" aria-valuetext="Memuat jumlah dukungan">
               <div class="meter__fill" id="road-meter" style="width:0"><span class="road__van" aria-hidden="true"><svg viewBox="-24 -20 48 34"><rect x="-20" y="-16" width="40" height="22" rx="6" fill="#C2410C"/><rect x="-14" y="-12" width="12" height="9" rx="2" fill="#CDEDEC"/><rect x="1" y="-12" width="12" height="9" rx="2" fill="#CDEDEC"/><circle cx="-11" cy="7" r="5" fill="#13232A"/><circle cx="11" cy="7" r="5" fill="#13232A"/></svg></span></div>
             </div>
             <ol class="road__ticks" id="road-ticks" aria-hidden="true"></ol>
-            <p class="road__stats"><span><strong id="road-current">–</strong> dukungan terkumpul</span><span>Target <strong id="road-target">100.000</strong></span></p>
+            <p class="road__stats"><span class="road__target">Menuju <strong id="road-next">100</strong> dukungan</span><span class="road__target">Target akhir <strong id="road-target">100.000</strong></span></p>
             <p class="small" id="road-note" style="margin-top:.25rem"></p>
 
             <details class="disclosure" id="rute">
@@ -2590,10 +2610,14 @@
     });
 
     /* ---------- Road to Bali ---------- */
-    function gambarRoad(current, target) {
+    function gambarRoad(current, targetAkhir) {
+      // Bar menuju tonggak berikutnya (100, 250, 500, 1rb, …) agar progres awal tetap terasa; target akhir tetap ditampilkan.
+      const tangga = [100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 250000, 500000, 1000000].filter((v) => v < targetAkhir).concat(targetAkhir);
+      const target = tangga.find((v) => v > current) || targetAkhir;
       const pct = Math.max(0, Math.min(100, (current / target) * 100));
       $('#road-current').textContent = nf.format(current);
-      $('#road-target').textContent = nf.format(target);
+      $('#road-next').textContent = nf.format(target);
+      $('#road-target').textContent = nf.format(targetAkhir);
       const meter = $('.road .meter');
       meter.setAttribute('aria-valuemax', target);
       meter.setAttribute('aria-valuenow', current);
@@ -2967,7 +2991,7 @@
     function bukaFestival() {
       fest.classList.remove('is-locked');
       if (festApi) festApi.setBalon(true);
-      if (!$('#fest-info').textContent) $('#fest-info').textContent = 'Tips: ketuk balon harapan atau salah satu warga untuk menyalakan cahaya dari Youth Character Summit 2026.';
+      if (!$('#fest-info').textContent) $('#fest-info').textContent = 'Ketuk balon harapan, warga, atau gelembung nilai untuk berinteraksi.';
       $('#fest-canvas').setAttribute('aria-label', 'Festival YCS di Bali. Gunakan kolom pencarian untuk menemukan namamu.');
     }
     if (saya) bukaFestival();
