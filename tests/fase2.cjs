@@ -172,13 +172,14 @@ test('Satu Kata: wajib identitas + saluran, 1 email = 1 orang, kata kasar ditola
   const app = muat({now: Date.parse('2026-11-10T09:00:00+07:00')});
   app.get('siapkan');
   let i = 0;
-  const id = (extra = {}) => ({aksi: 'kata-kirim', nama: 'Fauzan Rahman', sekolah: 'SMAN 1', email: `f${++i}@mail.com`, provinsi: 'Jawa Tengah', channelClicked: true, consent: true, requestId: crypto.randomUUID(), ipHash: 'ip' + i, ...extra});
+  const id = (extra = {}) => ({aksi: 'kata-kirim', karakter: 3, nama: 'Fauzan Rahman', sekolah: 'SMAN 1', email: `f${++i}@mail.com`, provinsi: 'Jawa Tengah', channelClicked: true, consent: true, requestId: crypto.randomUUID(), ipHash: 'ip' + i, ...extra});
   assert.equal(app.post(id({kata: 'berani', channelClicked: false})).error, 'validation', 'wajib klik saluran');
   assert.equal(app.post(id({kata: 'berani', email: 'bukan'})).error, 'validation');
   assert.equal(app.post(id({kata: 'dua kata'})).error, 'validation');
   assert.equal(app.post(id({kata: 'Anjing'})).error, 'kata_ditolak');
   const r = app.post(id({kata: 'Sejahtera!', email: 'fauzan@mail.com'}));
-  assert.deepEqual(r.entri, {n: 'Fauzan R.', k: 'sejahtera', p: 'Jawa Tengah'});
+  assert.deepEqual(r.entri, {n: 'Fauzan R.', k: 'sejahtera', p: 'Jawa Tengah', m: 3});
+  assert.equal(app.post(id({kata: 'maju', karakter: 11})).error, 'validation', 'karakter wajib 1..10');
   const lagi = app.post(id({kata: 'maju', email: 'FAUZAN@mail.com'}));
   assert.equal(lagi.sudah, true, 'email sama = orang yang sama');
   assert.equal(lagi.entri.k, 'sejahtera');
@@ -186,7 +187,8 @@ test('Satu Kata: wajib identitas + saluran, 1 email = 1 orang, kata kasar ditola
   const k = app.get('kata');
   assert.equal(k.total, 2);
   assert.deepEqual(k.kata[0], ['sejahtera', 2]);
-  assert.deepEqual(k.orang[0], ['Sinta', 'sejahtera', 'Bali'], 'terbaru lebih dulu');
+  assert.deepEqual(k.orang[0], ['Sinta', 'sejahtera', 'Bali', 3], 'terbaru lebih dulu');
+  assert.ok(app.get('config').acara.mulai.startsWith('2026-12-23'));
   assert.ok(!JSON.stringify(k).includes('@'), 'email tidak bocor');
   assert.equal(app.get('stats').road.current, 2);
 });

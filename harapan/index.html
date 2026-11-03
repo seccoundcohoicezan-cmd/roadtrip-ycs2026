@@ -48,7 +48,7 @@
       try {
         const d = await (await fetch('/api/kata', { cache: 'no-cache' })).json();
         if (!d.ok) return;
-        fest.setWarga((d.orang || []).map(([n, k, p]) => ({ n, k, p })));
+        fest.setWarga((d.orang || []).map(([n, k, p, m]) => ({ n, k, p, m })));
         document.getElementById('total').textContent = nf.format(d.total || 0);
       } catch (e) { /* coba lagi */ }
     }

@@ -342,7 +342,6 @@
     @keyframes sway { 0%, 100% { rotate: -6deg; } 50% { rotate: 6deg; } }
     .hero .sticker--kite { width: clamp(3.25rem, 7vw, 5.5rem); right: 4%; top: 1.5rem; }
     .hero .sticker--canang { width: clamp(3rem, 6vw, 5rem); left: 46%; bottom: 3.5rem; rotate: -8deg; }
-    .hero .sticker--stamp { width: clamp(4.5rem, 9vw, 7.5rem); right: 3%; bottom: 5rem; opacity: .95; }
     .hero .sticker--fr1 { width: 2.75rem; left: 47%; top: 52%; }
     .hero .sticker--fr2 { width: 1.75rem; left: 40%; top: 9%; }
     .hero__grid { position: relative; z-index: 1; }
@@ -361,7 +360,6 @@
     }
     @media (max-width: 47.99rem) {
       .hero .sticker--canang, .hero .sticker--fr1, .hero .sticker--fr2 { display: none; }
-      .hero .sticker--stamp { bottom: 1.5rem; right: 2%; }
       .hero .sticker--kite { top: .5rem; right: 3%; }
     }
     .hero__strokes { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
@@ -483,17 +481,8 @@
     .countdown__num { font-size: clamp(1.5rem, 3vw + .75rem, 2.25rem); font-weight: 800; line-height: 1.1; color: var(--primary-strong); font-variant-numeric: tabular-nums; }
     .countdown__label { font-size: .8125rem; color: var(--text-muted); font-weight: 600; }
 
-    .keydates { list-style: none; display: grid; gap: var(--space-3); margin-top: var(--space-5); padding-top: var(--space-4); border-top: 1px dashed var(--line); }
-    .keydates li { display: flex; gap: var(--space-3); align-items: flex-start; }
-    .keydates svg { width: 1.25rem; height: 1.25rem; color: var(--primary); flex: none; margin-top: .125rem; }
-    .keydates span { display: block; font-size: .8125rem; color: var(--text-muted); }
-    .keydates strong { font-size: .9375rem; }
-    .countdown-card__foot { margin-top: var(--space-4); font-size: .875rem; color: var(--text-muted); }
-    .countdown-card__foot a { font-weight: 700; }
 
     @media (min-width: 40rem) {
-      .keydates { grid-template-columns: repeat(3, 1fr); }
-      .keydates li + li { border-left: 1px solid var(--line); padding-left: var(--space-3); }
     }
     @media (min-width: 64rem) {
       .hero { padding-block: var(--space-7) calc(var(--space-9) + 2rem); }
@@ -560,7 +549,6 @@
     #live { background: url("assets/svg/pattern-kawung.svg") 0 0 / 4rem 4rem repeat; }
     #live .sticker--leaf { width: clamp(7rem, 14vw, 12rem); left: -2.5rem; top: -1rem; rotate: 20deg; opacity: .9; }
     #live .sticker--van { width: clamp(5.5rem, 10vw, 9rem); right: 2%; bottom: .75rem; }
-    #road .sticker--ticket { width: clamp(8rem, 16vw, 13rem); right: 2%; top: .5rem; rotate: 6deg; }
     #road .sticker--surf { width: clamp(2rem, 3.5vw, 3rem); left: 1%; bottom: 10%; rotate: -14deg; }
     #komunitas .sticker--penjor { width: clamp(4rem, 7vw, 6rem); right: 0; top: -2rem; }
     #faq { background: linear-gradient(180deg, transparent, rgb(255 201 60 / .10)); }
@@ -568,7 +556,7 @@
     #faq .sticker--leaf { width: clamp(6rem, 12vw, 10rem); right: -2.5rem; top: 1rem; rotate: -160deg; opacity: .85; }
     #harapan .sticker--fr { width: 3rem; right: 6%; top: 1.5rem; }
     @media (max-width: 47.99rem) {
-      #live .sticker--van, #road .sticker--ticket, #faq .sticker--gate, #komunitas .sticker--penjor { display: none; }
+      #live .sticker--van, #faq .sticker--gate, #komunitas .sticker--penjor { display: none; }
       #live .sticker--leaf { width: 5.5rem; left: -2rem; }
       #faq .sticker--leaf { width: 5rem; right: -1.5rem; }
     }
@@ -758,6 +746,21 @@
     .fest__fields { display: grid; gap: var(--space-3); margin-top: var(--space-4); }
     @media (min-width: 36rem) { .fest__fields { grid-template-columns: 1fr 1fr; } .fest__fields .field--wide { grid-column: 1 / -1; } }
     .fest__kata { min-height: 3.5rem; font-size: 1.25rem; font-weight: 800; }
+    .karakter { margin: var(--space-4) 0 0; padding: 0; border: 0; min-width: 0; }
+    .karakter legend { padding: 0; font-weight: 700; font-size: .875rem; }
+    .karakter legend .opt { font-weight: 500; color: var(--text-muted); }
+    .karakter__info { display: flex; gap: .5rem; align-items: center; margin-top: .375rem; font-size: .8125rem; color: var(--text-muted); }
+    .karakter__info svg { width: 1rem; height: 1rem; flex: none; color: var(--cta); }
+    .karakter.is-buka .karakter__info { display: none; }
+    .karakter__daftar { display: grid; grid-auto-flow: column; grid-auto-columns: 5.25rem; gap: .5rem; margin-top: .5rem; padding: .25rem .125rem .5rem; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+    @media (min-width: 40rem) { .karakter__daftar { grid-auto-flow: row; grid-template-columns: repeat(5, 1fr); grid-auto-columns: auto; overflow: visible; } }
+    .karakter__opsi { position: relative; display: grid; justify-items: center; gap: .125rem; min-height: 44px; padding: .375rem .25rem .5rem; border: 2px solid var(--line); border-radius: var(--radius); background: var(--surface-soft); font: inherit; font-size: .6875rem; font-weight: 700; line-height: 1.2; text-align: center; color: var(--text); cursor: pointer; scroll-snap-align: start; transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease); }
+    .karakter__opsi canvas { width: 3.5rem; height: auto; max-width: none; }
+    .karakter__opsi:hover { transform: translateY(-2px); }
+    .karakter__opsi[aria-checked="true"] { border-color: var(--cta); background: var(--yellow-100); }
+    .karakter__opsi[aria-checked="true"]::after { content: "✓"; position: absolute; top: .25rem; right: .3rem; width: 1.125rem; height: 1.125rem; border-radius: 50%; background: var(--cta); color: #fff; font-size: .6875rem; line-height: 1.125rem; }
+    .karakter:not(.is-buka) .karakter__opsi { filter: grayscale(.55); opacity: .75; }
+    :root[data-theme="dark"] .karakter__opsi[aria-checked="true"] { background: #3D2E07; }
     .fest-wa { display: grid; grid-template-columns: auto 1fr auto; gap: var(--space-3); align-items: center; margin-top: var(--space-4); padding: var(--space-3) var(--space-4); border: 2px dashed #25D366; border-radius: var(--radius); background: #F0FDF4; color: #14532D; text-decoration: none; transition: background var(--dur) var(--ease); }
     .fest-wa:hover { background: #DCFCE7; }
     .fest-wa__ico { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 50%; background: #25D366; color: #fff; }
@@ -1112,6 +1115,8 @@
     .mobile-nav .is-hot { color: var(--cta); font-weight: 800; }
 
     .countdown-card__when { margin-top: .25rem; font-size: .875rem; color: var(--text-muted); font-weight: 600; }
+    .countdown-card [hidden] { display: none; }
+    @media (max-width: 30rem) { .countdown-card { padding: var(--space-4); } .countdown__unit { padding: var(--space-2) 0; } .countdown-actions .btn { flex: 1; } }
     .countdown-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-4); }
     .countdown-wait { display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-4); padding: var(--space-4); border-radius: var(--radius); background: var(--yellow-100); color: #5B3B00; font-weight: 700; }
     .countdown-wait[hidden] { display: none; }
@@ -1420,7 +1425,6 @@
         <svg class="hero__stroke-1" viewBox="0 0 400 160"><path d="M10 120C80 40 200 10 390 30" fill="none" stroke="#FFC93C" stroke-width="34" stroke-linecap="round" opacity=".9"/></svg>
         <svg class="hero__stroke-2" viewBox="0 0 400 160"><path d="M10 130C120 90 260 120 390 20" fill="none" stroke="#FFC93C" stroke-width="26" stroke-linecap="round" opacity=".75"/></svg>
         <img class="sticker sticker--kite sticker--sway" src="assets/svg/kite.svg" alt="" width="200" height="300">
-        <img class="sticker sticker--stamp" src="assets/svg/stamp.svg" alt="" width="200" height="200">
       </div>
 
       <div class="container hero__grid">
@@ -1485,11 +1489,19 @@
 
         <div class="countdown-card" aria-labelledby="countdown-title">
           <div data-fase="pasca">
-            <p class="countdown-card__head"><svg aria-hidden="true"><use href="#i-megaphone"/></svg>Pengumuman sudah dirilis</p>
-            <p class="countdown-card__released" id="cd-released">Selamat untuk semua finalis! Yang belum lolos, perjalananmu belum selesai: aktifkan tiket wildcard.</p>
+            <p class="countdown-card__head" id="cd2-head"><svg aria-hidden="true"><use href="#i-pin"/></svg><span id="cd2-judul">Menuju keberangkatan ke Bali</span></p>
+            <p class="countdown-card__when" id="cd2-when">Rabu, 23 Desember 2026 · 08.00 WIB</p>
+            <div class="countdown" id="cd2" aria-hidden="true">
+              <div class="countdown__unit"><span class="countdown__num" data-unit2="d">--</span><span class="countdown__label">Hari</span></div>
+              <div class="countdown__unit"><span class="countdown__num" data-unit2="h">--</span><span class="countdown__label">Jam</span></div>
+              <div class="countdown__unit"><span class="countdown__num" data-unit2="m">--</span><span class="countdown__label">Menit</span></div>
+              <div class="countdown__unit"><span class="countdown__num" data-unit2="s">--</span><span class="countdown__label">Detik</span></div>
+            </div>
+            <p class="countdown-card__released" id="cd2-selesai" hidden>Terima kasih sudah menjadi bagian dari Youth Character Summit 2026!</p>
+            <p class="visually-hidden" id="cd2-sr" aria-live="off"></p>
             <div class="countdown-actions">
-              <a class="btn btn--live btn--sm" id="cd-replay" href="https://www.youtube.com/@universitasstekom/streams" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-play"/></svg>Tonton siaran pengumuman</a>
-              <button class="btn btn--soft btn--sm" type="button" data-share-open="pasca"><svg aria-hidden="true"><use href="#i-share"/></svg>Bagikan kabar ini</button>
+              <button class="btn btn--primary btn--sm" type="button" id="cd2-ingat"><svg aria-hidden="true"><use href="#i-bell"/></svg><span>Ingatkan saya</span></button>
+              <button class="btn btn--soft btn--sm" type="button" data-share-open="pasca"><svg aria-hidden="true"><use href="#i-share"/></svg>Bagikan</button>
             </div>
           </div>
           <div data-fase="pra">
@@ -1512,23 +1524,6 @@
           </div>
           </div>
 
-          <ul class="keydates">
-            <li>
-              <svg aria-hidden="true"><use href="#i-calendar"/></svg>
-              <div><span>Kampanye</span><strong>Festival Satu Kata</strong></div>
-            </li>
-            <li>
-              <svg aria-hidden="true"><use href="#i-megaphone"/></svg>
-              <div><span>Pengumuman 100 finalis</span><strong data-umum-tgl>16 Nov 2026</strong></div>
-            </li>
-            <li>
-              <svg aria-hidden="true"><use href="#i-pin"/></svg>
-              <div><span>Kegiatan di Bali</span><strong>23 Des 2026 – 2 Jan 2027</strong></div>
-            </li>
-          </ul>
-          <p class="countdown-card__foot" data-fase="pra">
-            Sambil menunggu, <a href="#satu-kata">masuk ke Festival Satu Kata</a> dan temukan namamu.
-          </p>
         </div>
       </div>
       <svg class="wave wave--bottom" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true"><path d="M0 46C180 78 360 10 560 30s380 50 560 26 240-46 320-34V80H0Z"/></svg>
@@ -1675,7 +1670,6 @@
 
     <!-- ========== ROAD TO BALI / LEADERBOARD / DELEGATES ========== -->
     <section class="section deco-bg" id="road" aria-label="Road to Bali, leaderboard, dan delegasi">
-      <img class="sticker sticker--ticket" src="assets/svg/ticket.svg" alt="" width="300" height="150" loading="lazy">
       <img class="sticker sticker--surf" src="assets/svg/surfboard.svg" alt="" width="120" height="300" loading="lazy">
       <div class="container trio">
 
@@ -1898,6 +1892,12 @@
               <span class="fest-wa__cek" aria-hidden="true"><svg><use href="#i-check"/></svg></span>
             </a>
             <p class="field__error" id="fk-wa-error"></p>
+            <fieldset class="karakter" id="fk-karakter-set" aria-describedby="fk-karakter-info fk-karakter-error">
+              <legend>Pilih karaktermu <span class="opt">(baju adat Nusantara)</span></legend>
+              <p class="karakter__info" id="fk-karakter-info"><svg aria-hidden="true"><use href="#i-lock"/></svg><span>Lengkapi data di atas dan ketuk Saluran WhatsApp untuk membuka pilihan karakter.</span></p>
+              <div class="karakter__daftar" id="fk-karakter" role="radiogroup" aria-label="Karakter baju adat"></div>
+              <p class="field__error" id="fk-karakter-error"></p>
+            </fieldset>
             <label class="check" for="fk-setuju" style="margin-top:1rem">
               <input type="checkbox" id="fk-setuju" required aria-describedby="fk-setuju-error">
               <span>Saya setuju data disimpan panitia sesuai <a href="privasi/" target="_blank">Kebijakan Privasi</a>. Nama panggilan, provinsi, dan kataku tampil di festival; email tidak pernah ditampilkan. Jika di bawah 18 tahun, saya sudah mendapat izin orang tua/wali.</span>
@@ -2336,12 +2336,46 @@
       else tampilGagalFinalis();
     }
 
+    /* ---------- Countdown setelah pengumuman: ke keberangkatan (23 Des), lalu ke akhir acara (2 Jan) ---------- */
+    let acaraMulai = Date.parse('2026-12-23T08:00:00+07:00'), acaraSelesai = Date.parse('2027-01-02T23:59:00+07:00');
+    function tahapAcara() {
+      const t = now();
+      if (t < acaraMulai) return { target: acaraMulai, judul: 'Menuju keberangkatan ke Bali', sr: 'Keberangkatan ke Bali' };
+      if (t < acaraSelesai) return { target: acaraSelesai, judul: 'YCS 2026 sedang berlangsung · selesai dalam', sr: 'Acara YCS 2026 selesai' };
+      return null;
+    }
+    function tickAcara() {
+      if (fase !== 'pasca') return;
+      const st = tahapAcara();
+      $('#cd2').hidden = !st;
+      $('#cd2-selesai').hidden = !!st;
+      $('#cd2-ingat').hidden = !st || st.target === acaraSelesai;
+      if (!st) { $('#cd2-judul').textContent = 'YCS 2026 telah selesai'; $('#cd2-when').textContent = `${fmtTglPendek.format(new Date(acaraMulai))} – ${fmtTglPendek.format(new Date(acaraSelesai))}`; return; }
+      $('#cd2-judul').textContent = st.judul;
+      $('#cd2-when').textContent = teksWaktu(st.target);
+      const s2 = Math.max(0, Math.floor((st.target - now()) / 1000));
+      const el = (u) => $(`[data-unit2="${u}"]`);
+      el('d').textContent = pad(Math.floor(s2 / 86400));
+      el('h').textContent = pad(Math.floor((s2 % 86400) / 3600));
+      el('m').textContent = pad(Math.floor((s2 % 3600) / 60));
+      el('s').textContent = pad(s2 % 60);
+      $('#cd2-sr').textContent = `${st.sr} pada ${teksWaktu(st.target)}.`;
+    }
+    setInterval(tickAcara, 1000);
+    $('#cd2-ingat').addEventListener('click', (e) => {
+      downloadIcs({ dataset: { start: new Date(acaraMulai).toISOString(), end: new Date(acaraSelesai).toISOString(), title: 'Youth Character Summit 2026 di Bali', platform: 'Acara', url: location.origin } });
+      $('span', e.currentTarget).textContent = 'Pengingat diunduh';
+      toast('File pengingat (.ics) diunduh. Buka untuk menambahkannya ke kalender.');
+    });
+
     function terapkanConfig() {
       if (!cfg) return;
+      if (cfg.acara && cfg.acara.mulai) acaraMulai = Date.parse(cfg.acara.mulai);
+      if (cfg.acara && cfg.acara.selesai) acaraSelesai = Date.parse(cfg.acara.selesai);
+      tickAcara();
       if (cfg.pengumuman) target = Date.parse(cfg.pengumuman);
       tulisTarget();
       if (cfg.linkLive) {
-        $('#cd-replay').href = cfg.linkLive;
         $('#live-all').href = cfg.linkLive;
       }
       if (Array.isArray(cfg.live)) bangunLive(cfg.live);
@@ -2760,7 +2794,7 @@
     const tautan = (ref, hash = '') => `${location.origin}${location.pathname}?ref=${ref}${hash}`;
     const SHARE = {
       pra: () => ({ url: tautan('share-countdown'), text: `Pengumuman finalis Youth Character Summit 2026: ${teksWaktu(target)}. Pantau countdown dan live-nya di sini!` }),
-      pasca: () => ({ url: tautan('share-finalis'), text: 'Pengumuman finalis YCS 2026 sudah rilis! Cek siapa saja yang melangkah ke Bali:' }),
+      pasca: () => ({ url: tautan('share-finalis'), text: 'Finalis YCS 2026 sudah diumumkan! Hitung mundur menuju Bali dimulai:' }),
       live: () => ({ url: tautan('share-live', '#live'), text: 'Jadwal live Youth Character Summit 2026, jangan sampai ketinggalan:' }),
       daftar: () => ({ url: tautan('share-daftar', '#delegasi'), text: 'Daftar finalis Youth Character Summit 2026. Ada nama temanmu?' }),
       kata: () => ({ url: tautan('share-kata', '#satu-kata'), text: kataSaya ? `Aku sudah masuk Festival Satu Kata YCS 2026 dengan kata "${kataSaya}". Cari namaku, lalu masuk juga:` : 'Masuk ke Festival Satu Kata YCS 2026: kirim satu kata dan temukan dirimu di antara ribuan pelajar!' }),
@@ -2932,7 +2966,7 @@
         const r = await fetch(CONFIG.kataEndpoint, { headers: { Accept: 'application/json' }, cache: 'no-cache' });
         const d = await r.json();
         if (!d.ok) return;
-        const list = (d.orang || []).map(([n, k, pv]) => ({ n, k, p: pv }));
+        const list = (d.orang || []).map(([n, k, pv, m]) => ({ n, k, p: pv, m }));
         if (saya && !list.some((e) => e.n === saya.n && e.k === saya.k)) list.unshift(saya);
         if (festApi) festApi.setWarga(list);
         $('#fest-total').textContent = nf.format(Math.max(d.total || 0, list.length));
@@ -2945,7 +2979,50 @@
     try { waKlik = sessionStorage.getItem('ycs_wa') === '1'; } catch (e) {}
     const tandaiWa = () => { $('#fk-wa').classList.add('is-done'); $('#fk-wa-state').textContent = 'Syarat terpenuhi. Jangan lupa tekan Ikuti di saluran.'; $('#fk-wa-error').textContent = ''; };
     if (waKlik) tandaiWa();
-    $('#fk-wa').addEventListener('click', () => { waKlik = true; try { sessionStorage.setItem('ycs_wa', '1'); } catch (e) {} tandaiWa(); });
+    $('#fk-wa').addEventListener('click', () => { waKlik = true; try { sessionStorage.setItem('ycs_wa', '1'); } catch (e) {} tandaiWa(); syncKarakter(); });
+
+    // Pilihan 10 karakter adat: selalu terlihat, tapi baru bisa dipilih setelah data lengkap + saluran dicentang.
+    let karakter = 0;
+    const cekData = () => [
+      ['fk-nama', $('#fk-nama').value.trim().length >= 2, 'Isi nama minimal 2 karakter.'],
+      ['fk-sekolah', $('#fk-sekolah').value.trim().length >= 2, 'Isi nama sekolah.'],
+      ['fk-prov', !!$('#fk-prov').value, 'Pilih provinsi.'],
+      ['fk-email', /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test($('#fk-email').value.trim()), 'Isi email yang valid, contoh: nama@email.com.'],
+      ['fk-kata', /^[A-Za-zÀ-ɏ-]{2,20}$/.test($('#fk-kata').value.trim()), 'Tulis satu kata saja (2–20 huruf, tanpa spasi atau angka).'],
+      ['fk-wa', waKlik, 'Ketuk kartu Saluran WhatsApp terlebih dahulu.'],
+    ];
+    const dataLengkap = () => cekData().every(([, ok]) => ok);
+    function syncKarakter() { $('#fk-karakter-set').classList.toggle('is-buka', dataLengkap()); }
+    (window.YCSFestival ? window.YCSFestival.MODEL : []).forEach((m) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'karakter__opsi';
+      b.setAttribute('role', 'radio');
+      b.setAttribute('aria-checked', 'false');
+      b.dataset.id = m.id;
+      const gambar = document.createElement('span');
+      window.YCSFestival.gambarModel(gambar, m.id);
+      b.append(gambar, document.createTextNode(m.nama));
+      b.addEventListener('click', () => {
+        if (!dataLengkap()) {
+          // Arahkan ke data yang belum lengkap dulu.
+          const kurang = cekData().find(([, ok]) => !ok);
+          cekData().forEach(([id, ok, msg]) => { if (!ok) { $('#' + id + '-error').textContent = msg; $('#' + id).setAttribute('aria-invalid', 'true'); } });
+          $('#fk-karakter-error').textContent = 'Lengkapi data dan centang Saluran WhatsApp dulu, baru pilih karakter.';
+          const el = $('#' + kurang[0]);
+          el.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+          el.focus({ preventScroll: true });
+          return;
+        }
+        karakter = m.id;
+        $$('.karakter__opsi').forEach((x) => x.setAttribute('aria-checked', String(x === b)));
+        $('#fk-karakter-error').textContent = '';
+      });
+      $('#fk-karakter').append(b);
+    });
+    $('#fest-form').addEventListener('input', syncKarakter);
+    $('#fest-form').addEventListener('change', syncKarakter);
+    syncKarakter();
 
     // Pesan error hilang begitu kolomnya diperbaiki.
     $('#fest-form').addEventListener('input', (e) => { const err = e.target.id && $('#' + e.target.id + '-error'); if (err) { err.textContent = ''; e.target.removeAttribute('aria-invalid'); } $('#fk-alert').textContent = ''; });
@@ -2960,6 +3037,7 @@
         ['fk-email', /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test($('#fk-email').value.trim()), 'Isi email yang valid, contoh: nama@email.com.'],
         ['fk-kata', /^[A-Za-zÀ-ɏ-]{2,20}$/.test(kata), 'Tulis satu kata saja (2–20 huruf, tanpa spasi atau angka).'],
         ['fk-wa', waKlik, 'Ketuk kartu Saluran WhatsApp terlebih dahulu.'],
+        ['fk-karakter', karakter > 0, 'Pilih salah satu karakter.'],
         ['fk-setuju', $('#fk-setuju').checked, 'Centang persetujuan untuk melanjutkan.'],
       ];
       let first = null;
@@ -2968,7 +3046,7 @@
       const ident = { nama: $('#fk-nama').value.trim(), sekolah: $('#fk-sekolah').value.trim(), provinsi: $('#fk-prov').value, email: $('#fk-email').value.trim() };
       const btn = $('#fk-kirim');
       sibuk(btn, true);
-      const d = await kirimJson(CONFIG.kataEndpoint, { aksi: 'kirim', kata, ...ident, channelClicked: true, consent: true, requestId: uuid(), perangkat, ref: sumber, website: $('#fk-website').value });
+      const d = await kirimJson(CONFIG.kataEndpoint, { aksi: 'kirim', kata, karakter, ...ident, channelClicked: true, consent: true, requestId: uuid(), perangkat, ref: sumber, website: $('#fk-website').value });
       sibuk(btn, false);
       if (!d.ok) {
         $('#fk-alert').textContent = { kata_ditolak: 'Kata ini tidak bisa ditampilkan. Coba kata positif lain, ya.', nama_ditolak: 'Nama ini tidak bisa ditampilkan. Gunakan nama aslimu.', terlalu_banyak: 'Terlalu banyak kiriman dari jaringan ini. Coba lagi nanti.', validation: 'Ada data yang belum sesuai. Periksa lagi isianmu.' }[d.error] || 'Koneksi bermasalah. Coba kirim lagi.';

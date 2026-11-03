@@ -6,11 +6,19 @@
   // Lapisan teks "Youth Character Summit 2026" (dipotong dari latar, latar transparan) agar cahaya bisa datang dari belakangnya.
   const JUDUL = { kecil: '/assets/img/festival/judul-900.webp', besar: '/assets/img/festival/judul-1600.webp', x: 440 / 1654, y: 20 / 588, w: 780 / 1654, h: 272 / 588 };
   const KULIT = ['#F2C9A0', '#E0AC7E', '#C68A5C', '#A8693F', '#8A5530'];
-  const BAJU = ['#FFFFFF', '#FFFFFF', '#F4F1EA', '#0E5A66', '#C2410C', '#FFC93C', '#7C3AED', '#DC2626', '#15803D', '#2563EB', '#DB2777', '#F59E0B'];
-  const BAWAH = ['#374151', '#1F2937', '#6B4F2A', '#7F1D1D', '#14532D', '#1E3A8A', '#9A3412'];
-  const KEPALA = ['pendek', 'pendek', 'panjang', 'hijab', 'udeng', 'topi'];
-  const WARNA_HIJAB = ['#F9FAFB', '#E11D48', '#0E7490', '#7C3AED', '#F59E0B', '#111827', '#DB2777'];
-  const RAMBUT = ['#1F1A17', '#2B211C', '#3B2A20', '#111111'];
+  // 10 karakter baju adat Nusantara (digambar dengan kode: ringan, tanpa unduhan gambar).
+  const MODEL = [
+    { id: 1, nama: 'Bali (Putra)', kepala: 'udeng', wk: '#FFFFFF', wk2: '#E8B923', rambut: 'pendek', atas: { warna: '#FFFFFF', model: 'kemeja' }, bawah: { tipe: 'kain', warna: '#111111', warna2: '#F5F5F5', pola: 'kotak' }, sabuk: '#F2C230' },
+    { id: 2, nama: 'Bali (Putri)', kepala: 'sanggul-bunga', wk: '#FFFFFF', wk2: '#F59E0B', rambut: 'sanggul', atas: { warna: '#F9A8D4', model: 'kebaya' }, bawah: { tipe: 'kain', warna: '#C9A227', warna2: '#8A6D12', pola: 'songket' }, sabuk: '#F2C230' },
+    { id: 3, nama: 'Jawa (Beskap)', kepala: 'blangkon', wk: '#6B4423', wk2: '#3B2412', rambut: 'pendek', atas: { warna: '#1C1C1C', model: 'beskap', aksen: '#E8B923' }, bawah: { tipe: 'kain', warna: '#7A4E2D', warna2: '#2B1A0E', pola: 'batik' } },
+    { id: 4, nama: 'Jawa (Kebaya)', kepala: 'konde', wk: '#1A1A1A', wk2: '#E8B923', rambut: 'sanggul', atas: { warna: '#8B1E2D', model: 'kebaya' }, bawah: { tipe: 'kain', warna: '#6B4423', warna2: '#E9D8B4', pola: 'batik' } },
+    { id: 5, nama: 'Minang (Bundo Kanduang)', kepala: 'tanduk', wk: '#B91C1C', wk2: '#E8B923', rambut: 'tutup', atas: { warna: '#B91C1C', model: 'kurung', aksen: '#E8B923' }, bawah: { tipe: 'kain', warna: '#7F1D1D', warna2: '#E8B923', pola: 'songket' } },
+    { id: 6, nama: 'Batak (Ulos)', kepala: 'sortali', wk: '#B91C1C', wk2: '#E8B923', rambut: 'pendek', atas: { warna: '#1F1F1F', model: 'kemeja' }, bawah: { tipe: 'kain', warna: '#7F1D1D', warna2: '#111111', pola: 'garis' }, selempang: ['#B91C1C', '#111111', '#F5F5F5'] },
+    { id: 7, nama: 'Dayak (Kalimantan)', kepala: 'bulu', wk: '#111111', wk2: '#F5F5F5', rambut: 'pendek', atas: { warna: '#1F1F1F', model: 'rompi', aksen: '#F5F5F5', aksen2: '#DC2626', dalam: '#E9D8B4' }, bawah: { tipe: 'kain', warna: '#B91C1C', warna2: '#111111', pola: 'garis' } },
+    { id: 8, nama: 'Bugis (Baju Bodo)', kepala: 'sanggul-emas', wk: '#1A1A1A', wk2: '#E8B923', rambut: 'sanggul', atas: { warna: '#EC4899', model: 'bodo' }, bawah: { tipe: 'kain', warna: '#6D28D9', warna2: '#22C55E', pola: 'kotak' } },
+    { id: 9, nama: 'Melayu (Teluk Belanga)', kepala: 'songkok', wk: '#111111', wk2: '#111111', rambut: 'pendek', atas: { warna: '#0F766E', model: 'kurung' }, bawah: { tipe: 'celana', warna: '#0F766E' }, samping: { warna: '#C9A227', warna2: '#8A6D12' } },
+    { id: 10, nama: 'Papua (Bulu Cenderawasih)', kepala: 'mahkota', wk: '#F59E0B', wk2: '#DC2626', rambut: 'pendek', atas: { warna: '#B45309', model: 'rompi', aksen: '#FDE047', aksen2: '#DC2626', dalam: null }, bawah: { tipe: 'rumbai', warna: '#B08A4A', warna2: '#7C5A2A' }, noken: '#8B5E34' },
+  ];
 
   function hash(s) {
     let h = 2166136261;
@@ -19,77 +27,125 @@
   }
   const pilih = (arr, h, geser) => arr[(h >>> geser) % arr.length];
 
-  // Ciri warga ditentukan dari nama + kata, jadi orang yang sama selalu tampil sama.
+  // Ciri warga: karakter adat pilihan (e.m, 1..10) + warna kulit/gerak dari nama + kata (selalu sama untuk orang yang sama).
   function ciri(e) {
     const h = hash((e.n || '') + '|' + (e.k || ''));
-    return {
-      kulit: pilih(KULIT, h, 0), baju: pilih(BAJU, h, 3), bawah: pilih(BAWAH, h, 7), kepala: pilih(KEPALA, h, 11),
-      hijab: pilih(WARNA_HIJAB, h, 14), rambut: pilih(RAMBUT, h, 17), sarung: ((h >>> 20) % 4) === 0, lambai: ((h >>> 23) % 5) === 0,
-      fase: ((h >>> 9) % 628) / 100, lompat: ((h >>> 26) % 3) === 0,
-    };
+    const m = Number(e.m) >= 1 && Number(e.m) <= MODEL.length ? Number(e.m) : (h % MODEL.length) + 1;
+    return { model: m, kulit: pilih(KULIT, h, 3), lambai: ((h >>> 23) % 5) === 0, fase: ((h >>> 9) % 628) / 100, lompat: ((h >>> 26) % 3) === 0 };
   }
-  const kunciCiri = (c) => [c.kulit, c.baju, c.bawah, c.kepala, c.hijab, c.rambut, c.sarung, c.lambai].join();
+  const kunciCiri = (c) => [c.model, c.kulit, c.lambai].join();
 
   function rrect(x, ctx, a, b, w, h, r) {
     x.beginPath();
     if (x.roundRect) x.roundRect(a, b, w, h, r); else x.rect(a, b, w, h);
     ctx();
   }
-  // Gambar satu warga berdiri menghadap depan; (0,0) = titik kaki tengah, tinggi H.
+  // Isi motif kain di dalam path yang sedang aktif (clip).
+  function motif(x, pola, w1, w2, bx, by, bw, bh, H) {
+    x.save(); x.clip();
+    x.fillStyle = w1; x.fillRect(bx, by, bw, bh);
+    x.fillStyle = w2;
+    const s = Math.max(1.5, H * 0.045);
+    if (pola === 'kotak') { for (let yy = by; yy < by + bh; yy += s) for (let xx = bx; xx < bx + bw; xx += s) if (((Math.round((xx - bx) / s) + Math.round((yy - by) / s)) % 2) === 0) x.fillRect(xx, yy, s, s); }
+    else if (pola === 'garis') { for (let yy = by + s * 0.5; yy < by + bh; yy += s * 1.4) x.fillRect(bx, yy, bw, s * 0.45); }
+    else if (pola === 'batik') { for (let yy = by + s * 0.6; yy < by + bh; yy += s * 1.3) for (let xx = bx + ((yy - by) / s % 2 ? s * 0.6 : 0); xx < bx + bw; xx += s * 1.3) { x.beginPath(); x.arc(xx, yy, s * 0.32, 0, Math.PI * 2); x.fill(); } }
+    else if (pola === 'songket') { for (let yy = by + s; yy < by + bh; yy += s * 1.6) { x.fillRect(bx, yy, bw, s * 0.2); for (let xx = bx + s * 0.5; xx < bx + bw; xx += s * 1.2) { x.beginPath(); x.moveTo(xx, yy - s * 0.4); x.lineTo(xx + s * 0.3, yy + s * 0.1); x.lineTo(xx, yy + s * 0.6); x.lineTo(xx - s * 0.3, yy + s * 0.1); x.fill(); } } }
+    x.restore();
+  }
+
+  // Gambar satu warga berbaju adat menghadap depan; (0,0) = titik kaki tengah, tinggi H.
   function gambarOrang(x, H, c, langkah = 0) {
-    const ayun = langkah === 1 ? H * 0.045 : langkah === 2 ? -H * 0.045 : 0;
+    const M = MODEL[c.model - 1];
+    const ayun = langkah === 1 ? H * 0.04 : langkah === 2 ? -H * 0.04 : 0;
     const kepalaR = H * 0.13, kepalaY = -H * 0.83;
     x.fillStyle = 'rgba(0,0,0,.18)';
     x.beginPath(); x.ellipse(0, 0, H * 0.2, H * 0.045, 0, 0, Math.PI * 2); x.fill();
-    // kaki / sarung
-    x.fillStyle = c.bawah;
-    if (c.sarung) { x.beginPath(); x.moveTo(-H * 0.17, -H * 0.36); x.lineTo(H * 0.17, -H * 0.36); x.lineTo(H * 0.14, -H * 0.03); x.lineTo(-H * 0.14, -H * 0.03); x.closePath(); x.fill(); }
-    else { x.fillRect(-H * 0.15 - ayun, -H * 0.37, H * 0.12, H * 0.35 - Math.abs(ayun) * 0.4); x.fillRect(H * 0.03 + ayun, -H * 0.37, H * 0.12, H * 0.35 - Math.abs(ayun) * 0.4); }
-    x.fillStyle = '#2B2B2B';
-    x.fillRect(-H * 0.16 - ayun, -H * 0.04 - Math.abs(ayun) * 0.4, H * 0.14, H * 0.04); x.fillRect(H * 0.02 + ayun, -H * 0.04 - Math.abs(ayun) * 0.4, H * 0.14, H * 0.04);
-    // lengan
-    x.fillStyle = c.baju;
-    x.fillRect(-H * 0.27, -H * 0.66, H * 0.09, H * 0.3);
-    if (c.lambai) { x.save(); x.translate(H * 0.22, -H * 0.64); x.rotate(-2.5); x.fillRect(-H * 0.045, 0, H * 0.09, H * 0.3); x.fillStyle = c.kulit; x.beginPath(); x.arc(0, H * 0.32, H * 0.05, 0, Math.PI * 2); x.fill(); x.restore(); }
-    else x.fillRect(H * 0.18, -H * 0.66, H * 0.09, H * 0.3);
+    // kaki + alas
     x.fillStyle = c.kulit;
-    x.beginPath(); x.arc(-H * 0.225, -H * 0.34, H * 0.05, 0, Math.PI * 2); x.fill();
-    if (!c.lambai) { x.beginPath(); x.arc(H * 0.225, -H * 0.34, H * 0.05, 0, Math.PI * 2); x.fill(); }
-    // badan
-    x.fillStyle = c.baju;
-    rrect(x, () => x.fill(), -H * 0.19, -H * 0.7, H * 0.38, H * 0.37, H * 0.08);
-    if (c.baju === '#FFFFFF' || c.baju === '#F4F1EA') { x.strokeStyle = 'rgba(0,0,0,.18)'; x.lineWidth = H * 0.02; rrect(x, () => x.stroke(), -H * 0.19, -H * 0.7, H * 0.38, H * 0.37, H * 0.08); }
-    // kepala
-    if (c.kepala === 'hijab') {
-      x.fillStyle = c.hijab;
-      x.beginPath(); x.arc(0, kepalaY, kepalaR * 1.3, 0, Math.PI * 2); x.fill();
-      x.beginPath(); x.moveTo(-kepalaR * 1.3, kepalaY); x.lineTo(kepalaR * 1.3, kepalaY); x.lineTo(H * 0.2, -H * 0.6); x.lineTo(-H * 0.2, -H * 0.6); x.closePath(); x.fill();
-      x.fillStyle = c.kulit; x.beginPath(); x.ellipse(0, kepalaY + kepalaR * 0.12, kepalaR * 0.78, kepalaR * 0.88, 0, 0, Math.PI * 2); x.fill();
+    x.fillRect(-H * 0.12 - ayun, -H * 0.12, H * 0.08, H * 0.1); x.fillRect(H * 0.04 + ayun, -H * 0.12, H * 0.08, H * 0.1);
+    x.fillStyle = '#2B2B2B';
+    x.fillRect(-H * 0.14 - ayun, -H * 0.035 - Math.abs(ayun) * 0.3, H * 0.12, H * 0.035); x.fillRect(H * 0.02 + ayun, -H * 0.035 - Math.abs(ayun) * 0.3, H * 0.12, H * 0.035);
+    // bawahan
+    const B = M.bawah;
+    if (B.tipe === 'celana') {
+      x.fillStyle = B.warna;
+      x.fillRect(-H * 0.15 - ayun, -H * 0.4, H * 0.13, H * 0.36); x.fillRect(H * 0.02 + ayun, -H * 0.4, H * 0.13, H * 0.36);
+    } else if (B.tipe === 'rumbai') {
+      x.strokeStyle = B.warna; x.lineWidth = Math.max(1, H * 0.018);
+      for (let i = -8; i <= 8; i++) { x.strokeStyle = i % 2 ? B.warna : B.warna2; x.beginPath(); x.moveTo(i * H * 0.02, -H * 0.42); x.lineTo(i * H * 0.022 + ayun * 0.4, -H * 0.1); x.stroke(); }
     } else {
-      x.fillStyle = c.kulit; x.beginPath(); x.arc(0, kepalaY, kepalaR, 0, Math.PI * 2); x.fill();
-      x.fillStyle = c.rambut;
-      if (c.kepala === 'panjang') { x.beginPath(); x.arc(0, kepalaY - kepalaR * 0.1, kepalaR * 1.08, Math.PI, 0); x.fill(); x.fillRect(-kepalaR * 1.08, kepalaY - kepalaR * 0.1, kepalaR * 0.4, kepalaR * 1.6); x.fillRect(kepalaR * 0.68, kepalaY - kepalaR * 0.1, kepalaR * 0.4, kepalaR * 1.6); }
-      else { x.beginPath(); x.arc(0, kepalaY - kepalaR * 0.15, kepalaR * 1.02, Math.PI * 1.05, Math.PI * 1.95); x.fill(); x.fillRect(-kepalaR, kepalaY - kepalaR * 0.55, kepalaR * 2, kepalaR * 0.45); }
-      if (c.kepala === 'udeng') { x.fillStyle = c.hijab === '#111827' ? '#F9FAFB' : c.hijab; x.fillRect(-kepalaR * 1.05, kepalaY - kepalaR * 0.75, kepalaR * 2.1, kepalaR * 0.42); x.beginPath(); x.moveTo(0, kepalaY - kepalaR * 0.8); x.lineTo(kepalaR * 0.45, kepalaY - kepalaR * 1.35); x.lineTo(kepalaR * 0.55, kepalaY - kepalaR * 0.7); x.fill(); }
-      if (c.kepala === 'topi') { x.fillStyle = c.baju === '#FFFFFF' ? '#0E5A66' : c.baju; x.beginPath(); x.arc(0, kepalaY - kepalaR * 0.3, kepalaR * 1.02, Math.PI, 0); x.fill(); x.fillRect(-kepalaR * 0.2, kepalaY - kepalaR * 0.42, kepalaR * 1.5, kepalaR * 0.25); }
+      x.beginPath(); x.moveTo(-H * 0.18, -H * 0.42); x.lineTo(H * 0.18, -H * 0.42); x.lineTo(H * 0.16 + ayun * 0.3, -H * 0.08); x.lineTo(-H * 0.16 + ayun * 0.3, -H * 0.08); x.closePath();
+      motif(x, B.pola, B.warna, B.warna2, -H * 0.2, -H * 0.43, H * 0.4, H * 0.36, H);
     }
-    // mata kecil (terlihat di barisan depan)
+    // lengan
+    const A = M.atas;
+    const lengan = A.model === 'rompi' ? (A.dalam || c.kulit) : A.warna;
+    x.fillStyle = lengan;
+    const pendek = A.model === 'bodo';
+    x.fillRect(-H * 0.27, -H * 0.66, H * 0.09, pendek ? H * 0.14 : H * 0.28);
+    if (c.lambai) { x.save(); x.translate(H * 0.22, -H * 0.64); x.rotate(-2.5); x.fillRect(-H * 0.045, 0, H * 0.09, pendek ? H * 0.14 : H * 0.28); x.fillStyle = c.kulit; if (pendek) x.fillRect(-H * 0.035, H * 0.14, H * 0.07, H * 0.14); x.beginPath(); x.arc(0, H * 0.31, H * 0.05, 0, Math.PI * 2); x.fill(); x.restore(); }
+    else x.fillRect(H * 0.18, -H * 0.66, H * 0.09, pendek ? H * 0.14 : H * 0.28);
+    x.fillStyle = c.kulit;
+    if (pendek) { x.fillRect(-H * 0.26, -H * 0.52, H * 0.07, H * 0.15); if (!c.lambai) x.fillRect(H * 0.19, -H * 0.52, H * 0.07, H * 0.15); }
+    x.beginPath(); x.arc(-H * 0.225, -H * 0.36, H * 0.05, 0, Math.PI * 2); x.fill();
+    if (!c.lambai) { x.beginPath(); x.arc(H * 0.225, -H * 0.36, H * 0.05, 0, Math.PI * 2); x.fill(); }
+    // atasan
+    if (A.model === 'rompi') { x.fillStyle = A.dalam || c.kulit; rrect(x, () => x.fill(), -H * 0.19, -H * 0.7, H * 0.38, H * 0.3, H * 0.07); }
+    if (A.model === 'bodo') {
+      x.fillStyle = A.warna; x.globalAlpha = 0.92;
+      x.beginPath(); x.moveTo(-H * 0.28, -H * 0.68); x.lineTo(H * 0.28, -H * 0.68); x.lineTo(H * 0.22, -H * 0.38); x.lineTo(-H * 0.22, -H * 0.38); x.closePath(); x.fill();
+      x.globalAlpha = 1;
+    } else if (A.model === 'rompi') {
+      x.fillStyle = A.warna;
+      x.fillRect(-H * 0.19, -H * 0.7, H * 0.12, H * 0.3); x.fillRect(H * 0.07, -H * 0.7, H * 0.12, H * 0.3);
+      x.fillStyle = A.aksen; for (let i = 0; i < 4; i++) { x.fillRect(-H * 0.17, -H * 0.66 + i * H * 0.07, H * 0.08, H * 0.02); x.fillRect(H * 0.09, -H * 0.66 + i * H * 0.07, H * 0.08, H * 0.02); }
+      x.fillStyle = A.aksen2; x.fillRect(-H * 0.15, -H * 0.62, H * 0.04, H * 0.04); x.fillRect(H * 0.11, -H * 0.55, H * 0.04, H * 0.04);
+    } else {
+      x.fillStyle = A.warna;
+      rrect(x, () => x.fill(), -H * 0.19, -H * 0.7, H * 0.38, A.model === 'kebaya' || A.model === 'kurung' ? H * 0.34 : H * 0.3, H * 0.07);
+      if (A.warna === '#FFFFFF') { x.strokeStyle = 'rgba(0,0,0,.16)'; x.lineWidth = H * 0.018; rrect(x, () => x.stroke(), -H * 0.19, -H * 0.7, H * 0.38, H * 0.3, H * 0.07); }
+      if (A.model === 'kebaya') { x.fillStyle = 'rgba(255,255,255,.55)'; x.beginPath(); x.moveTo(-H * 0.06, -H * 0.7); x.lineTo(0, -H * 0.52); x.lineTo(H * 0.06, -H * 0.7); x.fill(); }
+      if (A.model === 'beskap') { x.fillStyle = A.aksen; for (let i = 0; i < 3; i++) { x.beginPath(); x.arc(H * 0.05, -H * 0.64 + i * H * 0.08, H * 0.016, 0, Math.PI * 2); x.fill(); } }
+      if (A.model === 'kurung' && A.aksen) { x.fillStyle = A.aksen; x.fillRect(-H * 0.19, -H * 0.48, H * 0.38, H * 0.025); }
+    }
+    if (M.sabuk) { x.fillStyle = M.sabuk; x.fillRect(-H * 0.19, -H * 0.43, H * 0.38, H * 0.05); }
+    if (M.samping) { x.beginPath(); x.rect(-H * 0.2, -H * 0.44, H * 0.4, H * 0.14); motif(x, 'songket', M.samping.warna, M.samping.warna2, -H * 0.2, -H * 0.44, H * 0.4, H * 0.14, H); }
+    if (M.selempang) { const [s1, s2, s3] = M.selempang; x.save(); x.beginPath(); x.moveTo(-H * 0.19, -H * 0.7); x.lineTo(-H * 0.07, -H * 0.7); x.lineTo(H * 0.19, -H * 0.42); x.lineTo(H * 0.07, -H * 0.42); x.closePath(); x.clip(); x.fillStyle = s1; x.fillRect(-H * 0.2, -H * 0.72, H * 0.4, H * 0.32); x.fillStyle = s2; for (let i = 0; i < 6; i++) x.fillRect(-H * 0.2, -H * 0.69 + i * H * 0.05, H * 0.4, H * 0.015); x.fillStyle = s3; for (let i = 0; i < 6; i++) x.fillRect(-H * 0.2, -H * 0.675 + i * H * 0.05, H * 0.4, H * 0.006); x.restore(); }
+    if (M.noken) { x.fillStyle = M.noken; x.beginPath(); x.ellipse(H * 0.2, -H * 0.45, H * 0.08, H * 0.1, 0, 0, Math.PI * 2); x.fill(); x.strokeStyle = M.noken; x.lineWidth = H * 0.015; x.beginPath(); x.moveTo(H * 0.16, -H * 0.53); x.lineTo(-H * 0.08, -H * 0.7); x.stroke(); }
+    // kepala + rambut
+    x.fillStyle = c.kulit; x.beginPath(); x.arc(0, kepalaY, kepalaR, 0, Math.PI * 2); x.fill();
+    x.fillStyle = '#1F1A17';
+    if (M.rambut === 'pendek') { x.beginPath(); x.arc(0, kepalaY - kepalaR * 0.15, kepalaR * 1.02, Math.PI * 1.05, Math.PI * 1.95); x.fill(); x.fillRect(-kepalaR, kepalaY - kepalaR * 0.55, kepalaR * 2, kepalaR * 0.4); }
+    if (M.rambut === 'sanggul') { x.beginPath(); x.arc(0, kepalaY - kepalaR * 0.1, kepalaR * 1.06, Math.PI, 0); x.fill(); x.beginPath(); x.arc(0, kepalaY - kepalaR * 1.05, kepalaR * 0.5, 0, Math.PI * 2); x.fill(); }
+    const wk = M.wk, wk2 = M.wk2;
+    switch (M.kepala) {
+      case 'udeng': x.fillStyle = wk; x.fillRect(-kepalaR * 1.08, kepalaY - kepalaR * 0.95, kepalaR * 2.16, kepalaR * 0.55); x.beginPath(); x.moveTo(-kepalaR * 0.2, kepalaY - kepalaR * 0.9); x.lineTo(kepalaR * 0.25, kepalaY - kepalaR * 1.6); x.lineTo(kepalaR * 0.55, kepalaY - kepalaR * 0.85); x.fill(); x.fillStyle = wk2; x.fillRect(-kepalaR * 1.08, kepalaY - kepalaR * 0.5, kepalaR * 2.16, kepalaR * 0.1); break;
+      case 'sanggul-bunga': x.fillStyle = wk; for (let i = 0; i < 5; i++) { const a = i * 1.2566; x.beginPath(); x.arc(kepalaR * 0.55 + Math.cos(a) * kepalaR * 0.22, kepalaY - kepalaR * 0.95 + Math.sin(a) * kepalaR * 0.22, kepalaR * 0.17, 0, Math.PI * 2); x.fill(); } x.fillStyle = wk2; x.beginPath(); x.arc(kepalaR * 0.55, kepalaY - kepalaR * 0.95, kepalaR * 0.1, 0, Math.PI * 2); x.fill(); break;
+      case 'blangkon': x.fillStyle = wk; x.beginPath(); x.arc(0, kepalaY - kepalaR * 0.25, kepalaR * 1.08, Math.PI, 0); x.fill(); x.fillRect(-kepalaR * 1.08, kepalaY - kepalaR * 0.3, kepalaR * 2.16, kepalaR * 0.3); x.fillStyle = wk2; x.fillRect(-kepalaR * 1.08, kepalaY - kepalaR * 0.45, kepalaR * 2.16, kepalaR * 0.12); break;
+      case 'konde': x.fillStyle = wk2; x.beginPath(); x.arc(kepalaR * 0.4, kepalaY - kepalaR * 1.1, kepalaR * 0.12, 0, Math.PI * 2); x.fill(); break;
+      case 'tanduk': x.fillStyle = wk; x.beginPath(); x.moveTo(-kepalaR * 1.9, kepalaY - kepalaR * 1.5); x.quadraticCurveTo(-kepalaR * 0.6, kepalaY - kepalaR * 0.5, 0, kepalaY - kepalaR * 0.9); x.quadraticCurveTo(kepalaR * 0.6, kepalaY - kepalaR * 0.5, kepalaR * 1.9, kepalaY - kepalaR * 1.5); x.lineTo(kepalaR * 1.2, kepalaY - kepalaR * 0.4); x.lineTo(-kepalaR * 1.2, kepalaY - kepalaR * 0.4); x.closePath(); x.fill(); x.fillStyle = wk2; x.fillRect(-kepalaR * 1.1, kepalaY - kepalaR * 0.55, kepalaR * 2.2, kepalaR * 0.12); break;
+      case 'sortali': x.fillStyle = wk; x.fillRect(-kepalaR * 1.06, kepalaY - kepalaR * 0.7, kepalaR * 2.12, kepalaR * 0.32); x.fillStyle = wk2; x.beginPath(); x.moveTo(0, kepalaY - kepalaR * 1.25); x.lineTo(kepalaR * 0.22, kepalaY - kepalaR * 0.7); x.lineTo(-kepalaR * 0.22, kepalaY - kepalaR * 0.7); x.fill(); break;
+      case 'bulu': x.fillStyle = wk; x.fillRect(-kepalaR * 1.05, kepalaY - kepalaR * 0.7, kepalaR * 2.1, kepalaR * 0.25); for (let i = -1; i <= 1; i++) { x.fillStyle = i ? wk2 : wk; x.beginPath(); x.ellipse(i * kepalaR * 0.45, kepalaY - kepalaR * 1.45, kepalaR * 0.16, kepalaR * 0.75, i * 0.35, 0, Math.PI * 2); x.fill(); } break;
+      case 'sanggul-emas': x.fillStyle = wk2; x.fillRect(-kepalaR * 0.6, kepalaY - kepalaR * 1.2, kepalaR * 1.2, kepalaR * 0.14); x.beginPath(); x.arc(kepalaR * 0.5, kepalaY - kepalaR * 1.0, kepalaR * 0.14, 0, Math.PI * 2); x.fill(); break;
+      case 'songkok': x.fillStyle = wk; x.fillRect(-kepalaR * 0.95, kepalaY - kepalaR * 1.25, kepalaR * 1.9, kepalaR * 0.75); break;
+      case 'mahkota': for (let i = -3; i <= 3; i++) { x.fillStyle = [wk, wk2, '#22C55E', '#FDE047'][(i + 4) % 4]; x.beginPath(); x.ellipse(i * kepalaR * 0.32, kepalaY - kepalaR * 1.55, kepalaR * 0.13, kepalaR * 0.8, i * 0.22, 0, Math.PI * 2); x.fill(); } x.fillStyle = '#7C2D12'; x.fillRect(-kepalaR * 1.05, kepalaY - kepalaR * 0.8, kepalaR * 2.1, kepalaR * 0.28); break;
+    }
     x.fillStyle = '#1F1A17';
     x.beginPath(); x.arc(-kepalaR * 0.35, kepalaY + kepalaR * 0.15, kepalaR * 0.11, 0, Math.PI * 2); x.arc(kepalaR * 0.35, kepalaY + kepalaR * 0.15, kepalaR * 0.11, 0, Math.PI * 2); x.fill();
   }
 
   // Sprite per kombinasi ciri + fase langkah, digambar sekali lalu diskalakan (ringan untuk ribuan warga).
-  const SPR_H = 96, SPR_W = 72;
+  const SPR_H = 96, SPR_W = 80, SPR_ATAS = 34, SPR_BAWAH = 6; // ruang atas untuk hiasan kepala tinggi (mahkota, tanduk)
   const cacheSprite = new Map();
   function sprite(c, langkah) {
     const k = kunciCiri(c) + '|' + langkah;
     let s = cacheSprite.get(k);
     if (s) return s;
     s = document.createElement('canvas');
-    s.width = SPR_W; s.height = SPR_H + 8;
+    s.width = SPR_W; s.height = SPR_H + SPR_ATAS + SPR_BAWAH;
     const x = s.getContext('2d');
-    x.translate(SPR_W / 2, SPR_H + 2);
-    gambarOrang(x, SPR_H * 0.98, c, langkah);
+    x.translate(SPR_W / 2, SPR_H + SPR_ATAS);
+    gambarOrang(x, SPR_H, c, langkah);
     cacheSprite.set(k, s);
     return s;
   }
@@ -207,8 +263,8 @@
         const langkah = w.jalan ? (Math.floor(w.langkahT) % 2) + 1 : 0;
         const naik = w.jalan ? Math.abs(Math.sin(w.langkahT * Math.PI)) * h * 0.03 : 0;
         const sp = sprite(w.c, langkah);
-        const sh = h * (SPR_H + 8) / SPR_H, sw = sh * SPR_W / (SPR_H + 8);
-        ctx.drawImage(sp, px - sw / 2, py - sh + h * 0.06 - naik, sw, sh);
+        const k = h / SPR_H, sw = SPR_W * k, sh = (SPR_H + SPR_ATAS + SPR_BAWAH) * k;
+        ctx.drawImage(sp, px - sw / 2, py - (SPR_H + SPR_ATAS) * k - naik, sw, sh);
         w.layar = { x: px, y: py - h - naik, kaki: py, h };
       }
       for (const bl of balon) {
@@ -482,5 +538,16 @@
     mulai();
     return api;
   }
+  // Gambar karakter adat utuh (untuk pilihan karakter di form).
+  YCSFestival.MODEL = MODEL.map((m) => ({ id: m.id, nama: m.nama }));
+  YCSFestival.gambarModel = (el, id, kulit = '#E0AC7E') => {
+    const c = document.createElement('canvas');
+    c.width = 96; c.height = 128;
+    const x = c.getContext('2d');
+    x.translate(48, 122);
+    gambarOrang(x, 100, { model: id, kulit, lambai: false });
+    el.textContent = '';
+    el.append(c);
+  };
   window.YCSFestival = YCSFestival;
 })();

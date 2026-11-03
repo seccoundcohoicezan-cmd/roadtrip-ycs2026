@@ -4,7 +4,7 @@ const HEADERS_LAMA = ['Waktu', 'ID permintaan', 'Nama', 'Sekolah', 'Email', 'Bin
 const HEADERS = HEADERS_LAMA.concat(['Kota/Kabupaten', 'Provinsi']);
 const REKAP_NAME = 'Rekap';
 const REKAP_VERSI = '3';
-const SKEMA_VERSI = '5';
+const SKEMA_VERSI = '6';
 const WIB = 7 * 3600 * 1000;
 
 const TAB = {
@@ -18,7 +18,7 @@ const KOLOM = {
   kode: ['Kode', 'Email', 'Nama', 'Status', 'Berlaku hingga (WIB)', 'Waktu klaim', 'Percobaan salah', 'Catatan'],
   dana: ['Waktu', 'ID permintaan', 'Nama', 'Email', 'Nomor WhatsApp', 'Sekolah', 'Kota/Kabupaten', 'Provinsi', 'Sumber'],
   survei: ['Waktu', 'ID permintaan', 'Destinasi pilihan', 'Kegiatan favorit', 'Waktu ideal', 'Status', 'Provinsi', 'Destinasi impian lain', 'Email', 'Sumber'],
-  kata: ['Waktu', 'ID permintaan', 'Kata', 'Provinsi', 'Sumber', 'Tampil', 'Nama', 'Sekolah', 'Email', 'Klik saluran WhatsApp'],
+  kata: ['Waktu', 'ID permintaan', 'Kata', 'Provinsi', 'Sumber', 'Tampil', 'Nama', 'Sekolah', 'Email', 'Klik saluran WhatsApp', 'Karakter'],
   log: ['Waktu', 'Aksi', 'Detail']
 };
 const STATUS_KODE = {belum: 'belum klaim', sudah: 'sudah klaim', hangus: 'hangus'};
@@ -50,11 +50,13 @@ const PENGATURAN = [
   ['popup_gambar', '', 'Opsional: URL gambar https (rasio 16:9).'],
   ['popup_tombol', 'Lihat selengkapnya', 'Teks tombol.'],
   ['popup_link', '', 'Tujuan saat pop-up/tombol diklik: link https://, halaman situs (mis. /klaim/), atau bagian (#live).'],
+  ['waktu_acara_mulai', '2026-12-23 08:00', 'Mulai acara utama (keberangkatan ke Bali). Setelah pengumuman, countdown beranda menghitung ke waktu ini.'],
+  ['waktu_acara_selesai', '2027-01-02 23:59', 'Akhir acara utama. Selama acara berlangsung, countdown menghitung ke waktu ini.'],
   ['link_saluran', 'https://whatsapp.com/channel/0029Vb5vVIaId7nEqecJ1I1G', 'Saluran WhatsApp yang harus diikuti untuk membuka hasil Satu Kata.'],
   ['kata_blokir', '', 'Kata tambahan yang ditolak di Satu Kata (pisahkan dengan koma). Sembunyikan kata yang sudah masuk lewat kolom Tampil = TIDAK di tab Satu Kata.']
 ];
 const KUNCI_YA_TIDAK = ['pakai_link_cadangan', 'klaim_aktif', 'survei_aktif', 'dana_aktif', 'dana_tampilkan_sisa', 'popup_aktif'];
-const KUNCI_WAKTU = ['waktu_pengumuman', 'klaim_berlaku_hingga', 'survei_buka'];
+const KUNCI_WAKTU = ['waktu_pengumuman', 'klaim_berlaku_hingga', 'survei_buka', 'waktu_acara_mulai', 'waktu_acara_selesai'];
 const KUNCI_ANGKA = ['road_target', 'road_tambahan', 'dana_kuota'];
 const LIVE_AWAL = [
   ['Kenalan dengan YCS & YCS Squad', 'Instagram', '2026-10-22 19:00', '2026-10-22 20:00', 'https://www.instagram.com/universitasstekom', '', 'YA'],
@@ -335,6 +337,7 @@ function konfigPublik_() {
       teksTutup: cfg.dana_teks_tutup || '', teksHabis: cfg.dana_teks_habis || '', teksSukses: cfg.dana_teks_sukses || ''},
     event: {nama: cfg.nama_event || '', link: cfg.link_event || ''},
     saluran: cfg.link_saluran || '',
+    acara: {mulai: isNaN(waktu_(cfg.waktu_acara_mulai)) ? null : isoWib_(waktu_(cfg.waktu_acara_mulai)), selesai: isNaN(waktu_(cfg.waktu_acara_selesai)) ? null : isoWib_(waktu_(cfg.waktu_acara_selesai))},
     popup: ya_(cfg.popup_aktif) && cfg.popup_judul ? {aktif: true, judul: cfg.popup_judul, teks: cfg.popup_teks || '', gambar: cfg.popup_gambar || '', tombol: cfg.popup_tombol || '', link: cfg.popup_link || ''} : {aktif: false}
   };
 }
@@ -383,7 +386,8 @@ function namaTampil_(nama) {
   return besar(k[0]).slice(0, 20) + (k[1] ? ' ' + k[1].charAt(0).toUpperCase() + '.' : '');
 }
 function entriKata_(r) {
-  return {n: namaTampil_(r[6]), k: String(r[2] || ''), p: String(r[3] || '')};
+  const m = Number(r[10]);
+  return {n: namaTampil_(r[6]), k: String(r[2] || ''), p: String(r[3] || ''), m: m >= 1 && m <= 10 ? m : 0};
 }
 // Satu Kata = satu orang: wajib identitas (seperti twibbon dulu) + klik saluran WhatsApp; satu email satu kata.
 function kataKirim_(p) {
@@ -392,6 +396,9 @@ function kataKirim_(p) {
   const nama = teks_(p.nama, 60), sekolah = teks_(p.sekolah, 100), email = teks_(p.email, 254).toLowerCase();
   const prov = teks_(p.provinsi, 40), ref = teks_(p.ref, 40).replace(/[^\w-]/g, '');
   if (!/^[a-z\u00c0-\u024f-]{2,20}$/.test(kata) || /\s/.test(teks_(p.kata, 30)) || nama.length < 2 || sekolah.length < 2 || !emailValid_(email) || !prov || p.channelClicked !== true || p.consent !== true || !/^[a-f0-9-]{36}$/i.test(p.requestId || '') || p.website) return {ok: false, error: 'validation'};
+  // Karakter baju adat pilihan (1..10) wajib.
+  const karakter = Number(p.karakter);
+  if (!(karakter >= 1 && karakter <= 10 && Math.floor(karakter) === karakter)) return {ok: false, error: 'validation'};
   if (kataDiblokir_(kata, cfg)) return {ok: false, error: 'kata_ditolak'};
   if (namaTampil_(nama).toLowerCase().split(/[\s.]+/).some(w => w.length > 1 && KATA_KASAR.indexOf(w) >= 0)) return {ok: false, error: 'nama_ditolak'};
   if (batasKirim_('kata', p, 10)) return {ok: false, error: 'terlalu_banyak'};
@@ -401,9 +408,9 @@ function kataKirim_(p) {
     if (last > 1) {
       const dup = sheet.getRange(2, 2, last - 1, 1).createTextFinder(p.requestId).matchEntireCell(true).findNext()
         || sheet.getRange(2, 9, last - 1, 1).createTextFinder(email).matchEntireCell(true).matchCase(false).findNext();
-      if (dup) return {ok: true, sudah: true, entri: entriKata_(sheet.getRange(dup.getRow(), 1, 1, 10).getValues()[0])};
+      if (dup) return {ok: true, sudah: true, entri: entriKata_(sheet.getRange(dup.getRow(), 1, 1, 11).getValues()[0])};
     }
-    const baris = [teksWib_(Date.now()), p.requestId, kata, cleanCell_(prov), ref || 'web', 'YA', cleanCell_(nama), cleanCell_(sekolah), cleanCell_(email), 'Ya'];
+    const baris = [teksWib_(Date.now()), p.requestId, kata, cleanCell_(prov), ref || 'web', 'YA', cleanCell_(nama), cleanCell_(sekolah), cleanCell_(email), 'Ya', karakter];
     sheet.appendRow(baris);
     cache_().remove('kata');
     return {ok: true, entri: entriKata_(baris)};
@@ -418,14 +425,14 @@ function kataPublik_() {
   const hit = {};
   let total = 0;
   const orang = [];
-  if (n > 0) sheet.getRange(2, 1, n, 10).getValues().forEach(r => {
+  if (n > 0) sheet.getRange(2, 1, n, 11).getValues().forEach(r => {
     if (String(r[5]).toUpperCase() === 'TIDAK') return;
     const k = String(r[2] || '').trim().toLowerCase();
     if (!k) return;
     total++;
     hit[k] = (hit[k] || 0) + 1;
     const e = entriKata_(r);
-    orang.push([e.n, e.k, e.p]);
+    orang.push([e.n, e.k, e.p, e.m]);
   });
   const kata = Object.keys(hit).map(k => [k, hit[k]]).sort((a, b) => b[1] - a[1]).slice(0, 150);
   // Warga festival: maksimal 2.000 terbaru (terbaru lebih dulu).
