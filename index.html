@@ -1311,6 +1311,28 @@
     .road .meter__fill { position: relative; min-width: .75rem; }
     .road__van { position: absolute; right: -1.125rem; top: 50%; translate: 0 -50%; display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 50%; background: #fff; box-shadow: 0 4px 12px -4px rgb(8 44 51 / .35); font-size: 0; }
     .road__van svg { width: 1.375rem; height: 1.375rem; }
+    /* Adegan perjalanan Road to Bali: lapisan parallax + bus dengan sopir yang melambai. */
+    .rb-scene { position: relative; height: clamp(9.5rem, 22vw, 12rem); margin: var(--space-4) 0 0; overflow: hidden; border-radius: 1rem; background: linear-gradient(180deg, #8FD3F4 0%, #CDEFFB 55%, #E9F7F1 100%); box-shadow: inset 0 0 0 1px rgb(14 90 102 / .12); }
+    .rb-l { position: absolute; left: 0; right: 0; background-repeat: repeat-x; background-position: 0 100%; }
+    .rb-awan { top: 6%; height: 30%; background-image: url("assets/img/road/awan.svg"); background-size: auto 100%; animation: rb-geser 70s linear infinite; }
+    .rb-gunung { bottom: 30%; height: 42%; background-image: url("assets/img/road/gunung.svg"); background-size: auto 100%; animation: rb-geser 90s linear infinite; }
+    .rb-bukit { bottom: 24%; height: 34%; background-image: url("assets/img/road/bukit.svg"); background-size: auto 100%; animation: rb-geser 38s linear infinite; }
+    .rb-pohon { bottom: 24%; height: 38%; background-image: url("assets/img/road/pohon.svg"); background-size: auto 100%; animation: rb-geser 20s linear infinite; }
+    .rb-jalan { position: absolute; left: 0; right: 0; bottom: 0; height: 26%; background: linear-gradient(180deg, #5B6770, #44505A); border-top: 3px solid #E9D8B4; }
+    .rb-garis { position: absolute; left: 0; right: 0; top: 46%; height: 4px; background: repeating-linear-gradient(90deg, #FFE08A 0 26px, transparent 26px 52px); animation: rb-garis .9s linear infinite; }
+    .rb-finish { position: absolute; right: 3%; bottom: 22%; display: grid; place-items: center; width: 2.75rem; height: 3.25rem; border-left: 3px solid #5B3B1A; }
+    .rb-finish span { position: absolute; top: 0; left: 0; padding: .125rem .375rem; border-radius: 0 .375rem .375rem 0; background: repeating-conic-gradient(#111 0 25%, #fff 0 50%) 0 0 / 8px 8px; color: transparent; font-size: .625rem; }
+    .rb-finish::after { content: "BALI"; position: absolute; top: -1.15rem; left: -.75rem; padding: .0625rem .375rem; border-radius: .375rem; background: var(--yellow-400); color: var(--teal-950); font-size: .625rem; font-weight: 800; letter-spacing: .06em; }
+    .rb-bus { position: absolute; left: var(--pos, 4%); bottom: 6%; width: clamp(7.5rem, 26%, 10.5rem); aspect-ratio: 560 / 365; transition: left 1.6s cubic-bezier(.2, .7, .2, 1); animation: rb-goyang .5s ease-in-out infinite alternate; }
+    .rb-bus img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; }
+    .rb-kepala { transform-origin: 30.7% 39.2%; animation: rb-kepala 2.4s ease-in-out infinite; }
+    .rb-tangan { transform-origin: 19.5% 47.8%; animation: rb-dadah .55s ease-in-out infinite alternate; }
+    @keyframes rb-geser { to { background-position-x: -1800px; } }
+    @keyframes rb-garis { to { background-position-x: -52px; } }
+    @keyframes rb-goyang { from { transform: translateY(0); } to { transform: translateY(-2px); } }
+    @keyframes rb-kepala { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+    @keyframes rb-dadah { from { transform: rotate(-12deg); } to { transform: rotate(10deg); } }
+    @media (prefers-reduced-motion: reduce) { .rb-l, .rb-garis, .rb-bus, .rb-kepala, .rb-tangan { animation: none; } }
     .road__angka { display: flex; align-items: baseline; gap: .5rem; margin-top: var(--space-4); }
     .road__angka strong { font-size: clamp(1.75rem, 3vw, 2.25rem); line-height: 1; color: var(--teal-900); font-variant-numeric: tabular-nums; }
     .road__angka span { font-size: .9375rem; color: #33464D; }
@@ -1776,9 +1798,22 @@
           </div>
 
           <div class="road__progress">
+            <div class="rb-scene" aria-hidden="true">
+              <div class="rb-l rb-awan"></div>
+              <div class="rb-l rb-gunung"></div>
+              <div class="rb-l rb-bukit"></div>
+              <div class="rb-l rb-pohon"></div>
+              <div class="rb-jalan"><span class="rb-garis"></span></div>
+              <div class="rb-finish"><span>BALI</span></div>
+              <div class="rb-bus" id="rb-bus">
+                <img src="assets/img/road/bus.webp" alt="" width="560" height="365" decoding="async" loading="lazy">
+                <img class="rb-tangan" src="assets/img/road/tangan.webp" alt="" width="560" height="365" decoding="async" loading="lazy">
+                <img class="rb-kepala" src="assets/img/road/kepala.webp" alt="" width="560" height="365" decoding="async" loading="lazy">
+              </div>
+            </div>
             <p class="road__angka"><strong id="road-current">–</strong><span>dukungan terkumpul</span></p>
             <div class="meter" role="progressbar" aria-labelledby="road-title" aria-valuemin="0" aria-valuemax="100000" aria-valuenow="0" aria-valuetext="Memuat jumlah dukungan">
-              <div class="meter__fill" id="road-meter" style="width:0"><span class="road__van" aria-hidden="true"><svg viewBox="-24 -20 48 34"><rect x="-20" y="-16" width="40" height="22" rx="6" fill="#C2410C"/><rect x="-14" y="-12" width="12" height="9" rx="2" fill="#CDEDEC"/><rect x="1" y="-12" width="12" height="9" rx="2" fill="#CDEDEC"/><circle cx="-11" cy="7" r="5" fill="#13232A"/><circle cx="11" cy="7" r="5" fill="#13232A"/></svg></span></div>
+              <div class="meter__fill" id="road-meter" style="width:0"></div>
             </div>
             <ol class="road__ticks" id="road-ticks" aria-hidden="true"></ol>
             <p class="road__stats"><span class="road__target">Menuju <strong id="road-next">100</strong> dukungan</span><span class="road__target">Target akhir <strong id="road-target">100.000</strong></span></p>
@@ -2625,7 +2660,8 @@
       meter.setAttribute('aria-valuetext', `${nf.format(current)} dari target ${nf.format(target)} dukungan`);
       const ringkas = new Intl.NumberFormat('id-ID', { notation: 'compact' });
       $('#road-ticks').innerHTML = [.25, .5, .75, 1].map((f) => `<li class="${current >= target * f ? 'is-on' : ''}" style="left:${f * 100}%">${ringkas.format(Math.round(target * f))}</li>`).join('');
-      const isi = () => { $('#road-meter').style.width = pct + '%'; };
+      // Bus berjalan di sepanjang jalan sesuai persentase menuju tonggak berikutnya.
+      const isi = () => { $('#road-meter').style.width = pct + '%'; $('#rb-bus').style.setProperty('--pos', `calc(${(pct * 0.6).toFixed(1)}% + 2%)`); };
       if (reduceMotion) return isi();
       const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); isi(); } }, { threshold: .4 });
       io.observe($('#road-to-bali'));
@@ -2837,7 +2873,7 @@
       pasca: () => ({ url: tautan('share-finalis'), text: 'Finalis YCS 2026 sudah diumumkan! Hitung mundur menuju Bali dimulai:' }),
       live: () => ({ url: tautan('share-live', '#live'), text: 'Jadwal live Youth Character Summit 2026, jangan sampai ketinggalan:' }),
       daftar: () => ({ url: tautan('share-daftar', '#delegasi'), text: 'Daftar finalis Youth Character Summit 2026. Ada nama temanmu?' }),
-      kata: () => ({ url: tautan('share-kata', '#satu-kata'), text: kataSaya ? `Aku sudah masuk Festival Satu Kata YCS 2026 dengan kata "${kataSaya}". Cari namaku, lalu masuk juga:` : 'Masuk ke Festival Satu Kata YCS 2026: kirim satu kata dan temukan dirimu di antara ribuan pelajar!' }),
+      kata: () => ({ url: tautan('share-kata', '#satu-kata'), text: kataSaya ? `Aku bagian dari Festival 1 Kata YCS 2026 dengan kata "${kataSaya}". Cari namaku, lalu kirim katamu juga:` : 'Ayo masuk Festival 1 Kata YCS 2026: kirim satu kata dan temukan dirimu di antara ribuan pelajar!' }),
     };
     // HP: langsung buka lembar bagikan bawaan (sudah berisi WhatsApp/Instagram). Desktop: dialog pilihan.
     function bagikan(data) {
@@ -2861,7 +2897,7 @@
       if (act === 'native') navigator.share({ title: document.title, text: shareData.text, url: shareData.url }).catch(() => {});
       shareDlg.close();
     });
-    $$('[data-share-open]').forEach((b) => b.addEventListener('click', () => bagikan(SHARE[b.dataset.shareOpen]())));
+    $$('[data-share-open]').forEach((b) => b.addEventListener('click', () => (b.dataset.shareOpen === 'kata' ? bagikanKartu() : bagikan(SHARE[b.dataset.shareOpen]()))));
     $$('[data-remind]').forEach((b) => b.addEventListener('click', () => {
       downloadIcs({ dataset: {
         start: new Date(target).toISOString(), end: new Date(target + 90 * 60000).toISOString(),
@@ -3140,8 +3176,9 @@
       festApi.sorot(w, 10000, saya && w.n === saya.n && w.k === saya.k ? 'Ini kamu!' : 'Ketemu!');
     });
 
-    // Kartu festival 1080×1350: potongan panggung + kata milikmu.
-    $('#fest-unduh').addEventListener('click', async () => {
+    // Kartu festival 1080×1350: potongan panggung + kata milikmu + QR menuju Festival 1 Kata.
+    const muatGambar = (src) => new Promise((ok) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ok(null); i.src = src; });
+    async function buatKartu() {
       if (document.fonts) await Promise.all([document.fonts.load('400 80px "Permanent Marker"'), document.fonts.load('800 60px "Plus Jakarta Sans"')]).catch(() => {});
       const W = 1080, H = 1350, c = document.createElement('canvas');
       c.width = W; c.height = H;
@@ -3158,32 +3195,63 @@
       if (saw) festApi.sorot(saw, 4000, 'Ini kamu!');
       await new Promise((r) => setTimeout(r, 120));
       const src = $('#fest-canvas');
-      const tw = W - 100, th = 620, r = Math.max(tw / src.width, th / src.height);
+      const tw = W - 100, th = 560, r = Math.max(tw / src.width, th / src.height);
       x.save();
-      x.beginPath(); if (x.roundRect) x.roundRect(50, 220, tw, th, 36); else x.rect(50, 220, tw, th); x.clip();
-      x.drawImage(src, 50 + (tw - src.width * r) / 2, 220 + (th - src.height * r) / 2, src.width * r, src.height * r);
+      x.beginPath(); if (x.roundRect) x.roundRect(50, 215, tw, th, 36); else x.rect(50, 215, tw, th); x.clip();
+      x.drawImage(src, 50 + (tw - src.width * r) / 2, 215 + (th - src.height * r) / 2, src.width * r, src.height * r);
       x.restore();
       if (saya) {
-        x.fillStyle = 'rgba(255,255,255,.8)'; x.font = '700 34px "Plus Jakarta Sans", sans-serif';
-        x.fillText(`${saya.n} · ${saya.p}`, W / 2, 935);
-        x.font = '800 116px "Plus Jakarta Sans", sans-serif';
+        x.fillStyle = 'rgba(255,255,255,.82)'; x.font = '700 34px "Plus Jakarta Sans", sans-serif';
+        x.fillText(`${saya.n} · ${saya.p}`, W / 2, 850);
+        x.font = '800 110px "Plus Jakarta Sans", sans-serif';
         const lebar = Math.min(W - 140, x.measureText(saya.k).width + 90);
-        x.fillStyle = '#FFC93C'; x.beginPath(); if (x.roundRect) x.roundRect((W - lebar) / 2, 970, lebar, 150, 36); else x.rect((W - lebar) / 2, 970, lebar, 150); x.fill();
-        x.fillStyle = '#082C33'; x.fillText(saya.k, W / 2, 1088, W - 200);
+        x.fillStyle = '#FFC93C'; x.beginPath(); if (x.roundRect) x.roundRect((W - lebar) / 2, 880, lebar, 142, 36); else x.rect((W - lebar) / 2, 880, lebar, 142); x.fill();
+        x.fillStyle = '#082C33'; x.fillText(saya.k, W / 2, 992, W - 200);
       }
-      x.fillStyle = 'rgba(255,255,255,.9)'; x.font = '700 30px "Plus Jakarta Sans", sans-serif';
-      x.fillText(`Aku salah satu dari ${$('#fest-total').textContent} warga festival`, W / 2, 1200);
-      x.fillStyle = 'rgba(255,255,255,.65)'; x.font = '600 26px "Plus Jakarta Sans", sans-serif';
-      x.fillText(location.host + '/#satu-kata', W / 2, 1260);
-      c.toBlob((blob) => {
-        if (!blob) return;
-        const url = URL.createObjectURL(blob);
-        const a = Object.assign(document.createElement('a'), { href: url, download: `festival-ycs2026${saya ? '-' + saya.k : ''}.png` });
-        document.body.append(a); a.click(); a.remove();
-        setTimeout(() => URL.revokeObjectURL(url), 2000);
-        toast('Kartu festival diunduh. Bagikan ke story dan ajak temanmu masuk!');
-      }, 'image/png');
+      // Bagian bawah: kalimat kampanye (kiri) + QR (kanan).
+      x.fillStyle = 'rgba(255,255,255,.12)'; x.fillRect(50, 1072, W - 100, 2);
+      x.textAlign = 'left';
+      x.fillStyle = 'rgba(255,255,255,.85)'; x.font = '700 36px "Plus Jakarta Sans", sans-serif';
+      x.fillText('Aku bagian dari', 60, 1150);
+      x.fillStyle = '#FFC93C'; x.font = '400 72px "Permanent Marker", cursive';
+      x.fillText('Festival 1 Kata', 56, 1232, 640);
+      x.fillStyle = 'rgba(255,255,255,.7)'; x.font = '600 26px "Plus Jakarta Sans", sans-serif';
+      x.fillText('Scan QR & kirim katamu juga', 60, 1286);
+      const qr = await muatGambar('assets/img/festival/qr-festival.png');
+      if (qr) {
+        const q = 210, qx = W - 60 - q, qy = 1098;
+        x.fillStyle = '#fff'; x.beginPath(); if (x.roundRect) x.roundRect(qx - 12, qy - 12, q + 24, q + 24, 22); else x.rect(qx - 12, qy - 12, q + 24, q + 24); x.fill();
+        x.imageSmoothingEnabled = false; x.drawImage(qr, qx, qy, q, q); x.imageSmoothingEnabled = true;
+      }
+      return new Promise((ok) => c.toBlob(ok, 'image/png'));
+    }
+    const namaKartu = () => `festival-1-kata${saya ? '-' + saya.k : ''}.png`;
+    function unduhBlob(blob) {
+      const url = URL.createObjectURL(blob);
+      const a = Object.assign(document.createElement('a'), { href: url, download: namaKartu() });
+      document.body.append(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+    }
+    $('#fest-unduh').addEventListener('click', async () => {
+      const blob = await buatKartu();
+      if (!blob) return;
+      unduhBlob(blob);
+      toast('Kartu festival diunduh. Bagikan ke story dan ajak temanmu masuk!');
     });
+    // Ajak teman: bagikan FOTO kartu + teks + link sekaligus (Web Share dengan file); cadangan: unduh foto + dialog link.
+    async function bagikanKartu() {
+      const data = SHARE.kata();
+      if (!saya) { bagikan(data); return; }
+      const blob = await buatKartu();
+      const file = blob && new File([blob], namaKartu(), { type: 'image/png' });
+      if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+        try { await navigator.share({ files: [file], title: 'Festival 1 Kata · YCS 2026', text: `${data.text} ${data.url}`, url: data.url }); return; }
+        catch (e) { if (e.name === 'AbortError') return; }
+      }
+      if (blob) unduhBlob(blob);
+      toast('Foto kartu diunduh. Lampirkan fotonya saat membagikan link di bawah.');
+      bagikan(data);
+    }
 
     /* ---------- Galeri berjalan ---------- */
     const marquee = $('#marquee');
