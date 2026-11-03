@@ -103,6 +103,9 @@
     let balonAktif = opsi.balonAktif ?? true;
     let area = { y0: 0, y1: 0, imgH: 0 };
     const balon = []; // {w, el, sampai, pin}
+    const efek = []; // cahaya dari judul ke warga: {w, t0}
+    const kilau = Array.from({ length: 22 }, (_, i) => { const r = acak(i * 7919 + 13); return { x: r(), y: r(), f: r() * 6.28, k: 0.8 + r() * 1.6, s: 0.6 + r() * 0.9 }; });
+    const burung = Array.from({ length: 3 }, (_, i) => ({ y: 0.1 + i * 0.07, v: 0.018 + i * 0.006, off: i * 0.37 }));
     latar.onload = () => { siapLatar = true; ukur(); };
     latar.src = (canvas.clientWidth > 700 ? LATAR.besar : LATAR.kecil);
 
@@ -113,7 +116,7 @@
       W = w; H = h;
       canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
       // Gambar latar selalu utuh selebar panggung (tidak dipotong); sisa tinggi diisi lanjutan plaza.
-      area.imgH = siapLatar ? W * latar.height / latar.width : W * 596 / 1654;
+      area.imgH = siapLatar ? W * latar.height / latar.width : W * 588 / 1654;
       area.y0 = Math.min(H * 0.8, area.imgH * 0.86);
       area.y1 = H * 0.975;
       gambar(performance.now());
@@ -186,6 +189,7 @@
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, W, H);
       gambarLatar();
+      gambarSuasana(t);
       const b = tinggiDasar();
       const urut = warga.slice().sort((p, q) => p.y - q.y);
       for (const w of urut) {
@@ -207,9 +211,99 @@
         ctx.strokeStyle = '#FFC93C'; ctx.lineWidth = 3;
         ctx.beginPath(); ctx.ellipse(l.x, l.kaki + l.h * 0.02, l.h * 0.32 * k, l.h * 0.09 * k, 0, 0, Math.PI * 2); ctx.stroke();
       }
+      gambarCahaya(t);
       aturBalon(t);
       if (opsi.onFrame) opsi.onFrame();
     }
+
+    // Titik pusat teks "Youth Character Summit 2026" pada gambar latar.
+    const judul = () => ({ x: W * 0.5, y: area.imgH * 0.27, r: area.imgH * 0.24 });
+
+    /* ---------- Suasana langit: sinar berputar, judul berpendar, kilau, burung (ringan) ---------- */
+    function gambarSuasana(t) {
+      if (gerakMinim) return;
+      const j = judul(), d = t / 1000;
+      ctx.save();
+      ctx.beginPath(); ctx.rect(0, 0, W, area.imgH * 0.78); ctx.clip();
+      ctx.globalCompositeOperation = 'lighter';
+      const panjang = area.imgH * 1.1;
+      for (let i = 0; i < 12; i++) {
+        const a = d * 0.06 + i * Math.PI / 6;
+        const g = ctx.createRadialGradient(j.x, j.y, j.r * 0.4, j.x, j.y, panjang);
+        g.addColorStop(0, 'rgba(255,240,190,.16)'); g.addColorStop(1, 'rgba(255,240,190,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.moveTo(j.x, j.y);
+        ctx.arc(j.x, j.y, panjang, a - 0.07, a + 0.07); ctx.closePath(); ctx.fill();
+      }
+      const denyut = 0.12 + 0.07 * Math.sin(d * 1.6);
+      const gl = ctx.createRadialGradient(j.x, j.y, 0, j.x, j.y, j.r * 1.4);
+      gl.addColorStop(0, `rgba(255,236,170,${denyut})`); gl.addColorStop(1, 'rgba(255,236,170,0)');
+      ctx.fillStyle = gl; ctx.fillRect(j.x - j.r * 1.5, j.y - j.r * 1.5, j.r * 3, j.r * 3);
+      for (const k of kilau) {
+        const a = Math.max(0, Math.sin(d * k.k + k.f));
+        if (a < 0.05) continue;
+        const x = k.x * W, y = k.y * area.imgH * 0.62, r = (2 + 4 * a) * k.s * (W / 1200 + 0.4);
+        ctx.fillStyle = `rgba(255,250,220,${0.75 * a})`;
+        ctx.beginPath(); ctx.moveTo(x, y - r * 2); ctx.lineTo(x + r * 0.4, y - r * 0.4); ctx.lineTo(x + r * 2, y); ctx.lineTo(x + r * 0.4, y + r * 0.4);
+        ctx.lineTo(x, y + r * 2); ctx.lineTo(x - r * 0.4, y + r * 0.4); ctx.lineTo(x - r * 2, y); ctx.lineTo(x - r * 0.4, y - r * 0.4); ctx.closePath(); ctx.fill();
+      }
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = Math.max(1.5, W / 700); ctx.lineCap = 'round';
+      for (const bd of burung) {
+        const x = ((d * bd.v + bd.off) % 1.2 - 0.1) * W, y = bd.y * area.imgH + Math.sin(d + bd.off * 9) * 6;
+        const s = W / 110, kepak = Math.sin(d * 9 + bd.off * 20) * 0.5;
+        ctx.beginPath(); ctx.moveTo(x - s, y - s * (0.3 + kepak)); ctx.quadraticCurveTo(x - s * 0.4, y - s * 0.1, x, y); ctx.quadraticCurveTo(x + s * 0.4, y - s * 0.1, x + s, y - s * (0.3 + kepak)); ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    /* ---------- Pemicu: cahaya meluncur dari teks judul ke warga yang dicari / diklik ---------- */
+    function gambarCahaya(t) {
+      for (let i = efek.length - 1; i >= 0; i--) {
+        const e = efek[i], u = (t - e.t0) / 1800;
+        if (u > 1) { efek.splice(i, 1); continue; }
+        const l = e.w.layar;
+        if (!l) continue;
+        const j = judul(), tx = l.x, ty = l.y + l.h * 0.15;
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        // 1) judul menyala
+        const nyala = Math.max(0, 1 - u / 0.45);
+        if (nyala > 0) {
+          const g = ctx.createRadialGradient(j.x, j.y, 0, j.x, j.y, j.r * (1.2 + u * 2));
+          g.addColorStop(0, `rgba(255,245,200,${0.85 * nyala})`); g.addColorStop(0.5, `rgba(255,214,107,${0.45 * nyala})`); g.addColorStop(1, 'rgba(255,214,107,0)');
+          ctx.fillStyle = g; ctx.fillRect(0, 0, W, area.imgH);
+        }
+        // 2) berkas cahaya melengkung dari judul ke kepala warga
+        const p = Math.min(1, Math.max(0, (u - 0.12) / 0.5));
+        if (p > 0 && u < 0.95) {
+          const cx = (j.x + tx) / 2 + (tx > j.x ? -1 : 1) * W * 0.06, cy = Math.min(j.y, ty) + (ty - j.y) * 0.25;
+          const titik = (q) => ({ x: (1 - q) * (1 - q) * j.x + 2 * (1 - q) * q * cx + q * q * tx, y: (1 - q) * (1 - q) * j.y + 2 * (1 - q) * q * cy + q * q * ty });
+          const pudar = u > 0.7 ? 1 - (u - 0.7) / 0.25 : 1;
+          ctx.lineCap = 'round';
+          for (const [lebar, warna] of [[14, `rgba(255,200,80,${0.22 * pudar})`], [6, `rgba(255,236,160,${0.6 * pudar})`], [2.5, `rgba(255,255,255,${0.95 * pudar})`]]) {
+            ctx.strokeStyle = warna; ctx.lineWidth = lebar * (W / 1200 + 0.5);
+            ctx.beginPath();
+            for (let q = Math.max(0, p - 0.45); q <= p + 0.001; q += 0.02) { const pt = titik(q); if (q === Math.max(0, p - 0.45)) ctx.moveTo(pt.x, pt.y); else ctx.lineTo(pt.x, pt.y); }
+            ctx.stroke();
+          }
+          const ujung = titik(p);
+          const gu = ctx.createRadialGradient(ujung.x, ujung.y, 0, ujung.x, ujung.y, 26);
+          gu.addColorStop(0, `rgba(255,255,255,${pudar})`); gu.addColorStop(1, 'rgba(255,220,120,0)');
+          ctx.fillStyle = gu; ctx.beginPath(); ctx.arc(ujung.x, ujung.y, 26, 0, Math.PI * 2); ctx.fill();
+        }
+        // 3) ledakan cahaya kecil di sekitar warga
+        if (u > 0.6) {
+          const v = (u - 0.6) / 0.4;
+          ctx.strokeStyle = `rgba(255,214,107,${0.9 * (1 - v)})`; ctx.lineWidth = 3;
+          ctx.beginPath(); ctx.arc(tx, ty, l.h * (0.3 + v * 1.1), 0, Math.PI * 2); ctx.stroke();
+          ctx.fillStyle = `rgba(255,250,215,${1 - v})`;
+          for (let k = 0; k < 10; k++) { const a = k * Math.PI / 5 + e.t0; const rr = l.h * (0.35 + v * 1.3); ctx.beginPath(); ctx.arc(tx + Math.cos(a) * rr, ty + Math.sin(a) * rr * 0.8, 2.5 * (1 - v) + 1, 0, Math.PI * 2); ctx.fill(); }
+        }
+        ctx.restore();
+      }
+    }
+    function cahaya(w) { efek.length = 0; efek.push({ w, t0: performance.now() }); mulai(); }
 
     /* ---------- Balon kata: banyak sekaligus, tidak pernah saling menutupi ---------- */
     const maksBalon = () => (W >= 1000 ? 6 : W >= 700 ? 4 : 2);
@@ -219,6 +313,8 @@
       el.setAttribute('aria-hidden', 'true');
       el.innerHTML = `<span class="fest-b__ava"></span><span class="fest-b__isi"><strong>${esc(w.n)}</strong><em>${esc(w.k)}</em>${w.p ? `<small>${esc(w.p)}</small>` : ''}</span>${label ? `<span class="fest-b__tag">${esc(label)}</span>` : ''}`;
       api.gambarAvatar(el.querySelector('.fest-b__ava'), w);
+      // Klik balon harapan = memicu cahaya dari judul ke orangnya.
+      el.addEventListener('click', () => { if (!pin) api.sorot(w, 8000, ''); });
       wadah.append(el);
       const bl = { w, el, pin, sampai: performance.now() + (pin ? 9000 : 4200 + Math.random() * 1500), lebar: el.offsetWidth, tinggi: el.offsetHeight };
       requestAnimationFrame(() => el.classList.add('is-on'));
@@ -279,6 +375,18 @@
     }
     const mulai = () => { if (!raf) raf = requestAnimationFrame(putar); };
 
+    canvas.addEventListener('click', (ev) => {
+      if (!balonAktif) return;
+      const r = canvas.getBoundingClientRect(), x = ev.clientX - r.left, y = ev.clientY - r.top;
+      let pilih = null, terbaik = Infinity;
+      for (const w of warga) {
+        const l = w.layar;
+        if (!l || Math.abs(x - l.x) > l.h * 0.35 || y < l.y - 6 || y > l.kaki + 6) continue;
+        const dd = Math.abs(x - l.x) + Math.abs(y - (l.y + l.kaki) / 2) * 0.3 - l.kaki * 0.001;
+        if (dd < terbaik) { terbaik = dd; pilih = w; }
+      }
+      if (pilih) api.sorot(pilih, 8000, '');
+    });
     new ResizeObserver(ukur).observe(canvas);
     if ('IntersectionObserver' in window) new IntersectionObserver(([e]) => { terlihat = e.isIntersecting; if (terlihat) mulai(); }).observe(canvas);
     document.addEventListener('visibilitychange', () => { if (!document.hidden) mulai(); });
@@ -313,8 +421,10 @@
         bl.sampai = performance.now() + ms;
         w.diam = true;
         balon.push(bl);
+        cahaya(w);
         mulai();
       },
+      cahaya,
       setBalon(on) { balonAktif = on; if (!on) balon.forEach((b) => { b.sampai = 0; }); },
       posisi(w) { return w && w.layar ? { x: w.layar.x, y: w.layar.y, h: w.layar.h, W, H } : null; },
       ciri,
