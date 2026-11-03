@@ -1,6 +1,6 @@
 # Satu Kata untuk Indonesia
 
-Kampanye kini menjadi **Festival Satu Kata** di beranda (`/#satu-kata`). Pengunjung mengisi data (nama, sekolah, provinsi, email), mengetuk Saluran WhatsApp, lalu mengirim satu kata. Setelah itu festival terbuka. Setiap kiriman tampil sebagai satu warga kecil di plaza Bali (`assets/js/festival.js`, kanvas), balon harapan muncul bergantian satu per satu, dan ada pencarian nama serta kartu festival PNG. Satu email = satu warga.
+Kampanye kini menjadi **Festival Satu Kata** di beranda (`/#satu-kata`). Pengunjung mengisi data (nama, sekolah, provinsi, email), mengetuk Saluran WhatsApp, lalu mengirim satu kata. Setelah itu festival terbuka. Setiap kiriman tampil sebagai satu warga kecil yang berjalan berpindah tempat di plaza Bali (`assets/js/festival.js`, kanvas; latar dipakai utuh tanpa dipotong). Banyak balon harapan tampil bersamaan tanpa saling menutupi. Ada juga pencarian nama dan kartu festival PNG. Satu email = satu warga.
 
 | Alamat | Isi |
 |---|---|

@@ -718,24 +718,28 @@
     .fest-count { font-weight: 700; color: var(--text-muted); }
     .fest-count strong { display: block; font-size: clamp(1.75rem, 4vw, 2.5rem); line-height: 1; color: var(--cta); font-variant-numeric: tabular-nums; }
     .fest { position: relative; margin-top: var(--space-5); }
-    .fest__stage { position: relative; overflow: hidden; aspect-ratio: 4 / 5; border-radius: 1.5rem; background: #BFE6F7; box-shadow: var(--shadow-lg); }
-    @media (min-width: 40rem) { .fest__stage { aspect-ratio: 16 / 10; } }
-    @media (min-width: 64rem) { .fest__stage { aspect-ratio: 16 / 9; } }
+    .fest__stage { position: relative; overflow: hidden; aspect-ratio: 4 / 5; border-radius: 1.5rem; background: #ECCEA4; box-shadow: var(--shadow-lg); }
+    @media (min-width: 40rem) { .fest__stage { aspect-ratio: 1654 / 951; } }
     .fest__stage > canvas { position: absolute; inset: 0; width: 100%; height: 100%; transition: filter 700ms var(--ease); }
     .fest.is-locked .fest__stage > canvas { filter: blur(7px) saturate(1.15); }
-    .fest__balon { position: absolute; z-index: 3; left: 0; top: 0; display: flex; gap: .75rem; align-items: center; min-width: 11.5rem; max-width: 17rem; padding: .625rem 1rem .625rem .625rem; border: 3px solid #FFC93C; border-radius: 1.125rem; background: #FFFBF3; color: var(--ink); box-shadow: 0 14px 30px -12px rgb(0 0 0 / .5); transform: translate(-50%, calc(-100% - 18px)) scale(.9); opacity: 0; transition: opacity 300ms var(--ease), transform 300ms var(--ease); pointer-events: none; }
-    .fest__balon.is-on { opacity: 1; transform: translate(-50%, calc(-100% - 18px)); }
-    .fest__balon::after { content: ""; position: absolute; left: var(--ekor, 50%); bottom: -11px; width: 18px; height: 18px; background: #FFFBF3; border-right: 3px solid #FFC93C; border-bottom: 3px solid #FFC93C; transform: translateX(-50%) rotate(45deg); }
-    .fest.is-locked .fest__balon { display: none; }
-    .fest__ava { display: grid; place-items: center; width: 3.25rem; height: 3.25rem; flex: none; overflow: hidden; border-radius: 50%; background: #FFD86B; }
-    .fest__ava canvas { width: 100%; height: 100%; max-width: none; }
-    .fest__balon strong { display: block; font-size: 1rem; line-height: 1.2; }
-    .fest__balon em { display: block; font-family: var(--font-brush); font-style: normal; font-size: 1.375rem; line-height: 1.15; color: var(--orange-600); overflow-wrap: anywhere; }
-    .fest__balon small { display: block; font-size: .75rem; color: var(--ink-muted); }
-    .fest__kamu { position: absolute; top: -.75rem; right: -.5rem; padding: .125rem .5rem; border-radius: var(--radius-pill); background: var(--cta); color: #fff; font-size: .6875rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
-    .fest__kamu[hidden] { display: none; }
+    .fest-b { position: absolute; z-index: 3; left: 0; top: 0; display: flex; gap: .5rem; align-items: center; max-width: 13rem; padding: .375rem .75rem .375rem .375rem; border: 2.5px solid #FFC93C; border-radius: .875rem; background: #FFFBF3; color: var(--ink); box-shadow: 0 10px 22px -10px rgb(0 0 0 / .45); opacity: 0; transition: opacity 300ms var(--ease); pointer-events: none; will-change: transform; }
+    .fest-b.is-on { opacity: 1; }
+    .fest-b::after { content: ""; position: absolute; left: var(--ekor, 50%); bottom: -8px; width: 13px; height: 13px; background: #FFFBF3; border-right: 2.5px solid #FFC93C; border-bottom: 2.5px solid #FFC93C; transform: translateX(-50%) rotate(45deg); }
+    .fest-b.is-pin { z-index: 4; max-width: 16rem; padding: .5rem .875rem .5rem .5rem; border-width: 3px; border-color: var(--cta); }
+    .fest-b.is-pin::after { border-color: var(--cta); }
+    .fest.is-locked .fest-b { display: none; }
+    .fest-b__ava { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; flex: none; overflow: hidden; border-radius: 50%; background: #FFD86B; }
+    .fest-b.is-pin .fest-b__ava { width: 3rem; height: 3rem; }
+    .fest-b__ava canvas { width: 100%; height: 100%; max-width: none; }
+    .fest-b__isi { min-width: 0; line-height: 1.15; }
+    .fest-b strong { display: block; font-size: .8125rem; }
+    .fest-b em { display: block; font-family: var(--font-brush); font-style: normal; font-size: 1.0625rem; color: var(--orange-600); overflow-wrap: anywhere; }
+    .fest-b.is-pin strong { font-size: 1rem; }
+    .fest-b.is-pin em { font-size: 1.375rem; }
+    .fest-b small { display: block; font-size: .6875rem; color: var(--ink-muted); }
+    .fest-b__tag { position: absolute; top: -.7rem; right: -.4rem; padding: .1rem .5rem; border-radius: var(--radius-pill); background: var(--cta); color: #fff; font-size: .6875rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
     .fest__alat { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; margin-top: var(--space-3); }
-    @media (min-width: 48rem) { .fest__alat { position: absolute; z-index: 4; left: 1rem; right: 1rem; bottom: 1rem; margin: 0; padding: .5rem; border-radius: var(--radius-pill); background: rgb(255 255 255 / .92); backdrop-filter: blur(8px); box-shadow: var(--shadow); } }
+    @media (min-width: 48rem) { .fest__alat { padding: .5rem; border: 1px solid var(--line); border-radius: var(--radius-pill); background: var(--surface); box-shadow: var(--shadow-sm); } }
     .fest.is-locked .fest__alat { display: none; }
     .fest__cari { display: flex; flex: 1 1 18rem; gap: var(--space-2); }
     .fest__cari .input { min-height: 2.75rem; border-radius: var(--radius-pill); }
@@ -1863,11 +1867,6 @@
         <div class="fest is-locked" id="fest">
           <div class="fest__stage">
             <canvas id="fest-canvas" role="img" aria-label="Ilustrasi Festival YCS di Bali. Setiap orang kecil adalah satu pelajar yang sudah mengirim kata."></canvas>
-            <div class="fest__balon" id="fest-balon" aria-hidden="true">
-              <span class="fest__ava" id="fest-ava"></span>
-              <span><strong id="fest-nama"></strong><em id="fest-kata"></em><small id="fest-prov"></small></span>
-              <span class="fest__kamu" id="fest-kamu" hidden>Ini kamu!</span>
-            </div>
           </div>
           <div class="fest__alat" id="fest-alat">
             <form class="fest__cari" id="fest-cari" role="search">
@@ -2899,10 +2898,8 @@
 
     /* ---------- Festival Satu Kata: 1 data = 1 warga di plaza Bali ---------- */
     const fest = $('#fest');
-    const balon = $('#fest-balon');
     let kataSaya = '';
     let saya = null;
-    let balonWarga = null, balonSampai = 0;
     let festApi = null;
     try { saya = JSON.parse(localStorage.getItem('ycs_fest') || 'null'); } catch (e) { saya = null; }
     if (saya) kataSaya = saya.k;
@@ -2919,46 +2916,12 @@
 
     function bukaFestival() {
       fest.classList.remove('is-locked');
+      if (festApi) festApi.setBalon(true);
       $('#fest-canvas').setAttribute('aria-label', 'Festival YCS di Bali. Gunakan kolom pencarian untuk menemukan namamu.');
     }
     if (saya) bukaFestival();
-    if (window.YCSFestival) festApi = window.YCSFestival($('#fest-canvas'), { onFrame: () => posisikanBalon() });
-
-    function posisikanBalon() {
-      if (!festApi || !balonWarga) return;
-      const p = festApi.posisi(balonWarga);
-      if (!p) return;
-      const bw = balon.offsetWidth || 220;
-      const x = Math.max(bw / 2 + 8, Math.min(p.W - bw / 2 - 8, p.x));
-      balon.style.left = x + 'px';
-      balon.style.top = Math.max(balon.offsetHeight + 24, p.y) + 'px';
-      balon.style.setProperty('--ekor', `calc(50% + ${p.x - x}px)`);
-    }
-    // Satu balon dalam satu waktu: harapan tampil bergantian, tidak saling menumpuk.
-    function tampilBalon(w, lama) {
-      balon.classList.remove('is-on');
-      setTimeout(() => {
-        balonWarga = w;
-        balonSampai = Date.now() + (lama || 3000);
-        festApi.gambarAvatar($('#fest-ava'), w);
-        $('#fest-nama').textContent = w.n;
-        $('#fest-kata').textContent = w.k;
-        $('#fest-prov').textContent = w.p || '';
-        $('#fest-kamu').hidden = !(saya && w.n === saya.n && w.k === saya.k);
-        posisikanBalon();
-        balon.classList.add('is-on');
-      }, balonWarga ? 280 : 0);
-    }
-    setInterval(() => {
-      if (!festApi || fest.classList.contains('is-locked') || Date.now() < balonSampai || document.hidden) return;
-      const list = festApi.tampil;
-      if (!list.length) return;
-      // Utamakan warga yang terlihat jelas (barisan depan) agar balon terbaca.
-      const kandidat = list.slice(0, Math.max(8, Math.ceil(list.length * 0.6)));
-      let w = kandidat[Math.floor(Math.random() * kandidat.length)];
-      if (w === balonWarga && kandidat.length > 1) w = kandidat[(kandidat.indexOf(w) + 1) % kandidat.length];
-      tampilBalon(w, 3000);
-    }, 600);
+    // Warga berjalan berpindah tempat; banyak balon kata tampil bersamaan tanpa saling menutupi.
+    if (window.YCSFestival) festApi = window.YCSFestival($('#fest-canvas'), { wadahBalon: $('.fest__stage'), balonAktif: !!saya });
 
     async function muatFestival() {
       try {
@@ -3017,7 +2980,7 @@
       $('#fest-total').textContent = nf.format(Math.max(festApi ? festApi.jumlah : 1, Number(($('#fest-total').textContent || '0').replace(/\D/g, '')) + (d.sudah ? 0 : 1)));
       $('#fest-info').textContent = d.sudah ? `Kamu sudah ada di festival sebagai "${saya.n}" dengan kata "${saya.k}".` : `Selamat datang di festival, ${saya.n}! Itu kamu yang ditandai.`;
       document.getElementById('satu-kata').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
-      if (w) setTimeout(() => { festApi.sorot(w, 10000); tampilBalon(w, 9000); }, 500);
+      if (w) setTimeout(() => festApi.sorot(w, 12000, 'Ini kamu!'), 400);
     });
 
     let hasilCari = [], posCari = 0, qTerakhir = '';
@@ -3031,8 +2994,7 @@
       const w = hasilCari[posCari % hasilCari.length];
       info.textContent = `Ketemu: ${w.n} (${w.k})` + (hasilCari.length > 1 ? ` · ${posCari % hasilCari.length + 1} dari ${hasilCari.length}, tekan Temukan lagi untuk berikutnya` : '');
       posCari++;
-      festApi.sorot(w, 10000);
-      tampilBalon(w, 9000);
+      festApi.sorot(w, 10000, saya && w.n === saya.n && w.k === saya.k ? 'Ini kamu!' : 'Ketemu!');
     });
 
     // Kartu festival 1080×1350: potongan panggung + kata milikmu.
@@ -3050,7 +3012,7 @@
       x.fillStyle = '#fff'; x.font = '400 66px "Permanent Marker", cursive';
       x.fillText('Festival Satu Kata YCS 2026', W / 2, 175, W - 100);
       const saw = saya && festApi ? festApi.tampil.find((w) => w.n === saya.n && w.k === saya.k) : null;
-      if (saw) festApi.sorot(saw, 4000);
+      if (saw) festApi.sorot(saw, 4000, 'Ini kamu!');
       await new Promise((r) => setTimeout(r, 120));
       const src = $('#fest-canvas');
       const tw = W - 100, th = 620, r = Math.max(tw / src.width, th / src.height);
