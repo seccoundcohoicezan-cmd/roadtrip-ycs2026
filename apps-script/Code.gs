@@ -5,6 +5,7 @@ const HEADERS = HEADERS_LAMA.concat(['Kota/Kabupaten', 'Provinsi']);
 const REKAP_NAME = 'Rekap';
 const REKAP_VERSI = '3';
 const SKEMA_VERSI = '6';
+const MAKS_KARAKTER = 40; // jumlah karakter adat di assets/js/festival.js (saat ini 24, cadangan untuk tambahan)
 const WIB = 7 * 3600 * 1000;
 
 const TAB = {
@@ -387,7 +388,7 @@ function namaTampil_(nama) {
 }
 function entriKata_(r) {
   const m = Number(r[10]);
-  return {n: namaTampil_(r[6]), k: String(r[2] || ''), p: String(r[3] || ''), m: m >= 1 && m <= 10 ? m : 0};
+  return {n: namaTampil_(r[6]), k: String(r[2] || ''), p: String(r[3] || ''), m: m >= 1 && m <= MAKS_KARAKTER ? m : 0};
 }
 // Satu Kata = satu orang: wajib identitas (seperti twibbon dulu) + klik saluran WhatsApp; satu email satu kata.
 function kataKirim_(p) {
@@ -396,9 +397,9 @@ function kataKirim_(p) {
   const nama = teks_(p.nama, 60), sekolah = teks_(p.sekolah, 100), email = teks_(p.email, 254).toLowerCase();
   const prov = teks_(p.provinsi, 40), ref = teks_(p.ref, 40).replace(/[^\w-]/g, '');
   if (!/^[a-z\u00c0-\u024f-]{2,20}$/.test(kata) || /\s/.test(teks_(p.kata, 30)) || nama.length < 2 || sekolah.length < 2 || !emailValid_(email) || !prov || p.channelClicked !== true || p.consent !== true || !/^[a-f0-9-]{36}$/i.test(p.requestId || '') || p.website) return {ok: false, error: 'validation'};
-  // Karakter baju adat pilihan (1..10) wajib.
+  // Karakter baju adat pilihan (1..MAKS_KARAKTER) wajib.
   const karakter = Number(p.karakter);
-  if (!(karakter >= 1 && karakter <= 10 && Math.floor(karakter) === karakter)) return {ok: false, error: 'validation'};
+  if (!(karakter >= 1 && karakter <= MAKS_KARAKTER && Math.floor(karakter) === karakter)) return {ok: false, error: 'validation'};
   if (kataDiblokir_(kata, cfg)) return {ok: false, error: 'kata_ditolak'};
   if (namaTampil_(nama).toLowerCase().split(/[\s.]+/).some(w => w.length > 1 && KATA_KASAR.indexOf(w) >= 0)) return {ok: false, error: 'nama_ditolak'};
   if (batasKirim_('kata', p, 10)) return {ok: false, error: 'terlalu_banyak'};

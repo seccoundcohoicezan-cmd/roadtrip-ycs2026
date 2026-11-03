@@ -179,7 +179,7 @@ test('Satu Kata: wajib identitas + saluran, 1 email = 1 orang, kata kasar ditola
   assert.equal(app.post(id({kata: 'Anjing'})).error, 'kata_ditolak');
   const r = app.post(id({kata: 'Sejahtera!', email: 'fauzan@mail.com'}));
   assert.deepEqual(r.entri, {n: 'Fauzan R.', k: 'sejahtera', p: 'Jawa Tengah', m: 3});
-  assert.equal(app.post(id({kata: 'maju', karakter: 11})).error, 'validation', 'karakter wajib 1..10');
+  assert.equal(app.post(id({kata: 'maju', karakter: 99})).error, 'validation', 'karakter wajib dalam daftar');
   const lagi = app.post(id({kata: 'maju', email: 'FAUZAN@mail.com'}));
   assert.equal(lagi.sudah, true, 'email sama = orang yang sama');
   assert.equal(lagi.entri.k, 'sejahtera');

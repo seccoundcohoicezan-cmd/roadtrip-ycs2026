@@ -736,7 +736,10 @@
     .fest__cari .input { min-height: 2.75rem; border-radius: var(--radius-pill); }
     .fest__info { flex-basis: 100%; min-height: 1.25rem; padding: 0 .75rem; font-size: .8125rem; font-weight: 600; color: var(--text-muted); }
     .fest__info:empty { display: none; }
-    .fest__gerbang { position: relative; z-index: 5; margin: -3rem .75rem 0; padding: clamp(1.25rem, 4vw, 1.75rem); border-radius: 1.5rem; background: var(--surface); color: var(--text); box-shadow: 0 30px 60px -24px rgb(8 44 51 / .55); }
+    @media (max-width: 39.99rem) { .fest.is-locked .fest__stage { aspect-ratio: 16 / 11; } .fest__gerbang h3 { font-size: 1.1875rem; } }
+    .orb.is-sembunyi { opacity: 0; pointer-events: none; transform: scale(.6); }
+    .orb { transition: opacity 250ms var(--ease), transform 250ms var(--ease); }
+    .fest__gerbang { position: relative; z-index: 5; margin: -1.5rem .5rem 0; padding: clamp(1.25rem, 4vw, 1.75rem); border-radius: 1.5rem; background: var(--surface); color: var(--text); box-shadow: 0 30px 60px -24px rgb(8 44 51 / .55); }
     @media (min-width: 64rem) { .fest.is-locked .fest__stage { min-height: 50rem; } }
     @media (min-width: 64rem) { .fest__gerbang { position: absolute; top: 50%; left: 50%; width: min(34rem, 92%); max-height: 92%; margin: 0; overflow: auto; transform: translate(-50%, -50%); } }
     .fest:not(.is-locked) .fest__gerbang { display: none; }
@@ -752,10 +755,15 @@
     .karakter__info { display: flex; gap: .5rem; align-items: center; margin-top: .375rem; font-size: .8125rem; color: var(--text-muted); }
     .karakter__info svg { width: 1rem; height: 1rem; flex: none; color: var(--cta); }
     .karakter.is-buka .karakter__info { display: none; }
-    .karakter__daftar { display: grid; grid-auto-flow: column; grid-auto-columns: 5.25rem; gap: .5rem; margin-top: .5rem; padding: .25rem .125rem .5rem; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
-    @media (min-width: 40rem) { .karakter__daftar { grid-auto-flow: row; grid-template-columns: repeat(5, 1fr); grid-auto-columns: auto; overflow: visible; } }
+    .karakter__daftar { display: grid; grid-auto-flow: column; grid-template-rows: repeat(2, auto); grid-auto-columns: 4.75rem; gap: .5rem; margin: .5rem -.25rem 0; padding: .25rem .25rem .625rem; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
+    @media (min-width: 64rem) { .karakter__daftar { grid-auto-flow: row; grid-template-rows: none; grid-template-columns: repeat(6, 1fr); grid-auto-columns: auto; max-height: 21rem; overflow: auto; } }
+    .karakter__nama { display: grid; gap: .0625rem; }
+    .karakter__nama strong { font-size: .6875rem; }
+    .karakter__nama small { font-size: .5625rem; font-weight: 600; color: var(--text-muted); }
+    .karakter__saran { margin-top: .25rem; font-size: .8125rem; font-weight: 600; color: var(--success); }
+    .karakter__saran:empty { display: none; }
     .karakter__opsi { position: relative; display: grid; justify-items: center; gap: .125rem; min-height: 44px; padding: .375rem .25rem .5rem; border: 2px solid var(--line); border-radius: var(--radius); background: var(--surface-soft); font: inherit; font-size: .6875rem; font-weight: 700; line-height: 1.2; text-align: center; color: var(--text); cursor: pointer; scroll-snap-align: start; transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease); }
-    .karakter__opsi canvas { width: 3.5rem; height: auto; max-width: none; }
+    .karakter__opsi canvas { width: 3.25rem; height: auto; max-width: none; }
     .karakter__opsi:hover { transform: translateY(-2px); }
     .karakter__opsi[aria-checked="true"] { border-color: var(--cta); background: var(--yellow-100); }
     .karakter__opsi[aria-checked="true"]::after { content: "✓"; position: absolute; top: .25rem; right: .3rem; width: 1.125rem; height: 1.125rem; border-radius: 50%; background: var(--cta); color: #fff; font-size: .6875rem; line-height: 1.125rem; }
@@ -1878,7 +1886,7 @@
 
           <form class="fest__gerbang" id="fest-form" novalidate>
             <h3><svg aria-hidden="true"><use href="#i-lock"/></svg>Festival masih terkunci</h3>
-            <p>Isi datamu dan kirim satu kata harapan untuk masuk. Kamu akan muncul sebagai satu warga di festival dan bisa menemukan namamu.</p>
+            <p>Isi data, pilih karakter, lalu kirim satu kata harapan. Kamu akan muncul sebagai warga festival dan bisa menemukan namamu.</p>
             <div class="fest__fields">
               <div class="field field--wide"><label for="fk-nama">Nama</label><input class="input" id="fk-nama" required minlength="2" maxlength="60" autocomplete="name" placeholder="Contoh: Fauzan Rahman" aria-describedby="fk-nama-error"><p class="field__error" id="fk-nama-error"></p></div>
               <div class="field field--wide"><label for="fk-sekolah">Sekolah</label><input class="input" id="fk-sekolah" required minlength="2" maxlength="100" placeholder="Contoh: SMAN 1 Semarang" aria-describedby="fk-sekolah-error"><p class="field__error" id="fk-sekolah-error"></p></div>
@@ -1893,9 +1901,10 @@
             </a>
             <p class="field__error" id="fk-wa-error"></p>
             <fieldset class="karakter" id="fk-karakter-set" aria-describedby="fk-karakter-info fk-karakter-error">
-              <legend>Pilih karaktermu <span class="opt">(baju adat Nusantara)</span></legend>
+              <legend>Pilih karaktermu <span class="opt">(24 baju adat Nusantara · geser untuk melihat semua)</span></legend>
               <p class="karakter__info" id="fk-karakter-info"><svg aria-hidden="true"><use href="#i-lock"/></svg><span>Lengkapi data di atas dan ketuk Saluran WhatsApp untuk membuka pilihan karakter.</span></p>
               <div class="karakter__daftar" id="fk-karakter" role="radiogroup" aria-label="Karakter baju adat"></div>
+              <p class="karakter__saran" id="fk-karakter-saran" role="status"></p>
               <p class="field__error" id="fk-karakter-error"></p>
             </fieldset>
             <label class="check" for="fk-setuju" style="margin-top:1rem">
@@ -3002,23 +3011,44 @@
       b.dataset.id = m.id;
       const gambar = document.createElement('span');
       window.YCSFestival.gambarModel(gambar, m.id);
-      b.append(gambar, document.createTextNode(m.nama));
+      const [suku, ket] = m.nama.split(' (');
+      const label = document.createElement('span');
+      label.className = 'karakter__nama';
+      label.innerHTML = `<strong></strong><small></small>`;
+      label.firstChild.textContent = suku;
+      label.lastChild.textContent = ket ? ket.replace(')', '') : '';
+      b.append(gambar, label);
+      b.setAttribute('aria-label', m.nama);
       b.addEventListener('click', () => {
         if (!dataLengkap()) {
-          // Arahkan ke data yang belum lengkap dulu.
-          const kurang = cekData().find(([, ok]) => !ok);
-          cekData().forEach(([id, ok, msg]) => { if (!ok) { $('#' + id + '-error').textContent = msg; $('#' + id).setAttribute('aria-invalid', 'true'); } });
-          $('#fk-karakter-error').textContent = 'Lengkapi data dan centang Saluran WhatsApp dulu, baru pilih karakter.';
-          const el = $('#' + kurang[0]);
+          // Arahkan ke satu kolom yang belum lengkap (tanpa memunculkan semua pesan error sekaligus).
+          const [id, , msg] = cekData().find(([, ok]) => !ok);
+          $('#' + id + '-error').textContent = msg;
+          $('#fk-karakter-error').textContent = id === 'fk-wa' ? 'Ketuk kartu Saluran WhatsApp di atas dulu, lalu pilih karakter.' : 'Lengkapi data di atas dulu, lalu pilih karakter.';
+          const el = $('#' + id);
           el.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
           el.focus({ preventScroll: true });
           return;
         }
-        karakter = m.id;
-        $$('.karakter__opsi').forEach((x) => x.setAttribute('aria-checked', String(x === b)));
-        $('#fk-karakter-error').textContent = '';
+        pilihKarakter(m.id, true);
       });
       $('#fk-karakter').append(b);
+    });
+    let karakterManual = false;
+    function pilihKarakter(id, manual) {
+      karakter = id;
+      if (manual) karakterManual = true;
+      $$('.karakter__opsi').forEach((x) => { const on = Number(x.dataset.id) === id; x.setAttribute('aria-checked', String(on)); if (on && !manual) x.scrollIntoView({ block: 'nearest', inline: 'center' }); });
+      $('#fk-karakter-error').textContent = '';
+      $('#fk-karakter-saran').textContent = '';
+    }
+    // Karakter bawaan mengikuti provinsi (selama peserta belum memilih sendiri).
+    $('#fk-prov').addEventListener('change', () => {
+      const id = window.YCSFestival ? window.YCSFestival.modelProvinsi($('#fk-prov').value) : 0;
+      if (!id || karakterManual) return;
+      pilihKarakter(id, false);
+      const m = window.YCSFestival.MODEL.find((x) => x.id === id);
+      $('#fk-karakter-saran').textContent = `Otomatis dipilih sesuai provinsimu: ${m.nama}. Boleh diganti.`;
     });
     $('#fest-form').addEventListener('input', syncKarakter);
     $('#fest-form').addEventListener('change', syncKarakter);
@@ -3175,6 +3205,15 @@
       if (e.key === 'Escape' && orb.classList.contains('is-open')) { setOrb(false); orbCore.focus(); }
     });
     setTimeout(() => orb.classList.add('is-seen'), 6000);
+    // Di HP tombol bulat disembunyikan saat mengetik / saat form festival & Dana Kaget di layar agar tidak menutupi isian.
+    let formTerlihat = 0;
+    const syncOrb2 = () => orb.classList.toggle('is-sembunyi', !orb.classList.contains('is-open') && (formTerlihat > 0 || document.activeElement?.matches?.('input, select, textarea')));
+    document.addEventListener('focusin', syncOrb2);
+    document.addEventListener('focusout', () => setTimeout(syncOrb2, 50));
+    if ('IntersectionObserver' in window && matchMedia('(max-width: 47.99rem)').matches) {
+      const io = new IntersectionObserver((es) => { es.forEach((e) => { formTerlihat += e.isIntersecting ? 1 : -1; }); formTerlihat = Math.max(0, formTerlihat); syncOrb2(); }, { threshold: 0.15 });
+      ['#fest-form', '#dk-step1', '#dk-step2'].forEach((sel) => { const el = document.querySelector(sel); if (el) io.observe(el); });
+    }
     // Keterangan kecil di tiap menu mengikuti status dari admin.
     function syncOrb() {
       if (!cfg) return;
