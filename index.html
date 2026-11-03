@@ -722,7 +722,10 @@
     @media (min-width: 40rem) { .fest__stage { aspect-ratio: 1654 / 951; } }
     .fest__stage > canvas { position: absolute; inset: 0; width: 100%; height: 100%; transition: filter 700ms var(--ease); }
     .fest.is-locked .fest__stage > canvas { filter: blur(7px) saturate(1.15); }
-    .fest-b { position: absolute; z-index: 3; left: 0; top: 0; display: flex; gap: .5rem; align-items: center; max-width: 13rem; padding: .375rem .75rem .375rem .375rem; border: 2.5px solid #FFC93C; border-radius: .875rem; background: #FFFBF3; color: var(--ink); box-shadow: 0 10px 22px -10px rgb(0 0 0 / .45); opacity: 0; transition: opacity 300ms var(--ease); pointer-events: none; will-change: transform; }
+    .fest-b { position: absolute; z-index: 3; left: 0; top: 0; display: flex; gap: .5rem; align-items: center; max-width: 13rem; padding: .375rem .75rem .375rem .375rem; border: 2.5px solid #FFC93C; border-radius: .875rem; background: #FFFBF3; color: var(--ink); box-shadow: 0 10px 22px -10px rgb(0 0 0 / .45); opacity: 0; transition: opacity 300ms var(--ease); cursor: pointer; will-change: transform; }
+    .fest-b:not(.is-on) { pointer-events: none; }
+    .fest-b.is-on:hover { border-color: var(--cta); }
+    .fest:not(.is-locked) .fest__stage > canvas { cursor: pointer; }
     .fest-b.is-on { opacity: 1; }
     .fest-b::after { content: ""; position: absolute; left: var(--ekor, 50%); bottom: -8px; width: 13px; height: 13px; background: #FFFBF3; border-right: 2.5px solid #FFC93C; border-bottom: 2.5px solid #FFC93C; transform: translateX(-50%) rotate(45deg); }
     .fest-b.is-pin { z-index: 4; max-width: 16rem; padding: .5rem .875rem .5rem .5rem; border-width: 3px; border-color: var(--cta); }
@@ -2917,6 +2920,7 @@
     function bukaFestival() {
       fest.classList.remove('is-locked');
       if (festApi) festApi.setBalon(true);
+      if (!$('#fest-info').textContent) $('#fest-info').textContent = 'Tips: ketuk balon harapan atau salah satu warga untuk menyalakan cahaya dari Youth Character Summit 2026.';
       $('#fest-canvas').setAttribute('aria-label', 'Festival YCS di Bali. Gunakan kolom pencarian untuk menemukan namamu.');
     }
     if (saya) bukaFestival();
