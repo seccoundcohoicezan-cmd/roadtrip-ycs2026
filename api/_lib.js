@@ -1,14 +1,24 @@
 // Utilitas bersama fungsi Vercel. File berawalan "_" tidak menjadi route.
 const crypto = require('node:crypto');
 
-// Endpoint Apps Script bersifat publik; tidak ada OAuth/token akun di frontend.
-const ENDPOINT = process.env.YCS_APPS_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbzbzKw_rqGIgOxczylvv9C9jt1YkJdRK6wmgNK3Jkxh7XFbAhMA3aBhRgOENjYHjdI7/exec';
+// Sejak MRKT-56 data utama ada di server Dokploy (menjalankan Code.gs yang sama di memori, cepat ±50 ms) dan
+// diteruskan ke Google Sheet sebagai cadangan. Bila server data tidak terjangkau, permintaan BACA jatuh ke Apps Script
+// (data cadangan, mungkin tertinggal beberapa detik); permintaan TULIS tidak, agar data tidak bercabang.
+// YCS_DATA_URL=off → kembali memakai Apps Script sepenuhnya.
+const APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbzbzKw_rqGIgOxczylvv9C9jt1YkJdRK6wmgNK3Jkxh7XFbAhMA3aBhRgOENjYHjdI7/exec';
+const DATA_URL = process.env.YCS_DATA_URL || 'https://ycs-data.194-238-23-221.sslip.io/exec';
+const ENDPOINT = process.env.YCS_APPS_SCRIPT_URL || (DATA_URL === 'off' ? APPS_SCRIPT : DATA_URL);
+const CADANGAN = ENDPOINT === APPS_SCRIPT || process.env.YCS_APPS_SCRIPT_URL ? null : APPS_SCRIPT;
 const STATUS = {kata_ditolak: 422, nama_ditolak: 422, validation: 400, sesi_habis: 401, sandi_salah: 401, terlalu_banyak: 429, rate_limit: 429, busy: 503, server: 502, save_failed: 502, connection: 502};
 
-async function upstreamGet(aksi, timeout = 20000) {
-  const r = await fetch(ENDPOINT + '?aksi=' + encodeURIComponent(aksi), {headers: {Accept: 'application/json'}, redirect: 'follow', signal: AbortSignal.timeout(timeout)});
+async function ambil(url, aksi, timeout) {
+  const r = await fetch(url + '?aksi=' + encodeURIComponent(aksi), {headers: {Accept: 'application/json'}, redirect: 'follow', signal: AbortSignal.timeout(timeout)});
   if (!r.ok) throw new Error('upstream ' + r.status);
   return r.json();
+}
+async function upstreamGet(aksi, timeout = 20000) {
+  if (!CADANGAN) return ambil(ENDPOINT, aksi, timeout);
+  try { return await ambil(ENDPOINT, aksi, 6000); } catch (_) { return ambil(CADANGAN, aksi, timeout); }
 }
 async function upstreamPost(payload, timeout = 25000) {
   const r = await fetch(ENDPOINT, {method: 'POST', headers: {'Content-Type': 'text/plain;charset=utf-8'}, body: JSON.stringify(payload), redirect: 'follow', signal: AbortSignal.timeout(timeout)});

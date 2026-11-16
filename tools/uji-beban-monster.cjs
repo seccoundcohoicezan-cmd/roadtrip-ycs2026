@@ -1,7 +1,7 @@
 // Uji beban Lawan Monster: N pemain virtual mengetuk selama D detik + pemantau GET.
 // Pakai: node tools/uji-beban-monster.cjs <base-url> [pemain=300] [detik=20] [pemantau=pemain]
-// Lokal: jalankan tools/dev-server.cjs dengan fengari, mulai event lewat admin/seed, lalu jalankan skrip ini.
-// Produksi: setiap kiriman memakai kuota Vercel & Upstash; batas token 300/10 menit per IP (env MONSTER_BATAS_MASUK).
+// Lokal: jalankan tools/dev-server.cjs, seed {"kata": N} (email w0..wN-1@mail.com = peserta festival), mulai event, lalu jalankan skrip ini.
+// Produksi: pemain harus peserta festival asli (email di tab Satu Kata), jadi uji beban produksi butuh data uji; batas perangkat baru 300/10 menit per IP.
 const [base = 'http://127.0.0.1:8787', nPemain = '300', detik = '20', nPantau] = process.argv.slice(2);
 const N = Number(nPemain), D = Number(detik) * 1000, P = nPantau == null ? N : Number(nPantau);
 const lat = [], galat = {};
@@ -11,7 +11,7 @@ async function panggil(method, body, ip) {
   const t0 = performance.now();
   req++;
   try {
-    const r = await fetch(base + '/api/monster', {method, headers: {'Content-Type': 'application/json', 'X-Forwarded-For': ip}, body: body && JSON.stringify(body)});
+    const r = await fetch(base + '/srv/monster', {method, headers: {'Content-Type': 'application/json', 'X-Forwarded-For': ip}, body: body && JSON.stringify(body)});
     const d = await r.json();
     lat.push(performance.now() - t0);
     if (!d.ok) galat[d.error] = (galat[d.error] || 0) + 1;
@@ -20,7 +20,7 @@ async function panggil(method, body, ip) {
 }
 async function pemain(i, akhir, id) {
   const ip = `10.${(i >> 8) & 255}.${i & 255}.${(i * 7) & 255}`;
-  const m = await panggil('POST', {aksi: 'masuk'}, ip);
+  const m = await panggil('POST', {aksi: 'masuk', perangkat: 'uji-beban-perangkat-' + String(i).padStart(6, '0'), email: `w${i}@mail.com`}, ip);
   if (!m.token) return;
   let seq = 0, iv = 1000;
   await jalan(Math.random() * 1000);
@@ -36,12 +36,12 @@ async function pemantau(akhir) {
   while (Date.now() < akhir) { await panggil('GET', null, '10.255.0.1'); await jalan(2500); }
 }
 (async () => {
-  const awal = await (await fetch(base + '/api/monster')).json();
+  const awal = await (await fetch(base + '/srv/monster')).json();
   if (awal.fase !== 'tanding') { console.error('Event belum berjalan (fase ' + awal.fase + '). Mulai dulu lewat admin.'); process.exit(1); }
   const akhir = Date.now() + D, t0 = Date.now();
   await Promise.all([...Array.from({length: N}, (_, i) => pemain(i, akhir, awal.id)), ...Array.from({length: P}, () => pemantau(akhir))]);
   await jalan(500);
-  const st = await (await fetch(base + '/api/monster', {headers: {'Cache-Control': 'no-cache'}})).json();
+  const st = await (await fetch(base + '/srv/monster', {headers: {'Cache-Control': 'no-cache'}})).json();
   lat.sort((a, b) => a - b);
   const q = (p) => Math.round(lat[Math.min(lat.length - 1, Math.floor(lat.length * p))] || 0);
   const dtk = (Date.now() - t0) / 1000;

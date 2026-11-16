@@ -4,13 +4,14 @@ const HEADERS_LAMA = ['Waktu', 'ID permintaan', 'Nama', 'Sekolah', 'Email', 'Bin
 const HEADERS = HEADERS_LAMA.concat(['Kota/Kabupaten', 'Provinsi']);
 const REKAP_NAME = 'Rekap';
 const REKAP_VERSI = '3';
-const SKEMA_VERSI = '7';
+const SKEMA_VERSI = '8';
 const MAKS_KARAKTER = 40; // jumlah karakter adat di assets/js/festival.js (saat ini 24, cadangan untuk tambahan)
 const WIB = 7 * 3600 * 1000;
 
 const TAB = {
   pengaturan: 'Pengaturan', live: 'Jadwal Live', finalis: 'Finalis', kode: 'Kode Wildcard',
-  dana: 'Dana Kaget', survei: 'Survei', kata: 'Satu Kata', admin: 'Admin', log: 'Log Admin'
+  dana: 'Dana Kaget', survei: 'Survei', kata: 'Satu Kata', admin: 'Admin', log: 'Log Admin',
+  tiket: 'Tiket Monster', monster: 'Monster Event'
 };
 const KOLOM = {
   pengaturan: ['Kunci', 'Nilai', 'Keterangan'],
@@ -20,8 +21,13 @@ const KOLOM = {
   dana: ['Waktu', 'ID permintaan', 'Nama', 'Email', 'Nomor WhatsApp', 'Sekolah', 'Kota/Kabupaten', 'Provinsi', 'Sumber'],
   survei: ['Waktu', 'ID permintaan', 'Destinasi pilihan', 'Kegiatan favorit', 'Waktu ideal', 'Status', 'Provinsi', 'Destinasi impian lain', 'Email', 'Sumber'],
   kata: ['Waktu', 'ID permintaan', 'Kata', 'Provinsi', 'Sumber', 'Tampil', 'Nama', 'Sekolah', 'Email', 'Klik saluran WhatsApp', 'Karakter'],
-  log: ['Waktu', 'Aksi', 'Detail']
+  log: ['Waktu', 'Aksi', 'Detail'],
+  tiket: ['Waktu', 'Event', 'No tiket', 'Nama', 'Sekolah', 'Provinsi', 'Email', 'Perangkat', 'Kontribusi', 'Status', 'Catatan'],
+  monster: ['Event', 'Mulai', 'Selesai', 'Kalah pada', 'Total tenaga', 'Pemain', 'Tiket', 'Pemenang']
 };
+// Server data utama (Dokploy) memakai rahasia bersama; di sini hanya hash SHA-256-nya (repo publik).
+const PRIMER_HASH = '3a5acc3b061cdf7dea58878bc9f5e40f216da8d7312bece45c00763ad8ba8fa5';
+const TAB_TANPA_SINKRON = ['Rekap']; // berisi rumus, dibangun di Sheet sendiri
 const STATUS_KODE = {belum: 'belum klaim', sudah: 'sudah klaim', hangus: 'hangus'};
 
 // [kunci, nilai awal, keterangan]. Nilai disimpan sebagai teks; waktu ditulis "YYYY-MM-DD HH:mm" (WIB).
@@ -70,11 +76,12 @@ const PENGATURAN = [
   ['monster_skala_naik', '0.3', 'Ukuran monster = 1 + naik x (level-1), maksimal 2,5x.'],
   ['monster_interval_ms', '1000', 'Jeda kirim batch tap (ms, 500-5000). Otomatis diperlambat saat pemain sangat banyak.'],
   ['monster_batas_tap', '10', 'Batas tap per detik per pemain yang dihitung server (anti-bot).'],
+  ['monster_tiket_min', '1', 'Minimal poin kontribusi untuk mendapat 1 tiket undian per event (1 perangkat = 1 peserta = 1 tiket).'],
   ['monster_nama', 'Raja Batu', 'Nama monster yang tampil di layar.'],
   ['monster_wujud', 'raja_batu', 'raja_batu = ilustrasi Raja Batu dari panitia; lucu = monster kartun gambar kode (lebih ramah anak).']
 ];
 const MONSTER_PILIHAN = {monster_pemicu: ['sebelum_live', 'jadwal', 'manual'], monster_darurat: ['NORMAL', 'MULAI', 'STOP'], monster_wujud: ['raja_batu', 'lucu']};
-const MONSTER_ANGKA = {monster_menit_sebelum: [1, 180], monster_durasi: [1, 180], monster_level: [1, 10], monster_target_dasar: [10, 1e9], monster_interval_ms: [500, 5000], monster_batas_tap: [3, 30]};
+const MONSTER_ANGKA = {monster_menit_sebelum: [1, 180], monster_durasi: [1, 180], monster_level: [1, 10], monster_target_dasar: [10, 1e9], monster_interval_ms: [500, 5000], monster_batas_tap: [3, 30], monster_tiket_min: [1, 1000000]};
 const KUNCI_YA_TIDAK = ['pakai_link_cadangan', 'klaim_aktif', 'survei_aktif', 'dana_aktif', 'dana_tampilkan_sisa', 'popup_aktif', 'monster_aktif'];
 const KUNCI_WAKTU = ['waktu_pengumuman', 'klaim_berlaku_hingga', 'survei_buka', 'waktu_acara_mulai', 'waktu_acara_selesai', 'monster_waktu'];
 const KUNCI_ANGKA = ['road_target', 'road_tambahan', 'dana_kuota'];
@@ -370,7 +377,7 @@ function monsterPublik_(cfg) {
     durasi: cfg.monster_durasi, darurat: cfg.monster_darurat || 'NORMAL', mulaiManual: Number(cfg.monster_mulai_manual) || null,
     target: cfg.monster_target, level: cfg.monster_level, targetDasar: cfg.monster_target_dasar, targetKali: cfg.monster_target_kali,
     poin: cfg.monster_poin, skalaNaik: cfg.monster_skala_naik, interval: cfg.monster_interval_ms, batasTap: cfg.monster_batas_tap,
-    nama: cfg.monster_nama || 'Raja Batu', wujud: cfg.monster_wujud || 'raja_batu'
+    nama: cfg.monster_nama || 'Raja Batu', wujud: cfg.monster_wujud || 'raja_batu', tiketMin: cfg.monster_tiket_min || '1'
   };
 }
 // Validasi satu nilai monster_*; hasil null = tidak valid.
@@ -638,7 +645,8 @@ const EKSPOR = {
   dana: () => [TAB.dana, KOLOM.dana.length],
   survei: () => [TAB.survei, KOLOM.survei.length],
   finalis: () => [TAB.finalis, KOLOM.finalis.length],
-  kata: () => [TAB.kata, KOLOM.kata.length]
+  kata: () => [TAB.kata, KOLOM.kata.length],
+  tiket: () => [TAB.tiket, KOLOM.tiket.length]
 };
 function hitungStatus_(ss) {
   const kode = {total: 0, belum: 0, sudah: 0, hangus: 0};
@@ -817,6 +825,53 @@ function admin_(p) {
   return {ok: false, error: 'aksi_tidak_dikenal'};
 }
 
+/* ===================== Server data utama (Dokploy) ===================== */
+// Sejak MRKT-56 data utama ada di server Dokploy (menjalankan Code.gs ini di memori). Sheet ini menjadi CADANGAN:
+// - primer-ekspor: server mengambil seluruh isi Sheet saat pertama kali hidup / saat admin menekan "Ambil dari Sheet".
+// - primer-terapkan: server meneruskan perubahan (tambah baris di akhir, atau ganti isi tab) beberapa detik sekali.
+function hex_(bytes) { return bytes.map(b => ('0' + ((b + 256) % 256).toString(16)).slice(-2)).join(''); }
+function primerSah_(rahasia) {
+  return typeof rahasia === 'string' && rahasia.length >= 32 && hex_(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, rahasia)) === PRIMER_HASH;
+}
+const keSel_ = v => (v && typeof v === 'object' && '$d' in v) ? new Date(v.$d) : v;
+const dariSel_ = v => v instanceof Date ? {$d: v.getTime()} : v;
+function primer_(p) {
+  if (!primerSah_(p.rahasia)) return {ok: false, error: 'sandi_salah'};
+  const ss = ss_();
+  if (p.aksi === 'primer-ekspor') {
+    const tabs = ss.getSheets().filter(sh => TAB_TANPA_SINKRON.indexOf(sh.getName()) < 0).map(sh => {
+      const n = sh.getLastRow(), w = sh.getLastColumn();
+      return {nama: sh.getName(), baris: n && w ? sh.getRange(1, 1, n, w).getValues().map(r => r.map(dariSel_)) : []};
+    });
+    const pr = PropertiesService.getScriptProperties();
+    const props = {};
+    ['ADMIN_HASH', 'live_diisi', 'skema_versi', 'rekap_versi'].forEach(k => { const v = pr.getProperty(k); if (v != null) props[k] = v; });
+    return {ok: true, tabs: tabs, props: props, waktu: Date.now()};
+  }
+  const hasil = [];
+  return kunci_(LockService.getScriptLock(), () => {
+    (Array.isArray(p.ops) ? p.ops : []).forEach(op => {
+      if (!op || typeof op.nama !== 'string' || TAB_TANPA_SINKRON.indexOf(op.nama) >= 0) return;
+      const kunciTab = Object.keys(TAB).filter(k => TAB[k] === op.nama)[0];
+      const sh = ss.getSheetByName(op.nama) || (kunciTab ? buatTab_(ss, kunciTab) : ss.insertSheet(op.nama));
+      const baris = (op.baris || []).map(r => r.map(keSel_));
+      const lebar = Math.max(1, ...baris.map(r => r.length));
+      const kotak = baris.map(r => r.concat(Array(lebar - r.length).fill('')));
+      if (op.mode === 'append') {
+        if (sh.getLastRow() !== op.dari - 1) { hasil.push({nama: op.nama, ok: false, perlu: 'replace'}); return; }
+        if (kotak.length) sh.getRange(op.dari, 1, kotak.length, lebar).setValues(kotak);
+      } else {
+        const n = sh.getLastRow(), w = sh.getLastColumn();
+        if (n && w) sh.getRange(1, 1, n, w).clearContent();
+        if (kotak.length) sh.getRange(1, 1, kotak.length, lebar).setValues(kotak);
+      }
+      hasil.push({nama: op.nama, ok: true, baris: sh.getLastRow()});
+    });
+    cache_().removeAll(['cfg', 'reveal', 'stats', 'kata']);
+    return {ok: true, hasil: hasil};
+  });
+}
+
 /* ===================== Router ===================== */
 
 function doGet(e) {
@@ -845,11 +900,12 @@ function doGet(e) {
 }
 function doPost(e) {
   try {
-    if (!e || !e.postData || e.postData.contents.length > 600000) return json_({ok: false, error: 'invalid_request'});
+    if (!e || !e.postData || e.postData.contents.length > 30000000) return json_({ok: false, error: 'invalid_request'});
     const p = JSON.parse(e.postData.contents);
     const aksi = typeof p.aksi === 'string' ? p.aksi : 'twibbon';
+    if (aksi === 'primer-ekspor' || aksi === 'primer-terapkan') return json_(primer_(p));
     if (aksi !== 'twibbon') pastikanSkema_();
-    if (aksi !== 'admin-impor' && e.postData.contents.length > 8192) return json_({ok: false, error: 'invalid_request'});
+    if (e.postData.contents.length > (aksi === 'admin-impor' ? 600000 : 8192)) return json_({ok: false, error: 'invalid_request'});
     if (aksi === 'twibbon') return json_(twibbon_(p));
     if (aksi === 'klaim-cek') return json_(klaim_(p, false));
     if (aksi === 'klaim-verifikasi') return json_(klaim_(p, true));

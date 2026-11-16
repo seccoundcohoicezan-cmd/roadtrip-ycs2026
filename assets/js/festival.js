@@ -239,9 +239,31 @@
     const skalaY = (y) => 0.5 + 0.62 * Math.max(0, Math.min(1, (y - area.y0) / Math.max(1, area.y1 - area.y0)));
 
     function tujuanBaru(w, r) {
-      w.tx = 0.03 + r() * 0.94;
-      w.ty = r();
+      // Tujuan acak, tapi tidak di dalam zona monster (bila ada).
+      for (let i = 0; i < 12; i++) {
+        w.tx = 0.03 + r() * 0.94;
+        w.ty = r();
+        if (!diZona(w.tx, w.ty)) break;
+      }
       w.jeda = r() < 0.35 ? 0.8 + r() * 2.5 : 0;
+    }
+    // Zona monster (Lawan Monster): {x, atas, kaki, lebar} dalam px layar. Warga tidak boleh menimpa monster:
+    // yang berada di dalam zona menyingkir ke sisi terdekat, dan tidak ada yang berjalan menembusnya.
+    let zona = null;
+    function diZona(x, y) {
+      if (!zona || !W) return false;
+      const py = area.y0 + y * (area.y1 - area.y0), px = x * W;
+      const hh = tinggiDasar() * skalaY(py);
+      return px > zona.x - zona.lebar / 2 - hh * 0.3 && px < zona.x + zona.lebar / 2 + hh * 0.3 && py > zona.atas && py - hh < zona.kaki + 4;
+    }
+    function keluarZona(w) {
+      const kiri = (zona.x - zona.lebar / 2) / W - 0.07, kanan = (zona.x + zona.lebar / 2) / W + 0.07;
+      let keKiri = w.x * W < zona.x;
+      if (keKiri && kiri < 0.03) keKiri = false;
+      if (!keKiri && kanan > 0.97) keKiri = kiri >= 0.03;
+      w.tx = keKiri ? Math.max(0.02, kiri - w.r() * 0.1) : Math.min(0.98, kanan + w.r() * 0.1);
+      w.ty = w.y;
+      w.jeda = 0; w.diam = false; w.kabur = true;
     }
     function siapkanWarga(e, i, dariGerbang) {
       const w = { ...e, c: ciri(e) };
@@ -276,14 +298,17 @@
     function gerak(dt) {
       if (gerakMinim) return;
       for (const w of warga) {
+        if (zona && !w.kabur && diZona(w.x, w.y)) keluarZona(w);
         if (w.diam) continue;
         if (w.jeda > 0) { w.jeda -= dt; w.jalan = false; continue; }
         const dx = w.tx - w.x, dy = (w.ty - w.y) * 0.6;
         const jarak = Math.hypot(dx, dy);
-        if (jarak < 0.004) { tujuanBaru(w, w.r); continue; }
-        const s = (0.6 + 0.6 * w.y) * w.v * dt;
-        w.x += (dx / jarak) * Math.min(s, jarak);
-        w.y += (dy / jarak) * Math.min(s, jarak) / 0.6;
+        if (jarak < 0.004) { w.kabur = false; tujuanBaru(w, w.r); continue; }
+        const s = (0.6 + 0.6 * w.y) * w.v * dt * (w.kabur ? 2.6 : 1);
+        const nx = w.x + (dx / jarak) * Math.min(s, jarak), ny = w.y + (dy / jarak) * Math.min(s, jarak) / 0.6;
+        // Langkah berikutnya masuk zona monster → pilih tujuan lain (jangan menembus monster).
+        if (zona && !w.kabur && diZona(nx, ny)) { tujuanBaru(w, w.r); w.jeda = 0; continue; }
+        w.x = nx; w.y = ny;
         w.jalan = true;
         w.langkahT += dt * 7;
       }
@@ -639,6 +664,14 @@
       setBalon(on) { balonAktif = on; if (!on) balon.forEach((b) => { b.sampai = 0; }); },
       posisi(w) { return w && w.layar ? { x: w.layar.x, y: w.layar.y, h: w.layar.h, W, H } : null; },
       wargaDi,
+      // Lawan Monster: zona = {x, atas, kaki, lebar} (px layar) atau null. Gerak minim → warga langsung dipindah.
+      get zona() { return zona; },
+      setZona(z) {
+        zona = z && z.lebar > 0 ? z : null;
+        if (!zona) { warga.forEach((w) => { w.kabur = false; }); return; }
+        if (gerakMinim) warga.forEach((w) => { if (diZona(w.x, w.y)) { keluarZona(w); w.x = w.tx; w.kabur = false; } });
+        mulai();
+      },
       // Batas lantai plaza (px layar) untuk menaruh objek lain di atas panggung, mis. monster.
       lantai() { return { y0: area.y0, y1: area.y1, W, H }; },
       ciri,
@@ -653,6 +686,7 @@
       },
       kanvas: canvas,
     };
+    canvas.ycsFestival = api; // untuk diagnosa & uji (mis. cek warga tidak menimpa monster)
     ukur();
     mulai();
     return api;
