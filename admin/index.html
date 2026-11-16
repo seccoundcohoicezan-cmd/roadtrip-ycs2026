@@ -720,23 +720,23 @@
       await simpanMon({monster_darurat: 'NORMAL'}, 'Monster kembali mengikuti pemicu.');
       sibuk(btn, false);
     });
-    // Status langsung dari /api/monster (endpoint publik yang sama dengan peserta).
+    // Status langsung dari /srv/monster (server data, endpoint publik yang sama dengan peserta).
     const FASE = {mati: 'Tidak aktif', tidak_ada: 'Tidak ada event terjadwal', tunggu: 'Menunggu kemunculan', tanding: 'Sedang bertanding', menang: 'Monster sudah kalah', habis: 'Waktu habis (monster belum kalah)'};
     let monTimer = 0;
     async function statusMon() {
       clearTimeout(monTimer);
       if ($('#p-monster').hidden || document.hidden) return;
       try {
-        const r = await fetch('/api/monster', {cache: 'no-store'});
+        const r = await fetch('/srv/monster', {cache: 'no-store'});
         const d = await r.json();
-        const sub = d.alasan === 'penyimpanan' ? 'Upstash Redis belum terhubung di Vercel → fitur belum bisa berjalan. Lihat README bagian Lawan Monster.' : d.dihentikan ? 'Dihentikan lewat tombol Stop darurat.' : (FASE[d.fase] || d.fase);
+        const sub = d.dihentikan ? 'Dihentikan lewat tombol Stop darurat.' : (FASE[d.fase] || d.fase);
         $('#mon-status-sub').textContent = sub;
         const tg = d.target ? d.target[(d.level || 1) - 1] : 0;
         $('#mon-adm-isi').style.width = tg ? Math.min(100, (d.tenaga || 0) / tg * 100) + '%' : '0';
         const kv = [];
         if (d.mulai) kv.push(['Mulai', waktu(d.mulai)], ['Berakhir', waktu(d.selesai)]);
         if (d.live) kv.push(['Live berikutnya', d.live.judul]);
-        if (d.level) kv.push(['Level', `${d.level} / ${d.levelMaks}`], ['Tenaga level ini', `${nf.format(d.tenaga)} / ${nf.format(tg)}`], ['Total tenaga', nf.format(d.total)], ['Pemain aktif (15 dtk)', nf.format(d.pemain)], ['Jeda kirim tap', (d.interval / 1000).toLocaleString('id-ID') + ' dtk']);
+        if (d.level) kv.push(['Level', `${d.level} / ${d.levelMaks}`], ['Tenaga level ini', `${nf.format(d.tenaga)} / ${nf.format(tg)}`], ['Total tenaga', nf.format(d.total)], ['Pemain aktif (15 dtk)', nf.format(d.pemain)], ['Tiket terbit', nf.format(d.tiket || 0)], ['Jeda kirim tap', (d.interval / 1000).toLocaleString('id-ID') + ' dtk']);
         if (d.kalah) kv.push(['Kalah pada', waktu(d.kalah)]);
         $('#mon-kv').innerHTML = kv.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('');
       } catch (e) { $('#mon-status-sub').textContent = 'Gagal memuat status.'; }

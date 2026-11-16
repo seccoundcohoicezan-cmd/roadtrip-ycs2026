@@ -3079,7 +3079,7 @@
     muatFestival();
     setInterval(() => { if (!document.hidden && !fest.classList.contains('is-locked')) muatFestival(); }, 90000);
 
-    /* ---------- Lawan Monster: event kolaboratif sebelum live (assets/js/monster.js + /api/monster) ---------- */
+    /* ---------- Lawan Monster: event kolaboratif sebelum live (assets/js/monster.js + /srv/monster → server data) ---------- */
     // Dipasang setelah halaman siap; bila skrip/endpoint gagal, festival tetap berjalan seperti biasa.
     window.addEventListener('DOMContentLoaded', () => {
       if (!window.YCSMonster) return;

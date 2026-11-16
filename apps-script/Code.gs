@@ -61,7 +61,7 @@ const PENGATURAN = [
   ['waktu_acara_selesai', '2027-01-02 23:59', 'Akhir acara utama. Selama acara berlangsung, countdown menghitung ke waktu ini.'],
   ['link_saluran', 'https://whatsapp.com/channel/0029Vb5vVIaId7nEqecJ1I1G', 'Saluran WhatsApp yang harus diikuti untuk membuka hasil Satu Kata.'],
   ['kata_blokir', '', 'Kata tambahan yang ditolak di Satu Kata (pisahkan dengan koma). Sembunyikan kata yang sudah masuk lewat kolom Tampil = TIDAK di tab Satu Kata.'],
-  ['monster_aktif', 'TIDAK', 'Lawan Monster: YA = event monster dijalankan sesuai pemicu. Butuh Upstash Redis terhubung di Vercel.'],
+  ['monster_aktif', 'TIDAK', 'Lawan Monster: YA = event monster dijalankan sesuai pemicu (diproses server data Dokploy).'],
   ['monster_pemicu', 'sebelum_live', 'sebelum_live = otomatis N menit sebelum setiap jadwal di tab Jadwal Live; jadwal = pada monster_waktu; manual = hanya lewat tombol Mulai sekarang.'],
   ['monster_menit_sebelum', '20', 'Pemicu sebelum_live: monster muncul sekian menit sebelum live dimulai.'],
   ['monster_waktu', '', 'Pemicu jadwal: waktu monster muncul (WIB).'],
