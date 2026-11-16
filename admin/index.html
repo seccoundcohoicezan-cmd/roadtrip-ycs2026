@@ -98,6 +98,16 @@
     th { background: var(--surface-soft); font-weight: 800; white-space: nowrap; }
     td .input, td .select { min-height: 40px; padding: .375rem .625rem; border-radius: var(--radius-sm); font-size: .875rem; min-width: 8rem; }
     td input[type="checkbox"] { width: 1.25rem; height: 1.25rem; accent-color: var(--teal-700); }
+    .mon-adm-bar { height: .75rem; margin-top: var(--space-3); overflow: hidden; border-radius: 999px; background: var(--surface-soft); }
+    .mon-adm-bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #FF8A3D, #FFC93C); transition: width .6s; }
+    .mon-adm-aksi { display: flex; flex-wrap: wrap; gap: .5rem; margin: var(--space-3) 0; }
+    .mon-adm-stop { color: #B42318; }
+    .mon-adm-mode { margin-top: var(--space-2); font-weight: 700; }
+    .mon-adm-jadwal { margin: .25rem 0 0; padding-left: 1.1rem; font-size: .9375rem; }
+    .mon-adm-jadwal li + li { margin-top: .25rem; }
+    .mon-adm-tabel { width: 100%; min-width: 30rem; font-size: .9375rem; font-variant-numeric: tabular-nums; }
+    #p-monster .panel-grid { margin-bottom: var(--space-4); }
+    [data-pemicu][hidden] { display: none; }
     .live-table { min-width: 64rem; }
     .preview { min-width: 32rem; }
     .preview td { white-space: nowrap; max-width: 14rem; overflow: hidden; text-overflow: ellipsis; }
@@ -130,6 +140,7 @@
     <symbol id="i-ticket" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M3 7.5A1.5 1.5 0 0 1 4.5 6h15A1.5 1.5 0 0 1 21 7.5V10a2 2 0 0 0 0 4v2.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 16.5V14a2 2 0 0 0 0-4Z"/></symbol>
     <symbol id="i-gift" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9M12 8v13M12 8S10.5 3 8 3a2.5 2.5 0 0 0 0 5M12 8s1.5-5 4-5a2.5 2.5 0 0 1 0 5"/></g></symbol>
     <symbol id="i-bell" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9m4.3 13a1.9 1.9 0 0 0 3.4 0"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></symbol>
     <symbol id="i-trash" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13"/></symbol>
   </svg>
 
@@ -175,6 +186,7 @@
           <button role="tab" id="t-ringkasan" aria-controls="p-ringkasan" aria-selected="true"><svg aria-hidden="true"><use href="#i-grid"/></svg>Ringkasan</button>
           <button role="tab" id="t-pengaturan" aria-controls="p-pengaturan" aria-selected="false" tabindex="-1"><svg aria-hidden="true"><use href="#i-gear"/></svg>Pengaturan</button>
           <button role="tab" id="t-live" aria-controls="p-live" aria-selected="false" tabindex="-1"><svg aria-hidden="true"><use href="#i-play"/></svg>Jadwal Live</button>
+          <button role="tab" id="t-monster" aria-controls="p-monster" aria-selected="false" tabindex="-1"><svg aria-hidden="true"><use href="#i-bolt"/></svg>Lawan Monster</button>
           <button role="tab" id="t-data" aria-controls="p-data" aria-selected="false" tabindex="-1"><svg aria-hidden="true"><use href="#i-db"/></svg>Impor &amp; Ekspor</button>
           <button role="tab" id="t-keamanan" aria-controls="p-keamanan" aria-selected="false" tabindex="-1"><svg aria-hidden="true"><use href="#i-lock"/></svg>Keamanan</button>
         </div>
@@ -287,6 +299,66 @@
           <div class="savebar"><p id="live-status" role="status">Tidak ada perubahan.</p><button class="btn btn--cta btn--sm" type="button" id="btn-simpan-live">Simpan jadwal</button></div>
         </section>
 
+        <!-- Lawan Monster -->
+        <section role="tabpanel" id="p-monster" aria-labelledby="t-monster" tabindex="0" hidden>
+          <div class="content__head"><div><h1>Lawan Monster</h1><p class="muted small">Event kolaboratif di panggung Festival Satu Kata. Peserta mengetuk warga untuk mengumpulkan tenaga sampai monster kalah, lalu lanjut ke live.</p></div></div>
+          <div class="panel-grid">
+            <div class="panel">
+              <h2>Status sekarang</h2>
+              <p class="panel__sub" id="mon-status-sub">Memuat…</p>
+              <div class="mon-adm-bar" aria-hidden="true"><i id="mon-adm-isi"></i></div>
+              <dl class="kv" id="mon-kv"></dl>
+            </div>
+            <div class="panel">
+              <h2>Tombol darurat</h2>
+              <p class="panel__sub">Berlaku dalam ±5 detik di semua HP.</p>
+              <div class="mon-adm-aksi">
+                <button class="btn btn--cta btn--sm" type="button" id="mon-mulai">Mulai sekarang</button>
+                <button class="btn btn--soft btn--sm mon-adm-stop" type="button" id="mon-stop">Stop darurat</button>
+                <button class="btn btn--soft btn--sm" type="button" id="mon-normal">Kembali ikut jadwal</button>
+              </div>
+              <p class="field__hint"><strong>Mulai sekarang</strong> membuat event baru (tenaga dari nol) selama durasi di bawah. <strong>Stop darurat</strong> langsung menyembunyikan monster. <strong>Kembali ikut jadwal</strong> memakai pemicu yang dipilih.</p>
+              <p class="mon-adm-mode" id="mon-mode"></p>
+            </div>
+          </div>
+          <form id="f-monster" novalidate>
+            <section class="set-card" aria-labelledby="g-mon-pemicu">
+              <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-bolt"/></svg></span><div><h2 id="g-mon-pemicu">Pemicu kemunculan</h2><p>Kapan monster muncul. Semua waktu memakai jam server (WIB), bukan jam HP peserta.</p></div></header>
+              <div class="set-grid">
+                <label class="switch" for="m-monster_aktif"><span>Fitur Lawan Monster aktif<small>Mati = monster tidak pernah muncul.</small></span><input type="checkbox" id="m-monster_aktif" data-key="monster_aktif" data-type="bool"></label>
+                <div class="field"><label for="m-monster_pemicu">Pemicu</label><select class="select" id="m-monster_pemicu" data-key="monster_pemicu"><option value="sebelum_live">Sebelum live (otomatis tiap jadwal live)</option><option value="jadwal">Waktu tertentu</option><option value="manual">Manual (tombol Mulai sekarang)</option></select></div>
+                <div class="field" data-pemicu="sebelum_live"><label for="m-monster_menit_sebelum">Muncul berapa menit sebelum live</label><input class="input" type="number" min="1" max="180" step="1" id="m-monster_menit_sebelum" data-key="monster_menit_sebelum"><p class="field__hint">Jadwal live diambil dari tab <strong>Jadwal Live</strong>. Event berakhir saat live dimulai.</p></div>
+                <div class="field" data-pemicu="jadwal"><label for="m-monster_waktu">Waktu monster muncul (WIB)</label><input class="input" type="datetime-local" id="m-monster_waktu" data-key="monster_waktu" data-type="waktu"></div>
+                <div class="field" data-pemicu="jadwal manual"><label for="m-monster_durasi">Durasi event (menit)</label><input class="input" type="number" min="1" max="180" step="1" id="m-monster_durasi" data-key="monster_durasi"><p class="field__hint">Juga dipakai tombol Mulai sekarang.</p></div>
+                <div class="field field--full"><span class="label">Jadwal kemunculan berikutnya</span><ul class="mon-adm-jadwal" id="mon-jadwal"></ul></div>
+              </div>
+            </section>
+            <section class="set-card" aria-labelledby="g-mon-level">
+              <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-grid"/></svg></span><div><h2 id="g-mon-level">Level, target &amp; poin</h2><p>Poin per tap naik tiap level; monster membesar. Isi daftar target, atau kosongkan untuk memakai rumus.</p></div></header>
+              <div class="set-grid">
+                <div class="field field--full"><label for="m-monster_target">Target tenaga per level <span class="opt">(pisahkan koma; jumlah angka = jumlah level)</span></label><input class="input input--mono" id="m-monster_target" data-key="monster_target" placeholder="5000,15000,40000"></div>
+                <div class="field"><label for="m-monster_level">Rumus: jumlah level</label><input class="input" type="number" min="1" max="10" step="1" id="m-monster_level" data-key="monster_level"></div>
+                <div class="field"><label for="m-monster_target_dasar">Rumus: target level 1</label><input class="input" type="number" min="10" step="1" id="m-monster_target_dasar" data-key="monster_target_dasar"></div>
+                <div class="field"><label for="m-monster_target_kali">Rumus: pengali per level</label><input class="input" inputmode="decimal" id="m-monster_target_kali" data-key="monster_target_kali" placeholder="2.8"><p class="field__hint">Target level L = dasar × pengali<sup>L−1</sup>.</p></div>
+                <div class="field"><label for="m-monster_poin">Poin per tap <span class="opt">(opsional, pisahkan koma)</span></label><input class="input input--mono" id="m-monster_poin" data-key="monster_poin" placeholder="kosong = 1, 2, 3, …"></div>
+                <div class="field"><label for="m-monster_skala_naik">Pertambahan ukuran per level</label><input class="input" inputmode="decimal" id="m-monster_skala_naik" data-key="monster_skala_naik" placeholder="0.3"><p class="field__hint">Ukuran = 1 + nilai × (level − 1), maksimal 2,5×.</p></div>
+                <div class="field field--full"><span class="label">Pratinjau</span>
+                  <div class="table-wrap"><table class="mon-adm-tabel"><thead><tr><th scope="col">Level</th><th scope="col">Poin per tap</th><th scope="col">Target tenaga</th><th scope="col">Ukuran monster</th><th scope="col">Tap bila 1.000 pemain</th></tr></thead><tbody id="mon-pratinjau"></tbody></table></div>
+                </div>
+              </div>
+            </section>
+            <section class="set-card" aria-labelledby="g-mon-tampil">
+              <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-gear"/></svg></span><div><h2 id="g-mon-tampil">Tampilan &amp; perlindungan</h2><p>Wujud monster dan batas anti-spam.</p></div></header>
+              <div class="set-grid">
+                <div class="field"><label for="m-monster_nama">Nama monster</label><input class="input" id="m-monster_nama" data-key="monster_nama" maxlength="40"></div>
+                <div class="field"><label for="m-monster_wujud">Wujud</label><select class="select" id="m-monster_wujud" data-key="monster_wujud"><option value="raja_batu">Raja Batu (ilustrasi panitia)</option><option value="lucu">Monster kartun lucu (ramah anak)</option></select></div>
+                <div class="field"><label for="m-monster_batas_tap">Batas tap per detik per pemain</label><input class="input" type="number" min="3" max="30" step="1" id="m-monster_batas_tap" data-key="monster_batas_tap"><p class="field__hint">Tap di atas batas tidak dihitung server (anti-bot).</p></div>
+                <div class="field"><label for="m-monster_interval_ms">Jeda kirim tap (ms)</label><input class="input" type="number" min="500" max="5000" step="100" id="m-monster_interval_ms" data-key="monster_interval_ms"><p class="field__hint">Otomatis diperlambat 2–5× saat pemain di atas 300/1.000/3.000 orang.</p></div>
+              </div>
+            </section>
+            <div class="savebar"><p id="mon-set-status" role="status">Tidak ada perubahan.</p><button class="btn btn--cta btn--sm" type="submit" id="btn-simpan-mon">Simpan pengaturan monster</button></div>
+          </form>
+        </section>
         <!-- Data -->
         <section role="tabpanel" id="p-data" aria-labelledby="t-data" tabindex="0" hidden>
           <div class="content__head"><div><h1>Impor &amp; Ekspor</h1><p class="muted small">CSV dari Excel/Google Sheets (pemisah koma atau titik koma).</p></div></div>
@@ -360,6 +432,7 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="/assets/js/halaman.js"></script>
+  <script src="/assets/js/monster-aturan.js"></script>
   <script>
   (() => {
     'use strict';
@@ -419,6 +492,7 @@
       renderRingkasan();
       renderPengaturan();
       renderLive();
+      renderMonster();
     }
     $('#btn-segarkan').addEventListener('click', muat);
 
@@ -427,6 +501,7 @@
     function pilih(tab, focus) {
       tabs.forEach((t) => { const on = t === tab; t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1; $('#' + t.getAttribute('aria-controls')).hidden = !on; });
       if (focus) tab.focus();
+      if (tab.id === 't-monster' && typeof statusMon === 'function') statusMon();
     }
     tabs.forEach((t, i) => {
       t.addEventListener('click', () => pilih(t));
@@ -516,6 +591,105 @@
       $('#set-status').textContent = 'Tersimpan.';
     });
 
+    /* ---------- Lawan Monster ---------- */
+    const monInputs = () => $$('#f-monster [data-key]');
+    function nilaiMon() {
+      const out = {};
+      monInputs().forEach((el) => { out[el.dataset.key] = el.dataset.type === 'bool' ? (el.checked ? 'YA' : 'TIDAK') : el.dataset.type === 'waktu' ? dariInput(el.value) : el.value.trim(); });
+      return out;
+    }
+    function renderMonster() {
+      monInputs().forEach((el) => {
+        const v = cfgVal(el.dataset.key);
+        if (el.dataset.type === 'bool') el.checked = /^YA$/i.test(v);
+        else if (el.dataset.type === 'waktu') el.value = keInput(v);
+        else el.value = v;
+      });
+      $('#mon-set-status').textContent = 'Tidak ada perubahan.';
+      const mode = (cfgVal('monster_darurat') || 'NORMAL').toUpperCase();
+      $('#mon-mode').textContent = !/^YA$/i.test(cfgVal('monster_aktif')) ? 'Fitur sedang dimatikan.' : mode === 'STOP' ? 'Mode: STOP darurat (monster disembunyikan).' : mode === 'MULAI' ? 'Mode: dimulai manual.' : 'Mode: mengikuti pemicu.';
+      pratinjauMon();
+    }
+    function pratinjauMon() {
+      const v = nilaiMon();
+      const a = window.YCSMonsterAturan.aturan({target: v.monster_target, level: v.monster_level, targetDasar: v.monster_target_dasar, targetKali: v.monster_target_kali, poin: v.monster_poin, skalaNaik: v.monster_skala_naik});
+      $('#mon-pratinjau').innerHTML = a.target.map((t, i) => `<tr><td>${i + 1}</td><td>${nf.format(a.poin[i])}</td><td>${nf.format(t)}</td><td>${String(a.skala[i]).replace('.', ',')}×</td><td>±${nf.format(Math.ceil(t / a.poin[i] / 1000))} tap/orang</td></tr>`).join('');
+      $$('#f-monster [data-pemicu]').forEach((el) => { el.hidden = !el.dataset.pemicu.split(' ').includes(v.monster_pemicu); });
+      // Daftar kemunculan dari jadwal live (pemicu sebelum_live) atau waktu tertentu.
+      const sekarang = data ? Date.parse(data.sekarang) : Date.now();
+      let item = [];
+      if (v.monster_pemicu === 'sebelum_live') {
+        const menit = Number(v.monster_menit_sebelum) || 20;
+        item = (data ? data.live : []).filter((r) => r[0] && /^YA$/i.test(r[6] || 'YA')).map((r) => ({judul: r[0], t: Date.parse(String(r[2]).replace(' ', 'T') + ':00+07:00')}))
+          .filter((x) => x.t > sekarang).sort((x, y) => x.t - y.t).slice(0, 4)
+          .map((x) => `Monster muncul ${waktu(new Date(x.t - menit * 60000).toISOString())}, ${menit} menit sebelum <em>${esc(x.judul)}</em>`);
+      } else if (v.monster_pemicu === 'jadwal' && v.monster_waktu) item = [`Monster muncul ${waktu(new Date(Date.parse(v.monster_waktu.replace(' ', 'T') + ':00+07:00')).toISOString())} selama ${v.monster_durasi || 20} menit`];
+      else if (v.monster_pemicu === 'manual') item = ['Hanya saat tombol <strong>Mulai sekarang</strong> ditekan.'];
+      $('#mon-jadwal').innerHTML = (item.length ? item : ['Belum ada jadwal yang akan datang.']).map((x) => `<li>${x}</li>`).join('');
+    }
+    $('#f-monster').addEventListener('input', () => { pratinjauMon(); $('#mon-set-status').textContent = 'Ada perubahan yang belum disimpan.'; });
+    async function simpanMon(ubah, pesanOk) {
+      const d = await api('admin-simpan-pengaturan', {nilai: ubah});
+      if (!d.ok) { $('#mon-set-status').textContent = pesan(d) + (d.kunci ? ' (' + d.kunci.join(', ') + ')' : ''); return false; }
+      toast(pesanOk);
+      await muat();
+      statusMon();
+      return true;
+    }
+    $('#f-monster').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nilai = nilaiMon(), ubah = {};
+      Object.keys(nilai).forEach((k) => { if (nilai[k] !== cfgVal(k)) ubah[k] = nilai[k]; });
+      if (!Object.keys(ubah).length) { $('#mon-set-status').textContent = 'Tidak ada perubahan.'; return; }
+      if (nilai.monster_pemicu === 'jadwal' && !nilai.monster_waktu) { $('#mon-set-status').textContent = 'Isi waktu monster muncul.'; $('#m-monster_waktu').focus(); return; }
+      const btn = $('#btn-simpan-mon');
+      sibuk(btn, true);
+      const ok = await simpanMon(ubah, 'Pengaturan monster tersimpan.');
+      sibuk(btn, false);
+      if (ok) $('#mon-set-status').textContent = 'Tersimpan.';
+    });
+    $('#mon-mulai').addEventListener('click', async (e) => {
+      const btn = e.currentTarget;
+      if (!confirm('Mulai event monster SEKARANG? Event baru dimulai dari tenaga nol selama ' + (cfgVal('monster_durasi') || 20) + ' menit.')) return;
+      sibuk(btn, true);
+      await simpanMon({monster_aktif: 'YA', monster_darurat: 'MULAI'}, 'Monster dimulai. Muncul di HP peserta dalam ±5 detik.');
+      sibuk(btn, false);
+    });
+    $('#mon-stop').addEventListener('click', async (e) => {
+      const btn = e.currentTarget;
+      if (!confirm('Hentikan monster sekarang? Monster langsung disembunyikan dari semua peserta.')) return;
+      sibuk(btn, true);
+      await simpanMon({monster_darurat: 'STOP'}, 'Monster dihentikan.');
+      sibuk(btn, false);
+    });
+    $('#mon-normal').addEventListener('click', async (e) => {
+      const btn = e.currentTarget;
+      sibuk(btn, true);
+      await simpanMon({monster_darurat: 'NORMAL'}, 'Monster kembali mengikuti pemicu.');
+      sibuk(btn, false);
+    });
+    // Status langsung dari /api/monster (endpoint publik yang sama dengan peserta).
+    const FASE = {mati: 'Tidak aktif', tidak_ada: 'Tidak ada event terjadwal', tunggu: 'Menunggu kemunculan', tanding: 'Sedang bertanding', menang: 'Monster sudah kalah', habis: 'Waktu habis (monster belum kalah)'};
+    let monTimer = 0;
+    async function statusMon() {
+      clearTimeout(monTimer);
+      if ($('#p-monster').hidden || document.hidden) return;
+      try {
+        const r = await fetch('/api/monster', {cache: 'no-store'});
+        const d = await r.json();
+        const sub = d.alasan === 'penyimpanan' ? 'Upstash Redis belum terhubung di Vercel → fitur belum bisa berjalan. Lihat README bagian Lawan Monster.' : d.dihentikan ? 'Dihentikan lewat tombol Stop darurat.' : (FASE[d.fase] || d.fase);
+        $('#mon-status-sub').textContent = sub;
+        const tg = d.target ? d.target[(d.level || 1) - 1] : 0;
+        $('#mon-adm-isi').style.width = tg ? Math.min(100, (d.tenaga || 0) / tg * 100) + '%' : '0';
+        const kv = [];
+        if (d.mulai) kv.push(['Mulai', waktu(d.mulai)], ['Berakhir', waktu(d.selesai)]);
+        if (d.live) kv.push(['Live berikutnya', d.live.judul]);
+        if (d.level) kv.push(['Level', `${d.level} / ${d.levelMaks}`], ['Tenaga level ini', `${nf.format(d.tenaga)} / ${nf.format(tg)}`], ['Total tenaga', nf.format(d.total)], ['Pemain aktif (15 dtk)', nf.format(d.pemain)], ['Jeda kirim tap', (d.interval / 1000).toLocaleString('id-ID') + ' dtk']);
+        if (d.kalah) kv.push(['Kalah pada', waktu(d.kalah)]);
+        $('#mon-kv').innerHTML = kv.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('');
+      } catch (e) { $('#mon-status-sub').textContent = 'Gagal memuat status.'; }
+      monTimer = setTimeout(statusMon, 3000);
+    }
     /* ---------- Jadwal live ---------- */
     function barisLive(r = ['', 'YouTube', '', '', '', '', 'YA']) {
       const tr = document.createElement('tr');

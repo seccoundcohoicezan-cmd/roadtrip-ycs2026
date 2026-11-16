@@ -24,6 +24,15 @@ http.createServer(async (req, res) => {
 }).listen(GAS_PORT, '127.0.0.1');
 process.env.YCS_APPS_SCRIPT_URL = `http://127.0.0.1:${GAS_PORT}/exec`;
 
+// Lawan Monster: Upstash Redis tiruan (port+2) bila paket fengari tersedia (NODE_PATH). Tanpa itu, /api/monster menjawab fase 'mati'.
+try {
+  const fakeRedis = require('../tests/_fake-upstash.cjs');
+  if (!fakeRedis.tersedia) throw new Error('fengari');
+  fakeRedis.mulai(PORT + 2);
+  process.env.KV_REST_API_URL = `http://127.0.0.1:${PORT + 2}`;
+  process.env.KV_REST_API_TOKEN = 'uji-token';
+} catch (e) { console.log('Redis tiruan nonaktif (pasang fengari & set NODE_PATH untuk menguji Lawan Monster).'); }
+
 http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://x');
   try {
@@ -41,7 +50,7 @@ http.createServer(async (req, res) => {
         status(n) { res.statusCode = n; return r; },
         json(v) { res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify(v)); return r; },
       };
-      return await handler({method: req.method, headers: {...req.headers, 'x-forwarded-for': '127.0.0.1'}, body, query: Object.fromEntries(url.searchParams)}, r);
+      return await handler({method: req.method, headers: {...req.headers, 'x-forwarded-for': req.headers['x-forwarded-for'] || '127.0.0.1'}, body, query: Object.fromEntries(url.searchParams)}, r);
     }
     let file = path.join(ROOT, decodeURIComponent(url.pathname));
     if (!file.startsWith(ROOT)) { res.statusCode = 403; return res.end(); }
@@ -93,6 +102,7 @@ function seed(p, res) {
     }
   }
   app.cache.clear();
+  try { require('../tests/_fake-upstash.cjs').jalankan(p.monsterReset ? ['FLUSHALL'] : ['DEL', 'm:cfg']); } catch (_) {}
   res.setHeader('Content-Type', 'application/json');
   res.end(JSON.stringify({ok: true, sandi: s.Admin.rows[1][1], kodeAkses: peng.find((x) => x[0] === 'dana_kode_akses')[1]}));
 }

@@ -746,6 +746,38 @@
     .fest__info { grid-column: 1 / -1; display: flex; gap: .5rem; align-items: flex-start; margin: 0; padding-top: .75rem; border-top: 1px dashed var(--line); font-size: .8125rem; color: var(--text-muted); }
     .fest__info::before { content: "i"; display: grid; place-items: center; width: 1.125rem; height: 1.125rem; flex: none; margin-top: .0625rem; border-radius: 50%; background: var(--surface-soft); color: var(--primary); font-size: .6875rem; font-weight: 800; font-style: normal; }
     .fest__info:empty { display: none; }
+    /* ============ Lawan Monster (event sebelum live, di atas panggung festival) ============ */
+    .mon { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+    .mon[hidden] { display: none; }
+    .mon__kanvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .mon__tangkap { position: absolute; inset: 0; pointer-events: auto; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+    .mon__tangkap:focus-visible { outline: 3px solid #FFD86B; outline-offset: -6px; border-radius: 1.5rem; }
+    .mon__hud { position: absolute; top: .625rem; left: 50%; width: min(30rem, calc(100% - 1.25rem)); transform: translateX(-50%); padding: .5rem .75rem .5625rem; border: 2.5px solid #FFC93C; border-radius: 1rem; background: rgb(255 251 243 / .94); color: var(--ink); box-shadow: 0 12px 26px -14px rgb(0 0 0 / .55); }
+    .mon__baris { display: flex; align-items: center; gap: .5rem; font-size: .8125rem; line-height: 1.2; }
+    .mon__baris--kecil { justify-content: space-between; margin-top: .3125rem; font-size: .75rem; color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+    .mon__nama { font-size: .9375rem; font-weight: 800; color: #5B0A16; }
+    .mon__lvl { padding: .0625rem .5rem; border-radius: var(--radius-pill); background: #5B0A16; color: #FFD86B; font-size: .6875rem; font-weight: 800; letter-spacing: .03em; }
+    .mon__pemain { margin-left: auto; font-weight: 700; color: var(--teal-900, #0B4F59); }
+    .mon__bar { position: relative; height: .875rem; margin-top: .375rem; overflow: hidden; border-radius: var(--radius-pill); background: #F3E2C3; box-shadow: inset 0 1px 3px rgb(0 0 0 / .18); }
+    .mon__bar i { position: absolute; inset: 0; transform-origin: left; transform: scaleX(0); background: linear-gradient(90deg, #FF8A3D, #FFC93C 60%, #FFF3A6); }
+    .mon__bar b { position: absolute; inset: 0; background: repeating-linear-gradient(115deg, rgb(255 255 255 / .28) 0 .5rem, transparent .5rem 1rem); animation: mon-geser 1.2s linear infinite; }
+    @keyframes mon-geser { to { background-position: 2.2rem 0; } }
+    .mon__ajak { position: absolute; left: 50%; bottom: .75rem; max-width: calc(100% - 1.5rem); margin: 0; padding: .4375rem .875rem; transform: translateX(-50%); border-radius: var(--radius-pill); background: rgb(91 10 22 / .88); color: #FFF3D6; font-size: .8125rem; font-weight: 700; text-align: center; box-shadow: 0 8px 20px -10px rgb(0 0 0 / .5); }
+    .mon__ajak[hidden], .mon__ajak:empty { display: none; }
+    .mon[data-fase="tunggu"] .mon__ajak { top: .75rem; bottom: auto; background: rgb(11 79 89 / .9); }
+    .mon__pesan { position: absolute; left: 50%; top: 50%; width: min(24rem, calc(100% - 2rem)); padding: 1.25rem; transform: translate(-50%, -50%); border: 3px solid #FFC93C; border-radius: 1.25rem; background: #FFFBF3; color: var(--ink); text-align: center; pointer-events: auto; box-shadow: 0 30px 60px -20px rgb(0 0 0 / .6); animation: pop-ok .5s cubic-bezier(.2, 1.4, .4, 1) both; }
+    .mon__pesan[hidden] { display: none; }
+    .mon__pesan h3 { font-family: var(--font-brush); font-weight: 400; font-size: clamp(1.75rem, 5vw, 2.5rem); line-height: 1; color: #D7263D; }
+    .mon__pesan p { margin: .5rem 0 1rem; font-size: .9375rem; color: var(--ink-muted); }
+    .mon__pesan .btn { margin: .25rem; }
+    .fest__stage.is-monster .fest-b { opacity: 0 !important; pointer-events: none !important; }
+    .mon-banner { position: fixed; z-index: 44; left: max(1rem, env(safe-area-inset-left)); bottom: calc(1.25rem + env(safe-area-inset-bottom)); max-width: calc(100% - 7rem); display: flex; align-items: center; gap: .5rem; padding: .625rem 1rem; border: 2.5px solid #FFC93C; border-radius: var(--radius-pill); background: #5B0A16; color: #FFF3D6; font-size: .875rem; line-height: 1.2; text-decoration: none; box-shadow: 0 14px 30px -12px rgb(0 0 0 / .55); animation: pop-ok .5s cubic-bezier(.2, 1.4, .4, 1) both; }
+    .mon-banner[hidden] { display: none; }
+    .mon-banner strong { color: #FFD86B; }
+    .mon-banner__jam { font-variant-numeric: tabular-nums; font-weight: 800; }
+    .mon-banner__dot { width: .625rem; height: .625rem; flex: none; border-radius: 50%; background: #FF5D5D; box-shadow: 0 0 0 0 rgb(255 93 93 / .7); animation: mon-denyut 1.4s infinite; }
+    @keyframes mon-denyut { to { box-shadow: 0 0 0 .625rem rgb(255 93 93 / 0); } }
+    @media (prefers-reduced-motion: reduce) { .mon__bar b, .mon-banner__dot, .mon-banner, .mon__pesan { animation: none; } }
     @media (max-width: 39.99rem) { .fest.is-locked .fest__stage { aspect-ratio: 16 / 11; } .fest__gerbang h3 { font-size: 1.1875rem; } }
     .orb.is-sembunyi { opacity: 0; pointer-events: none; transform: scale(.6); }
     .orb { transition: opacity 250ms var(--ease), transform 250ms var(--ease); }
@@ -2172,6 +2204,7 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="assets/js/festival.js"></script>
+  <script src="assets/js/monster.js" defer></script>
   <script>
   (() => {
     'use strict';
@@ -3045,6 +3078,19 @@
     }
     muatFestival();
     setInterval(() => { if (!document.hidden && !fest.classList.contains('is-locked')) muatFestival(); }, 90000);
+
+    /* ---------- Lawan Monster: event kolaboratif sebelum live (assets/js/monster.js + /api/monster) ---------- */
+    // Dipasang setelah halaman siap; bila skrip/endpoint gagal, festival tetap berjalan seperti biasa.
+    window.addEventListener('DOMContentLoaded', () => {
+      if (!window.YCSMonster) return;
+      try {
+        window.YCSMonster.pasang({
+          stage: $('.fest__stage'), festApi, now, endpoint: '/api/monster',
+          bolehTap: () => !fest.classList.contains('is-locked'),
+          saatTerkunci: () => { toast('Isi data & satu kata dulu untuk ikut melawan monster.'); $('#fest-form').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' }); },
+        });
+      } catch (e) { /* fitur tambahan, jangan ganggu fitur lama */ }
+    });
 
     let waKlik = false;
     try { waKlik = sessionStorage.getItem('ycs_wa') === '1'; } catch (e) {}
