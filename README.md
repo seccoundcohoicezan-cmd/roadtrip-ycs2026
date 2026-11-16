@@ -111,9 +111,28 @@ curl -X POST localhost:8787/__seed -d '{"finalis":30,"twibbon":40}'   # data con
 - **Satu Kata** (`#satu-kata`): kirim kata gratis. Awan kata hasilnya ter-blur dan terbuka setelah pengunjung mengetuk tombol Saluran WhatsApp (link diatur di Admin → Satu Kata). Setelah terbuka, kartu kata PNG bisa diunduh. Layar acara: `/harapan/?display=1`. Detail: `harapan/README.md`.
 - **Road to Bali & leaderboard provinsi** = twibbon lama + Satu Kata + klaim Dana Kaget.
 
+## Server data (Dokploy) & Sheet cadangan (MRKT-56)
+
+Sejak 16 Nov 2026 data utama ada di **server data** Dokploy (`server/`, project **YCS 2026**, aplikasi **YCS Data**, `https://ycs-data.194-238-23-221.sslip.io`). Server ini menjalankan `apps-script/Code.gs` yang sama di memori (`server/gas-memori.cjs`), jadi aturan bisnisnya tidak berubah, tapi jawabannya ±0,3 dtk, bukan 2–3 dtk.
+
+```
+HP ─► Vercel api/*.js (sin1) ──/exec──► server data (Dokploy, /data/primer.json)
+HP ─► /srv/monster (rewrite vercel.json) ─────────┘          │ tiap 3 dtk: baris baru → append, sel berubah → ganti isi tab
+                                                             ▼
+                                              Google Sheet (cadangan) ◄─ Apps Script primer-terapkan
+```
+
+- **Cadangan:** setiap perubahan diteruskan ke Google Sheet ±3 detik kemudian. Tab `Rekap` (rumus) tidak disentuh.
+- **Edit lewat panel admin, bukan Sheet.** Editan langsung di Sheet akan tertimpa. Bila terlanjur mengedit Sheet, buka admin → Keamanan → **Ambil ulang dari Sheet**.
+- **Bila server data mati:** permintaan baca (config, kata, stats, reveal) jatuh ke Apps Script (data cadangan); permintaan tulis menjawab "server sibuk" agar data tidak bercabang. Darurat: set env Vercel `YCS_DATA_URL=off` untuk kembali ke Apps Script penuh.
+- **Impor awal:** saat volume `/data` kosong, server mengambil seluruh isi Sheet lewat `primer-ekspor`. Rahasia bersama ada di env Dokploy `PRIMARY_SECRET`; di `Code.gs` hanya hash SHA-256-nya.
+- **Reset password admin:** `POST /internal/sandi-baru {"rahasia": PRIMARY_SECRET}` membuat password baru di tab **Admin** sel B2 (ikut diteruskan ke Sheet).
+- Deploy: Dokploy membangun `server/Dockerfile` (konteks build = root repo) otomatis saat push ke `main`. Saat redeploy (±10 dtk), state disimpan dan perubahan yang belum terkirim diteruskan setelah server hidup lagi.
+- Status: `GET /health` dan admin → Keamanan → **Data & cadangan**.
+
 ## Lawan Monster (MRKT-56)
 
-Event kolaboratif di panggung Festival Satu Kata sebelum live. Monster muncul di tengah plaza. Peserta mengetuk warga festival: tenaga turun dari langit ke warga yang diketuk, lalu mengalir ke bar tenaga bersama. Saat target level tercapai, monster naik level (membesar, tiap tap bernilai lebih). Setelah level terakhir, sinar cahaya turun dari langit, monster runtuh, muncul **"Monster Terkalahkan!"** dan tombol live.
+Event kolaboratif di panggung Festival Satu Kata sebelum live. Monster muncul di tengah plaza dan **warga festival menyingkir dari area monster** (tidak ada yang menimpa atau berjalan menembus monster). Peserta mengetuk warga: tenaga turun dari langit ke warga yang diketuk lalu mengalir ke bar bersama. Target level tercapai → monster naik level & membesar. Setelah level terakhir, sinar dari langit, monster runtuh, muncul **"Monster Terkalahkan!"** + tombol live.
 
 ### Pemicu (panel admin → tab **Lawan Monster**)
 
@@ -123,64 +142,35 @@ Event kolaboratif di panggung Festival Satu Kata sebelum live. Monster muncul di
 | `jadwal` | `monster_waktu` | setelah `monster_durasi` menit |
 | `manual` | hanya lewat tombol **Mulai sekarang** | setelah `monster_durasi` menit |
 
-Tombol darurat: **Mulai sekarang** (event baru, tenaga dari nol, mengalahkan pemicu lain), **Stop darurat** (monster langsung disembunyikan), **Kembali ikut jadwal**. Semua perubahan berlaku ±5 detik. Hitung mundur "monster muncul dalam …" tampil 60 menit sebelumnya di panggung dan 15 menit sebelumnya sebagai banner. Hasil (menang/waktu habis) tetap tampil 15 menit setelah event. Semua waktu memakai jam server Vercel, bukan jam HP.
+Tombol darurat: **Mulai sekarang** (event baru dari nol), **Stop darurat**, **Kembali ikut jadwal**. Berlaku ±1 detik. Semua waktu memakai jam server.
 
 ### Level & rumus
 
-- Target per level: daftar `monster_target` (bawaan `5000,15000,40000` → 3 level). Kosongkan untuk rumus: target L = `monster_target_dasar` × `monster_target_kali`^(L−1), dibulatkan ke ratusan (5000 × 2,8 → 5.000, 14.000, 39.200).
-- Poin per tap = nomor level (L1 = 1, L2 = 2, …) atau daftar `monster_poin`.
-- Ukuran monster = 1 + `monster_skala_naik` × (L−1), maksimal 2,5× (bawaan 1×; 1,3×; 1,6×).
-- Kelebihan tenaga saat naik level tidak dibawa ke level berikutnya.
+- Target per level `monster_target` (bawaan `5000,15000,40000`) atau rumus dasar × kali^(L−1). Poin per tap = nomor level (atau `monster_poin`). Ukuran = 1 + 0,3 × (L−1), maks 2,5×. Kelebihan tenaga saat naik level tidak dibawa.
 - Rumus yang sama dipakai server dan pratinjau admin: `assets/js/monster-aturan.js`.
 
-### Arsitektur
+### 1 perangkat = 1 peserta, tiket & spin undian
 
-```
-HP peserta ──GET /api/monster (cache CDN 1 dtk)──────────────┐
-          ──POST tap {token, n, seq, e} tiap 1–5 dtk──► api/monster.js ──EVALSHA──► Upstash Redis (skrip Lua atomik)
-panel admin ──/api/admin──► Apps Script (tab Pengaturan) ──► config dibaca api/monster.js (cache 5 dtk; Redis m:cfg 60 dtk)
-```
+- Ikut melawan hanya bisa setelah membuka festival (email harus ada di tab **Satu Kata**).
+- Perangkat diberi ID acak (localStorage + cookie `ycs_perangkat`). Server mengikat **1 perangkat ↔ 1 email** secara permanen: email yang sama dari perangkat lain ditolak, dan perangkat yang sama tidak bisa dipakai email lain. Peserta ganti HP → admin → **Lepas ikatan perangkat**.
+- Sidik jari ringan (UA, layar, zona waktu, kanvas) + IP disimpan: tiket dari perangkat yang tampak sama ditandai `perangkat mirip #000x` di kolom Catatan untuk ditinjau panitia (tidak diblokir otomatis karena HP sekolah bisa identik).
+- Setiap peserta yang menyumbang ≥ `monster_tiket_min` tenaga (bawaan 1) mendapat **1 tiket per event**, nomor `#0001`, `#0002`, … Tiket tampil di HUD peserta dan tercatat di tab **Tiket Monster**. Ringkasan event di tab **Monster Event**.
+- **Spin undian saat live:** admin → Lawan Monster → **Tiket & spin undian** → pilih event → **Layar penuh** → **Putar spin**. Pemenang diacak di server (`crypto.randomInt`), tidak bisa menang dua kali, status `MENANG #n <waktu>` ditulis ke tab Tiket Monster.
+- Batasan jujur: orang yang membuka mode penyamaran / menghapus data browser mendapat ID perangkat baru, tapi emailnya tetap terikat ke perangkat pertama; orang dengan beberapa email + beberapa browser masih bisa mendapat lebih dari satu tiket (ditandai bila sidik jari + IP sama).
 
-- `api/monster.js`: GET status; POST `masuk` (token HMAC, maks 300 token/10 menit per IP, env `MONSTER_BATAS_MASUK`); POST `tap`.
-- `api/_monster.js`: penentuan jadwal + skrip Lua. Satu skrip = satu perintah atomik: batas 10 tap/detik/pemain (token bucket, burst 30), tolak `seq` lama (kiriman ulang tidak terhitung dua kali), poin dari level saat ini, naik level/kalah, kontribusi per pemain, hitung pemain aktif 15 detik.
-- `api/_redis.js`: klien REST Upstash tanpa dependensi.
-- `assets/js/monster.js`: overlay kanvas + HUD (tanpa library). Aset Raja Batu (`assets/img/monster/*.webp`, ±250 KB) hanya diunduh saat ada event. Tap disimpan di `localStorage` saat offline lalu dikirim ulang.
-- Interval kirim tap naik otomatis 2×/3×/5× saat pemain aktif ≥ 300/1.000/3.000.
-- Hanya pengunjung yang sudah membuka festival (isi data + satu kata) yang bisa mengetuk; yang lain melihat monster + ajakan membuka festival.
-- Wujud: `raja_batu` (sprite dari ilustrasi panitia) atau `lucu` (monster kartun gambar kode, ramah anak).
+### Anti-spam & beban
 
-Redis (prefiks `m:`, kedaluwarsa 2 hari): `m:e:<event>` state (lvl, tenaga, total, kalah, naik), `m:u:<event>` kontribusi per pemain, `m:r:<event>:<pemain>` batas tap, `m:a:<event>` pemain aktif, `m:ip:<hash>` batas token, `m:cfg` salinan pengaturan.
-
-### Mengaktifkan (sekali)
-
-1. Vercel → project → **Storage** → **Create Database** → **Upstash for Redis** (Marketplace), wilayah Singapura (`ap-southeast-1`), lalu **Connect** ke project ini. Variabel `KV_REST_API_URL` dan `KV_REST_API_TOKEN` terisi otomatis. Redeploy.
-2. Opsional: set `MONSTER_SECRET` (string acak panjang) untuk tanda tangan token pemain. Tanpa ini, rahasia diturunkan dari token Redis.
-3. Panel admin → **Lawan Monster** → nyalakan **Fitur Lawan Monster aktif**, pilih pemicu, simpan. Status "Upstash Redis belum terhubung" berarti langkah 1 belum selesai.
-
-Tanpa Redis, `/api/monster` menjawab `fase: mati` dan beranda tidak berubah sama sekali.
-
-### Kapasitas & biaya (perkiraan)
-
-Per pemain yang aktif mengetuk: 1 panggilan fungsi + 1 perintah Redis per interval. Penonton yang tidak mengetuk hanya memicu GET ber-cache CDN.
-
-| Pemain aktif selama 20 menit | Interval | Panggilan fungsi ≈ perintah Redis |
-|---|---|---|
-| 200 | 1 dtk | ±240 ribu |
-| 1.000 | 2 dtk | ±600 ribu |
-| 3.000 | 5 dtk | ±720 ribu |
-
-Kuota gratis: Vercel Hobby 1 juta panggilan fungsi/bulan (bila habis, **semua** fungsi `api/` berhenti sampai bulan berikutnya), Upstash gratis 500 ribu perintah/bulan (pay-as-you-go US$0,20 per 100 ribu). Untuk event ribuan pelajar: pakai Upstash pay-as-you-go dan pertimbangkan Vercel Pro pada bulan event, atau naikkan `monster_interval_ms` ke 2000–3000.
+- Batas 10 tap/detik/pemain (token bucket, burst 30), tap dikirim per batch (interval 1 dtk, otomatis 2–5× saat pemain ≥ 300/1.000/3.000), `seq` anti-duplikat sehingga kiriman ulang setelah offline tidak terhitung dua kali, perangkat baru maks 300 / 10 menit per IP.
+- Monster tidak lagi memakai fungsi Vercel per tap: `/srv/monster` di-rewrite langsung ke server data, jadi kuota 1 juta panggilan fungsi Vercel Hobby tidak terpakai untuk tap. Upstash tidak dipakai.
 
 ### Uji
 
 ```bash
-npm i fengari --prefix ~/fengari            # sekali, di luar repo (tidak ikut deploy)
-NODE_PATH=~/fengari/node_modules node --test tests/*.cjs
-NODE_PATH=~/fengari/node_modules node tools/dev-server.cjs 8787   # Upstash tiruan otomatis di port 8789
-# mulai event lewat /admin/ (sandi dari POST /__seed), lalu uji beban:
-node tools/uji-beban-monster.cjs http://127.0.0.1:8787 400 20
+node --test tests/*.cjs                       # 21 tes: Code.gs, monster (perangkat/tiket/spin), sinkron server data ↔ Sheet
+node tools/dev-server.cjs 8787                # :8787 situs+api, :8788 server data, :8789 Sheet tiruan (GET /__sheet)
+node tools/uji-beban-monster.cjs http://127.0.0.1:8787 400 20   # setelah seed {"kata":400} + Mulai sekarang
 ```
 
-Hasil lokal (dev server, Redis tiruan): 400 pemain + 400 pemantau selama 20 detik, 25.045 tap dikirim = 25.045 diterima, 0 galat, total tenaga konsisten. Angka latensi lokal tidak mewakili produksi; uji beban produksi hanya di luar jam event karena memakai kuota.
+Hasil lokal: 400 pemain + 400 pemantau selama 20 detik, 0 galat, 400 tiket terbit dan diteruskan ke Sheet tiruan. E2E browser (scripts MRKT-56) 36/36, E2E lama MRKT-45 78/78.
 
-Checklist manual sebelum event: tombol Mulai sekarang di admin → monster muncul di 2 HP berbeda (Android kelas bawah + iPhone) → ketuk → bar naik di kedua HP → mode pesawat 10 detik sambil mengetuk → online lagi, tenaga bertambah sekali → menang → tombol live → Stop darurat menyembunyikan monster.
+Checklist sebelum event: admin → Mulai sekarang → monster muncul di 2 HP (Android kelas bawah + iPhone), warga menyingkir → ketuk di kedua HP → tiket muncul → mode pesawat 10 detik sambil mengetuk → online, tenaga bertambah sekali → menang → tombol live → spin di layar penuh → cek tab Tiket Monster di Sheet → Stop darurat.

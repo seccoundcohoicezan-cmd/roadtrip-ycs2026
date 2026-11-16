@@ -108,6 +108,28 @@
     .mon-adm-tabel { width: 100%; min-width: 30rem; font-size: .9375rem; font-variant-numeric: tabular-nums; }
     #p-monster .panel-grid { margin-bottom: var(--space-4); }
     [data-pemicu][hidden] { display: none; }
+    .spin-alat { display: flex; flex-wrap: wrap; gap: .75rem; align-items: end; margin-top: var(--space-3); }
+    .spin-alat .field { min-width: 14rem; }
+    .spin-panggung { margin-top: var(--space-4); padding: clamp(1.25rem, 4vw, 2.5rem); border-radius: 1.25rem; background: radial-gradient(circle at 50% 0%, #FFE58A, #FF8A3D 55%, #5B0A16); color: #fff; text-align: center; }
+    .spin-judul { font-weight: 800; letter-spacing: .08em; text-transform: uppercase; font-size: .875rem; opacity: .9; }
+    .spin-reel { position: relative; height: 4.5rem; margin: 1rem auto; max-width: 36rem; overflow: hidden; border: 4px solid #FFC93C; border-radius: 1rem; background: #FFFBF3; color: #5B0A16; }
+    .spin-isi span { display: flex; align-items: center; justify-content: center; height: 4.5rem; padding: 0 1rem; font-size: clamp(1.25rem, 3.5vw, 2rem); font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .spin-detail { min-height: 1.5rem; font-size: 1.0625rem; font-weight: 700; }
+    .spin-tombol { margin-top: .5rem; min-width: 12rem; font-size: 1.0625rem; }
+    .spin-info { margin-top: .5rem; font-size: .875rem; opacity: .9; }
+    .spin-menang { margin: var(--space-3) 0 0; padding-left: 1.25rem; }
+    .spin-menang li { margin-top: .25rem; }
+    .spin-daftar { margin-top: var(--space-4); }
+    .spin-daftar summary { cursor: pointer; font-weight: 700; }
+    .spin-lepas { margin-top: var(--space-4); }
+    .spin-lepas div { display: flex; gap: .5rem; margin-top: .375rem; max-width: 30rem; }
+    #spin-card:fullscreen { overflow: auto; padding: 2rem; background: #5B0A16; }
+    #spin-card:fullscreen > :not(.spin-panggung) { display: none; }
+    #spin-card:fullscreen .spin-panggung { min-height: calc(100vh - 4rem); display: flex; flex-direction: column; justify-content: center; }
+    #spin-card:fullscreen .spin-reel { height: 8rem; max-width: 60rem; }
+    #spin-card:fullscreen .spin-isi span { height: 8rem; font-size: clamp(2rem, 5vw, 4rem); }
+    #spin-card:fullscreen .spin-judul { font-size: 1.5rem; }
+    #spin-card:fullscreen .spin-detail { font-size: 1.75rem; }
     .live-table { min-width: 64rem; }
     .preview { min-width: 32rem; }
     .preview td { white-space: nowrap; max-width: 14rem; overflow: hidden; text-overflow: ellipsis; }
@@ -353,11 +375,33 @@
                 <div class="field"><label for="m-monster_nama">Nama monster</label><input class="input" id="m-monster_nama" data-key="monster_nama" maxlength="40"></div>
                 <div class="field"><label for="m-monster_wujud">Wujud</label><select class="select" id="m-monster_wujud" data-key="monster_wujud"><option value="raja_batu">Raja Batu (ilustrasi panitia)</option><option value="lucu">Monster kartun lucu (ramah anak)</option></select></div>
                 <div class="field"><label for="m-monster_batas_tap">Batas tap per detik per pemain</label><input class="input" type="number" min="3" max="30" step="1" id="m-monster_batas_tap" data-key="monster_batas_tap"><p class="field__hint">Tap di atas batas tidak dihitung server (anti-bot).</p></div>
+                <div class="field"><label for="m-monster_tiket_min">Minimal tenaga untuk 1 tiket undian</label><input class="input" type="number" min="1" step="1" id="m-monster_tiket_min" data-key="monster_tiket_min"><p class="field__hint">Tiap peserta (1 perangkat = 1 peserta) mendapat 1 tiket per event setelah menyumbang sebanyak ini.</p></div>
                 <div class="field"><label for="m-monster_interval_ms">Jeda kirim tap (ms)</label><input class="input" type="number" min="500" max="5000" step="100" id="m-monster_interval_ms" data-key="monster_interval_ms"><p class="field__hint">Otomatis diperlambat 2–5× saat pemain di atas 300/1.000/3.000 orang.</p></div>
               </div>
             </section>
             <div class="savebar"><p id="mon-set-status" role="status">Tidak ada perubahan.</p><button class="btn btn--cta btn--sm" type="submit" id="btn-simpan-mon">Simpan pengaturan monster</button></div>
           </form>
+          <section class="set-card spin-card" id="spin-card" aria-labelledby="g-spin">
+            <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-ticket"/></svg></span><div><h2 id="g-spin">Tiket &amp; spin undian</h2><p>Peserta yang berkontribusi mendapat 1 tiket per event (1 perangkat = 1 peserta). Putar saat live; pemenang dipilih acak oleh server dan dicatat di tab <strong>Tiket Monster</strong>.</p></div></header>
+            <div class="spin-alat">
+              <div class="field"><label for="spin-event">Event</label><select class="select" id="spin-event"></select></div>
+              <button class="btn btn--soft btn--sm" type="button" id="spin-segarkan">Segarkan</button>
+              <button class="btn btn--soft btn--sm" type="button" id="spin-layar">Layar penuh (untuk live)</button>
+            </div>
+            <div class="spin-panggung" id="spin-panggung">
+              <p class="spin-judul">Undian Pejuang Festival</p>
+              <div class="spin-reel" aria-live="polite"><div class="spin-isi" id="spin-isi"><span>Siap diputar</span></div></div>
+              <p class="spin-detail" id="spin-detail"></p>
+              <button class="btn btn--cta spin-tombol" type="button" id="spin-putar">Putar spin</button>
+              <p class="spin-info" id="spin-info"></p>
+            </div>
+            <ol class="spin-menang" id="spin-menang"></ol>
+            <details class="spin-daftar"><summary id="spin-ringkas">Daftar tiket</summary>
+              <input class="input" id="spin-cari" placeholder="Cari nama, sekolah, atau nomor tiket" style="margin:.75rem 0">
+              <div class="table-wrap"><table class="mon-adm-tabel"><thead><tr><th scope="col">Tiket</th><th scope="col">Nama</th><th scope="col">Sekolah</th><th scope="col">Provinsi</th><th scope="col">Tenaga</th><th scope="col">Status</th><th scope="col">Catatan</th></tr></thead><tbody id="spin-tabel"></tbody></table></div>
+            </details>
+            <form class="spin-lepas" id="f-lepas"><label for="lepas-email">Peserta ganti HP? Lepas ikatan perangkat</label><div><input class="input" type="email" id="lepas-email" placeholder="email peserta"><button class="btn btn--soft btn--sm" type="submit">Lepas</button></div><p class="field__hint" id="lepas-info">Setelah dilepas, peserta bisa ikut lagi dari perangkat baru.</p></form>
+          </section>
         </section>
         <!-- Data -->
         <section role="tabpanel" id="p-data" aria-labelledby="t-data" tabindex="0" hidden>
@@ -413,6 +457,13 @@
         <!-- Keamanan -->
         <section role="tabpanel" id="p-keamanan" aria-labelledby="t-keamanan" tabindex="0" hidden>
           <div class="content__head"><div><h1>Keamanan</h1><p class="muted small">Sesi admin berlaku 6 jam. 10 kali salah password mengunci login selama 15 menit.</p></div></div>
+          <div class="panel" style="max-width:32rem;margin-bottom:var(--space-4)">
+            <h2>Data &amp; cadangan</h2>
+            <p class="panel__sub">Data utama ada di server Dokploy; setiap perubahan diteruskan ke Google Sheet beberapa detik kemudian sebagai cadangan. Ubah data lewat panel ini, bukan langsung di Sheet.</p>
+            <dl class="kv" id="kv-primer"></dl>
+            <p class="field__hint">Terlanjur mengubah Sheet langsung (mis. kolom Tampil di Satu Kata)? Tekan tombol di bawah untuk memuat ulang seluruh isi Sheet ke server. Hanya bisa saat tidak ada perubahan yang belum terkirim.</p>
+            <div class="mon-adm-aksi"><button class="btn btn--soft btn--sm" type="button" id="btn-primer-segarkan">Segarkan status</button><button class="btn btn--soft btn--sm" type="button" id="btn-tarik-sheet">Ambil ulang dari Sheet</button></div>
+          </div>
           <form class="panel" id="f-sandi" novalidate style="max-width:32rem">
             <h2>Ganti password</h2>
             <div class="field" style="margin-top:1rem"><label for="sandi-lama">Password saat ini</label><input class="input" type="password" id="sandi-lama" autocomplete="current-password" required></div>
@@ -501,7 +552,8 @@
     function pilih(tab, focus) {
       tabs.forEach((t) => { const on = t === tab; t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1; $('#' + t.getAttribute('aria-controls')).hidden = !on; });
       if (focus) tab.focus();
-      if (tab.id === 't-monster' && typeof statusMon === 'function') statusMon();
+      if (tab.id === 't-monster' && typeof statusMon === 'function') { statusMon(); muatTiket(); }
+      if (tab.id === 't-keamanan') statusPrimer();
     }
     tabs.forEach((t, i) => {
       t.addEventListener('click', () => pilih(t));
@@ -690,6 +742,81 @@
       } catch (e) { $('#mon-status-sub').textContent = 'Gagal memuat status.'; }
       monTimer = setTimeout(statusMon, 3000);
     }
+    /* ---------- Tiket & spin undian ---------- */
+    let spinData = null, berputar = false;
+    const monAdmin = (data) => api('admin-primer', {perintah: 'monster', data});
+    async function muatTiket(event) {
+      const d = await monAdmin({aksi: 'tiket', event: event || $('#spin-event').value || ''});
+      if (!d.ok) { $('#spin-info').textContent = pesan(d); return; }
+      spinData = d;
+      $('#spin-event').innerHTML = d.events.length ? d.events.map((e) => `<option value="${esc(e.id)}"${e.id === d.event ? ' selected' : ''}>${esc(e.id)} · ${nf.format(e.tiket)} tiket${e.kalah ? ' · menang' : ''}</option>`).join('') : '<option value="">Belum ada event</option>';
+      renderTiket();
+    }
+    function renderTiket() {
+      const t = spinData ? spinData.tiket : [];
+      const q = $('#spin-cari').value.trim().toLowerCase();
+      const aktif = t.filter((x) => x.status === 'aktif').length;
+      $('#spin-ringkas').textContent = `Daftar tiket (${nf.format(t.length)} tiket, ${nf.format(aktif)} belum menang)`;
+      $('#spin-info').textContent = t.length ? `${nf.format(aktif)} tiket ikut undian.` : 'Belum ada tiket di event ini.';
+      $('#spin-putar').disabled = !aktif || berputar;
+      $('#spin-tabel').innerHTML = t.filter((x) => !q || [x.nomor, x.nama, x.sekolah, x.provinsi].join(' ').toLowerCase().includes(q)).slice(0, 500)
+        .map((x) => `<tr><td>${esc(x.nomor)}</td><td>${esc(x.nama)}</td><td>${esc(x.sekolah)}</td><td>${esc(x.provinsi)}</td><td>${nf.format(Number(x.kontribusi) || 0)}</td><td>${esc(x.status)}</td><td>${esc(x.catatan || '')}</td></tr>`).join('');
+      $('#spin-menang').innerHTML = t.filter((x) => /^MENANG/.test(x.status)).sort((a, b) => a.status.localeCompare(b.status, 'id', {numeric: true}))
+        .map((x) => `<li><strong>${esc(x.nama)}</strong> (${esc(x.sekolah)}, ${esc(x.provinsi)}) · tiket ${esc(x.nomor)} · ${esc(x.status.replace(/^MENANG #\d+ /, ''))}</li>`).join('');
+    }
+    $('#spin-cari').addEventListener('input', renderTiket);
+    $('#spin-event').addEventListener('change', () => muatTiket($('#spin-event').value));
+    $('#spin-segarkan').addEventListener('click', () => muatTiket());
+    $('#spin-layar').addEventListener('click', () => { const c = $('#spin-card'); if (document.fullscreenElement) document.exitFullscreen(); else if (c.requestFullscreen) c.requestFullscreen(); });
+    $('#spin-putar').addEventListener('click', async () => {
+      if (berputar) return;
+      berputar = true; $('#spin-putar').disabled = true; $('#spin-detail').textContent = '';
+      const nama = (spinData ? spinData.tiket.filter((x) => x.status === 'aktif').map((x) => x.nama) : []).sort(() => Math.random() - 0.5);
+      const isi = $('#spin-isi');
+      let i = 0, jeda = 50, putar = true;
+      const gulir = () => { if (!putar) return; isi.innerHTML = `<span>${esc(nama[i++ % Math.max(1, nama.length)] || '…')}</span>`; setTimeout(gulir, jeda); };
+      gulir();
+      const d = await monAdmin({aksi: 'spin', event: $('#spin-event').value});
+      if (!d.ok) { putar = false; berputar = false; isi.innerHTML = '<span>Gagal</span>'; $('#spin-info').textContent = pesan(d); renderTiket(); return; }
+      // perlambat bertahap lalu berhenti di pemenang (dipilih server sebelum animasi selesai)
+      const akhir = Date.now() + 3200;
+      const melambat = () => { jeda = Math.min(420, jeda * 1.18); if (Date.now() < akhir) setTimeout(melambat, 180); else { putar = false; tampilMenang(d); } };
+      melambat();
+    });
+    function tampilMenang(d) {
+      $('#spin-isi').innerHTML = `<span>🎉 ${esc(d.pemenang.nama)}</span>`;
+      $('#spin-detail').textContent = `${d.pemenang.sekolah} · ${d.pemenang.provinsi} · tiket ${d.pemenang.nomor}`;
+      berputar = false;
+      muatTiket(d.event);
+    }
+    $('#f-lepas').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = $('#lepas-email').value.trim();
+      if (!email) return;
+      if (!confirm('Lepas ikatan perangkat untuk ' + email + '?')) return;
+      const d = await monAdmin({aksi: 'lepas-perangkat', email});
+      $('#lepas-info').textContent = d.ok ? 'Dilepas. Peserta bisa masuk lagi dari perangkat baru.' : d.error === 'tidak_ditemukan' ? 'Email itu belum terikat ke perangkat mana pun.' : pesan(d);
+    });
+
+    /* ---------- Data & cadangan (server Dokploy → Sheet) ---------- */
+    async function statusPrimer() {
+      const d = await api('admin-primer', {perintah: 'status'});
+      if (!d.ok) { $('#kv-primer').innerHTML = `<div><dt>Status</dt><dd>${esc(d.error === 'validation' || d.error === 'aksi_tidak_dikenal' ? 'Server data belum aktif (memakai Apps Script langsung)' : pesan(d))}</dd></div>`; return d; }
+      const kv = [['Data utama', 'Server Dokploy'], ['Aktif sejak', d.sejak ? waktu(d.sejak) : '—'], ['Terakhir diteruskan ke Sheet', d.sinkronTerakhir ? waktu(d.sinkronTerakhir) : 'belum ada perubahan'],
+        ['Menunggu diteruskan', d.tertunda ? 'ya (beberapa detik)' : 'tidak'], ['Galat terakhir', d.galatTerakhir || '—'], ['Impor terakhir dari Sheet', d.impor ? waktu(d.impor) : '—']];
+      $('#kv-primer').innerHTML = kv.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('');
+      return d;
+    }
+    $('#btn-primer-segarkan').addEventListener('click', statusPrimer);
+    $('#btn-tarik-sheet').addEventListener('click', async (e) => {
+      if (!confirm('Muat ulang SELURUH isi Google Sheet ke server? Data di server diganti isi Sheet saat ini.')) return;
+      const btn = e.currentTarget;
+      sibuk(btn, true);
+      const d = await api('admin-primer', {perintah: 'tarik-sheet'});
+      sibuk(btn, false);
+      toast(d.ok ? 'Data dimuat ulang dari Sheet.' : d.error === 'masih_sinkron' ? 'Masih ada perubahan yang belum terkirim ke Sheet. Coba lagi beberapa detik lagi.' : pesan(d));
+      if (d.ok) { await muat(); statusPrimer(); }
+    });
     /* ---------- Jadwal live ---------- */
     function barisLive(r = ['', 'YouTube', '', '', '', '', 'YA']) {
       const tr = document.createElement('tr');

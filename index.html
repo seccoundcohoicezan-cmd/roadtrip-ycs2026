@@ -3085,7 +3085,8 @@
       if (!window.YCSMonster) return;
       try {
         window.YCSMonster.pasang({
-          stage: $('.fest__stage'), festApi, now, endpoint: '/api/monster',
+          stage: $('.fest__stage'), festApi, now, endpoint: '/srv/monster',
+          identitas: () => { try { return JSON.parse(localStorage.getItem('ycs_identitas') || 'null'); } catch (e) { return null; } },
           bolehTap: () => !fest.classList.contains('is-locked'),
           saatTerkunci: () => { toast('Isi data & satu kata dulu untuk ikut melawan monster.'); $('#fest-form').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' }); },
         });

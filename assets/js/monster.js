@@ -16,7 +16,7 @@
 
   function pasang(opsi) {
     const stage = opsi.stage, fest = opsi.festApi, now = opsi.now || Date.now;
-    const endpoint = opsi.endpoint || '/api/monster';
+    const endpoint = opsi.endpoint || '/srv/monster';
     const gerakMinim = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     /* ---------- DOM ---------- */
@@ -74,6 +74,35 @@
     let akhir = null;         // animasi kemenangan {t0}
     let levelLama = 0, idLama = '', ditutup = '';
     let token = baca(KUNCI_TOKEN);
+    let tiketSaya = null, blokir = null; // blokir: {error, nama} bila aturan 1 perangkat = 1 peserta menolak
+
+    // Identitas perangkat: acak sekali, disimpan di localStorage + cookie (dipakai bersama halaman lain).
+    function idPerangkat() {
+      let id = null;
+      try { id = localStorage.getItem('ycs_perangkat'); } catch (e) {}
+      if (!id) { const m = document.cookie.match(/(?:^|; )ycs_perangkat=([\w-]{16,64})/); id = m && m[1]; }
+      if (!id) id = crypto.randomUUID ? crypto.randomUUID() : Array.from(crypto.getRandomValues(new Uint8Array(16)), (b) => b.toString(16).padStart(2, '0')).join('');
+      try { localStorage.setItem('ycs_perangkat', id); } catch (e) {}
+      document.cookie = 'ycs_perangkat=' + id + '; max-age=34560000; path=/; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
+      return id;
+    }
+    // Sidik jari ringan (bukan pelacak): hanya untuk menandai tiket dari perangkat yang tampak sama agar ditinjau panitia.
+    async function sidik() {
+      try {
+        const c = document.createElement('canvas'); c.width = 120; c.height = 30;
+        const x = c.getContext('2d'); x.font = '16px sans-serif'; x.fillStyle = '#f60'; x.fillText('YCS-2026 ✓', 2, 20);
+        const bahan = [navigator.userAgent, navigator.language, Intl.DateTimeFormat().resolvedOptions().timeZone, screen.width + 'x' + screen.height + '@' + devicePixelRatio,
+          navigator.hardwareConcurrency, navigator.deviceMemory, navigator.platform, c.toDataURL().slice(-64)].join('|');
+        const h = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(bahan));
+        return Array.from(new Uint8Array(h).slice(0, 12), (b) => b.toString(16).padStart(2, '0')).join('');
+      } catch (e) { return ''; }
+    }
+    const PESAN_BLOKIR = {
+      perangkat_dipakai: (d) => `Perangkat ini sudah terdaftar atas nama ${d.nama || 'peserta lain'}. 1 perangkat hanya untuk 1 peserta.`,
+      email_perangkat_lain: () => 'Emailmu sudah dipakai ikut dari perangkat lain. 1 peserta hanya dari 1 perangkat. Hubungi panitia bila ganti HP.',
+      belum_festival: () => 'Datamu belum tercatat di festival. Kirim satu kata dulu, lalu ikut melawan.',
+      tanpa_identitas: () => 'Isi ulang data festival (nama, sekolah, email) di bawah untuk ikut melawan.',
+    };
     let antre = baca(KUNCI_ANTRE) || { e: '', n: 0, kirim: null, seq: 0 };
     let timerPoll = 0, timerKirim = 0, sedangKirim = false, gagalBeruntun = 0;
 
@@ -232,7 +261,8 @@
       const tampil = st.fase === 'tanding' || akhir || st.fase === 'menang';
       if (tampil && !(st.fase === 'menang' && !akhir)) {
         (st.wujud === 'lucu' ? gambarMonsterLucu : gambarRajaBatu)(g, t, kedip, mati);
-      }
+        aturZona(akhir && akhir.selesai ? null : g);
+      } else aturZona(null);
       // partikel tenaga: langit → warga → bar
       const bar = partikel.length ? titikBar() : null;
       for (let i = partikel.length - 1; i >= 0; i--) {
@@ -278,6 +308,14 @@
     const mulaiGambar = () => { if (!raf && st && !el.hidden) raf = requestAnimationFrame(gambar); };
     document.addEventListener('visibilitychange', () => { if (!document.hidden) { mulaiGambar(); poll(0); } });
 
+    // Zona monster dikirim ke festival agar warga menyingkir dan tidak menimpa monster.
+    let zonaLama = '';
+    function aturZona(g) {
+      if (!fest || !fest.setZona) return;
+      const z = g ? { x: Math.round(g.x), atas: Math.round(g.kaki - g.tinggi), kaki: Math.round(g.kaki), lebar: Math.round(g.tinggi * (st.wujud === 'lucu' ? 1.05 : 0.8)) } : null;
+      const k = JSON.stringify(z);
+      if (k !== zonaLama) { zonaLama = k; fest.setZona(z); }
+    }
     function tulisBar() {
       const tg = target();
       const persen = Math.max(0, Math.min(100, tampilTenaga / Math.max(1, tg) * 100));
@@ -340,6 +378,7 @@
       const tampil = adaEvent && ditutup !== st.id && (st.fase !== 'tunggu' || Date.parse(st.mulai) - now() < 60 * 60000);
       el.hidden = !tampil;
       stage.classList.toggle('is-monster', tampil && st.fase !== 'tunggu');
+      if (!tampil || st.fase === 'tunggu' || st.fase === 'habis') aturZona(null);
       if (!tampil) { pesan.hidden = true; return; }
       if (!W) ukur();
       el.dataset.fase = st.fase;
@@ -349,9 +388,11 @@
       $('.mon__nama').textContent = st.nama;
       $('.mon__lvl').textContent = st.levelMaks ? `Level ${st.level || 1}/${st.levelMaks}` : '';
       $('.mon__pemain').textContent = st.pemain ? `${nf.format(st.pemain)} pejuang` : '';
-      $('.mon__saya').textContent = sayaPoin ? `Kontribusimu ${nf.format(sayaPoin)}` : `+${poin()} per tap`;
+      $('.mon__saya').textContent = tiketSaya ? `Tiket ${tiketSaya} · ${nf.format(sayaPoin)} tenaga` : sayaPoin ? `Kontribusimu ${nf.format(sayaPoin)}` : `+${poin()} per tap`;
+      if (tanding && opsi.bolehTap() && !token && !blokir && navigator.onLine) pastikanToken().catch(() => {});
       if (st.fase === 'tunggu') tampilAjak(`${st.nama} muncul dalam ${jam(Date.parse(st.mulai) - now())}. Siapkan jarimu!`);
       else if (tanding && !opsi.bolehTap()) tampilAjak('Buka festival dulu (isi data & satu kata di bawah) untuk ikut melawan.');
+      else if (tanding && blokir) tampilAjak((PESAN_BLOKIR[blokir.error] || (() => 'Tidak bisa ikut dari perangkat ini.'))(blokir));
       else if (tanding && !navigator.onLine) tampilAjak(`Koneksi terputus. ${nf.format(pending())} tap disimpan dan dikirim saat tersambung.`);
       else if (tanding) tampilAjak(ajakTetap ? '' : 'Ketuk warga festival untuk mengirim tenaga!');
       else if (st.fase === 'habis') tampilPesan();
@@ -371,7 +412,7 @@
       pesan.hidden = false;
       pesan.querySelector('h3').textContent = menang ? 'Monster Terkalahkan!' : 'Waktu habis!';
       pesan.querySelector('p').textContent = menang
-        ? `Terima kasih, pejuang festival! ${sayaPoin ? 'Kamu menyumbang ' + nf.format(sayaPoin) + ' tenaga. ' : ''}Sekarang saatnya live.`
+        ? `Terima kasih, pejuang festival! ${sayaPoin ? 'Kamu menyumbang ' + nf.format(sayaPoin) + ' tenaga. ' : ''}${tiketSaya ? 'Tiket undianmu ' + tiketSaya + ', pantau spin saat live!' : 'Sekarang saatnya live.'}`
         : `${st.nama} kabur sebelum dikalahkan. Tetap semangat, sampai jumpa di live!`;
       const a = pesan.querySelector('a');
       const link = st.live && st.live.link;
@@ -393,6 +434,7 @@
       if (!st || st.fase !== 'tanding') return;
       if (ev.type === 'keydown') ev.preventDefault();
       if (!opsi.bolehTap()) { opsi.saatTerkunci && opsi.saatTerkunci(); return; }
+      if (blokir) { tampilkan(true); return; }
       const r = stage.getBoundingClientRect();
       const x = (ev.clientX ?? r.left + r.width / 2) - r.left, y = (ev.clientY ?? r.top + r.height * 0.7) - r.top;
       // Cari warga terdekat agar tenaga "turun" ke orang yang diketuk; bila tidak ada, ke titik ketukan.
@@ -425,16 +467,29 @@
       const r = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined });
       return r.json();
     }
-    async function pastikanToken() {
-      if (token) return token;
-      const d = await minta({ aksi: 'masuk' });
-      if (!d.ok) throw new Error(d.error || 'masuk');
-      token = d.token; simpan(KUNCI_TOKEN, token);
-      return token;
+    let masukJalan = null;
+    function pastikanToken() {
+      if (token) return Promise.resolve(token);
+      if (blokir) return Promise.reject(new Error(blokir.error));
+      if (!masukJalan) masukJalan = (async () => {
+        const idt = (opsi.identitas && opsi.identitas()) || {};
+        if (!idt.email) { blokir = { error: 'tanpa_identitas' }; throw new Error('tanpa_identitas'); }
+        const d = await minta({ aksi: 'masuk', perangkat: idPerangkat(), fp: await sidik(), email: idt.email });
+        if (!d.ok) {
+          if (PESAN_BLOKIR[d.error]) { blokir = d; antre.n = 0; antre.kirim = null; simpan(KUNCI_ANTRE, antre); if (st) tampilkan(true); }
+          throw new Error(d.error || 'masuk');
+        }
+        token = d.token; simpan(KUNCI_TOKEN, token);
+        if (d.tiket) tiketSaya = d.tiket;
+        if (d.saya) sayaPoin = d.saya;
+        if (st) tampilkan(true);
+        return token;
+      })().finally(() => { masukJalan = null; });
+      return masukJalan;
     }
     // Satu batch dalam perjalanan; gagal → dikirim ulang dengan seq yang sama.
     async function kirim() {
-      if (sedangKirim || !st || st.fase !== 'tanding' || !navigator.onLine) return;
+      if (sedangKirim || !st || st.fase !== 'tanding' || !navigator.onLine || blokir) return;
       if (!antre.kirim && antre.n <= 0) return;
       sedangKirim = true;
       try {
@@ -456,9 +511,11 @@
         if (d.buang) antre.n = 0; else antre.n = Math.min(MAKS_ANTRE, antre.n + Math.max(0, sisa));
         simpan(KUNCI_ANTRE, antre);
         if (d.saya) sayaPoin = d.saya;
+        if (d.tiket && d.tiket !== tiketSaya) { tiketSaya = d.tiket; tampilAjak(`Selamat! Kamu dapat tiket undian ${tiketSaya}. Pantau spin saat live YCS!`, 5000); }
         gagalBeruntun = 0;
         terapkan(d.status);
       } catch (e) {
+        if (blokir) return;
         gagalBeruntun++;
         if (gagalBeruntun === 3 && navigator.onLine) tampilAjak('Server sedang ramai. Tapmu disimpan dan dikirim ulang otomatis.', 4000);
       } finally {

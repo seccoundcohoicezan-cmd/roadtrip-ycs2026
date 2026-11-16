@@ -1,42 +1,50 @@
-// Server lokal untuk uji ujung-ke-ujung tanpa Vercel dan tanpa Google:
-// - file statis repo + fungsi api/*.js (seperti Vercel)
-// - Apps Script tiruan yang menjalankan apps-script/Code.gs dengan Spreadsheet di memori
+// Server lokal untuk uji ujung-ke-ujung tanpa Vercel, Dokploy, dan Google — susunannya sama dengan produksi:
+// - port      : file statis repo + fungsi api/*.js (seperti Vercel) + rewrite /srv/monster → server data
+// - port + 1  : server data (server/index.cjs, seperti Dokploy) — menjalankan Code.gs di memori + Lawan Monster
+// - port + 2  : "Google Sheet" tiruan (Code.gs di memori) — sumber impor awal & tujuan penerusan cadangan
 // Pakai: node tools/dev-server.cjs [port=8787]. Data contoh: POST /__seed (lihat di bawah).
 const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
-const {muat} = require('../tests/_mock-gas.cjs');
+const {muat} = require('../server/gas-memori.cjs');
+const {buatPrimer} = require('../server/index.cjs');
 
 const ROOT = path.join(__dirname, '..');
 const PORT = Number(process.argv[2] || 8787);
-const GAS_PORT = PORT + 1;
-const app = muat();
+const DATA_PORT = PORT + 1, SHEET_PORT = PORT + 2;
+const RAHASIA = 'rahasia-uji-lokal-' + 'x'.repeat(32);
 const MIME = {'.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.png': 'image/png', '.jpg': 'image/jpeg', '.ico': 'image/x-icon'};
-
 const baca = (req) => new Promise((ok) => { let b = ''; req.on('data', (c) => { b += c; }); req.on('end', () => ok(b)); });
 
-// Apps Script tiruan
+// "Google Sheet" tiruan: Code.gs asli, dengan hash rahasia uji (Code.gs produksi memakai hash rahasia asli).
+const sheet = muat();
+sheet.ctx.primerSah_ = (r) => r === RAHASIA;
+sheet.get('siapkan');
 http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://x');
-  const out = req.method === 'POST' ? app.post(JSON.parse(await baca(req) || '{}')) : app.get(url.searchParams.get('aksi'));
+  const out = req.method === 'POST' ? sheet.post(await baca(req) || '{}') : sheet.get(url.searchParams.get('aksi'));
   res.setHeader('Content-Type', 'application/json');
   res.end(JSON.stringify(out));
-}).listen(GAS_PORT, '127.0.0.1');
-process.env.YCS_APPS_SCRIPT_URL = `http://127.0.0.1:${GAS_PORT}/exec`;
+}).listen(SHEET_PORT, '127.0.0.1');
 
-// Lawan Monster: Upstash Redis tiruan (port+2) bila paket fengari tersedia (NODE_PATH). Tanpa itu, /api/monster menjawab fase 'mati'.
-try {
-  const fakeRedis = require('../tests/_fake-upstash.cjs');
-  if (!fakeRedis.tersedia) throw new Error('fengari');
-  fakeRedis.mulai(PORT + 2);
-  process.env.KV_REST_API_URL = `http://127.0.0.1:${PORT + 2}`;
-  process.env.KV_REST_API_TOKEN = 'uji-token';
-} catch (e) { console.log('Redis tiruan nonaktif (pasang fengari & set NODE_PATH untuk menguji Lawan Monster).'); }
+// Server data (seperti Dokploy), tanpa file (memori saja), meneruskan ke Sheet tiruan tiap 1 detik.
+const primer = buatPrimer({sheetUrl: `http://127.0.0.1:${SHEET_PORT}/exec`, rahasia: RAHASIA, sinkronMs: 1000, origins: '*', log: () => {}});
+primer.server.listen(DATA_PORT, '127.0.0.1');
+const siap = primer.mulai();
+process.env.YCS_APPS_SCRIPT_URL = `http://127.0.0.1:${DATA_PORT}/exec`;
 
 http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://x');
   try {
+    await siap;
     if (url.pathname === '/__seed' && req.method === 'POST') return seed(JSON.parse(await baca(req) || '{}'), res);
+    if (url.pathname === '/__sheet') { res.setHeader('Content-Type', 'application/json'); return res.end(JSON.stringify(Object.fromEntries(Object.entries(sheet.sheets).map(([n, x]) => [n, x.rows])))); }
+    if (url.pathname.startsWith('/srv/')) { // seperti rewrite vercel.json → server data
+      const r = await fetch(`http://127.0.0.1:${DATA_PORT}/` + url.pathname.slice(5) + url.search, {method: req.method, headers: {'content-type': 'application/json', 'x-forwarded-for': req.headers['x-forwarded-for'] || '127.0.0.1'}, body: req.method === 'POST' ? await baca(req) : undefined});
+      res.statusCode = r.status;
+      ['content-type', 'cache-control'].forEach((h) => r.headers.get(h) && res.setHeader(h, r.headers.get(h)));
+      return res.end(await r.text());
+    }
     if (url.pathname.startsWith('/api/')) {
       const nama = url.pathname.slice(5).replace(/[^a-z]/g, '');
       const file = path.join(ROOT, 'api', nama + '.js');
@@ -65,10 +73,11 @@ http.createServer(async (req, res) => {
     console.error(err);
     res.statusCode = 500; res.end('{}');
   }
-}).listen(PORT, '127.0.0.1', () => console.log(`YCS dev: http://127.0.0.1:${PORT}  (Apps Script tiruan :${GAS_PORT})`));
+}).listen(PORT, '127.0.0.1', () => console.log(`YCS dev: http://127.0.0.1:${PORT}  (server data :${DATA_PORT}, Sheet tiruan :${SHEET_PORT})`));
 
 // POST /__seed {pengaturan:{kunci:nilai}, finalis:n, kode:[[kode,email,nama]], twibbon:n}
 function seed(p, res) {
+  const app = primer.app;
   app.get('siapkan');
   const s = app.sheets;
   const peng = s.Pengaturan.rows;
@@ -102,7 +111,9 @@ function seed(p, res) {
     }
   }
   app.cache.clear();
-  try { require('../tests/_fake-upstash.cjs').jalankan(p.monsterReset ? ['FLUSHALL'] : ['DEL', 'm:cfg']); } catch (_) {}
+  if (p.monsterReset) { const st = primer.monster.state; st.events = {}; if (p.monsterReset === 'semua') { st.perangkat = {}; st.email = {}; } }
+  primer.monster.segarkan();
+  primer.tandai();
   res.setHeader('Content-Type', 'application/json');
   res.end(JSON.stringify({ok: true, sandi: s.Admin.rows[1][1], kodeAkses: peng.find((x) => x[0] === 'dana_kode_akses')[1]}));
 }
