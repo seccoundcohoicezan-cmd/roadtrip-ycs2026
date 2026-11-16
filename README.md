@@ -152,11 +152,23 @@ Tombol darurat: **Mulai sekarang** (event baru dari nol), **Stop darurat**, **Ke
 ### 1 perangkat = 1 peserta, tiket & spin undian
 
 - Ikut melawan hanya bisa setelah membuka festival (email harus ada di tab **Satu Kata**).
-- Perangkat diberi ID acak (localStorage + cookie `ycs_perangkat`). Server mengikat **1 perangkat ↔ 1 email** secara permanen: email yang sama dari perangkat lain ditolak, dan perangkat yang sama tidak bisa dipakai email lain. Peserta ganti HP → admin → **Lepas ikatan perangkat**.
+- Perangkat diberi ID acak (localStorage + cookie `ycs_perangkat`). Server mengikat **1 perangkat ↔ 1 email** secara permanen: email yang sama dari perangkat lain ditolak, dan perangkat yang sama tidak bisa dipakai email lain. Peserta ganti HP → admin → Lawan Monster → **Perangkat peserta** → Lepas ikatan.
 - Sidik jari ringan (UA, layar, zona waktu, kanvas) + IP disimpan: tiket dari perangkat yang tampak sama ditandai `perangkat mirip #000x` di kolom Catatan untuk ditinjau panitia (tidak diblokir otomatis karena HP sekolah bisa identik).
 - Setiap peserta yang menyumbang ≥ `monster_tiket_min` tenaga (bawaan 1) mendapat **1 tiket per event**, nomor `#0001`, `#0002`, … Tiket tampil di HUD peserta dan tercatat di tab **Tiket Monster**. Ringkasan event di tab **Monster Event**.
-- **Spin undian saat live:** admin → Lawan Monster → **Tiket & spin undian** → pilih event → **Layar penuh** → **Putar spin**. Pemenang diacak di server (`crypto.randomInt`), tidak bisa menang dua kali, status `MENANG #n <waktu>` ditulis ke tab Tiket Monster.
+- **Spin undian saat live:** tab **Spin Undian** (lihat di bawah). Pemenang tidak bisa menang dua kali.
 - Batasan jujur: orang yang membuka mode penyamaran / menghapus data browser mendapat ID perangkat baru, tapi emailnya tetap terikat ke perangkat pertama; orang dengan beberapa email + beberapa browser masih bisa mendapat lebih dari satu tiket (ditandai bila sidik jari + IP sama).
+
+### Mode uji monster
+
+Admin → Lawan Monster → **Mode uji monster** → durasi → **Mulai uji** → buka link `/?uji-monster=KODE#satu-kata` di HP. Event uji terpisah dari event asli: hanya terlihat oleh pembawa link (walau monster mati/STOP), tidak wajib membuka festival, perangkat tidak diikat, dan tiket uji (catatan `UJI`) tidak ditulis ke Sheet. Tiket uji bisa dicoba di tab Spin Undian (event berawalan "UJI").
+
+### Spin Undian (tab terpisah)
+
+- **Atur hadiah & peluang** (bisa dibuka di layar penuh lewat tombol ⚙): nama hadiah, stok (kosong = tanpa batas) dan **bobot**. Peluang keluar = bobot / total bobot hadiah yang stoknya masih ada. Hadiah yang habis otomatis keluar dari roda.
+- **Peluang tiket menang:** sama rata, atau sebanding kontribusi (tenaga).
+- Roda hadiah berputar dan berhenti di hadiah yang dipilih server (`crypto.randomInt`), bersamaan dengan gulungan nama pemenang.
+- **Mode latihan:** hasil tidak dicatat, stok tidak berkurang.
+- Status pemenang di tab Tiket Monster: `MENANG #n · <hadiah> · <waktu> WIB`. Pengaturan hadiah dicadangkan di tab **Hadiah Spin**.
 
 ### Anti-spam & beban
 
@@ -166,11 +178,11 @@ Tombol darurat: **Mulai sekarang** (event baru dari nol), **Stop darurat**, **Ke
 ### Uji
 
 ```bash
-node --test tests/*.cjs                       # 21 tes: Code.gs, monster (perangkat/tiket/spin), sinkron server data ↔ Sheet
+node --test tests/*.cjs                       # 23 tes: Code.gs, monster (perangkat/tiket/spin), sinkron server data ↔ Sheet
 node tools/dev-server.cjs 8787                # :8787 situs+api, :8788 server data, :8789 Sheet tiruan (GET /__sheet)
 node tools/uji-beban-monster.cjs http://127.0.0.1:8787 400 20   # setelah seed {"kata":400} + Mulai sekarang
 ```
 
-Hasil lokal: 400 pemain + 400 pemantau selama 20 detik, 0 galat, 400 tiket terbit dan diteruskan ke Sheet tiruan. E2E browser (scripts MRKT-56) 36/36, E2E lama MRKT-45 78/78.
+Hasil lokal: 400 pemain + 400 pemantau selama 20 detik, 0 galat, 400 tiket terbit dan diteruskan ke Sheet tiruan. E2E browser (scripts MRKT-56) 44/44, E2E lama MRKT-45 78/78.
 
 Checklist sebelum event: admin → Mulai sekarang → monster muncul di 2 HP (Android kelas bawah + iPhone), warga menyingkir → ketuk di kedua HP → tiket muncul → mode pesawat 10 detik sambil mengetuk → online, tenaga bertambah sekali → menang → tombol live → spin di layar penuh → cek tab Tiket Monster di Sheet → Stop darurat.

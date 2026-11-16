@@ -11,7 +11,7 @@ const WIB = 7 * 3600 * 1000;
 const TAB = {
   pengaturan: 'Pengaturan', live: 'Jadwal Live', finalis: 'Finalis', kode: 'Kode Wildcard',
   dana: 'Dana Kaget', survei: 'Survei', kata: 'Satu Kata', admin: 'Admin', log: 'Log Admin',
-  tiket: 'Tiket Monster', monster: 'Monster Event'
+  tiket: 'Tiket Monster', monster: 'Monster Event', hadiah: 'Hadiah Spin'
 };
 const KOLOM = {
   pengaturan: ['Kunci', 'Nilai', 'Keterangan'],
@@ -23,7 +23,8 @@ const KOLOM = {
   kata: ['Waktu', 'ID permintaan', 'Kata', 'Provinsi', 'Sumber', 'Tampil', 'Nama', 'Sekolah', 'Email', 'Klik saluran WhatsApp', 'Karakter'],
   log: ['Waktu', 'Aksi', 'Detail'],
   tiket: ['Waktu', 'Event', 'No tiket', 'Nama', 'Sekolah', 'Provinsi', 'Email', 'Perangkat', 'Kontribusi', 'Status', 'Catatan'],
-  monster: ['Event', 'Mulai', 'Selesai', 'Kalah pada', 'Total tenaga', 'Pemain', 'Tiket', 'Pemenang']
+  monster: ['Event', 'Mulai', 'Selesai', 'Kalah pada', 'Total tenaga', 'Pemain', 'Tiket', 'Pemenang'],
+  hadiah: ['Hadiah', 'Stok', 'Terpakai', 'Bobot', 'Peluang']
 };
 // Server data utama (Dokploy) memakai rahasia bersama; di sini hanya hash SHA-256-nya (repo publik).
 const PRIMER_HASH = '3a5acc3b061cdf7dea58878bc9f5e40f216da8d7312bece45c00763ad8ba8fa5';

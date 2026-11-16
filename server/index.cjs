@@ -183,8 +183,9 @@ function buatPrimer(o = {}) {
     }
     if (url.pathname === '/monster' || url.pathname === '/monster/admin') {
       if (req.method === 'GET') {
-        const st = monster.lihat();
-        const cache = st.fase === 'tanding' ? 'public, max-age=0, s-maxage=1, stale-while-revalidate=2'
+        const uji = url.searchParams.get('uji');
+        const st = monster.lihat(uji);
+        const cache = uji ? 'no-store' : st.fase === 'tanding' ? 'public, max-age=0, s-maxage=1, stale-while-revalidate=2'
           : st.mulai && st.fase === 'tunggu' ? 'public, max-age=0, s-maxage=' + Math.max(1, Math.min(15, Math.floor((Date.parse(st.mulai) - Date.now()) / 1000) - 1)) : 'public, max-age=0, s-maxage=10';
         return kirim(res, 200, st, cache, req);
       }

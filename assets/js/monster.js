@@ -6,7 +6,8 @@
 (() => {
   'use strict';
   const nf = new Intl.NumberFormat('id-ID');
-  const KUNCI_TOKEN = 'ycs_mon_tok', KUNCI_ANTRE = 'ycs_mon_antre';
+  const UJI = /[?&]uji-monster=/.test(location.search);
+  const KUNCI_TOKEN = UJI ? 'ycs_mon_tok_uji' : 'ycs_mon_tok', KUNCI_ANTRE = UJI ? 'ycs_mon_antre_uji' : 'ycs_mon_antre';
   const MAKS_ANTRE = 150;      // batas tap tersimpan di klien (server tetap membatasi 10 tap/detik)
   const MAKS_PARTIKEL = 70;    // batas partikel agar HP kelas bawah tetap lancar
   const simpan = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
@@ -17,6 +18,10 @@
   function pasang(opsi) {
     const stage = opsi.stage, fest = opsi.festApi, now = opsi.now || Date.now;
     const endpoint = opsi.endpoint || '/srv/monster';
+    // Mode uji monster (dibuka admin): ?uji-monster=KODE → event terpisah, hanya terlihat oleh pembawa link,
+    // tidak wajib membuka festival dan tidak mengikat perangkat. Token & antrean disimpan terpisah.
+    const uji = (new URLSearchParams(location.search).get('uji-monster') || '').replace(/[^\w-]/g, '').slice(0, 20) || null;
+    const bolehTap = () => !!uji || opsi.bolehTap();
     const gerakMinim = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     /* ---------- DOM ---------- */
@@ -100,6 +105,7 @@
     const PESAN_BLOKIR = {
       perangkat_dipakai: (d) => `Perangkat ini sudah terdaftar atas nama ${d.nama || 'peserta lain'}. 1 perangkat hanya untuk 1 peserta.`,
       email_perangkat_lain: () => 'Emailmu sudah dipakai ikut dari perangkat lain. 1 peserta hanya dari 1 perangkat. Hubungi panitia bila ganti HP.',
+      uji_berakhir: () => 'Link uji ini sudah tidak berlaku. Minta link baru ke admin.',
       belum_festival: () => 'Datamu belum tercatat di festival. Kirim satu kata dulu, lalu ikut melawan.',
       tanpa_identitas: () => 'Isi ulang data festival (nama, sekolah, email) di bawah untuk ikut melawan.',
     };
@@ -326,6 +332,7 @@
 
     /* ---------- Tampilan per fase ---------- */
     function aturBanner() {
+      if (infoUjiSalah && Date.now() < infoUjiSalah) return; // pesan "link uji tidak berlaku" sedang tampil
       if (!st) { banner.hidden = true; return; }
       const nama = st.nama || 'Monster';
       let isi = '';
@@ -336,8 +343,15 @@
     }
     const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
+    let infoUjiSalah = 0;
     function terapkan(baru) {
       if (!baru || !baru.ok) return;
+      if (uji && (baru.ujiSalah || (baru.uji && baru.fase === 'tidak_ada')) && !infoUjiSalah) {
+        infoUjiSalah = Date.now() + 8000;
+        banner.textContent = 'Link uji monster sudah tidak berlaku. Minta link baru ke admin.';
+        banner.hidden = false;
+        setTimeout(() => { banner.hidden = true; }, 8000);
+      }
       const lama = st;
       st = baru;
       const adaEvent = ['tanding', 'menang', 'habis', 'tunggu'].includes(st.fase);
@@ -384,14 +398,14 @@
       el.dataset.fase = st.fase;
       hud.hidden = st.fase === 'tunggu';
       tangkap.hidden = !tanding;
-      if (fest && fest.setBalon) fest.setBalon(!tanding && !!opsi.bolehTap());
-      $('.mon__nama').textContent = st.nama;
+      if (fest && fest.setBalon) fest.setBalon(!tanding && !!bolehTap());
+      $('.mon__nama').textContent = (st.uji ? 'MODE UJI · ' : '') + st.nama;
       $('.mon__lvl').textContent = st.levelMaks ? `Level ${st.level || 1}/${st.levelMaks}` : '';
       $('.mon__pemain').textContent = st.pemain ? `${nf.format(st.pemain)} pejuang` : '';
       $('.mon__saya').textContent = tiketSaya ? `Tiket ${tiketSaya} · ${nf.format(sayaPoin)} tenaga` : sayaPoin ? `Kontribusimu ${nf.format(sayaPoin)}` : `+${poin()} per tap`;
-      if (tanding && opsi.bolehTap() && !token && !blokir && navigator.onLine) pastikanToken().catch(() => {});
+      if (tanding && bolehTap() && !token && !blokir && navigator.onLine) pastikanToken().catch(() => {});
       if (st.fase === 'tunggu') tampilAjak(`${st.nama} muncul dalam ${jam(Date.parse(st.mulai) - now())}. Siapkan jarimu!`);
-      else if (tanding && !opsi.bolehTap()) tampilAjak('Buka festival dulu (isi data & satu kata di bawah) untuk ikut melawan.');
+      else if (tanding && !bolehTap()) tampilAjak('Buka festival dulu (isi data & satu kata di bawah) untuk ikut melawan.');
       else if (tanding && blokir) tampilAjak((PESAN_BLOKIR[blokir.error] || (() => 'Tidak bisa ikut dari perangkat ini.'))(blokir));
       else if (tanding && !navigator.onLine) tampilAjak(`Koneksi terputus. ${nf.format(pending())} tap disimpan dan dikirim saat tersambung.`);
       else if (tanding) tampilAjak(ajakTetap ? '' : 'Ketuk warga festival untuk mengirim tenaga!');
@@ -420,7 +434,7 @@
       if (link) { a.href = link; a.textContent = Date.parse(st.live.mulai) > now() ? `Live mulai ${new Date(st.live.mulai).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB · Buka` : 'Tonton Live sekarang'; }
       tampilAjak('');
     }
-    $('.mon__tutup').addEventListener('click', () => { ditutup = st ? st.id : ''; pesan.hidden = true; el.hidden = true; stage.classList.remove('is-monster'); if (fest && fest.setBalon) fest.setBalon(!!opsi.bolehTap()); });
+    $('.mon__tutup').addEventListener('click', () => { ditutup = st ? st.id : ''; pesan.hidden = true; el.hidden = true; stage.classList.remove('is-monster'); if (fest && fest.setBalon) fest.setBalon(!!bolehTap()); });
 
     /* ---------- Tap ---------- */
     let sayaPoin = 0;
@@ -433,7 +447,7 @@
     function ketuk(ev) {
       if (!st || st.fase !== 'tanding') return;
       if (ev.type === 'keydown') ev.preventDefault();
-      if (!opsi.bolehTap()) { opsi.saatTerkunci && opsi.saatTerkunci(); return; }
+      if (!bolehTap()) { opsi.saatTerkunci && opsi.saatTerkunci(); return; }
       if (blokir) { tampilkan(true); return; }
       const r = stage.getBoundingClientRect();
       const x = (ev.clientX ?? r.left + r.width / 2) - r.left, y = (ev.clientY ?? r.top + r.height * 0.7) - r.top;
@@ -473,8 +487,8 @@
       if (blokir) return Promise.reject(new Error(blokir.error));
       if (!masukJalan) masukJalan = (async () => {
         const idt = (opsi.identitas && opsi.identitas()) || {};
-        if (!idt.email) { blokir = { error: 'tanpa_identitas' }; throw new Error('tanpa_identitas'); }
-        const d = await minta({ aksi: 'masuk', perangkat: idPerangkat(), fp: await sidik(), email: idt.email });
+        if (!idt.email && !uji) { blokir = { error: 'tanpa_identitas' }; throw new Error('tanpa_identitas'); }
+        const d = await minta({ aksi: 'masuk', perangkat: idPerangkat(), fp: await sidik(), email: idt.email || '', uji });
         if (!d.ok) {
           if (PESAN_BLOKIR[d.error]) { blokir = d; antre.n = 0; antre.kirim = null; simpan(KUNCI_ANTRE, antre); if (st) tampilkan(true); }
           throw new Error(d.error || 'masuk');
@@ -501,7 +515,7 @@
           simpan(KUNCI_ANTRE, antre);
         }
         await pastikanToken();
-        const d = await minta({ aksi: 'tap', token, n: antre.kirim.n, seq: antre.kirim.seq, e: antre.e });
+        const d = await minta({ aksi: 'tap', token, n: antre.kirim.n, seq: antre.kirim.seq, e: antre.e, uji });
         if (!d.ok) {
           if (d.error === 'sesi_habis') { token = null; simpan(KUNCI_TOKEN, null); }
           throw new Error(d.error);
@@ -535,7 +549,7 @@
       clearTimeout(timerPoll);
       timerPoll = setTimeout(async () => {
         try {
-          const r = await fetch(endpoint, { headers: { Accept: 'application/json' } });
+          const r = await fetch(uji ? endpoint + '?uji=' + encodeURIComponent(uji) : endpoint, { headers: { Accept: 'application/json' } });
           terapkan(await r.json());
         } catch (e) { /* coba lagi nanti */ }
         poll(jedaPoll());

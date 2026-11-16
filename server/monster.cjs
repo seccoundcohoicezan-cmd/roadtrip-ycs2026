@@ -54,6 +54,9 @@ function buatMonster(app, opsi = {}) {
   st.perangkat = st.perangkat || {}; // id perangkat → {email, fp, ip, t}
   st.email = st.email || {};         // email → id perangkat
   st.events = st.events || {};       // id event → {lvl, tenaga, total, kalah, naik, u:{pid:{p,q}}, tiket:{pid:nomor}, n, final}
+  st.uji = st.uji || null;           // mode uji monster: {kode, mulai, sampai} — event terpisah, hanya lewat link ?uji-monster=kode
+  st.ujiPemain = st.ujiPemain || {}; // pid → identitas penguji (tidak mengikat perangkat)
+  st.spin = st.spin || {hadiah: [], peluang: 'rata'}; // hadiah: [{id, nama, stok|null, bobot, terpakai}]
   const ember = new Map();           // batas kecepatan per pemain (tidak perlu disimpan)
   const aktif = new Map();           // id event → Map(pid → terakhir aktif)
   const ipHitung = new Map();        // batas token per IP: ip → {n, sampai}
@@ -104,11 +107,24 @@ function buatMonster(app, opsi = {}) {
     return m.size;
   }
 
+  // Mode uji: abaikan saklar aktif/darurat; hanya klien yang membawa kode uji yang melihat event ini.
+  function jadwalUntuk(c, t, uji) {
+    if (!uji) return jadwal(c, t);
+    const u = st.uji;
+    if (!u || uji !== u.kode) return {fase: 'mati', ujiSalah: true};
+    if (t >= u.sampai + PASCA) return {fase: 'tidak_ada', uji: true};
+    const live = (c.live || []).map((l) => ({judul: l.judul, platform: l.platform, link: l.link, mulai: Date.parse(l.mulai)})).filter((l) => l.mulai >= t).sort((a, b) => a.mulai - b.mulai)[0] || null;
+    return {fase: 'aktif', id: 'u' + u.mulai.toString(36), mulai: u.mulai, selesai: u.sampai, live, uji: true};
+  }
+  const ujiSah = (kode) => !!(kode && st.uji && kode === st.uji.kode);
+
   function status(c, j, t) {
     const m = c.monster;
     const a = aturan(m);
     const dasar = {ok: true, now: t, fase: j.fase, nama: m.nama || 'Raja Batu', wujud: m.wujud === 'lucu' ? 'lucu' : 'raja_batu'};
     if (j.dihentikan) dasar.dihentikan = true;
+    if (j.uji) dasar.uji = true;
+    if (j.ujiSalah) dasar.ujiSalah = true;
     if (!j.id) return dasar;
     const live = j.live ? {judul: j.live.judul, platform: j.live.platform, link: j.live.link, mulai: new Date(j.live.mulai).toISOString()} : null;
     const out = {...dasar, id: j.id, mulai: new Date(j.mulai).toISOString(), selesai: new Date(j.selesai).toISOString(), live, levelMaks: a.target.length, target: a.target, poin: a.poin, skala: a.skala};
@@ -122,15 +138,25 @@ function buatMonster(app, opsi = {}) {
     return out;
   }
 
-  function lihat() {
+  function lihat(uji) {
     const c = cfg(), t = now();
-    return status(c, jadwal(c, t), t);
+    return status(c, jadwalUntuk(c, t, uji || null), t);
   }
 
   function masuk(p, ip) {
     const perangkat = String(p.perangkat || '');
     if (!/^[\w-]{16,64}$/.test(perangkat)) return {ok: false, error: 'validation'};
     const email = bersihEmail(p.email);
+    if (p.uji) {
+      // Mode uji: tidak wajib peserta festival dan tidak mengikat perangkat (aturan 1 perangkat tetap utuh untuk event asli).
+      if (!ujiSah(p.uji)) return {ok: false, error: 'uji_berakhir'};
+      const pid = '~' + pidDari(perangkat).slice(1); // '~' bukan karakter base64url → tidak bentrok dengan pid asli
+      const orang = peserta(email) || {nama: 'Penguji ' + perangkat.slice(-4), sekolah: '-', provinsi: '-'};
+      st.ujiPemain[pid] = {email, nama: orang.nama, sekolah: orang.sekolah, provinsi: orang.provinsi};
+      pidKe.set(pid, perangkat);
+      const j = jadwalUntuk(cfg(), now(), p.uji), e = j.id && st.events[j.id];
+      return {ok: true, uji: true, token: pid + '.' + tanda(pid), nama: namaTampil(orang.nama), tiket: e && e.tiket[pid] ? e.tiket[pid] : null, saya: e && e.u[pid] ? e.u[pid].p : 0};
+    }
     const ada = st.perangkat[perangkat];
     if (!ada) {
       // batas perangkat baru per IP (CGNAT seluler: longgar), 300 / 10 menit
@@ -156,7 +182,15 @@ function buatMonster(app, opsi = {}) {
   }
 
   function terbitkanTiket(id, e, pid, a) {
-    const perangkat = pidKe.get(pid), info = st.perangkat[perangkat] || {};
+    const perangkat = pidKe.get(pid) || '', info = st.perangkat[perangkat] || {};
+    if (id[0] === 'u') { // tiket uji: disimpan di memori server, tidak ditulis ke Sheet
+      const o = st.ujiPemain[pid] || {};
+      e.n += 1;
+      const nomor = '#' + String(e.n).padStart(4, '0');
+      e.tiket[pid] = nomor;
+      (e.ujiRows = e.ujiRows || []).push([new Date(now()).toISOString(), id, nomor, o.nama || '', o.sekolah || '', o.provinsi || '', o.email || '', perangkat.slice(0, 8), e.u[pid].p, 'aktif', 'UJI']);
+      return nomor;
+    }
     const orang = peserta(info.email) || {};
     e.n += 1;
     const nomor = '#' + String(e.n).padStart(4, '0'); // diawali # agar Sheet tidak mengubahnya jadi angka
@@ -177,8 +211,9 @@ function buatMonster(app, opsi = {}) {
     if (!pid) return {ok: false, error: 'sesi_habis'};
     const n = Math.floor(Number(p.n)), seq = Math.floor(Number(p.seq));
     if (!Number.isFinite(n) || n < 0 || n > 200 || !Number.isFinite(seq) || seq < 0) return {ok: false, error: 'validation'};
-    const c = cfg(), t = now(), j = jadwal(c, t);
+    const c = cfg(), t = now(), j = jadwalUntuk(c, t, p.uji || null);
     if (j.fase !== 'aktif' || p.e !== j.id) return {ok: true, terima: 0, buang: true, status: status(c, j, t)};
+    if ((pid[0] === '~') !== !!j.uji) return {ok: false, error: 'sesi_habis'}; // token uji hanya untuk event uji
     const a = aturan(c.monster), e = ev(j.id), maks = a.target.length;
     const u = e.u[pid] || (e.u[pid] = {p: 0, q: -1});
     let terima = 0;
@@ -213,6 +248,7 @@ function buatMonster(app, opsi = {}) {
   function finalisasi(id, out) {
     const e = st.events[id];
     e.final = true;
+    if (id[0] === 'u') { (e.ujiRows || []).forEach((r) => { const pid = Object.keys(e.tiket).find((q) => e.tiket[q] === r[2]); if (pid) r[8] = e.u[pid].p; }); ubah(); return; }
     const sh = app.sheets['Tiket Monster'];
     if (sh) {
       const nomorPid = new Map(Object.entries(e.tiket).map(([pid, no]) => [no, pid]));
@@ -226,6 +262,7 @@ function buatMonster(app, opsi = {}) {
   /* ---------- Admin ---------- */
   const adminSah = (token) => typeof token === 'string' && token.length >= 40 && !!app.cache.get('adm:' + app.ctx.hash_(token));
   const barisTiket = (id) => {
+    if (id && id[0] === 'u') return ((st.events[id] || {}).ujiRows || []).map((r, i) => ({r, i: i + 1}));
     const sh = app.sheets['Tiket Monster'];
     return sh ? sh.rows.map((r, i) => ({r, i})).filter((x) => x.i && x.r[1] === id) : [];
   };
@@ -237,30 +274,102 @@ function buatMonster(app, opsi = {}) {
     return [...ids].map((id) => {
       const e = st.events[id] || {total: 0, u: {}, kalah: 0};
       const t = barisTiket(id);
-      return {id, total: e.total, pemain: Object.keys(e.u).length, tiket: t.length, kalah: !!e.kalah, pemenang: t.filter((x) => /^MENANG/.test(String(x.r[9]))).length};
+      return {id, uji: id[0] === 'u', total: e.total, pemain: Object.keys(e.u).length, tiket: t.length, kalah: !!e.kalah, pemenang: t.filter((x) => /^MENANG/.test(String(x.r[9]))).length};
     }).sort((a, b) => parseInt(b.id.slice(1), 36) - parseInt(a.id.slice(1), 36));
   }
+  function infoUji() {
+    const u = st.uji;
+    if (!u) return null;
+    const e = st.events['u' + u.mulai.toString(36)] || {};
+    return {kode: u.kode, mulai: new Date(u.mulai).toISOString(), sampai: new Date(u.sampai).toISOString(), berjalan: now() < u.sampai, tiket: e.n || 0, total: e.total || 0, kalah: !!e.kalah};
+  }
+
+  /* ---------- Hadiah & peluang spin ---------- */
+  const peluangHadiah = (daftar) => { const t = daftar.reduce((s, h) => s + h.bobot, 0); return daftar.map((h) => ({...h, persen: t ? Math.round(h.bobot / t * 1000) / 10 : 0})); };
+  const tersedia = () => st.spin.hadiah.filter((h) => h.bobot > 0 && (h.stok == null || h.terpakai < h.stok));
+  function infoSpin() {
+    return {hadiah: peluangHadiah(st.spin.hadiah.map((h) => ({...h, sisa: h.stok == null ? null : Math.max(0, h.stok - h.terpakai)}))), roda: peluangHadiah(tersedia()), peluang: st.spin.peluang};
+  }
+  // Cadangan pengaturan hadiah di tab "Hadiah Spin".
+  function tulisHadiah() {
+    const sh = app.sheets['Hadiah Spin'] || app.ctx.tab_(app.ss, 'hadiah');
+    const total = st.spin.hadiah.reduce((s, h) => s + h.bobot, 0);
+    sh.rows.splice(1);
+    st.spin.hadiah.forEach((h) => sh.rows.push([h.nama, h.stok == null ? 'tanpa batas' : h.stok, h.terpakai, h.bobot, total ? Math.round(h.bobot / total * 1000) / 10 + '%' : '0%']));
+    sh.rows.push(['(peluang tiket)', st.spin.peluang === 'kontribusi' ? 'berdasarkan kontribusi' : 'sama rata', '', '', '']);
+  }
+  function aturSpin(p) {
+    const daftar = Array.isArray(p.hadiah) ? p.hadiah : [];
+    if (daftar.length > 30) return {ok: false, error: 'validation'};
+    const lama = new Map(st.spin.hadiah.map((h) => [h.id, h]));
+    const baru = [];
+    for (const h of daftar) {
+      const nama = String(h.nama || '').replace(/[\u0000-\u001f]/g, '').trim().slice(0, 60);
+      if (!nama) continue;
+      const stok = h.stok === '' || h.stok == null ? null : Math.floor(Number(h.stok));
+      const bobot = Number(String(h.bobot).replace(',', '.'));
+      if ((stok != null && (!Number.isFinite(stok) || stok < 0 || stok > 1e6)) || !Number.isFinite(bobot) || bobot < 0 || bobot > 1e6) return {ok: false, error: 'nilai_tidak_valid', hadiah: nama};
+      const id = typeof h.id === 'string' && /^[\w-]{4,20}$/.test(h.id) ? h.id : crypto.randomBytes(5).toString('base64url');
+      baru.push({id, nama, stok, bobot, terpakai: (lama.get(id) || {}).terpakai || 0});
+    }
+    st.spin.hadiah = baru;
+    st.spin.peluang = p.peluang === 'kontribusi' ? 'kontribusi' : 'rata';
+    tulisHadiah();
+    app.ctx.logAdmin_('atur hadiah spin', baru.length + ' hadiah, peluang ' + st.spin.peluang);
+    ubah();
+    return {ok: true, ...infoSpin()};
+  }
+  // Undi: hadiah dipilih sesuai bobot (yang stoknya masih ada), tiket dipilih acak (sama rata / sebanding kontribusi).
+  // latihan = hasil tidak dicatat dan stok tidak berkurang.
+  function spin(id, latihan) {
+    if (!id) return {ok: false, error: 'tidak_ada_tiket'};
+    const semua = barisTiket(id);
+    const calon = semua.filter((x) => x.r[9] === 'aktif');
+    if (!calon.length) return {ok: false, error: 'tidak_ada_tiket'};
+    const roda = tersedia();
+    if (st.spin.hadiah.length && !roda.length) return {ok: false, error: 'hadiah_habis'};
+    const acakBobot = (arr, w) => { const total = arr.reduce((s, x) => s + w(x), 0); let r = crypto.randomInt(Math.max(1, Math.round(total * 1000))) / 1000; for (const x of arr) { r -= w(x); if (r < 0) return x; } return arr[arr.length - 1]; };
+    const e = st.events[id];
+    const kontribusi = (x) => { const pid = e && Object.keys(e.tiket).find((q) => e.tiket[q] === String(x.r[2])); return Math.max(1, Number(pid ? e.u[pid].p : x.r[8]) || 1); };
+    const pilih = st.spin.peluang === 'kontribusi' ? acakBobot(calon, kontribusi) : calon[crypto.randomInt(calon.length)];
+    const hadiah = roda.length ? acakBobot(roda, (h) => h.bobot) : null;
+    const ke = semua.filter((x) => /^MENANG/.test(String(x.r[9]))).length + 1;
+    const rodaInfo = peluangHadiah(roda).map((h) => ({id: h.id, nama: h.nama, bobot: h.bobot, persen: h.persen}));
+    if (!latihan) {
+      pilih.r[9] = ['MENANG #' + ke, hadiah ? hadiah.nama : '', app.ctx.teksWib_(now()) + ' WIB'].filter(Boolean).join(' · ');
+      if (hadiah) { hadiah.terpakai += 1; tulisHadiah(); }
+      const me = app.sheets['Monster Event'];
+      const baris = id[0] !== 'u' && me && me.rows.find((r) => r[0] === id);
+      if (baris) baris[7] = [baris[7], String(pilih.r[2]) + ' ' + pilih.r[3] + (hadiah ? ' (' + hadiah.nama + ')' : '')].filter(Boolean).join('; ');
+      app.ctx.logAdmin_('spin tiket monster', id + ' ' + String(pilih.r[2]) + (hadiah ? ' ' + hadiah.nama : ''));
+      ubah();
+    }
+    return {...infoSpin(), ok: true, latihan, event: id, ke: latihan ? null : ke, pemenang: {nomor: String(pilih.r[2]), nama: pilih.r[3], sekolah: pilih.r[4], provinsi: pilih.r[5]},
+      hadiah: hadiah ? {id: hadiah.id, nama: hadiah.nama} : null, rodaPutar: rodaInfo, sisa: latihan ? calon.length : calon.length - 1};
+  }
+
   function admin(p) {
     if (!adminSah(p.token)) return {ok: false, error: 'sesi_habis'};
     const daftar = ringkasEvent();
     const id = p.event || (daftar.find((x) => x.tiket) || daftar[0] || {}).id;
     const tiket = () => barisTiket(id).map(({r}) => ({nomor: String(r[2]), nama: r[3], sekolah: r[4], provinsi: r[5], kontribusi: r[8], status: r[9], catatan: r[10]}));
     if (p.aksi === 'tiket') return {ok: true, event: id || null, events: daftar, tiket: id ? tiket() : []};
-    if (p.aksi === 'spin') {
-      if (!id) return {ok: false, error: 'tidak_ada_tiket'};
-      const calon = barisTiket(id).filter((x) => x.r[9] === 'aktif');
-      if (!calon.length) return {ok: false, error: 'tidak_ada_tiket'};
-      const pilih = calon[crypto.randomInt(calon.length)];
-      const ke = barisTiket(id).filter((x) => /^MENANG/.test(String(x.r[9]))).length + 1;
-      pilih.r[9] = 'MENANG #' + ke + ' ' + app.ctx.teksWib_(now()) + ' WIB';
-      const me = app.sheets['Monster Event'];
-      const baris = me && me.rows.find((r) => r[0] === id);
-      if (baris) baris[7] = [baris[7], String(pilih.r[2]) + ' ' + pilih.r[3]].filter(Boolean).join('; ');
-      app.ctx.logAdmin_('spin tiket monster', id + ' ' + String(pilih.r[2]));
-      ubah();
-      const acak = calon.map((x) => x.r[3]).sort(() => Math.random() - 0.5).slice(0, 40);
-      return {ok: true, event: id, ke, pemenang: {nomor: String(pilih.r[2]), nama: pilih.r[3], sekolah: pilih.r[4], provinsi: pilih.r[5]}, sisa: calon.length - 1, gulir: acak};
+    if (p.aksi === 'spin-info') return {ok: true, ...infoSpin()};
+    if (p.aksi === 'spin-atur') return aturSpin(p);
+    if (p.aksi === 'spin') return spin(id, !!p.latihan);
+    if (p.aksi === 'uji-mulai') {
+      const menit = Math.round(angka(p.menit, 10, 1, 120));
+      st.uji = {kode: crypto.randomBytes(6).toString('base64url'), mulai: now(), sampai: now() + menit * MENIT};
+      st.ujiPemain = {};
+      app.ctx.logAdmin_('mulai uji monster', menit + ' menit');
+      ubah(); memo.t = 0;
+      return {ok: true, uji: infoUji()};
     }
+    if (p.aksi === 'uji-stop') {
+      if (st.uji) { st.uji = null; app.ctx.logAdmin_('hentikan uji monster', ''); ubah(); }
+      return {ok: true, uji: null};
+    }
+    if (p.aksi === 'uji') return {ok: true, uji: infoUji()};
     if (p.aksi === 'lepas-perangkat') {
       const email = bersihEmail(p.email);
       const d = st.email[email];

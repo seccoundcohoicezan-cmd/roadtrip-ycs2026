@@ -123,13 +123,47 @@
     .spin-daftar summary { cursor: pointer; font-weight: 700; }
     .spin-lepas { margin-top: var(--space-4); }
     .spin-lepas div { display: flex; gap: .5rem; margin-top: .375rem; max-width: 30rem; }
-    #spin-card:fullscreen { overflow: auto; padding: 2rem; background: #5B0A16; }
-    #spin-card:fullscreen > :not(.spin-panggung) { display: none; }
-    #spin-card:fullscreen .spin-panggung { min-height: calc(100vh - 4rem); display: flex; flex-direction: column; justify-content: center; }
-    #spin-card:fullscreen .spin-reel { height: 8rem; max-width: 60rem; }
-    #spin-card:fullscreen .spin-isi span { height: 8rem; font-size: clamp(2rem, 5vw, 4rem); }
+    .spin-layout { display: grid; gap: var(--space-4); margin-top: var(--space-4); }
+    .spin-layout.is-atur { grid-template-columns: minmax(0, 1fr) minmax(20rem, 28rem); }
+    @media (max-width: 60rem) { .spin-layout.is-atur { grid-template-columns: 1fr; } }
+    .spin-panggung { margin-top: 0; }
+    .spin-atas { display: flex; justify-content: space-between; align-items: center; gap: .5rem; }
+    .spin-gear { border: 2px solid rgb(255 255 255 / .6); border-radius: 999px; background: rgb(0 0 0 / .18); color: #fff; padding: .375rem .875rem; font-weight: 700; cursor: pointer; }
+    .spin-gear:focus-visible { outline: 3px solid #FFD86B; }
+    .spin-latihan-tanda { display: inline-block; margin-top: .5rem; padding: .25rem .75rem; border-radius: 999px; background: #0B4F59; font-weight: 800; letter-spacing: .05em; font-size: .8125rem; }
+    .spin-roda-wrap { position: relative; width: min(100%, 22rem); margin: 1rem auto .25rem; }
+    .spin-roda-wrap canvas { display: block; width: 100%; height: auto; filter: drop-shadow(0 12px 24px rgb(0 0 0 / .35)); }
+    .spin-penunjuk { position: absolute; top: -6px; left: 50%; width: 0; height: 0; transform: translateX(-50%); border-left: 16px solid transparent; border-right: 16px solid transparent; border-top: 30px solid #FFFBF3; filter: drop-shadow(0 3px 3px rgb(0 0 0 / .35)); }
+    .spin-hadiah { min-height: 1.75rem; font-family: var(--font-brush, inherit); font-size: clamp(1.25rem, 3vw, 1.75rem); color: #FFE066; }
+    .spin-atur { padding: var(--space-4); border: 1px solid var(--line); border-radius: 1.25rem; background: var(--surface); color: var(--text); }
+    .spin-atur h3 { font-size: 1.125rem; }
+    .hadiah-tabel { width: 100%; min-width: 0; margin: .75rem 0; font-size: .875rem; table-layout: fixed; }
+    .hadiah-tabel th:nth-child(1) { width: auto; } .hadiah-tabel th:nth-child(2), .hadiah-tabel th:nth-child(3) { width: 4.25rem; } .hadiah-tabel th:nth-child(4) { width: 4.25rem; } .hadiah-tabel th:nth-child(5) { width: 2.25rem; }
+    .hadiah-tabel th { padding: .375rem .25rem; font-size: .75rem; }
+    .hadiah-tabel td { padding: .25rem; vertical-align: middle; }
+    .hadiah-tabel input, .hadiah-tabel .input { box-sizing: border-box; width: 100%; min-width: 0; max-width: 100%; min-height: 2.25rem; padding: .25rem .375rem; }
+    .hadiah-tabel td.h-persen { text-align: right; padding-right: .375rem; }
+    .hadiah-tabel .h-nama { width: 100%; min-width: 0; }
+    .hadiah-tabel .h-angka { width: 100%; text-align: center; }
+    .hadiah-tabel .icon-btn { width: 2rem; height: 2rem; }
+    .hadiah-tabel .h-persen { font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .peluang-tiket { margin: var(--space-3) 0; border: 0; padding: 0; display: grid; gap: .375rem; font-size: .875rem; }
+    .peluang-tiket legend { font-weight: 700; margin-bottom: .25rem; }
+    .uji-link { display: flex; gap: .5rem; flex-wrap: wrap; }
+    .uji-link .input { flex: 1; min-width: 14rem; }
+    #spin-card:fullscreen { overflow: auto; padding: 1.5rem; background: #5B0A16; }
+    #spin-card:fullscreen > :not(.spin-layout) { display: none; }
+    #spin-card:fullscreen .spin-layout { margin: 0; min-height: calc(100vh - 3rem); }
+    #spin-card:fullscreen .spin-panggung { display: flex; flex-direction: column; justify-content: center; }
+    #spin-card:fullscreen .spin-roda-wrap { width: min(54vh, 34rem); margin-top: .25rem; }
+    #spin-card:fullscreen .spin-reel { height: 5rem; max-width: 60rem; margin: .5rem auto; }
+    #spin-card:fullscreen .spin-isi span { height: 5rem; font-size: clamp(1.75rem, 4vw, 3rem); }
     #spin-card:fullscreen .spin-judul { font-size: 1.5rem; }
-    #spin-card:fullscreen .spin-detail { font-size: 1.75rem; }
+    #spin-card:fullscreen .spin-detail { font-size: 1.5rem; }
+    #spin-card:fullscreen .spin-hadiah { font-size: clamp(1.5rem, 3.5vw, 2.5rem); }
+    #spin-card:fullscreen .spin-panggung { padding: 1rem 1.5rem; }
+    #spin-card:fullscreen .spin-detail, #spin-card:fullscreen .spin-hadiah { margin: .25rem 0; }
+    #spin-card:fullscreen .spin-atur { max-height: calc(100vh - 3rem); overflow: auto; }
     .live-table { min-width: 64rem; }
     .preview { min-width: 32rem; }
     .preview td { white-space: nowrap; max-width: 14rem; overflow: hidden; text-overflow: ellipsis; }
@@ -209,6 +243,7 @@
           <button role="tab" id="t-pengaturan" aria-controls="p-pengaturan" aria-selected="false" tabindex="-1"><svg aria-hidden="true"><use href="#i-gear"/></svg>Pengaturan</button>
           <button role="tab" id="t-live" aria-controls="p-live" aria-selected="false" tabindex="-1"><svg aria-hidden="true"><use href="#i-play"/></svg>Jadwal Live</button>
           <button role="tab" id="t-monster" aria-controls="p-monster" aria-selected="false" tabindex="-1"><svg aria-hidden="true"><use href="#i-bolt"/></svg>Lawan Monster</button>
+          <button role="tab" id="t-spin" aria-controls="p-spin" aria-selected="false" tabindex="-1"><svg aria-hidden="true"><use href="#i-ticket"/></svg>Spin Undian</button>
           <button role="tab" id="t-data" aria-controls="p-data" aria-selected="false" tabindex="-1"><svg aria-hidden="true"><use href="#i-db"/></svg>Impor &amp; Ekspor</button>
           <button role="tab" id="t-keamanan" aria-controls="p-keamanan" aria-selected="false" tabindex="-1"><svg aria-hidden="true"><use href="#i-lock"/></svg>Keamanan</button>
         </div>
@@ -381,28 +416,61 @@
             </section>
             <div class="savebar"><p id="mon-set-status" role="status">Tidak ada perubahan.</p><button class="btn btn--cta btn--sm" type="submit" id="btn-simpan-mon">Simpan pengaturan monster</button></div>
           </form>
-          <section class="set-card spin-card" id="spin-card" aria-labelledby="g-spin">
-            <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-ticket"/></svg></span><div><h2 id="g-spin">Tiket &amp; spin undian</h2><p>Peserta yang berkontribusi mendapat 1 tiket per event (1 perangkat = 1 peserta). Putar saat live; pemenang dipilih acak oleh server dan dicatat di tab <strong>Tiket Monster</strong>.</p></div></header>
+          <section class="set-card" aria-labelledby="g-mon-uji">
+            <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-play"/></svg></span><div><h2 id="g-mon-uji">Mode uji monster</h2><p>Coba monster kapan saja tanpa terlihat pengunjung. Hanya HP yang membuka link uji yang melihat monster; tidak wajib isi festival, perangkat tidak diikat, tiket uji tidak masuk Sheet. Memakai pengaturan level di atas.</p></div></header>
+            <div class="set-grid">
+              <div class="field"><label for="uji-menit">Durasi uji (menit)</label><input class="input" type="number" min="1" max="120" step="1" id="uji-menit" value="10"></div>
+              <div class="mon-adm-aksi" style="align-self:end"><button class="btn btn--cta btn--sm" type="button" id="uji-mulai">Mulai uji</button><button class="btn btn--soft btn--sm mon-adm-stop" type="button" id="uji-stop">Hentikan uji</button></div>
+              <div class="field field--full"><span class="label">Link uji</span><div class="uji-link"><input class="input input--mono" id="uji-link" readonly placeholder="Tekan Mulai uji untuk membuat link"><button class="btn btn--soft btn--sm" type="button" id="uji-salin">Salin</button><a class="btn btn--soft btn--sm" id="uji-buka" target="_blank" rel="noopener">Buka</a></div><p class="field__hint" id="uji-status">Tidak ada uji berjalan.</p></div>
+            </div>
+          </section>
+          <section class="set-card" aria-labelledby="g-mon-perangkat">
+            <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-lock"/></svg></span><div><h2 id="g-mon-perangkat">Perangkat peserta</h2><p>1 perangkat = 1 peserta. Bila peserta ganti HP, lepas ikatan perangkat lamanya.</p></div></header>
+            <form class="spin-lepas" id="f-lepas"><label for="lepas-email">Email peserta</label><div><input class="input" type="email" id="lepas-email" placeholder="email peserta"><button class="btn btn--soft btn--sm" type="submit">Lepas ikatan</button></div><p class="field__hint" id="lepas-info">Setelah dilepas, peserta bisa ikut lagi dari perangkat baru.</p></form>
+          </section>
+        </section>
+        <!-- Spin undian -->
+        <section role="tabpanel" id="p-spin" aria-labelledby="t-spin" tabindex="0" hidden>
+          <div class="content__head"><div><h1>Spin Undian</h1><p class="muted small">Undi tiket Lawan Monster saat live. Atur hadiah &amp; peluang keluarnya, lalu putar di layar penuh.</p></div></div>
+          <section class="set-card spin-card" id="spin-card" aria-label="Spin undian">
             <div class="spin-alat">
               <div class="field"><label for="spin-event">Event</label><select class="select" id="spin-event"></select></div>
+              <label class="switch spin-latihan" for="spin-latihan"><span>Mode latihan<small>Hasil tidak dicatat, stok tidak berkurang.</small></span><input type="checkbox" id="spin-latihan"></label>
               <button class="btn btn--soft btn--sm" type="button" id="spin-segarkan">Segarkan</button>
-              <button class="btn btn--soft btn--sm" type="button" id="spin-layar">Layar penuh (untuk live)</button>
+              <button class="btn btn--cta btn--sm" type="button" id="spin-layar">Layar penuh (untuk live)</button>
             </div>
-            <div class="spin-panggung" id="spin-panggung">
-              <p class="spin-judul">Undian Pejuang Festival</p>
-              <div class="spin-reel" aria-live="polite"><div class="spin-isi" id="spin-isi"><span>Siap diputar</span></div></div>
-              <p class="spin-detail" id="spin-detail"></p>
-              <button class="btn btn--cta spin-tombol" type="button" id="spin-putar">Putar spin</button>
-              <p class="spin-info" id="spin-info"></p>
+            <div class="spin-layout" id="spin-layout">
+              <div class="spin-panggung" id="spin-panggung">
+                <div class="spin-atas"><p class="spin-judul">Undian Pejuang Festival</p><button class="spin-gear" type="button" id="spin-gear" aria-expanded="false" aria-controls="spin-atur">⚙ Atur hadiah &amp; peluang</button></div>
+                <p class="spin-latihan-tanda" id="spin-latihan-tanda" hidden>MODE LATIHAN · tidak dicatat</p>
+                <div class="spin-roda-wrap" id="spin-roda-wrap"><canvas id="spin-roda" width="560" height="560" aria-label="Roda hadiah"></canvas><span class="spin-penunjuk" aria-hidden="true"></span></div>
+                <div class="spin-reel" aria-live="polite"><div class="spin-isi" id="spin-isi"><span>Siap diputar</span></div></div>
+                <p class="spin-detail" id="spin-detail"></p>
+                <p class="spin-hadiah" id="spin-hadiah"></p>
+                <button class="btn btn--cta spin-tombol" type="button" id="spin-putar">Putar spin</button>
+                <p class="spin-info" id="spin-info"></p>
+              </div>
+              <aside class="spin-atur" id="spin-atur" hidden>
+                <h3>Hadiah &amp; peluang keluar</h3>
+                <p class="field__hint">Bobot menentukan peluang: hadiah berbobot 3 keluar 3× lebih sering daripada berbobot 1. Stok kosong = tanpa batas; hadiah yang stoknya habis tidak ikut diundi.</p>
+                <div class="table-wrap"><table class="hadiah-tabel"><thead><tr><th scope="col">Hadiah</th><th scope="col">Stok</th><th scope="col">Bobot</th><th scope="col">Peluang</th><th scope="col"><span class="visually-hidden">Hapus</span></th></tr></thead><tbody id="hadiah-body"></tbody></table></div>
+                <button class="btn btn--soft btn--sm" type="button" id="hadiah-tambah">+ Tambah hadiah</button>
+                <fieldset class="peluang-tiket"><legend>Peluang tiket menang</legend>
+                  <label><input type="radio" name="peluang" value="rata" checked> Sama rata (tiap tiket peluangnya sama)</label>
+                  <label><input type="radio" name="peluang" value="kontribusi"> Sebanding kontribusi (makin banyak tenaga, makin besar peluang)</label>
+                </fieldset>
+                <div class="mon-adm-aksi"><button class="btn btn--cta btn--sm" type="button" id="hadiah-simpan">Simpan hadiah</button></div>
+                <p class="field__hint" id="hadiah-status"></p>
+              </aside>
             </div>
             <ol class="spin-menang" id="spin-menang"></ol>
             <details class="spin-daftar"><summary id="spin-ringkas">Daftar tiket</summary>
               <input class="input" id="spin-cari" placeholder="Cari nama, sekolah, atau nomor tiket" style="margin:.75rem 0">
               <div class="table-wrap"><table class="mon-adm-tabel"><thead><tr><th scope="col">Tiket</th><th scope="col">Nama</th><th scope="col">Sekolah</th><th scope="col">Provinsi</th><th scope="col">Tenaga</th><th scope="col">Status</th><th scope="col">Catatan</th></tr></thead><tbody id="spin-tabel"></tbody></table></div>
             </details>
-            <form class="spin-lepas" id="f-lepas"><label for="lepas-email">Peserta ganti HP? Lepas ikatan perangkat</label><div><input class="input" type="email" id="lepas-email" placeholder="email peserta"><button class="btn btn--soft btn--sm" type="submit">Lepas</button></div><p class="field__hint" id="lepas-info">Setelah dilepas, peserta bisa ikut lagi dari perangkat baru.</p></form>
           </section>
         </section>
+
         <!-- Data -->
         <section role="tabpanel" id="p-data" aria-labelledby="t-data" tabindex="0" hidden>
           <div class="content__head"><div><h1>Impor &amp; Ekspor</h1><p class="muted small">CSV dari Excel/Google Sheets (pemisah koma atau titik koma).</p></div></div>
@@ -552,7 +620,8 @@
     function pilih(tab, focus) {
       tabs.forEach((t) => { const on = t === tab; t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1; $('#' + t.getAttribute('aria-controls')).hidden = !on; });
       if (focus) tab.focus();
-      if (tab.id === 't-monster' && typeof statusMon === 'function') { statusMon(); muatTiket(); }
+      if (tab.id === 't-monster' && typeof statusMon === 'function') { statusMon(); muatUji(); }
+      if (tab.id === 't-spin') { muatTiket(); muatHadiah(); }
       if (tab.id === 't-keamanan') statusPrimer();
     }
     tabs.forEach((t, i) => {
@@ -742,15 +811,112 @@
       } catch (e) { $('#mon-status-sub').textContent = 'Gagal memuat status.'; }
       monTimer = setTimeout(statusMon, 3000);
     }
-    /* ---------- Tiket & spin undian ---------- */
-    let spinData = null, berputar = false;
+    /* ---------- Tiket & spin undian (tab Spin Undian) ---------- */
+    let spinData = null, berputar = false, hadiahEdit = [], rodaSudut = 0;
+    const WARNA = ['#FF8A3D', '#0E5A66', '#FFC93C', '#D7263D', '#2BA84A', '#7B2CBF', '#00A6ED', '#F25F5C', '#8D6E63', '#3D5A80'];
     const monAdmin = (data) => api('admin-primer', {perintah: 'monster', data});
     async function muatTiket(event) {
       const d = await monAdmin({aksi: 'tiket', event: event || $('#spin-event').value || ''});
       if (!d.ok) { $('#spin-info').textContent = pesan(d); return; }
       spinData = d;
-      $('#spin-event').innerHTML = d.events.length ? d.events.map((e) => `<option value="${esc(e.id)}"${e.id === d.event ? ' selected' : ''}>${esc(e.id)} · ${nf.format(e.tiket)} tiket${e.kalah ? ' · menang' : ''}</option>`).join('') : '<option value="">Belum ada event</option>';
+      $('#spin-event').innerHTML = d.events.length ? d.events.map((e) => `<option value="${esc(e.id)}"${e.id === d.event ? ' selected' : ''}>${e.uji ? 'UJI · ' : ''}${esc(e.id)} · ${nf.format(e.tiket)} tiket${e.kalah ? ' · menang' : ''}</option>`).join('') : '<option value="">Belum ada event</option>';
       renderTiket();
+    }
+    async function muatHadiah() {
+      const d = await monAdmin({aksi: 'spin-info'});
+      if (!d.ok) return;
+      hadiahEdit = d.hadiah.map((h) => ({id: h.id, nama: h.nama, stok: h.stok == null ? '' : String(h.stok), bobot: String(h.bobot), terpakai: h.terpakai}));
+      $$('input[name="peluang"]').forEach((r) => { r.checked = r.value === d.peluang; });
+      renderHadiah(); gambarRoda(d.roda);
+    }
+    // Daftar hadiah yang ikut diundi menurut isian form (untuk pratinjau persen & roda).
+    const rodaDariEdit = () => {
+      const ikut = hadiahEdit.filter((h) => h.nama.trim() && Number(h.bobot) > 0 && (h.stok === '' || Number(h.stok) > (h.terpakai || 0)));
+      const total = ikut.reduce((t, h) => t + Number(h.bobot), 0);
+      return ikut.map((h) => ({id: h.id, nama: h.nama.trim(), bobot: Number(h.bobot), persen: total ? Math.round(Number(h.bobot) / total * 1000) / 10 : 0}));
+    };
+    function renderHadiah() {
+      const roda = rodaDariEdit();
+      $('#hadiah-body').innerHTML = hadiahEdit.map((h, i) => {
+        const r = roda.find((x) => x.id === h.id && x.nama === h.nama.trim());
+        const sisa = h.stok === '' ? '' : ` title="Terpakai ${h.terpakai || 0}"`;
+        return `<tr data-i="${i}"><td><input class="input h-nama" aria-label="Nama hadiah" data-f="nama" value="${esc(h.nama)}" maxlength="60" placeholder="mis. Voucher 100rb"></td>
+          <td><input class="input h-angka" aria-label="Stok" data-f="stok" value="${esc(h.stok)}" inputmode="numeric" placeholder="∞"${sisa}></td>
+          <td><input class="input h-angka" aria-label="Bobot peluang" data-f="bobot" value="${esc(h.bobot)}" inputmode="decimal"></td>
+          <td class="h-persen">${r ? String(r.persen).replace('.', ',') + '%' : (h.stok !== '' && Number(h.stok) <= (h.terpakai || 0) ? 'habis' : '0%')}</td>
+          <td><button class="icon-btn" type="button" data-hapus="${i}" aria-label="Hapus hadiah">✕</button></td></tr>`;
+      }).join('') || '<tr><td colspan="5" class="muted small">Belum ada hadiah. Tanpa hadiah, spin hanya memilih pemenang.</td></tr>';
+    }
+    $('#hadiah-body').addEventListener('input', (e) => {
+      const tr = e.target.closest('tr[data-i]'); if (!tr) return;
+      hadiahEdit[+tr.dataset.i][e.target.dataset.f] = e.target.value;
+      const roda = rodaDariEdit();
+      $$('#hadiah-body tr[data-i]').forEach((row) => { const h = hadiahEdit[+row.dataset.i]; const r = roda.find((x) => x.id === h.id && x.nama === h.nama.trim()); row.querySelector('.h-persen').textContent = r ? String(r.persen).replace('.', ',') + '%' : '0%'; });
+      gambarRoda(roda);
+      $('#hadiah-status').textContent = 'Ada perubahan yang belum disimpan.';
+    });
+    $('#hadiah-body').addEventListener('click', (e) => { const b = e.target.closest('[data-hapus]'); if (!b) return; hadiahEdit.splice(+b.dataset.hapus, 1); renderHadiah(); gambarRoda(rodaDariEdit()); $('#hadiah-status').textContent = 'Ada perubahan yang belum disimpan.'; });
+    $('#hadiah-tambah').addEventListener('click', () => { hadiahEdit.push({id: 'h' + Math.random().toString(36).slice(2, 9), nama: '', stok: '', bobot: '1', terpakai: 0}); renderHadiah(); const n = $$('#hadiah-body .h-nama'); n[n.length - 1].focus(); });
+    $('#hadiah-simpan').addEventListener('click', async (e) => {
+      const btn = e.currentTarget;
+      sibuk(btn, true);
+      const peluang = ($$('input[name="peluang"]').find((r) => r.checked) || {}).value || 'rata';
+      const d = await monAdmin({aksi: 'spin-atur', hadiah: hadiahEdit.map((h) => ({id: h.id, nama: h.nama, stok: h.stok, bobot: h.bobot})), peluang});
+      sibuk(btn, false);
+      if (!d.ok) { $('#hadiah-status').textContent = d.error === 'nilai_tidak_valid' ? 'Stok/bobot tidak valid pada "' + d.hadiah + '".' : pesan(d); return; }
+      $('#hadiah-status').textContent = 'Tersimpan.';
+      hadiahEdit = d.hadiah.map((h) => ({id: h.id, nama: h.nama, stok: h.stok == null ? '' : String(h.stok), bobot: String(h.bobot), terpakai: h.terpakai}));
+      renderHadiah(); gambarRoda(d.roda);
+    });
+    $$('input[name="peluang"]').forEach((r) => r.addEventListener('change', () => { $('#hadiah-status').textContent = 'Ada perubahan yang belum disimpan.'; }));
+    $('#spin-gear').addEventListener('click', () => {
+      const buka = $('#spin-atur').hidden;
+      $('#spin-atur').hidden = !buka; $('#spin-layout').classList.toggle('is-atur', buka); $('#spin-gear').setAttribute('aria-expanded', String(buka));
+    });
+    // Roda hadiah: juring sebanding peluang. sudut = rotasi roda (rad); penunjuk di atas.
+    let rodaTampil = [];
+    function gambarRoda(roda, sudut = rodaSudut) {
+      rodaTampil = roda || [];
+      const c = $('#spin-roda'), x = c.getContext('2d'), R = c.width / 2;
+      $('#spin-roda-wrap').hidden = !rodaTampil.length;
+      x.clearRect(0, 0, c.width, c.height);
+      if (!rodaTampil.length) return;
+      const total = rodaTampil.reduce((t, h) => t + h.bobot, 0);
+      let a = sudut - Math.PI / 2;
+      rodaTampil.forEach((h, i) => {
+        const besar = h.bobot / total * Math.PI * 2;
+        x.beginPath(); x.moveTo(R, R); x.arc(R, R, R - 8, a, a + besar); x.closePath();
+        x.fillStyle = WARNA[i % WARNA.length]; x.fill();
+        x.strokeStyle = '#FFFBF3'; x.lineWidth = 4; x.stroke();
+        x.save(); x.translate(R, R); x.rotate(a + besar / 2);
+        x.fillStyle = '#fff'; x.font = '800 ' + Math.max(14, Math.min(26, 300 / Math.max(6, h.nama.length))) + 'px Poppins, system-ui, sans-serif';
+        x.textAlign = 'right'; x.textBaseline = 'middle'; x.shadowColor = 'rgba(0,0,0,.45)'; x.shadowBlur = 4;
+        if (besar > 0.12) x.fillText(h.nama.length > 22 ? h.nama.slice(0, 21) + '…' : h.nama, R - 26, 0);
+        x.font = '700 14px Poppins, system-ui, sans-serif'; if (besar > 0.2) x.fillText(String(h.persen).replace('.', ',') + '%', R - 26, 22);
+        x.restore();
+        a += besar;
+      });
+      x.beginPath(); x.arc(R, R, 34, 0, Math.PI * 2); x.fillStyle = '#FFFBF3'; x.fill();
+      x.fillStyle = '#5B0A16'; x.font = '800 18px Poppins, system-ui, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('YCS', R, R);
+    }
+    // Putar roda sampai tengah juring hadiah pemenang berada di bawah penunjuk.
+    function putarRoda(roda, idHadiah, ms) {
+      return new Promise((selesai) => {
+        if (!roda.length || !idHadiah) { selesai(); return; }
+        const total = roda.reduce((t, h) => t + h.bobot, 0);
+        let awal = 0;
+        for (const h of roda) { const b = h.bobot / total * Math.PI * 2; if (h.id === idHadiah) { awal += b / 2 + (Math.random() - 0.5) * b * 0.6; break; } awal += b; }
+        const dari = rodaSudut, normal = ((dari % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+        const ke = dari - normal + Math.PI * 2 * 6 + (Math.PI * 2 - awal);
+        const t0 = performance.now();
+        const langkah = (t) => {
+          const k = Math.min(1, (t - t0) / ms), e = 1 - Math.pow(1 - k, 4);
+          rodaSudut = dari + (ke - dari) * e;
+          gambarRoda(roda, rodaSudut);
+          if (k < 1) requestAnimationFrame(langkah); else selesai();
+        };
+        requestAnimationFrame(langkah);
+      });
     }
     function renderTiket() {
       const t = spinData ? spinData.tiket : [];
@@ -762,33 +928,61 @@
       $('#spin-tabel').innerHTML = t.filter((x) => !q || [x.nomor, x.nama, x.sekolah, x.provinsi].join(' ').toLowerCase().includes(q)).slice(0, 500)
         .map((x) => `<tr><td>${esc(x.nomor)}</td><td>${esc(x.nama)}</td><td>${esc(x.sekolah)}</td><td>${esc(x.provinsi)}</td><td>${nf.format(Number(x.kontribusi) || 0)}</td><td>${esc(x.status)}</td><td>${esc(x.catatan || '')}</td></tr>`).join('');
       $('#spin-menang').innerHTML = t.filter((x) => /^MENANG/.test(x.status)).sort((a, b) => a.status.localeCompare(b.status, 'id', {numeric: true}))
-        .map((x) => `<li><strong>${esc(x.nama)}</strong> (${esc(x.sekolah)}, ${esc(x.provinsi)}) · tiket ${esc(x.nomor)} · ${esc(x.status.replace(/^MENANG #\d+ /, ''))}</li>`).join('');
+        .map((x) => `<li><strong>${esc(x.nama)}</strong> (${esc(x.sekolah)}, ${esc(x.provinsi)}) · tiket ${esc(x.nomor)} · ${esc(x.status.replace(/^MENANG #\d+ · /, ''))}</li>`).join('');
     }
     $('#spin-cari').addEventListener('input', renderTiket);
     $('#spin-event').addEventListener('change', () => muatTiket($('#spin-event').value));
-    $('#spin-segarkan').addEventListener('click', () => muatTiket());
+    $('#spin-segarkan').addEventListener('click', () => { muatTiket(); muatHadiah(); });
+    $('#spin-latihan').addEventListener('change', () => { $('#spin-latihan-tanda').hidden = !$('#spin-latihan').checked; });
     $('#spin-layar').addEventListener('click', () => { const c = $('#spin-card'); if (document.fullscreenElement) document.exitFullscreen(); else if (c.requestFullscreen) c.requestFullscreen(); });
     $('#spin-putar').addEventListener('click', async () => {
       if (berputar) return;
-      berputar = true; $('#spin-putar').disabled = true; $('#spin-detail').textContent = '';
+      berputar = true; $('#spin-putar').disabled = true; $('#spin-detail').textContent = ''; $('#spin-hadiah').textContent = '';
       const nama = (spinData ? spinData.tiket.filter((x) => x.status === 'aktif').map((x) => x.nama) : []).sort(() => Math.random() - 0.5);
       const isi = $('#spin-isi');
       let i = 0, jeda = 50, putar = true;
       const gulir = () => { if (!putar) return; isi.innerHTML = `<span>${esc(nama[i++ % Math.max(1, nama.length)] || '…')}</span>`; setTimeout(gulir, jeda); };
       gulir();
-      const d = await monAdmin({aksi: 'spin', event: $('#spin-event').value});
-      if (!d.ok) { putar = false; berputar = false; isi.innerHTML = '<span>Gagal</span>'; $('#spin-info').textContent = pesan(d); renderTiket(); return; }
-      // perlambat bertahap lalu berhenti di pemenang (dipilih server sebelum animasi selesai)
-      const akhir = Date.now() + 3200;
-      const melambat = () => { jeda = Math.min(420, jeda * 1.18); if (Date.now() < akhir) setTimeout(melambat, 180); else { putar = false; tampilMenang(d); } };
+      const d = await monAdmin({aksi: 'spin', event: $('#spin-event').value, latihan: $('#spin-latihan').checked});
+      if (!d.ok) { putar = false; berputar = false; isi.innerHTML = '<span>Gagal</span>'; $('#spin-info').textContent = d.error === 'hadiah_habis' ? 'Semua hadiah sudah habis. Tambah stok di Atur hadiah.' : pesan(d); renderTiket(); return; }
+      // Pemenang & hadiah dipilih server; animasi roda dan nama berhenti tepat di hasil itu.
+      const lama = 4800, akhir = Date.now() + lama;
+      const melambat = () => { jeda = Math.min(420, jeda * 1.12); if (Date.now() < akhir - 300) setTimeout(melambat, 200); };
       melambat();
-    });
-    function tampilMenang(d) {
-      $('#spin-isi').innerHTML = `<span>🎉 ${esc(d.pemenang.nama)}</span>`;
+      await Promise.all([putarRoda(d.rodaPutar || [], d.hadiah && d.hadiah.id, lama), new Promise((r) => setTimeout(r, lama))]);
+      putar = false;
+      isi.innerHTML = `<span>🎉 ${esc(d.pemenang.nama)}</span>`;
       $('#spin-detail').textContent = `${d.pemenang.sekolah} · ${d.pemenang.provinsi} · tiket ${d.pemenang.nomor}`;
+      $('#spin-hadiah').textContent = d.hadiah ? 'Hadiah: ' + d.hadiah.nama : '';
+      $('#spin-info').textContent = d.latihan ? 'Latihan: hasil tidak dicatat.' : `Pemenang ke-${d.ke} tercatat di tab Tiket Monster.`;
       berputar = false;
-      muatTiket(d.event);
+      gambarRoda(d.roda, rodaSudut);
+      if (!d.latihan) { muatTiket(d.event); muatHadiah(); } else $('#spin-putar').disabled = false;
+    });
+
+    /* ---------- Mode uji monster ---------- */
+    let ujiTimer = 0;
+    function tampilUji(u) {
+      clearInterval(ujiTimer);
+      if (!u) { $('#uji-link').value = ''; $('#uji-buka').removeAttribute('href'); $('#uji-status').textContent = 'Tidak ada uji berjalan.'; return; }
+      const link = location.origin + '/?uji-monster=' + encodeURIComponent(u.kode) + '#satu-kata';
+      $('#uji-link').value = link; $('#uji-buka').href = link;
+      const tulis = () => {
+        const sisa = Date.parse(u.sampai) - Date.now();
+        $('#uji-status').textContent = sisa > 0 ? `Uji berjalan, sisa ${Math.floor(sisa / 60000)}:${String(Math.floor(sisa / 1000) % 60).padStart(2, '0')}. ${nf.format(u.tiket)} tiket uji, tenaga ${nf.format(u.total)}${u.kalah ? ', monster sudah kalah' : ''}. Tiket uji bisa dicoba di tab Spin Undian (event "UJI").` : 'Waktu uji habis (hasil masih tampil 15 menit). Tekan Mulai uji untuk uji baru.';
+      };
+      tulis(); ujiTimer = setInterval(tulis, 1000);
     }
+    async function muatUji() { const d = await monAdmin({aksi: 'uji'}); if (d.ok) tampilUji(d.uji); }
+    $('#uji-mulai').addEventListener('click', async (e) => {
+      const btn = e.currentTarget; sibuk(btn, true);
+      const d = await monAdmin({aksi: 'uji-mulai', menit: $('#uji-menit').value});
+      sibuk(btn, false);
+      if (!d.ok) { toast(pesan(d)); return; }
+      tampilUji(d.uji); toast('Uji monster dimulai. Buka link uji di HP.');
+    });
+    $('#uji-stop').addEventListener('click', async () => { const d = await monAdmin({aksi: 'uji-stop'}); if (d.ok) { tampilUji(null); toast('Uji dihentikan.'); } });
+    $('#uji-salin').addEventListener('click', async () => { if (!$('#uji-link').value) return; try { await navigator.clipboard.writeText($('#uji-link').value); toast('Link uji disalin.'); } catch (e) { $('#uji-link').select(); } });
     $('#f-lepas').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = $('#lepas-email').value.trim();

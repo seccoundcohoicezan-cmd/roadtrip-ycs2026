@@ -142,3 +142,62 @@ test('server data: impor dari Sheet, tulis lewat /exec, diteruskan ke Sheet (app
   srv.close();
   fs.rmSync(dir, {recursive: true, force: true});
 });
+
+test('mode uji: event terpisah lewat kode, tanpa ikatan perangkat, tiket tidak masuk Sheet', () => {
+  const {jam, app, m} = siapkanMonster();
+  app.sheets.Pengaturan.rows.find((x) => x[0] === 'monster_aktif')[1] = 'TIDAK';
+  app.cache.remove('cfg'); m.segarkan();
+  const token = app.post({aksi: 'admin-login', sandi: app.sheets.Admin.rows[1][1]}).token;
+  assert.equal(m.lihat().fase, 'mati', 'pengunjung biasa tidak melihat monster');
+  const u = m.admin({token, aksi: 'uji-mulai', menit: 5}).uji;
+  assert.equal(m.lihat().fase, 'mati', 'uji tidak terlihat tanpa kode');
+  assert.equal(m.lihat('salah').ujiSalah, true);
+  const s = m.lihat(u.kode);
+  assert.equal(s.fase, 'tanding'); assert.equal(s.uji, true); assert.ok(s.id.startsWith('u'));
+  const a = m.masuk({perangkat: 'dev-uji-aaaaaaaaaaaa', email: '', uji: u.kode}, '1.1.1.1');
+  assert.equal(a.ok, true, 'tanpa email festival pun boleh');
+  assert.equal(Object.keys(m.state.perangkat).length, 0, 'perangkat tidak diikat');
+  const r = m.tap({token: a.token, n: 10, seq: 1, e: s.id, uji: u.kode});
+  assert.equal(r.terima, 10); assert.equal(r.tiket, '#0001');
+  assert.equal(m.tap({token: a.token, n: 10, seq: 2, e: s.id}).buang, true, 'tanpa kode uji tidak masuk event uji');
+  assert.equal((app.sheets['Tiket Monster'] || {rows: [0]}).rows.length, 1, 'tiket uji tidak ditulis ke Sheet');
+  const t = m.admin({token, aksi: 'tiket', event: s.id});
+  assert.equal(t.tiket.length, 1); assert.equal(t.tiket[0].catatan, 'UJI');
+  assert.equal(m.admin({token, aksi: 'spin', event: s.id}).ok, true, 'tiket uji bisa dicoba di-spin');
+  m.admin({token, aksi: 'uji-stop'});
+  assert.equal(m.masuk({perangkat: 'dev-uji-aaaaaaaaaaaa', uji: u.kode}, '1.1.1.1').error, 'uji_berakhir');
+  jam.now += 1;
+});
+
+test('spin: hadiah berbobot, stok habis tidak ikut, latihan tidak dicatat, peluang sebanding kontribusi', () => {
+  const {jam, app, m} = siapkanMonster('100000');
+  const id = m.lihat().id;
+  const token = app.post({aksi: 'admin-login', sandi: app.sheets.Admin.rows[1][1]}).token;
+  ['ani', 'budi', 'cici'].forEach((n, i) => {
+    const tk = m.masuk({perangkat: 'dev-' + n.padEnd(16, 'x'), email: n + '@mail.com'}, '9.9.9.' + i).token;
+    m.tap({token: tk, n: i === 0 ? 30 : 1, seq: 1, e: id});
+  });
+  assert.equal(m.admin({token, aksi: 'spin-atur', hadiah: [{nama: 'Voucher', stok: 'x', bobot: 1}]}).error, 'nilai_tidak_valid');
+  const atur = m.admin({token, aksi: 'spin-atur', hadiah: [{nama: 'Voucher 100rb', stok: 1, bobot: 1}, {nama: 'Merchandise', stok: '', bobot: 3}], peluang: 'rata'});
+  assert.deepEqual(atur.roda.map((h) => h.persen), [25, 75]);
+  assert.equal(app.sheets['Hadiah Spin'].rows[1][0], 'Voucher 100rb', 'pengaturan hadiah dicadangkan ke Sheet');
+  const lat = m.admin({token, aksi: 'spin', event: id, latihan: true});
+  assert.equal(lat.ok, true); assert.equal(lat.latihan, true);
+  assert.equal(app.sheets['Tiket Monster'].rows.filter((r) => /^MENANG/.test(r[9])).length, 0, 'latihan tidak mencatat pemenang');
+  const s1 = m.admin({token, aksi: 'spin', event: id});
+  assert.ok(s1.hadiah); assert.match(app.sheets['Tiket Monster'].rows.find((r) => r[2] === s1.pemenang.nomor)[9], /^MENANG #1 · /);
+  // paksa Voucher habis lalu pastikan hanya Merchandise yang keluar
+  m.state.spin.hadiah[0].terpakai = 1;
+  const s2 = m.admin({token, aksi: 'spin', event: id});
+  assert.equal(s2.hadiah.nama, 'Merchandise'); assert.deepEqual(s2.rodaPutar.map((h) => h.nama), ['Merchandise']);
+  m.state.spin.hadiah = [{id: 'h1', nama: 'A', stok: 0, bobot: 1, terpakai: 0}];
+  assert.equal(m.admin({token, aksi: 'spin', event: id}).error, 'hadiah_habis');
+  // sebaran: bobot 1:3 → ±25%:75% (latihan, 4000 putaran)
+  m.admin({token, aksi: 'spin-atur', hadiah: [{nama: 'A', bobot: 1}, {nama: 'B', bobot: 3}], peluang: 'kontribusi'});
+  app.sheets['Tiket Monster'].rows.forEach((r, i) => { if (i) r[9] = 'aktif'; });
+  let b = 0, ani = 0;
+  for (let i = 0; i < 4000; i++) { const x = m.admin({token, aksi: 'spin', event: id, latihan: true}); if (x.hadiah.nama === 'B') b++; if (x.pemenang.nama === 'Ani Lestari') ani++; }
+  assert.ok(b / 4000 > 0.71 && b / 4000 < 0.79, 'hadiah B ±75%: ' + b / 4000);
+  assert.ok(ani / 4000 > 0.85, 'peluang sebanding kontribusi (Ani 30 vs 1 vs 1): ' + ani / 4000);
+  jam.now += 1;
+});
