@@ -4,7 +4,7 @@ const HEADERS_LAMA = ['Waktu', 'ID permintaan', 'Nama', 'Sekolah', 'Email', 'Bin
 const HEADERS = HEADERS_LAMA.concat(['Kota/Kabupaten', 'Provinsi']);
 const REKAP_NAME = 'Rekap';
 const REKAP_VERSI = '3';
-const SKEMA_VERSI = '6';
+const SKEMA_VERSI = '7';
 const MAKS_KARAKTER = 40; // jumlah karakter adat di assets/js/festival.js (saat ini 24, cadangan untuk tambahan)
 const WIB = 7 * 3600 * 1000;
 
@@ -54,10 +54,29 @@ const PENGATURAN = [
   ['waktu_acara_mulai', '2026-12-23 08:00', 'Mulai acara utama (keberangkatan ke Bali). Setelah pengumuman, countdown beranda menghitung ke waktu ini.'],
   ['waktu_acara_selesai', '2027-01-02 23:59', 'Akhir acara utama. Selama acara berlangsung, countdown menghitung ke waktu ini.'],
   ['link_saluran', 'https://whatsapp.com/channel/0029Vb5vVIaId7nEqecJ1I1G', 'Saluran WhatsApp yang harus diikuti untuk membuka hasil Satu Kata.'],
-  ['kata_blokir', '', 'Kata tambahan yang ditolak di Satu Kata (pisahkan dengan koma). Sembunyikan kata yang sudah masuk lewat kolom Tampil = TIDAK di tab Satu Kata.']
+  ['kata_blokir', '', 'Kata tambahan yang ditolak di Satu Kata (pisahkan dengan koma). Sembunyikan kata yang sudah masuk lewat kolom Tampil = TIDAK di tab Satu Kata.'],
+  ['monster_aktif', 'TIDAK', 'Lawan Monster: YA = event monster dijalankan sesuai pemicu. Butuh Upstash Redis terhubung di Vercel.'],
+  ['monster_pemicu', 'sebelum_live', 'sebelum_live = otomatis N menit sebelum setiap jadwal di tab Jadwal Live; jadwal = pada monster_waktu; manual = hanya lewat tombol Mulai sekarang.'],
+  ['monster_menit_sebelum', '20', 'Pemicu sebelum_live: monster muncul sekian menit sebelum live dimulai.'],
+  ['monster_waktu', '', 'Pemicu jadwal: waktu monster muncul (WIB).'],
+  ['monster_durasi', '20', 'Lama event (menit) untuk pemicu jadwal & tombol Mulai sekarang. Pemicu sebelum_live berakhir saat live dimulai.'],
+  ['monster_darurat', 'NORMAL', 'NORMAL = ikuti pemicu; MULAI = mulai sekarang (event baru); STOP = hentikan segera.'],
+  ['monster_mulai_manual', '', 'Diisi otomatis saat tombol Mulai sekarang ditekan (milidetik jam server). Jangan diubah.'],
+  ['monster_target', '5000,15000,40000', 'Target tenaga per level, dipisah koma. Jumlah angka = jumlah level. Kosongkan untuk memakai rumus.'],
+  ['monster_level', '3', 'Rumus (bila monster_target kosong): jumlah level.'],
+  ['monster_target_dasar', '5000', 'Rumus: target level 1.'],
+  ['monster_target_kali', '2.8', 'Rumus: target level L = dasar x kali^(L-1).'],
+  ['monster_poin', '', 'Poin per tap per level, dipisah koma. Kosong = nomor level (L1 = 1, L2 = 2, ...).'],
+  ['monster_skala_naik', '0.3', 'Ukuran monster = 1 + naik x (level-1), maksimal 2,5x.'],
+  ['monster_interval_ms', '1000', 'Jeda kirim batch tap (ms, 500-5000). Otomatis diperlambat saat pemain sangat banyak.'],
+  ['monster_batas_tap', '10', 'Batas tap per detik per pemain yang dihitung server (anti-bot).'],
+  ['monster_nama', 'Raja Batu', 'Nama monster yang tampil di layar.'],
+  ['monster_wujud', 'raja_batu', 'raja_batu = ilustrasi Raja Batu dari panitia; lucu = monster kartun gambar kode (lebih ramah anak).']
 ];
-const KUNCI_YA_TIDAK = ['pakai_link_cadangan', 'klaim_aktif', 'survei_aktif', 'dana_aktif', 'dana_tampilkan_sisa', 'popup_aktif'];
-const KUNCI_WAKTU = ['waktu_pengumuman', 'klaim_berlaku_hingga', 'survei_buka', 'waktu_acara_mulai', 'waktu_acara_selesai'];
+const MONSTER_PILIHAN = {monster_pemicu: ['sebelum_live', 'jadwal', 'manual'], monster_darurat: ['NORMAL', 'MULAI', 'STOP'], monster_wujud: ['raja_batu', 'lucu']};
+const MONSTER_ANGKA = {monster_menit_sebelum: [1, 180], monster_durasi: [1, 180], monster_level: [1, 10], monster_target_dasar: [10, 1e9], monster_interval_ms: [500, 5000], monster_batas_tap: [3, 30]};
+const KUNCI_YA_TIDAK = ['pakai_link_cadangan', 'klaim_aktif', 'survei_aktif', 'dana_aktif', 'dana_tampilkan_sisa', 'popup_aktif', 'monster_aktif'];
+const KUNCI_WAKTU = ['waktu_pengumuman', 'klaim_berlaku_hingga', 'survei_buka', 'waktu_acara_mulai', 'waktu_acara_selesai', 'monster_waktu'];
 const KUNCI_ANGKA = ['road_target', 'road_tambahan', 'dana_kuota'];
 const LIVE_AWAL = [
   ['Kenalan dengan YCS & YCS Squad', 'Instagram', '2026-10-22 19:00', '2026-10-22 20:00', 'https://www.instagram.com/universitasstekom', '', 'YA'],
@@ -339,9 +358,32 @@ function konfigPublik_() {
     event: {nama: cfg.nama_event || '', link: cfg.link_event || ''},
     saluran: cfg.link_saluran || '',
     acara: {mulai: isNaN(waktu_(cfg.waktu_acara_mulai)) ? null : isoWib_(waktu_(cfg.waktu_acara_mulai)), selesai: isNaN(waktu_(cfg.waktu_acara_selesai)) ? null : isoWib_(waktu_(cfg.waktu_acara_selesai))},
+    monster: monsterPublik_(cfg),
     popup: ya_(cfg.popup_aktif) && cfg.popup_judul ? {aktif: true, judul: cfg.popup_judul, teks: cfg.popup_teks || '', gambar: cfg.popup_gambar || '', tombol: cfg.popup_tombol || '', link: cfg.popup_link || ''} : {aktif: false}
   };
 }
+// Pengaturan mentah Lawan Monster; aturan level & jadwal dihitung di api/_monster.js (jam server Vercel).
+function monsterPublik_(cfg) {
+  const t = waktu_(cfg.monster_waktu);
+  return {
+    aktif: ya_(cfg.monster_aktif), pemicu: cfg.monster_pemicu || 'sebelum_live', menit: cfg.monster_menit_sebelum, waktu: isNaN(t) ? null : isoWib_(t),
+    durasi: cfg.monster_durasi, darurat: cfg.monster_darurat || 'NORMAL', mulaiManual: Number(cfg.monster_mulai_manual) || null,
+    target: cfg.monster_target, level: cfg.monster_level, targetDasar: cfg.monster_target_dasar, targetKali: cfg.monster_target_kali,
+    poin: cfg.monster_poin, skalaNaik: cfg.monster_skala_naik, interval: cfg.monster_interval_ms, batasTap: cfg.monster_batas_tap,
+    nama: cfg.monster_nama || 'Raja Batu', wujud: cfg.monster_wujud || 'raja_batu'
+  };
+}
+// Validasi satu nilai monster_*; hasil null = tidak valid.
+function nilaiMonster_(k, v) {
+  if (MONSTER_PILIHAN[k]) { const u = k === 'monster_darurat' ? v.toUpperCase() : v.toLowerCase(); return MONSTER_PILIHAN[k].indexOf(u) >= 0 ? u : null; }
+  if (MONSTER_ANGKA[k]) { const n = Number(v); return /^\d{1,10}$/.test(v) && n >= MONSTER_ANGKA[k][0] && n <= MONSTER_ANGKA[k][1] ? v : null; }
+  if (k === 'monster_target' || k === 'monster_poin') { const d = v.split(/[,;\s]+/).filter(String); return d.length <= 10 && d.every(x => /^\d{1,9}$/.test(x) && Number(x) > 0) ? d.join(',') : null; }
+  if (k === 'monster_target_kali' || k === 'monster_skala_naik') { const n = Number(v.replace(',', '.')); return isFinite(n) && n >= 0 && n <= 20 && v !== '' ? String(n) : null; }
+  if (k === 'monster_mulai_manual') return /^\d{0,15}$/.test(v) ? v : null;
+  if (k === 'monster_nama') return teks_(v, 40) || 'Raja Batu';
+  return v;
+}
+
 // Dukungan = twibbon lama + Satu Kata + klaim Dana Kaget. Leaderboard per provinsi dari ketiganya.
 function statistik_() {
   const c = cache_();
@@ -703,6 +745,11 @@ function admin_(p) {
       const sheet = tab_(ss, 'pengaturan');
       const rows = baris_(sheet, 2);
       const salah = [];
+      const tulis_ = (k, v) => {
+        const i = rows.findIndex(r => r[0] === k);
+        if (i >= 0) sheet.getRange(i + 2, 2).setNumberFormat('@').setValue(v);
+        else { sheet.appendRow([k, v, '']); rows.push([k, v]); }
+      };
       Object.keys(nilai).forEach(k => {
         if (!PENGATURAN.some(r => r[0] === k)) return;
         let v = teks_(String(nilai[k]), 500);
@@ -712,9 +759,10 @@ function admin_(p) {
         if (/^link/.test(k) && v && !/^https:\/\/\S+$/.test(v)) { salah.push(k); return; }
         if (k === 'popup_gambar' && v && !/^https:\/\/\S+$/.test(v)) { salah.push(k); return; }
         if (k === 'popup_link' && v && !/^(https:\/\/\S+|\/[\w\-\/?=&#.%]*|#[\w-]+)$/.test(v)) { salah.push(k); return; }
-        const i = rows.findIndex(r => r[0] === k);
-        if (i >= 0) sheet.getRange(i + 2, 2).setNumberFormat('@').setValue(v);
-        else sheet.appendRow([k, v, '']);
+        if (/^monster_/.test(k) && KUNCI_YA_TIDAK.indexOf(k) < 0 && KUNCI_WAKTU.indexOf(k) < 0) { const m = nilaiMonster_(k, v); if (m === null) { salah.push(k); return; } v = m; }
+        // Tombol "Mulai sekarang": catat jam server sebagai awal event baru (id event = waktu ini, progres mulai dari nol).
+        if (k === 'monster_darurat' && v === 'MULAI') tulis_('monster_mulai_manual', String(Date.now()));
+        tulis_(k, v);
       });
       if (salah.length) return {ok: false, error: 'nilai_tidak_valid', kunci: salah};
       c.removeAll(['cfg', 'reveal', 'stats']);

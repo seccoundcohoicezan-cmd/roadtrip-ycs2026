@@ -584,15 +584,20 @@
       const g = gelembungDi(x, y);
       if (g) { sentuhGelembung(g); return; }
       if (!balonAktif) return;
+      const pilih = wargaDi(x, y);
+      if (pilih) api.sorot(pilih, 8000, '');
+    });
+    // Warga di titik (x, y) layar; longgar > 0 memperlebar area sentuh (dipakai Lawan Monster).
+    function wargaDi(x, y, longgar = 0) {
       let pilih = null, terbaik = Infinity;
       for (const w of warga) {
         const l = w.layar;
-        if (!l || Math.abs(x - l.x) > l.h * 0.35 || y < l.y - 6 || y > l.kaki + 6) continue;
+        if (!l || Math.abs(x - l.x) > l.h * 0.35 + longgar || y < l.y - 6 - longgar || y > l.kaki + 6 + longgar) continue;
         const dd = Math.abs(x - l.x) + Math.abs(y - (l.y + l.kaki) / 2) * 0.3 - l.kaki * 0.001;
         if (dd < terbaik) { terbaik = dd; pilih = w; }
       }
-      if (pilih) api.sorot(pilih, 8000, '');
-    });
+      return pilih;
+    }
     new ResizeObserver(ukur).observe(canvas);
     if ('IntersectionObserver' in window) new IntersectionObserver(([e]) => { terlihat = e.isIntersecting; if (terlihat) mulai(); }).observe(canvas);
     document.addEventListener('visibilitychange', () => { if (!document.hidden) mulai(); });
@@ -633,6 +638,9 @@
       cahaya,
       setBalon(on) { balonAktif = on; if (!on) balon.forEach((b) => { b.sampai = 0; }); },
       posisi(w) { return w && w.layar ? { x: w.layar.x, y: w.layar.y, h: w.layar.h, W, H } : null; },
+      wargaDi,
+      // Batas lantai plaza (px layar) untuk menaruh objek lain di atas panggung, mis. monster.
+      lantai() { return { y0: area.y0, y1: area.y1, W, H }; },
       ciri,
       gambarAvatar(el, e) {
         const c = document.createElement('canvas');
