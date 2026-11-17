@@ -139,23 +139,6 @@ test('twibbon: migrasi header lama, simpan kota/provinsi/ref, statistik leaderbo
   assert.deepEqual(st.provinsi[0], {nama: 'Jawa Tengah', jumlah: 2});
 });
 
-test('proxy reveal menolak sebelum waktunya tanpa memanggil endpoint reveal', async () => {
-  const previous = global.fetch;
-  const calls = [];
-  global.fetch = async (url) => { calls.push(url); return {ok: true, json: async () => ({ok: true, pengumuman: new Date(Date.now() + 60000).toISOString()})}; };
-  try {
-    delete require.cache[require.resolve('../api/reveal.js')];
-    const handler = require('../api/reveal.js');
-    let code, body; const headers = {};
-    const res = {setHeader: (k, v) => { headers[k] = v; }, status(n) { code = n; return this; }, json(v) { body = v; return this; }};
-    await handler({method: 'GET', headers: {}}, res);
-    assert.equal(code, 425);
-    assert.equal(body.error, 'belum_waktunya');
-    assert.ok(calls.every((u) => !u.includes('aksi=reveal')));
-    assert.match(headers['Cache-Control'], /s-maxage=(\d+)/);
-  } finally { global.fetch = previous; }
-});
-
 test('pop-up informasi: hanya tampil di config bila aktif, link tujuan divalidasi', () => {
   const app = muat({now: Date.parse('2026-11-10T09:00:00+07:00')});
   app.get('siapkan');

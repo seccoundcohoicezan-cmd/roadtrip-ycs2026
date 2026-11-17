@@ -14,15 +14,4 @@ test('Apps Script validation, idempotent retries, conflict and formula escaping'
  assert.equal(post(payload).duplicate,true);assert.equal(rows.length,2);
  assert.equal(post({...payload,name:'Different'}).error,'request_conflict');assert.equal(rows.length,2);
 });
-test('Vercel proxy rejects invalid fields and unconfirmed upstream responses',async()=>{
- const handler=require('../api/twibbon.js');let code,result;
- const res={setHeader(){},status(n){code=n;return this},json(v){result=v;return this}};
- await handler({method:'POST',body:{...payload,email:'invalid'}},res);assert.equal(code,400);
- const previous=global.fetch;
- try {
-  global.fetch=async()=>({ok:true,json:async()=>({ok:false,error:'save_failed'})});
-  await handler({method:'POST',body:payload},res);assert.equal(code,502);assert.equal(result.ok,false);
-  global.fetch=async()=>({ok:true,json:async()=>({ok:true,requestId:payload.requestId})});
-  await handler({method:'POST',body:payload},res);assert.equal(code,200);assert.equal(result.ok,true);
- }finally{global.fetch=previous;}
-});
+// Validasi proxy twibbon kini diuji di tests/api.cjs (server/api.cjs).

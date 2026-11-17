@@ -23,17 +23,18 @@
       ]
     }
   ],
-  "regions": [
-    "sin1"
-  ],
   "rewrites": [
     {
+      "source": "/api/:path*",
+      "destination": "https://ycs-data.194-238-23-221.sslip.io/api/:path*"
+    },
+    {
       "source": "/srv/monster",
-      "destination": "https://ycs-data.194-238-23-221.sslip.io/monster"
+      "destination": "https://ycs-data.194-238-23-221.sslip.io/api/monster"
     },
     {
       "source": "/srv/pemenang",
-      "destination": "https://ycs-data.194-238-23-221.sslip.io/monster/pemenang"
+      "destination": "https://ycs-data.194-238-23-221.sslip.io/api/pemenang"
     }
   ]
 }

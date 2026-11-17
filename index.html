@@ -1711,7 +1711,7 @@
             <button class="btn btn--cta btn--block" type="submit" id="fk-kirim" style="margin-top:1rem">Kirim &amp; masuk festival <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
           </form>
         </div>
-        <!-- Pemenang undian spin Lawan Monster (dari /srv/pemenang) -->
+        <!-- Pemenang undian spin Lawan Monster (dari /api/pemenang) -->
         <div class="juara" id="pemenang" aria-labelledby="juara-title">
           <div class="juara__kepala">
             <span class="juara__label">Spin Lawan Monster</span>
@@ -3131,11 +3131,11 @@
     muatFestival();
     setInterval(() => { if (!document.hidden && !fest.classList.contains('is-locked')) muatFestival(); }, 90000);
 
-    /* ---------- Pemenang undian Lawan Monster (publik, nama disingkat) ---------- */
+    /* ---------- Pemenang undian Lawan Monster (/api/pemenang, nama disingkat) ---------- */
     const HP = /\b(hp|handphone|smartphone|ponsel|iphone|samsung|xiaomi|redmi|oppo|vivo|realme|infinix|poco)\b/i;
     async function muatJuara() {
       try {
-        const d = await fetch('/srv/pemenang', { headers: { Accept: 'application/json' } }).then((r) => r.json());
+        const d = await fetch('/api/pemenang', { headers: { Accept: 'application/json' } }).then((r) => r.json());
         if (!d.ok) return;
         const list = (d.pemenang || []).slice().sort((a, b) => (HP.test(b.hadiah) ? 1 : 0) - (HP.test(a.hadiah) ? 1 : 0));
         const ul = $('#juara-daftar');
@@ -3151,13 +3151,13 @@
     }
     muatJuara();
     setInterval(() => { if (!document.hidden) muatJuara(); }, 60000);
-    /* ---------- Lawan Monster: event kolaboratif sebelum live (assets/js/monster.js + /srv/monster → server data) ---------- */
+    /* ---------- Lawan Monster: event kolaboratif sebelum live (assets/js/monster.js + /api/monster) ---------- */
     // Dipasang setelah halaman siap; bila skrip/endpoint gagal, festival tetap berjalan seperti biasa.
     window.addEventListener('DOMContentLoaded', () => {
       if (!window.YCSMonster) return;
       try {
         window.YCSMonster.pasang({
-          stage: $('.fest__stage'), festApi, now, endpoint: '/srv/monster',
+          stage: $('.fest__stage'), festApi, now, endpoint: '/api/monster',
           identitas: () => { try { return JSON.parse(localStorage.getItem('ycs_identitas') || 'null'); } catch (e) { return null; } },
           bolehTap: () => !fest.classList.contains('is-locked'),
           saatTerkunci: () => { toast('Isi data & satu kata dulu untuk ikut melawan monster.'); $('#fest-form').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' }); },

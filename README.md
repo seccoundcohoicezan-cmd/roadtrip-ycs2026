@@ -1,25 +1,61 @@
 # roadtrip-ycs2026
 
-Situs **Youth Character Summit 2026**: beranda satu halaman (`index.html`) + halaman turunan, dideploy otomatis oleh Vercel dari branch `main`. Backend: fungsi Vercel (`api/`) → Google Apps Script (`apps-script/Code.gs`) → Google Sheet panitia.
+Situs **Youth Character Summit 2026**: beranda satu halaman (`index.html`) + halaman turunan.
+
+## Arsitektur (ringkas)
+
+```
+Browser ──► Vercel (file statis) ──rewrite /api/*──► Server YCS di Dokploy (server/)
+                                                     │  apps-script/Code.gs dijalankan di memori + Lawan Monster
+                                                     │  data: /data/primer.json
+                                                     └─► tiap ±3 dtk diteruskan ke Google Sheet (CADANGAN)
+```
+
+- **Satu backend**: `server/` (Node, tanpa dependensi). Tidak ada fungsi Vercel lagi.
+- **Kontrak API untuk frontend: [`docs/API.md`](docs/API.md)**. Semua halaman memanggil `/api/...` (path relatif).
+- **Aturan bisnis** (validasi formulir, kuota, sesi admin, pengaturan) ada di `apps-script/Code.gs`. Server menjalankan file yang sama di memori; Apps Script asli hanya dipakai untuk impor awal & menerima salinan cadangan.
+- **Google Sheet = cadangan.** Ubah data lewat panel `/admin/`, bukan langsung di Sheet (akan tertimpa). Darurat: admin → Keamanan → *Ambil ulang dari Sheet*.
 
 ## Struktur
 
 ```
-index.html        # beranda: HTML + CSS + JS dalam satu file (fase pra/pasca pengumuman)
-klaim/            # klaim tiket wildcard (kode 8 karakter + email penerima)
-dana-kaget/       # form Dana Kaget (kode akses, kuota atomik, satu orang satu pengajuan)
-survei/           # survei destinasi (dibuka saat pengumuman / survei_buka)
-privasi/          # kebijakan privasi lengkap (izin orang tua, batas akses)
-admin/            # panel admin (password, sesi 6 jam)
-api/              # fungsi Vercel: config, now, stats, reveal, klaim, dana, survei, admin, twibbon
-assets/css|js/    # gaya & utilitas bersama halaman turunan
-assets/data/      # wilayah.json (38 provinsi, 514 kab/kota; tools/gen-wilayah.py, sumber cahyadsn/wilayah MIT)
-tools/dev-server.cjs  # server lokal + Apps Script tiruan untuk uji tanpa Google/Vercel
-assets/img/       # foto dokumentasi (WebP, versi 800px & 1600px)
-assets/img/bali/  # foto ikon Bali dari Wikimedia Commons (WebP, kredit di footer)
-assets/svg/       # ilustrasi & stiker Bali (hasil tools/gen-assets.py)
-tools/            # generator aset SVG
+index.html            beranda (HTML + CSS + JS satu file)
+admin/                panel admin (password, sesi 6 jam)
+klaim/ dana-kaget/ survei/ privasi/ harapan/   halaman turunan
+assets/js/            festival.js (panggung festival), monster.js (Lawan Monster), monster-aturan.js, halaman.js
+assets/img|svg|data/  aset gambar & data wilayah
+server/               backend (Dokploy):
+  index.cjs             titik masuk & env
+  http.cjs              router: /api/*, /health, /internal/*, alias lama
+  api.cjs               semua endpoint publik (kontrak docs/API.md)
+  data.cjs              state, impor dari Sheet, simpan file, sinkron ke Sheet
+  monster.cjs           mesin Lawan Monster (jadwal, tap, jurus, tiket, spin)
+  gas-memori.cjs        Spreadsheet + layanan Apps Script di memori
+  Dockerfile
+apps-script/Code.gs   aturan bisnis + endpoint cadangan (primer-ekspor / primer-terapkan)
+tests/                node --test tests/*.cjs
+tools/dev-server.cjs  tiruan produksi lokal (statis + server + Sheet tiruan)
+docs/API.md           kontrak API
+vercel.json           header + rewrite /api/* → server
 ```
+
+## Menjalankan & uji lokal
+
+```bash
+node --test tests/*.cjs                 # unit: Code.gs, API, monster, sinkron
+node tools/dev-server.cjs 8787          # http://127.0.0.1:8787 (POST /__seed untuk data contoh, GET /__sheet isi Sheet tiruan)
+node tools/uji-beban-monster.cjs http://127.0.0.1:8787 400 20
+```
+
+## Deploy
+
+- **Situs**: Vercel otomatis dari `main` (statis).
+- **Server**: Dokploy project **YCS 2026** → aplikasi **YCS Data** (`ycs-data.194-238-23-221.sslip.io`, server KVM 8), otomatis dari `main`, `server/Dockerfile` dengan konteks build root repo, volume `ycs-data` → `/data`.
+  - Env: `PRIMARY_SECRET`, `MONSTER_SECRET`, `SHEET_URL`, `DATA_DIR=/data`, `ALLOWED_ORIGINS`, `SINKRON_MS`.
+  - Saat redeploy (±10 dtk), state tersimpan dan perubahan yang belum terkirim diteruskan setelah server hidup lagi.
+- **Apps Script** (cadangan): `cd apps-script && clasp push && clasp deploy -i <deploymentId>`. Perlu setiap kali `Code.gs` berubah, agar skema Sheet cadangan ikut.
+- Status: `GET https://ycs-data.194-238-23-221.sslip.io/health` atau admin → Keamanan → **Data & cadangan**.
+- **Reset password admin**: `POST /internal/sandi-baru {"rahasia": PRIMARY_SECRET}`. Password baru muncul di tab **Admin** sel B2 Sheet.
 
 ## Aset ilustrasi
 
@@ -40,7 +76,7 @@ Pastikan ada izin publikasi dari orang yang tampil di foto.
 
 Isi nama, sekolah, email, buka saluran WhatsApp, setujui penyimpanan data, lalu buat PNG. Klik saluran otomatis mencentang syarat; ini mencatat klik, bukan verifikasi keanggotaan WhatsApp. Foto dan email tidak dimasukkan ke server/gambar secara bersamaan: hanya nama, sekolah, email, pilihan bingkai, persetujuan, status klik dan ID permintaan dikirim; foto tetap lokal.
 
-- `api/twibbon.js`: fungsi Vercel yang meneruskan POST ke Apps Script, memeriksa respons sebelum menampilkan sukses. Variabel opsional `YCS_APPS_SCRIPT_URL` dapat mengganti endpoint deployment.
+- `POST /api/twibbon` (server/api.cjs): validasi lalu simpan, memeriksa respons sebelum menampilkan sukses.
 - `apps-script/Code.gs`: sumber backend. Membuat tab `Twibbon YCS 2026` tanpa mengubah tab lain, validasi server, lock, deduplikasi ID permintaan, perlindungan formula spreadsheet dan batas lima kiriman/email/jam. Batas email sederhana ini bukan perlindungan terhadap spam terdistribusi.
 - `apps-script/appsscript.json`: konfigurasi eksekusi sebagai pemilik dan akses publik.
 
@@ -55,7 +91,7 @@ Buka Apps Script dengan akun pemilik, pilih fungsi `siapkanSheet` di toolbar, kl
 - membuat tab `Rekap` berisi total twibbon, email unik, sekolah unik, jumlah hari ini, per bingkai, 30 sekolah teratas dan jumlah per hari (rumus otomatis);
 - menambah menu **YCS 2026 → Siapkan / rapikan sheet** di spreadsheet.
 
-Sebelum izin ini diberikan, endpoint Web App menjawab HTTP 403 untuk pengunjung. Deployment yang dipakai `api/twibbon.js` sudah memakai versi terbaru; jika membuat deployment baru, ubah URL di `api/twibbon.js` atau set `YCS_APPS_SCRIPT_URL` di Vercel. Panduan resmi: https://developers.google.com/apps-script/guides/web
+Sebelum izin ini diberikan, endpoint Web App menjawab HTTP 403 untuk pengunjung. Sekarang Apps Script hanya cadangan; server memakai `SHEET_URL` (env Dokploy) untuk impor & penerusan. Panduan resmi: https://developers.google.com/apps-script/guides/web
 
 Setelah aktif, lakukan satu uji nyata dengan data panitia, pastikan baris muncul dan unduh PNG berhasil. Jangan nyatakan integrasi aktif sebelum uji ini berhasil. Percobaan ulang pada halaman yang sama memakai ID yang sama sehingga respons hilang tidak menggandakan baris. Unduh ulang tanpa mengubah identitas/bingkai tidak menambah baris.
 
@@ -111,24 +147,9 @@ curl -X POST localhost:8787/__seed -d '{"finalis":30,"twibbon":40}'   # data con
 - **Satu Kata** (`#satu-kata`): kirim kata gratis. Awan kata hasilnya ter-blur dan terbuka setelah pengunjung mengetuk tombol Saluran WhatsApp (link diatur di Admin → Satu Kata). Setelah terbuka, kartu kata PNG bisa diunduh. Layar acara: `/harapan/?display=1`. Detail: `harapan/README.md`.
 - **Road to Bali & leaderboard provinsi** = twibbon lama + Satu Kata + klaim Dana Kaget.
 
-## Server data (Dokploy) & Sheet cadangan (MRKT-56)
+## Server & Sheet cadangan (MRKT-56)
 
-Sejak 16 Nov 2026 data utama ada di **server data** Dokploy (`server/`, project **YCS 2026**, aplikasi **YCS Data**, `https://ycs-data.194-238-23-221.sslip.io`). Server ini menjalankan `apps-script/Code.gs` yang sama di memori (`server/gas-memori.cjs`), jadi aturan bisnisnya tidak berubah, tapi jawabannya ±0,3 dtk, bukan 2–3 dtk.
-
-```
-HP ─► Vercel api/*.js (sin1) ──/exec──► server data (Dokploy, /data/primer.json)
-HP ─► /srv/monster (rewrite vercel.json) ─────────┘          │ tiap 3 dtk: baris baru → append, sel berubah → ganti isi tab
-                                                             ▼
-                                              Google Sheet (cadangan) ◄─ Apps Script primer-terapkan
-```
-
-- **Cadangan:** setiap perubahan diteruskan ke Google Sheet ±3 detik kemudian. Tab `Rekap` (rumus) tidak disentuh.
-- **Edit lewat panel admin, bukan Sheet.** Editan langsung di Sheet akan tertimpa. Bila terlanjur mengedit Sheet, buka admin → Keamanan → **Ambil ulang dari Sheet**.
-- **Bila server data mati:** permintaan baca (config, kata, stats, reveal) jatuh ke Apps Script (data cadangan); permintaan tulis menjawab "server sibuk" agar data tidak bercabang. Darurat: set env Vercel `YCS_DATA_URL=off` untuk kembali ke Apps Script penuh.
-- **Impor awal:** saat volume `/data` kosong, server mengambil seluruh isi Sheet lewat `primer-ekspor`. Rahasia bersama ada di env Dokploy `PRIMARY_SECRET`; di `Code.gs` hanya hash SHA-256-nya.
-- **Reset password admin:** `POST /internal/sandi-baru {"rahasia": PRIMARY_SECRET}` membuat password baru di tab **Admin** sel B2 (ikut diteruskan ke Sheet).
-- Deploy: Dokploy membangun `server/Dockerfile` (konteks build = root repo) otomatis saat push ke `main`. Saat redeploy (±10 dtk), state disimpan dan perubahan yang belum terkirim diteruskan setelah server hidup lagi.
-- Status: `GET /health` dan admin → Keamanan → **Data & cadangan**.
+Lihat **Arsitektur** dan **Deploy** di atas. Riwayat: 16 Nov 2026 data pindah dari Apps Script ke server Dokploy (Sheet menjadi cadangan). 17 Nov 2026 fungsi Vercel `api/` dihapus; semua endpoint ada di `server/api.cjs` dengan kontrak yang sama.
 
 ## Lawan Monster (MRKT-56)
 
@@ -162,14 +183,14 @@ Tombol darurat: **Mulai sekarang** (event baru dari nol), **Stop darurat**, **Ke
 
 - **Tap harus tepat** mengenai monster atau warga yang masih berdiri; tap di area kosong menampilkan "Meleset!" dan tidak dihitung.
 - **Monster berkeliling** plaza (bukan diam di tengah), menghadap arah jalannya; warga di dekatnya **panik** (tanda seru, keringat, gemetar, lari menyebar ke sisi plaza).
-- **Jurus monster** (`monster_jurus_*`): tiap N detik (bawaan 8) monster bersiap (aura merah + "Awas!"), memainkan **animasi jurus api** (sprite `raja-serang.webp`, dari animasi panitia, latar kotak-kotak dibuang di `~/mrkt56-tools/build/serang.py`) lalu menembakkan cahaya ke samping. Warga yang kena **terpental, mendarat rebah (debu), memudar, dengan bintang pusing** di atas kepala. **Nyawa warga** (bar hijau di HUD) dihitung di server dengan jam server: damage bawaan 4% × skala level per jurus. **Perisai**: tenaga yang terkumpul antar jurus sebanyak `monster_perisai`% target level menahan hingga 80% damage. Jumlah warga tumbang di layar mengikuti nyawa server.
+- **Jurus monster** (`monster_jurus_*`): tiap N detik (bawaan 8) monster bersiap (aura merah + "Awas!"), memainkan **animasi jurus api buatan kanvas** (bola api berputar masuk ke dada → ledakan + layar bergetar → gelombang kejut di tanah, sabetan api kiri-kanan, bara; durasi `monster_jurus_anim`, bawaan 1,6 dtk) lalu menembakkan cahaya ke samping. Warga yang kena **terpental, mendarat rebah (debu), memudar, dengan bintang pusing** di atas kepala. **Nyawa warga** (bar hijau di HUD) dihitung di server dengan jam server: damage bawaan 4% × skala level per jurus. **Perisai**: tenaga yang terkumpul antar jurus sebanyak `monster_perisai`% target level menahan hingga 80% damage. Jumlah warga tumbang di layar mengikuti nyawa server.
 - **Tiga akhir** dengan tampilan khusus: *Monster Terkalahkan!* (sinar dari langit, Raja Batu runtuh, konfeti), *Raja Batu Menang!* (nyawa warga habis: layar merah, monster membesar, semua warga tumbang), *Raja Batu Kabur!* (waktu habis: monster lari keluar plaza). Semua punya tombol live dan **Ajak teman**.
-- **Pemenang spin di landing**: kartu "Yang udah bawa pulang HP" di bawah panggung festival (`/srv/pemenang`, nama disingkat + provinsi + hadiah; pemenang HP disorot di atas).
+- **Pemenang spin di landing**: kartu "Yang udah bawa pulang HP" di bawah panggung festival (`/api/pemenang`, nama disingkat + provinsi + hadiah; pemenang HP disorot di atas).
 - Roda spin admin **selalu lingkaran**: tanpa hadiah, roda berisi nama peserta dan berhenti di nama pemenang.
 
 ### Mode uji monster
 
-Admin → Lawan Monster → **Mode uji monster** → durasi → **Mulai uji** → buka link `/?uji-monster=KODE#satu-kata` di HP. Event uji terpisah dari event asli: hanya terlihat oleh pembawa link (walau monster mati/STOP), tidak wajib membuka festival, perangkat tidak diikat, dan tiket uji (catatan `UJI`) tidak ditulis ke Sheet. Tiket uji bisa dicoba di tab Spin Undian (event berawalan "UJI").
+Admin → Lawan Monster → **Mode uji monster** → durasi + (opsional) **target tap uji** → **Mulai uji** → buka link `/?uji-monster=KODE#satu-kata` di HP. Event uji terpisah dari event asli: hanya terlihat oleh pembawa link (walau monster mati/STOP), tidak wajib membuka festival, perangkat tidak diikat, dan tiket uji (catatan `UJI`) tidak ditulis ke Sheet. Tiket uji bisa dicoba di tab Spin Undian (event berawalan "UJI").
 
 ### Spin Undian (tab terpisah)
 
@@ -182,12 +203,12 @@ Admin → Lawan Monster → **Mode uji monster** → durasi → **Mulai uji** �
 ### Anti-spam & beban
 
 - Batas 10 tap/detik/pemain (token bucket, burst 30), tap dikirim per batch (interval 1 dtk, otomatis 2–5× saat pemain ≥ 300/1.000/3.000), `seq` anti-duplikat sehingga kiriman ulang setelah offline tidak terhitung dua kali, perangkat baru maks 300 / 10 menit per IP.
-- Monster tidak lagi memakai fungsi Vercel per tap: `/srv/monster` di-rewrite langsung ke server data, jadi kuota 1 juta panggilan fungsi Vercel Hobby tidak terpakai untuk tap. Upstash tidak dipakai.
+- Tap langsung ke server (`/api/monster`), tidak memakai kuota fungsi Vercel. Upstash tidak dipakai.
 
 ### Uji
 
 ```bash
-node --test tests/*.cjs                       # 25 tes: Code.gs, monster (perangkat/tiket/spin), sinkron server data ↔ Sheet
+node --test tests/*.cjs                       # 29 tes: Code.gs, monster (perangkat/tiket/spin), sinkron server data ↔ Sheet
 node tools/dev-server.cjs 8787                # :8787 situs+api, :8788 server data, :8789 Sheet tiruan (GET /__sheet)
 node tools/uji-beban-monster.cjs http://127.0.0.1:8787 400 20   # setelah seed {"kata":400} + Mulai sekarang
 ```

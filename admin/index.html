@@ -393,7 +393,7 @@
             <section class="set-card" aria-labelledby="g-mon-level">
               <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-grid"/></svg></span><div><h2 id="g-mon-level">Level, target &amp; poin</h2><p>Poin per tap naik tiap level; monster membesar. Isi daftar target, atau kosongkan untuk memakai rumus.</p></div></header>
               <div class="set-grid">
-                <div class="field field--full"><label for="m-monster_target">Target tenaga per level <span class="opt">(pisahkan koma; jumlah angka = jumlah level)</span></label><input class="input input--mono" id="m-monster_target" data-key="monster_target" placeholder="5000,15000,40000"></div>
+                <div class="field field--full"><label for="m-monster_target">Target tap (tenaga) per level <span class="opt">(pisahkan koma; jumlah angka = jumlah level)</span></label><input class="input input--mono" id="m-monster_target" data-key="monster_target" placeholder="5000,15000,40000"></div>
                 <div class="field"><label for="m-monster_level">Rumus: jumlah level</label><input class="input" type="number" min="1" max="10" step="1" id="m-monster_level" data-key="monster_level"></div>
                 <div class="field"><label for="m-monster_target_dasar">Rumus: target level 1</label><input class="input" type="number" min="10" step="1" id="m-monster_target_dasar" data-key="monster_target_dasar"></div>
                 <div class="field"><label for="m-monster_target_kali">Rumus: pengali per level</label><input class="input" inputmode="decimal" id="m-monster_target_kali" data-key="monster_target_kali" placeholder="2.8"><p class="field__hint">Target level L = dasar × pengali<sup>L−1</sup>.</p></div>
@@ -408,6 +408,7 @@
               <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-bolt"/></svg></span><div><h2 id="g-mon-jurus">Jurus &amp; nyawa warga</h2><p>Monster menembakkan jurus berkala yang menumbangkan warga. Nyawa warga habis = monster menang. Tenaga yang terkumpul antar jurus menjadi perisai.</p></div></header>
               <div class="set-grid">
                 <label class="switch" for="m-monster_jurus_aktif"><span>Jurus monster aktif<small>Mati = monster hanya bisa kalah atau kabur.</small></span><input type="checkbox" id="m-monster_jurus_aktif" data-key="monster_jurus_aktif" data-type="bool"></label>
+                <div class="field"><label for="m-monster_jurus_anim">Durasi animasi jurus (detik)</label><input class="input" inputmode="decimal" id="m-monster_jurus_anim" data-key="monster_jurus_anim" placeholder="1.6"><p class="field__hint">0,6–4 detik: mengumpulkan api → ledakan → gelombang api.</p></div>
                 <div class="field"><label for="m-monster_jurus_detik">Jeda antar jurus (detik)</label><input class="input" type="number" min="4" max="60" step="1" id="m-monster_jurus_detik" data-key="monster_jurus_detik"></div>
                 <div class="field"><label for="m-monster_jurus_damage">Damage per jurus di level 1 (%)</label><input class="input" type="number" min="0" max="100" step="1" id="m-monster_jurus_damage" data-key="monster_jurus_damage"><p class="field__hint">Ikut naik sesuai ukuran level. Tanpa perlawanan, 4% = warga habis setelah 25 jurus.</p></div>
                 <div class="field"><label for="m-monster_perisai">Perisai (% target level antar jurus)</label><input class="input" type="number" min="0" max="100" step="1" id="m-monster_perisai" data-key="monster_perisai"><p class="field__hint">Bila tenaga sebanyak ini terkumpul di antara dua jurus, damage ditahan 80%.</p></div>
@@ -430,6 +431,7 @@
             <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-play"/></svg></span><div><h2 id="g-mon-uji">Mode uji monster</h2><p>Coba monster kapan saja tanpa terlihat pengunjung. Hanya HP yang membuka link uji yang melihat monster; tidak wajib isi festival, perangkat tidak diikat, tiket uji tidak masuk Sheet. Memakai pengaturan level di atas.</p></div></header>
             <div class="set-grid">
               <div class="field"><label for="uji-menit">Durasi uji (menit)</label><input class="input" type="number" min="1" max="120" step="1" id="uji-menit" value="10"></div>
+              <div class="field"><label for="uji-target">Target tap uji <span class="opt">(per level, pisahkan koma)</span></label><input class="input input--mono" id="uji-target" placeholder="kosong = ikut pengaturan, mis. 50,150"><p class="field__hint">Hanya untuk uji; event asli tetap memakai target di atas.</p></div>
               <div class="mon-adm-aksi" style="align-self:end"><button class="btn btn--cta btn--sm" type="button" id="uji-mulai">Mulai uji</button><button class="btn btn--soft btn--sm mon-adm-stop" type="button" id="uji-stop">Hentikan uji</button></div>
               <div class="field field--full"><span class="label">Link uji</span><div class="uji-link"><input class="input input--mono" id="uji-link" readonly placeholder="Tekan Mulai uji untuk membuat link"><button class="btn btn--soft btn--sm" type="button" id="uji-salin">Salin</button><a class="btn btn--soft btn--sm" id="uji-buka" target="_blank" rel="noopener">Buka</a></div><p class="field__hint" id="uji-status">Tidak ada uji berjalan.</p></div>
             </div>
@@ -801,14 +803,14 @@
       await simpanMon({monster_darurat: 'NORMAL'}, 'Monster kembali mengikuti pemicu.');
       sibuk(btn, false);
     });
-    // Status langsung dari /srv/monster (server data, endpoint publik yang sama dengan peserta).
+    // Status langsung dari /api/monster (endpoint publik yang sama dengan peserta).
     const FASE = {mati: 'Tidak aktif', tidak_ada: 'Tidak ada event terjadwal', tunggu: 'Menunggu kemunculan', tanding: 'Sedang bertanding', menang: 'Monster sudah kalah (warga menang)', monster_menang: 'Monster menang (nyawa warga habis)', habis: 'Monster kabur (waktu habis)'};
     let monTimer = 0;
     async function statusMon() {
       clearTimeout(monTimer);
       if ($('#p-monster').hidden || document.hidden) return;
       try {
-        const r = await fetch('/srv/monster', {cache: 'no-store'});
+        const r = await fetch('/api/monster', {cache: 'no-store'});
         const d = await r.json();
         const sub = d.dihentikan ? 'Dihentikan lewat tombol Stop darurat.' : (FASE[d.fase] || d.fase);
         $('#mon-status-sub').textContent = sub;
@@ -990,14 +992,14 @@
       $('#uji-link').value = link; $('#uji-buka').href = link;
       const tulis = () => {
         const sisa = Date.parse(u.sampai) - Date.now();
-        $('#uji-status').textContent = sisa > 0 ? `Uji berjalan, sisa ${Math.floor(sisa / 60000)}:${String(Math.floor(sisa / 1000) % 60).padStart(2, '0')}. ${nf.format(u.tiket)} tiket uji, tenaga ${nf.format(u.total)}${u.kalah ? ', monster sudah kalah' : ''}. Tiket uji bisa dicoba di tab Spin Undian (event "UJI").` : 'Waktu uji habis (hasil masih tampil 15 menit). Tekan Mulai uji untuk uji baru.';
+        $('#uji-status').textContent = sisa > 0 ? `Uji berjalan, sisa ${Math.floor(sisa / 60000)}:${String(Math.floor(sisa / 1000) % 60).padStart(2, '0')}${u.target ? ', target tap ' + u.target : ''}. ${nf.format(u.tiket)} tiket uji, tenaga ${nf.format(u.total)}${u.kalah ? ', monster sudah kalah' : u.monsterMenang ? ', monster menang' : ''}. Tiket uji bisa dicoba di tab Spin Undian (event "UJI").` : 'Waktu uji habis (hasil masih tampil 15 menit). Tekan Mulai uji untuk uji baru.';
       };
       tulis(); ujiTimer = setInterval(tulis, 1000);
     }
     async function muatUji() { const d = await monAdmin({aksi: 'uji'}); if (d.ok) tampilUji(d.uji); }
     $('#uji-mulai').addEventListener('click', async (e) => {
       const btn = e.currentTarget; sibuk(btn, true);
-      const d = await monAdmin({aksi: 'uji-mulai', menit: $('#uji-menit').value});
+      const d = await monAdmin({aksi: 'uji-mulai', menit: $('#uji-menit').value, target: $('#uji-target').value});
       sibuk(btn, false);
       if (!d.ok) { toast(pesan(d)); return; }
       tampilUji(d.uji); toast('Uji monster dimulai. Buka link uji di HP.');

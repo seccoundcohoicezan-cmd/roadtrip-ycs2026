@@ -1,8 +1,8 @@
 // Server lokal untuk uji ujung-ke-ujung tanpa Vercel, Dokploy, dan Google — susunannya sama dengan produksi:
-// - port      : file statis repo + fungsi api/*.js (seperti Vercel) + rewrite /srv/monster → server data
-// - port + 1  : server data (server/index.cjs, seperti Dokploy) — menjalankan Code.gs di memori + Lawan Monster
+// - port      : file statis repo (seperti Vercel) + rewrite /api/* dan /srv/* → server (seperti vercel.json)
+// - port + 1  : server YCS (server/index.cjs, seperti Dokploy) — Code.gs di memori + Lawan Monster + API publik
 // - port + 2  : "Google Sheet" tiruan (Code.gs di memori) — sumber impor awal & tujuan penerusan cadangan
-// Pakai: node tools/dev-server.cjs [port=8787]. Data contoh: POST /__seed (lihat di bawah).
+// Pakai: node tools/dev-server.cjs [port=8787]. Data contoh: POST /__seed (lihat di bawah). Isi Sheet tiruan: GET /__sheet.
 const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -14,9 +14,10 @@ const PORT = Number(process.argv[2] || 8787);
 const DATA_PORT = PORT + 1, SHEET_PORT = PORT + 2;
 const RAHASIA = 'rahasia-uji-lokal-' + 'x'.repeat(32);
 const MIME = {'.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.png': 'image/png', '.jpg': 'image/jpeg', '.ico': 'image/x-icon'};
+const REWRITE = {'/srv/monster': '/api/monster', '/srv/pemenang': '/api/pemenang'}; // alias lama di vercel.json
 const baca = (req) => new Promise((ok) => { let b = ''; req.on('data', (c) => { b += c; }); req.on('end', () => ok(b)); });
 
-// "Google Sheet" tiruan: Code.gs asli, dengan hash rahasia uji (Code.gs produksi memakai hash rahasia asli).
+// "Google Sheet" tiruan: Code.gs asli, dengan rahasia uji (Code.gs produksi memeriksa hash rahasia asli).
 const sheet = muat();
 sheet.ctx.primerSah_ = (r) => r === RAHASIA;
 sheet.get('siapkan');
@@ -27,11 +28,10 @@ http.createServer(async (req, res) => {
   res.end(JSON.stringify(out));
 }).listen(SHEET_PORT, '127.0.0.1');
 
-// Server data (seperti Dokploy), tanpa file (memori saja), meneruskan ke Sheet tiruan tiap 1 detik.
+// Server YCS (seperti Dokploy), tanpa file (memori saja), meneruskan ke Sheet tiruan tiap 1 detik.
 const primer = buatPrimer({sheetUrl: `http://127.0.0.1:${SHEET_PORT}/exec`, rahasia: RAHASIA, sinkronMs: 1000, origins: '*', log: () => {}});
 primer.server.listen(DATA_PORT, '127.0.0.1');
 const siap = primer.mulai();
-process.env.YCS_APPS_SCRIPT_URL = `http://127.0.0.1:${DATA_PORT}/exec`;
 
 http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://x');
@@ -39,27 +39,13 @@ http.createServer(async (req, res) => {
     await siap;
     if (url.pathname === '/__seed' && req.method === 'POST') return seed(JSON.parse(await baca(req) || '{}'), res);
     if (url.pathname === '/__sheet') { res.setHeader('Content-Type', 'application/json'); return res.end(JSON.stringify(Object.fromEntries(Object.entries(sheet.sheets).map(([n, x]) => [n, x.rows])))); }
-    if (url.pathname.startsWith('/srv/')) { // seperti rewrite vercel.json → server data
-      const tujuan = url.pathname === '/srv/pemenang' ? 'monster/pemenang' : url.pathname.slice(5);
-      const r = await fetch(`http://127.0.0.1:${DATA_PORT}/` + tujuan + url.search, {method: req.method, headers: {'content-type': 'application/json', 'x-forwarded-for': req.headers['x-forwarded-for'] || '127.0.0.1'}, body: req.method === 'POST' ? await baca(req) : undefined});
+    // rewrite seperti vercel.json: /api/* → server YCS
+    const tujuan = REWRITE[url.pathname] || (url.pathname.startsWith('/api/') ? url.pathname : null);
+    if (tujuan) {
+      const r = await fetch(`http://127.0.0.1:${DATA_PORT}${tujuan}${url.search}`, {method: req.method, headers: {'content-type': 'application/json', 'x-forwarded-for': req.headers['x-forwarded-for'] || '127.0.0.1'}, body: req.method === 'POST' ? await baca(req) : undefined});
       res.statusCode = r.status;
-      ['content-type', 'cache-control'].forEach((h) => r.headers.get(h) && res.setHeader(h, r.headers.get(h)));
+      ['content-type', 'cache-control', 'retry-after'].forEach((h) => r.headers.get(h) && res.setHeader(h, r.headers.get(h)));
       return res.end(await r.text());
-    }
-    if (url.pathname.startsWith('/api/')) {
-      const nama = url.pathname.slice(5).replace(/[^a-z]/g, '');
-      const file = path.join(ROOT, 'api', nama + '.js');
-      if (!fs.existsSync(file)) { res.statusCode = 404; return res.end('{}'); }
-      const raw = await baca(req);
-      let body = raw;
-      if ((req.headers['content-type'] || '').includes('json')) { try { body = JSON.parse(raw || '{}'); } catch (_) { body = raw; } }
-      const handler = require(file);
-      const r = {
-        setHeader: (k, v) => res.setHeader(k, v),
-        status(n) { res.statusCode = n; return r; },
-        json(v) { res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify(v)); return r; },
-      };
-      return await handler({method: req.method, headers: {...req.headers, 'x-forwarded-for': req.headers['x-forwarded-for'] || '127.0.0.1'}, body, query: Object.fromEntries(url.searchParams)}, r);
     }
     let file = path.join(ROOT, decodeURIComponent(url.pathname));
     if (!file.startsWith(ROOT)) { res.statusCode = 403; return res.end(); }
@@ -74,7 +60,7 @@ http.createServer(async (req, res) => {
     console.error(err);
     res.statusCode = 500; res.end('{}');
   }
-}).listen(PORT, '127.0.0.1', () => console.log(`YCS dev: http://127.0.0.1:${PORT}  (server data :${DATA_PORT}, Sheet tiruan :${SHEET_PORT})`));
+}).listen(PORT, '127.0.0.1', () => console.log(`YCS dev: http://127.0.0.1:${PORT}  (server :${DATA_PORT}, Sheet tiruan :${SHEET_PORT})`));
 
 // POST /__seed {pengaturan:{kunci:nilai}, finalis:n, kode:[[kode,email,nama]], twibbon:n}
 function seed(p, res) {

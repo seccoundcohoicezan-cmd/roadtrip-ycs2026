@@ -10,4 +10,4 @@ Kampanye kini menjadi **Festival Satu Kata** di beranda (`/#satu-kata`). Pengunj
 
 Data disimpan di tab **Satu Kata** pada Google Sheet panitia (lewat `api/kata.js` → Apps Script). Kata kasar umum ditolak otomatis. Kata tambahan bisa diblokir di Admin → Pengaturan → Satu Kata. Kata yang sudah masuk disembunyikan dengan mengisi kolom `Tampil` = `TIDAK`.
 
-Folder `supabase/` adalah arsip versi lama dan tidak dipakai lagi.
+Data Satu Kata dibaca dari `/api/kata` (server Dokploy).

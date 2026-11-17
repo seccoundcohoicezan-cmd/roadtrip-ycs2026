@@ -17,7 +17,7 @@
 
   function pasang(opsi) {
     const stage = opsi.stage, fest = opsi.festApi, now = opsi.now || Date.now;
-    const endpoint = opsi.endpoint || '/srv/monster';
+    const endpoint = opsi.endpoint || '/api/monster';
     // Mode uji monster (dibuka admin): ?uji-monster=KODE → event terpisah, hanya terlihat oleh pembawa link,
     // tidak wajib membuka festival dan tidak mengikat perangkat. Token & antrean disimpan terpisah.
     const uji = (new URLSearchParams(location.search).get('uji-monster') || '').replace(/[^\w-]/g, '').slice(0, 20) || null;
@@ -62,7 +62,6 @@
       const img = (src) => { const i = new Image(); i.decoding = 'async'; i.src = src; return i; };
       aset.lari = img('/assets/img/monster/raja-lari.webp');     // 10 frame horizontal
       aset.runtuh = img('/assets/img/monster/raja-runtuh.webp'); // 9 frame horizontal
-      aset.serang = img('/assets/img/monster/raja-serang.webp'); // 8 frame jurus api (dari animasi panitia)
     }
     // Bola cahaya dirender sekali lalu dipakai ulang (lebih murah daripada gradient per frame).
     const bola = document.createElement('canvas');
@@ -136,11 +135,21 @@
     const konfeti = [];
     let jurusDitembak = 0, jurusSinkron = 0, prediksi = null; // prediksi: {ke, nyawa} sampai server mengonfirmasi jurus
     const AWAL_JURUS = 1300; // telegraf (ms) sebelum jurus
-    const SERANG_MS = 1400; // animasi jurus api: mulai 700 ms sebelum waktu jurus, pancaran keluar di tengah (frame ledakan)
+    // Animasi jurus (digambar sendiri di kanvas, durasi dari admin: monster_jurus_anim).
+    // p 0..LEPAS = mengumpulkan api, LEPAS = ledakan tepat di waktu jurus (pancaran keluar), sesudahnya gelombang api.
+    const LEPAS = 0.55;
+    const serangMs = () => (st && st.jurusAnimMs) || 1600;
     function progresSerang() {
-      if (akhir && akhir.jenis === 'monster') { const u = (performance.now() - akhir.t0) / SERANG_MS; return u >= 0 && u < 1 ? u : null; }
+      const D = serangMs();
+      if (akhir && akhir.jenis === 'monster') { const u = (performance.now() - akhir.t0) / D; return u >= 0 && u < 1 ? u : null; }
       const s = sisaJurus();
-      return s <= SERANG_MS / 2 && s > -SERANG_MS / 2 ? (SERANG_MS / 2 - s) / SERANG_MS : null;
+      return s <= D * LEPAS && s > -D * (1 - LEPAS) ? (D * LEPAS - s) / D : null;
+    }
+    // Getaran layar sesaat setelah ledakan.
+    function getarLayar() {
+      const p = progresSerang();
+      if (p == null || gerakMinim || p < LEPAS || p > LEPAS + 0.18) return 0;
+      return (1 - (p - LEPAS) / 0.18) * 7;
     }
     const sisaJurus = () => (st && st.fase === 'tanding' && st.jurus && st.jurusBerikut ? st.jurusBerikut - now() : Infinity);
     function gerakMonster(dt) {
@@ -229,15 +238,16 @@
       ctx.restore();
     }
     function gambarRajaBatu(g, t, kedip, mati) {
-      const lari = aset.lari, runtuh = aset.runtuh, serang = aset.serang;
+      const lari = aset.lari, runtuh = aset.runtuh;
       const ps = mati == null ? progresSerang() : null;
-      if (ps != null && serang && serang.complete && serang.naturalWidth) return gambarSerang(g, serang, ps);
       const sumber = mati != null && runtuh && runtuh.complete ? runtuh : lari;
       if (!sumber || !sumber.complete || !sumber.naturalWidth) return gambarMonsterLucu(g, t, kedip, mati);
       const n = sumber === runtuh ? 9 : 10;
       const fw = sumber.naturalWidth / n, fh = sumber.naturalHeight;
-      const i = sumber === runtuh ? Math.min(n - 1, Math.floor((mati || 0) * n)) : Math.floor(t / (jalan.bergerak ? 170 : 520)) % n;
-      const h = g.tinggi, w = h * fw / fh;
+      const i = sumber === runtuh ? Math.min(n - 1, Math.floor((mati || 0) * n)) : ps != null ? (ps < LEPAS ? 2 : 6) : Math.floor(t / (jalan.bergerak ? 170 : 520)) % n;
+      // saat jurus: monster terangkat & membesar sedikit (mengumpulkan tenaga), lalu menghentak saat ledakan
+      const angkat = ps == null ? 0 : ps < LEPAS ? ps / LEPAS : Math.max(0, 1 - (ps - LEPAS) / 0.2);
+      const h = g.tinggi * (1 + 0.07 * angkat), w = h * fw / fh;
       const siaga = sisaJurus() < AWAL_JURUS || (akhir && akhir.jenis === 'monster');
       const goyang = kedip > 0 || siaga ? Math.sin(t / 18) * h * (siaga ? 0.02 : 0.012) : 0;
       ctx.save();
@@ -246,7 +256,7 @@
       if (siaga) gambarAura(g, t);
       ctx.translate(g.x, 0); ctx.scale(jalan.arah < 0 && mati == null ? -1 : 1, 1); ctx.translate(-g.x, 0);
       if (mati != null && mati > 0.85) ctx.globalAlpha = Math.max(0, 1 - (mati - 0.85) / 0.15);
-      ctx.drawImage(sumber, i * fw, 0, fw, fh, g.x - w / 2 + goyang, g.kaki - h, w, h);
+      ctx.drawImage(sumber, i * fw, 0, fw, fh, g.x - w / 2 + goyang, g.kaki - h - g.tinggi * 0.04 * angkat, w, h);
       if (kedip > 0) { // kedip terang tipis di atas sprite
         ctx.globalCompositeOperation = 'lighter';
         ctx.globalAlpha = kedip * 0.35;
@@ -255,17 +265,71 @@
       ctx.restore();
     }
 
-    // Jurus api: 8 frame sprite serangan (pusaran api + ledakan), sedikit lebih besar dari monster, menghadap arah jalan.
-    function gambarSerang(g, img, p) {
-      const n = 8, fw = img.naturalWidth / n, fh = img.naturalHeight;
-      const i = Math.min(n - 1, Math.floor(p * n));
-      const h = g.tinggi * 1.15, w = h * fw / fh;
+    // Jurus api buatan sendiri (tanpa sprite, tanpa kotak): bola api berputar masuk ke dada monster → ledakan
+    // → gelombang kejut di tanah + dua sabetan api melengkung ke kiri & kanan + percikan bara.
+    function acakJurus(ke) { let x = (ke * 9301 + 49297) % 233280; return () => (x = (x * 9301 + 49297) % 233280) / 233280; }
+    function gambarJurusEfek(g, p) {
+      const dada = { x: g.x, y: g.kaki - g.tinggi * 0.55 };
+      const r = acakJurus((st && st.jurusKe) || 1);
       ctx.save();
-      ctx.fillStyle = 'rgba(60,30,10,.25)';
-      ctx.beginPath(); ctx.ellipse(g.x, g.kaki, w * 0.38, h * 0.05, 0, 0, Math.PI * 2); ctx.fill();
-      gambarAura(g, performance.now());
-      ctx.translate(g.x, 0); ctx.scale(jalan.arah < 0 ? -1 : 1, 1); ctx.translate(-g.x, 0);
-      ctx.drawImage(img, i * fw, 0, fw, fh, g.x - w / 2, g.kaki - h * 0.92, w, h);
+      ctx.globalCompositeOperation = 'lighter';
+      if (p < LEPAS) {
+        const k = p / LEPAS;
+        // inti api di dada membesar
+        const ri = g.tinggi * (0.06 + 0.16 * k);
+        const gi = ctx.createRadialGradient(dada.x, dada.y, 0, dada.x, dada.y, ri * 2.2);
+        gi.addColorStop(0, 'rgba(255,255,220,.95)'); gi.addColorStop(0.35, 'rgba(255,170,40,.75)'); gi.addColorStop(1, 'rgba(255,60,20,0)');
+        ctx.fillStyle = gi; ctx.beginPath(); ctx.arc(dada.x, dada.y, ri * 2.2, 0, Math.PI * 2); ctx.fill();
+        // 14 bola api berputar spiral menuju inti
+        for (let i = 0; i < 14; i++) {
+          const fase = (k * 1.25 + i / 14) % 1, rad = g.tinggi * (1.05 - 0.95 * fase);
+          const sud = i * 2.4 + k * 9 + fase * 4;
+          const x = dada.x + Math.cos(sud) * rad, y = dada.y + Math.sin(sud) * rad * 0.55;
+          const uk = 6 + 16 * fase;
+          ctx.globalAlpha = 0.35 + 0.65 * fase;
+          ctx.drawImage(bola, x - uk / 2, y - uk / 2, uk, uk);
+        }
+      } else {
+        const k = (p - LEPAS) / (1 - LEPAS), e = 1 - Math.pow(1 - k, 3);
+        // kilatan ledakan
+        if (k < 0.45) {
+          const rf = g.tinggi * (0.3 + 1.4 * (k / 0.45));
+          const gf = ctx.createRadialGradient(dada.x, dada.y, 0, dada.x, dada.y, rf);
+          gf.addColorStop(0, `rgba(255,255,235,${0.95 * (1 - k / 0.45)})`); gf.addColorStop(0.5, `rgba(255,150,40,${0.6 * (1 - k / 0.45)})`); gf.addColorStop(1, 'rgba(255,60,20,0)');
+          ctx.globalAlpha = 1; ctx.fillStyle = gf; ctx.beginPath(); ctx.arc(dada.x, dada.y, rf, 0, Math.PI * 2); ctx.fill();
+        }
+        // dua gelombang kejut elips di tanah
+        [0, 0.18].forEach((tunda) => {
+          const kk = Math.max(0, (k - tunda) / (1 - tunda));
+          if (kk <= 0) return;
+          const rx = g.tinggi * (0.25 + 2.4 * (1 - Math.pow(1 - kk, 2)));
+          ctx.globalAlpha = 0.85 * (1 - kk);
+          ctx.strokeStyle = 'rgba(255,170,60,1)'; ctx.lineWidth = 10 * (1 - kk) + 2;
+          ctx.beginPath(); ctx.ellipse(g.x, g.kaki, rx, rx * 0.2, 0, 0, Math.PI * 2); ctx.stroke();
+        });
+        // sabetan api melengkung ke kiri & kanan (bulan sabit tebal → tipis)
+        [-1, 1].forEach((arah) => {
+          const pjg = Math.PI * 0.75 * e, R = g.tinggi * (0.45 + 1.1 * e);
+          const awal = arah < 0 ? Math.PI * 1.05 : -Math.PI * 0.05;
+          for (let lap = 0; lap < 3; lap++) {
+            ctx.globalAlpha = (1 - k * 0.85) * (0.9 - lap * 0.22);
+            ctx.strokeStyle = lap === 0 ? '#FFF2B0' : lap === 1 ? '#FFB43C' : '#FF5A1E';
+            ctx.lineWidth = (30 - lap * 8) * (1 - k * 0.6);
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.ellipse(dada.x, dada.y + g.tinggi * 0.15, R * (1 + lap * 0.06), R * 0.42, 0, arah < 0 ? awal : awal - pjg, arah < 0 ? awal + pjg : awal, false);
+            ctx.stroke();
+          }
+        });
+        // percikan bara beterbangan dengan gravitasi
+        for (let i = 0; i < 26; i++) {
+          const sud = r() * Math.PI * 2, v = g.tinggi * (0.6 + r() * 1.6);
+          const x = dada.x + Math.cos(sud) * v * e, y = dada.y + Math.sin(sud) * v * e * 0.6 + g.tinggi * 0.9 * k * k;
+          const uk = (4 + r() * 8) * (1 - k);
+          ctx.globalAlpha = 1 - k;
+          ctx.drawImage(bola, x - uk / 2, y - uk / 2, uk, uk);
+        }
+      }
       ctx.restore();
     }
     // Aura jurus: lingkaran api berdenyut di belakang monster saat bersiap menyerang / menang.
@@ -322,7 +386,7 @@
       const ke = (st.jurusKe || 0) + 1;
       if (sisa <= 0 && jurusDitembak < ke) {
         jurusDitembak = ke;
-        const dmg = st.jurusInfo ? st.jurusInfo.dmg : 4 * ((st.skala || [1])[levelIdx()] || 1);
+        const dmg = st.jurusInfo ? st.jurusInfo.dmg : (st.jurusDmgMaks ?? 4);
         const nyawaBaru = Math.max(0, (st.nyawa ?? 100) - dmg);
         prediksi = { ke, nyawa: nyawaBaru };
         st.nyawa = nyawaBaru; // bar langsung turun; server mengoreksi saat statusnya masuk
@@ -383,6 +447,8 @@
       tLalu = t;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, W, H);
+      const getar = getarLayar();
+      if (getar) ctx.translate((Math.random() - 0.5) * getar, (Math.random() - 0.5) * getar);
       gerakMonster(dt);
       cekJurus();
       const g = geometri();
@@ -392,7 +458,10 @@
       const tampil = st.fase === 'tanding' || akhir;
       if (tampil && !(akhir && akhir.jenis === 'kabur' && (jalan.x < -0.3 || jalan.x > 1.3))) {
         if (akhir && akhir.jenis === 'monster') { ctx.fillStyle = `rgba(120,0,10,${0.35 * Math.min(1, (t - akhir.t0) / 800)})`; ctx.fillRect(0, 0, W, H); }
+        const ps = mati == null ? progresSerang() : null;
+        if (ps != null && ps < LEPAS && st.wujud === 'lucu') gambarAura(g, t);
         (st.wujud === 'lucu' ? gambarMonsterLucu : gambarRajaBatu)(g, t, kedip, mati);
+        if (ps != null && !gerakMinim) gambarJurusEfek(g, ps);
         aturZona(akhir && akhir.selesai && akhir.jenis !== 'monster' ? null : g);
       } else aturZona(null);
       gambarPancaran(t);
