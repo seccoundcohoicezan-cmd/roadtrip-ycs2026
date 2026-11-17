@@ -374,22 +374,57 @@
       ctx.beginPath(); ctx.ellipse(x - h * 0.2, y + h * 0.05 + jatuh * h * 0.2, s * 0.16, s * 0.24, 0, 0, Math.PI * 2); ctx.fill();
       ctx.restore();
     }
-    // Warga tumbang kena jurus monster: rebah, pudar, arwah kecil naik sebentar.
+    // Warga tumbang kena jurus monster: terpental menjauhi monster sambil melambung, mendarat rebah (debu),
+    // lalu tergeletak dengan warna pudar + bintang "pusing" berputar di atas kepala (ramah anak, tanpa darah).
+    const abuCache = new WeakMap();
+    function spriteAbu(sp) {
+      let c = abuCache.get(sp);
+      if (c) return c;
+      c = document.createElement('canvas'); c.width = sp.width; c.height = sp.height;
+      const x = c.getContext('2d'); x.drawImage(sp, 0, 0);
+      try {
+        const d = x.getImageData(0, 0, c.width, c.height), p = d.data;
+        for (let i = 0; i < p.length; i += 4) { const l = p[i] * 0.3 + p[i + 1] * 0.59 + p[i + 2] * 0.11; p[i] = l * 0.55 + p[i] * 0.45; p[i + 1] = l * 0.55 + p[i + 1] * 0.45; p[i + 2] = l * 0.6 + p[i + 2] * 0.4 + 8; }
+        x.putImageData(d, 0, 0);
+      } catch (e) { /* kanvas tercemar: pakai warna asli */ }
+      abuCache.set(sp, c);
+      return c;
+    }
+    function bintang(x, y, r) {
+      ctx.beginPath();
+      for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.45 : r; ctx.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); }
+      ctx.closePath(); ctx.fill();
+    }
     function gambarTumbang(w, sp, px, py, h, sw, sh, k, t) {
-      const u = Math.min(1, (performance.now() - w.mati) / 450);
+      const u = (performance.now() - w.mati) / 1000;   // detik sejak kena
+      const arah = w.matiArah || (w.x < 0.5 ? -1 : 1);
+      const terbang = Math.min(1, u / 0.5), e = 1 - Math.pow(1 - terbang, 2);
+      const dx = arah * h * 0.55 * e;
+      const lompat = Math.sin(Math.PI * terbang) * h * 0.45;
+      const putar = arah * Math.PI / 2 * e;
+      const cx = px + dx, cy = py - h * 0.5 * (1 - e) - h * 0.14 * e - lompat;
+      // bayangan
+      ctx.fillStyle = 'rgba(70,45,20,' + (0.12 + 0.12 * e) + ')';
+      ctx.beginPath(); ctx.ellipse(cx, py, h * (0.18 + 0.32 * e), h * 0.06, 0, 0, Math.PI * 2); ctx.fill();
       ctx.save();
-      ctx.globalAlpha = 1 - 0.45 * u;
-      ctx.translate(px, py);
-      ctx.rotate(-Math.PI / 2 * u * (w.x < 0.5 ? 1 : -1));
-      ctx.drawImage(sp, -sw / 2, -(SPR_H + SPR_ATAS) * k, sw, sh);
+      ctx.translate(cx, cy); ctx.rotate(putar);
+      ctx.globalAlpha = 1 - 0.15 * e;
+      ctx.drawImage(e >= 1 ? spriteAbu(sp) : sp, -sw / 2, -(SPR_H + SPR_ATAS) * k + h * 0.5, sw, sh);
       ctx.restore();
-      const a = (performance.now() - w.mati) / 1600;
-      if (a < 1) {
-        ctx.save(); ctx.globalAlpha = 0.75 * (1 - a); ctx.fillStyle = '#FFFFFF';
-        const gy = py - h * 0.6 - a * h * 1.2, r = h * 0.18;
-        ctx.beginPath(); ctx.arc(px, gy, r, Math.PI, 0); ctx.lineTo(px + r, gy + r * 1.3); ctx.lineTo(px, gy + r); ctx.lineTo(px - r, gy + r * 1.3); ctx.closePath(); ctx.fill();
-        ctx.fillStyle = '#333'; ctx.beginPath(); ctx.arc(px - r * 0.35, gy, r * 0.13, 0, 7); ctx.arc(px + r * 0.35, gy, r * 0.13, 0, 7); ctx.fill();
-        ctx.restore();
+      // debu saat mendarat
+      if (u > 0.45 && u < 1.1) {
+        const d = (u - 0.45) / 0.65;
+        ctx.fillStyle = 'rgba(230,205,170,' + (0.6 * (1 - d)) + ')';
+        for (let i = 0; i < 4; i++) { ctx.beginPath(); ctx.arc(cx + (i - 1.5) * h * 0.22 * (0.6 + d), py - h * 0.05 - d * h * 0.12, h * (0.06 + 0.1 * d), 0, Math.PI * 2); ctx.fill(); }
+      }
+      // bintang pusing di atas kepala (kepala ada di sisi arah jatuh)
+      if (e >= 1) {
+        const kx = cx + arah * h * 0.42, ky = py - h * 0.2;
+        ctx.fillStyle = '#FFD84D';
+        for (let i = 0; i < 3; i++) {
+          const a = t / 260 + i * 2.094;
+          bintang(kx + Math.cos(a) * h * 0.2, ky + Math.sin(a) * h * 0.07 - h * 0.08, Math.max(2.5, h * 0.075));
+        }
       }
       w.layar = null; // tidak bisa diketuk
     }
@@ -711,7 +746,7 @@
       get zona() { return zona; },
       // Lawan Monster: warga panik selama monster di plaza; tumbangkan/bangkitkan warga (w.mati = waktu tumbang).
       setPanik(on) { panik = !!on; mulai(); },
-      tumbang(w) { if (w && !w.mati) { w.mati = performance.now(); w.diam = false; mulai(); } },
+      tumbang(w, arah) { if (w && !w.mati) { w.mati = performance.now(); w.matiArah = arah || 0; w.diam = false; mulai(); } },
       bangkitSemua() { warga.forEach((w) => { w.mati = 0; }); mulai(); },
       setZona(z) {
         zona = z && z.lebar > 0 ? z : null;

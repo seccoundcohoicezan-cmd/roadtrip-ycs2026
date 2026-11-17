@@ -62,6 +62,7 @@
       const img = (src) => { const i = new Image(); i.decoding = 'async'; i.src = src; return i; };
       aset.lari = img('/assets/img/monster/raja-lari.webp');     // 10 frame horizontal
       aset.runtuh = img('/assets/img/monster/raja-runtuh.webp'); // 9 frame horizontal
+      aset.serang = img('/assets/img/monster/raja-serang.webp'); // 8 frame jurus api (dari animasi panitia)
     }
     // Bola cahaya dirender sekali lalu dipakai ulang (lebih murah daripada gradient per frame).
     const bola = document.createElement('canvas');
@@ -133,8 +134,14 @@
     const jalan = { x: 0.5, y: 0.72, tx: 0.5, ty: 0.72, arah: 1, jeda: 0.8, bergerak: false };
     const sinarJurus = [];   // pancaran jurus: {t0, x0, y0, x1, y1}
     const konfeti = [];
-    let jurusDitembak = 0, jurusSinkron = 0;
+    let jurusDitembak = 0, jurusSinkron = 0, prediksi = null; // prediksi: {ke, nyawa} sampai server mengonfirmasi jurus
     const AWAL_JURUS = 1300; // telegraf (ms) sebelum jurus
+    const SERANG_MS = 1400; // animasi jurus api: mulai 700 ms sebelum waktu jurus, pancaran keluar di tengah (frame ledakan)
+    function progresSerang() {
+      if (akhir && akhir.jenis === 'monster') { const u = (performance.now() - akhir.t0) / SERANG_MS; return u >= 0 && u < 1 ? u : null; }
+      const s = sisaJurus();
+      return s <= SERANG_MS / 2 && s > -SERANG_MS / 2 ? (SERANG_MS / 2 - s) / SERANG_MS : null;
+    }
     const sisaJurus = () => (st && st.fase === 'tanding' && st.jurus && st.jurusBerikut ? st.jurusBerikut - now() : Infinity);
     function gerakMonster(dt) {
       jalan.bergerak = false;
@@ -222,7 +229,9 @@
       ctx.restore();
     }
     function gambarRajaBatu(g, t, kedip, mati) {
-      const lari = aset.lari, runtuh = aset.runtuh;
+      const lari = aset.lari, runtuh = aset.runtuh, serang = aset.serang;
+      const ps = mati == null ? progresSerang() : null;
+      if (ps != null && serang && serang.complete && serang.naturalWidth) return gambarSerang(g, serang, ps);
       const sumber = mati != null && runtuh && runtuh.complete ? runtuh : lari;
       if (!sumber || !sumber.complete || !sumber.naturalWidth) return gambarMonsterLucu(g, t, kedip, mati);
       const n = sumber === runtuh ? 9 : 10;
@@ -246,6 +255,19 @@
       ctx.restore();
     }
 
+    // Jurus api: 8 frame sprite serangan (pusaran api + ledakan), sedikit lebih besar dari monster, menghadap arah jalan.
+    function gambarSerang(g, img, p) {
+      const n = 8, fw = img.naturalWidth / n, fh = img.naturalHeight;
+      const i = Math.min(n - 1, Math.floor(p * n));
+      const h = g.tinggi * 1.15, w = h * fw / fh;
+      ctx.save();
+      ctx.fillStyle = 'rgba(60,30,10,.25)';
+      ctx.beginPath(); ctx.ellipse(g.x, g.kaki, w * 0.38, h * 0.05, 0, 0, Math.PI * 2); ctx.fill();
+      gambarAura(g, performance.now());
+      ctx.translate(g.x, 0); ctx.scale(jalan.arah < 0 ? -1 : 1, 1); ctx.translate(-g.x, 0);
+      ctx.drawImage(img, i * fw, 0, fw, fh, g.x - w / 2, g.kaki - h * 0.92, w, h);
+      ctx.restore();
+    }
     // Aura jurus: lingkaran api berdenyut di belakang monster saat bersiap menyerang / menang.
     function gambarAura(g, t) {
       const r = g.tinggi * (0.55 + 0.08 * Math.sin(t / 70));
@@ -285,9 +307,9 @@
           const tx = w.layar.x, ty = w.layar.y + w.layar.h * 0.5, ke = tx < ox ? -1 : 1;
           const ujungX = ke < 0 ? -40 : W + 40, ujungY = oy + (ty - oy) * ((ujungX - ox) / ((tx - ox) || 1));
           sinarJurus.push({ t0: t0 + i * 60, x0: ox, y0: oy, x1: ujungX, y1: ujungY, kena: { x: tx, y: ty } });
-          setTimeout(() => fest.tumbang(w), 120 + i * 60);
-        } else if (animasi) fest.tumbang(w);
-        else { fest.tumbang(w); w.mati = performance.now() - 5000; }
+          setTimeout(() => fest.tumbang(w, ke), 120 + i * 60);
+        } else if (animasi) fest.tumbang(w, w.layar.x < ox ? -1 : 1);
+        else { fest.tumbang(w, w.layar.x < ox ? -1 : 1); w.mati = performance.now() - 5000; }
       });
       mulaiGambar();
     }
@@ -301,9 +323,12 @@
       if (sisa <= 0 && jurusDitembak < ke) {
         jurusDitembak = ke;
         const dmg = st.jurusInfo ? st.jurusInfo.dmg : 4 * ((st.skala || [1])[levelIdx()] || 1);
-        sinkronTumbang(Math.max(0, (st.nyawa ?? 100) - dmg), true);
+        const nyawaBaru = Math.max(0, (st.nyawa ?? 100) - dmg);
+        prediksi = { ke, nyawa: nyawaBaru };
+        st.nyawa = nyawaBaru; // bar langsung turun; server mengoreksi saat statusnya masuk
+        sinkronTumbang(nyawaBaru, true);
         if (navigator.vibrate && !gerakMinim) try { navigator.vibrate([30, 40, 30]); } catch (e) {}
-        poll(250);
+        poll(600); setTimeout(() => poll(0), 1600);
       }
     }
     function tulisNyawa() {
@@ -464,6 +489,9 @@
     let infoUjiSalah = 0;
     function terapkan(baru) {
       if (!baru || !baru.ok) return;
+      // Status yang belum memuat jurus terakhir jangan menaikkan bar nyawa lagi (cegah kedip).
+      if (prediksi && baru.fase === 'tanding' && (baru.jurusKe || 0) < prediksi.ke) baru.nyawa = Math.min(baru.nyawa ?? 100, prediksi.nyawa);
+      else prediksi = null;
       if (uji && (baru.ujiSalah || (baru.uji && baru.fase === 'tidak_ada')) && !infoUjiSalah) {
         infoUjiSalah = Date.now() + 8000;
         banner.textContent = 'Link uji monster sudah tidak berlaku. Minta link baru ke admin.';
