@@ -116,13 +116,15 @@ function buatMonster(app, opsi = {}) {
     const live = (c.live || []).map((l) => ({judul: l.judul, platform: l.platform, link: l.link, mulai: Date.parse(l.mulai)})).filter((l) => l.mulai >= t).sort((a, b) => a.mulai - b.mulai)[0] || null;
     return {fase: 'aktif', id: 'u' + u.mulai.toString(36), mulai: u.mulai, selesai: u.sampai, live, uji: true};
   }
+  // Pengaturan efektif per event: event uji boleh memakai target tap sendiri (diisi admin saat Mulai uji).
+  const mUntuk = (c, j) => (j && j.uji && st.uji && st.uji.target ? {...c.monster, target: st.uji.target} : c.monster);
   const ujiSah = (kode) => !!(kode && st.uji && kode === st.uji.kode);
 
   // Jurus monster: tiap J detik sejak event mulai, nyawa warga berkurang damage × skala level.
   // Perisai: tenaga yang terkumpul sejak jurus sebelumnya (≥ perisai% target level) menahan hingga 80% damage.
   // Diproses malas (saat status/tap diminta) dengan jam server, jadi semua HP melihat nyawa yang sama.
   function prosesJurus(c, j, e, t) {
-    const m = c.monster;
+    const m = mUntuk(c, j);
     if (!m.jurus || e.kalah || e.monsterMenang || !j.mulai) return;
     if (e.nyawa == null) Object.assign(e, {nyawa: 100, jurusKe: 0, totalJurus: 0, monsterMenang: 0, jurusInfo: null});
     const J = angka(m.jurusDetik, 8, 4, 60) * 1000;
@@ -144,7 +146,7 @@ function buatMonster(app, opsi = {}) {
   }
 
   function status(c, j, t) {
-    const m = c.monster;
+    const m = mUntuk(c, j);
     const a = aturan(m);
     const dasar = {ok: true, now: t, fase: j.fase, nama: m.nama || 'Raja Batu', wujud: m.wujud === 'lucu' ? 'lucu' : 'raja_batu'};
     if (j.dihentikan) dasar.dihentikan = true;
@@ -159,7 +161,7 @@ function buatMonster(app, opsi = {}) {
     const pemain = jumlahAktif(j.id);
     out.fase = e.kalah ? 'menang' : e.monsterMenang ? 'monster_menang' : t < j.selesai ? 'tanding' : 'habis';
     const J = angka(m.jurusDetik, 8, 4, 60) * 1000;
-    Object.assign(out, {nyawa: e.nyawa ?? 100, jurus: !!m.jurus, jurusMs: J, jurusKe: e.jurusKe || 0, jurusBerikut: m.jurus && out.fase === 'tanding' ? j.mulai + ((e.jurusKe || 0) + 1) * J : null,
+    Object.assign(out, {nyawa: e.nyawa ?? 100, jurus: !!m.jurus, jurusMs: J, jurusAnimMs: Math.round(angka(m.jurusAnim, 1.6, 0.6, 4) * 1000), jurusDmgMaks: Math.round(angka(m.jurusDamage, 4, 0, 100) * a.skala[Math.min(e.lvl || 1, a.target.length) - 1] * 10) / 10, jurusKe: e.jurusKe || 0, jurusBerikut: m.jurus && out.fase === 'tanding' ? j.mulai + ((e.jurusKe || 0) + 1) * J : null,
       jurusInfo: e.jurusInfo || null, monsterMenang: e.monsterMenang ? new Date(e.monsterMenang).toISOString() : null});
     Object.assign(out, {level: Math.min(e.lvl, a.target.length), tenaga: e.tenaga, total: e.total, kalah: e.kalah ? new Date(e.kalah).toISOString() : null, naik: e.naik || null,
       pemain, tiket: e.n, interval: intervalUntuk(a.interval, pemain)});
@@ -243,7 +245,7 @@ function buatMonster(app, opsi = {}) {
     const c = cfg(), t = now(), j = jadwalUntuk(c, t, p.uji || null);
     if (j.fase !== 'aktif' || p.e !== j.id) return {ok: true, terima: 0, buang: true, status: status(c, j, t)};
     if ((pid[0] === '~') !== !!j.uji) return {ok: false, error: 'sesi_habis'}; // token uji hanya untuk event uji
-    const a = aturan(c.monster), e = ev(j.id), maks = a.target.length;
+    const a = aturan(mUntuk(c, j)), e = ev(j.id), maks = a.target.length;
     prosesJurus(c, j, e, t);
     const u = e.u[pid] || (e.u[pid] = {p: 0, q: -1});
     let terima = 0;
@@ -265,7 +267,7 @@ function buatMonster(app, opsi = {}) {
           if (e.lvl < maks) { e.lvl += 1; e.tenaga = 0; e.naik = t; }
           else { e.tenaga = a.target[e.lvl - 1]; e.kalah = t; }
         }
-        if (!e.tiket[pid] && u.p >= angka(c.monster.tiketMin, 1, 1, 1e9)) terbitkanTiket(j.id, e, pid, a);
+        if (!e.tiket[pid] && u.p >= angka(mUntuk(c, j).tiketMin, 1, 1, 1e9)) terbitkanTiket(j.id, e, pid, a);
       }
       ubah();
     }
@@ -311,7 +313,7 @@ function buatMonster(app, opsi = {}) {
     const u = st.uji;
     if (!u) return null;
     const e = st.events['u' + u.mulai.toString(36)] || {};
-    return {kode: u.kode, mulai: new Date(u.mulai).toISOString(), sampai: new Date(u.sampai).toISOString(), berjalan: now() < u.sampai, tiket: e.n || 0, total: e.total || 0, kalah: !!e.kalah};
+    return {kode: u.kode, mulai: new Date(u.mulai).toISOString(), sampai: new Date(u.sampai).toISOString(), berjalan: now() < u.sampai, target: u.target, tiket: e.n || 0, total: e.total || 0, kalah: !!e.kalah, monsterMenang: !!e.monsterMenang};
   }
 
   /* ---------- Hadiah & peluang spin ---------- */
@@ -392,9 +394,10 @@ function buatMonster(app, opsi = {}) {
     if (p.aksi === 'spin') return spin(id, !!p.latihan);
     if (p.aksi === 'uji-mulai') {
       const menit = Math.round(angka(p.menit, 10, 1, 120));
-      st.uji = {kode: crypto.randomBytes(6).toString('base64url'), mulai: now(), sampai: now() + menit * MENIT};
+      const target = String(p.target || '').split(/[;,\s]+/).map((x) => Math.round(Number(x.replace(/\./g, '')))).filter((x) => x > 0 && x <= 1e9).slice(0, 10);
+      st.uji = {kode: crypto.randomBytes(6).toString('base64url'), mulai: now(), sampai: now() + menit * MENIT, target: target.length ? target.join(',') : null};
       st.ujiPemain = {};
-      app.ctx.logAdmin_('mulai uji monster', menit + ' menit');
+      app.ctx.logAdmin_('mulai uji monster', menit + ' menit' + (target.length ? ', target ' + target.join(',') : ''));
       ubah(); memo.t = 0;
       return {ok: true, uji: infoUji()};
     }

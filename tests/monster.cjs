@@ -239,3 +239,19 @@ test('pemenang publik: nama disingkat, hadiah, tanpa event uji', () => {
   const s2 = m.admin({token, aksi: 'spin', event: id});
   assert.ok(s2.rodaPutar.length >= 1); assert.equal(s2.targetRoda, s2.pemenang.nomor); assert.ok(s2.rodaPutar.some((x) => x.id === s2.pemenang.nomor));
 });
+
+test('mode uji: target tap sendiri & durasi animasi jurus tervalidasi', () => {
+  const {app, m} = siapkanMonster('5000,15000,40000');
+  const token = app.post({aksi: 'admin-login', sandi: app.sheets.Admin.rows[1][1]}).token;
+  const u = m.admin({token, aksi: 'uji-mulai', menit: 3, target: '30, 60'}).uji;
+  assert.equal(u.target, '30,60');
+  const s = m.lihat(u.kode);
+  assert.deepEqual(s.target, [30, 60], 'event uji memakai target tap uji'); assert.equal(s.levelMaks, 2);
+  assert.deepEqual(m.lihat().target, [5000, 15000, 40000], 'event asli tetap memakai target pengaturan');
+  assert.equal(s.jurusAnimMs, 1600);
+  const simpan = (nilai) => app.post({aksi: 'admin-simpan-pengaturan', token, nilai});
+  assert.deepEqual(simpan({monster_jurus_anim: '9'}).kunci, ['monster_jurus_anim']);
+  assert.equal(simpan({monster_jurus_anim: '2,5'}).ok, true);
+  app.cache.remove('cfg'); m.segarkan();
+  assert.equal(m.lihat(u.kode).jurusAnimMs, 2500);
+});

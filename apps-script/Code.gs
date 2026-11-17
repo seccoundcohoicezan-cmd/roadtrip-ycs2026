@@ -4,7 +4,7 @@ const HEADERS_LAMA = ['Waktu', 'ID permintaan', 'Nama', 'Sekolah', 'Email', 'Bin
 const HEADERS = HEADERS_LAMA.concat(['Kota/Kabupaten', 'Provinsi']);
 const REKAP_NAME = 'Rekap';
 const REKAP_VERSI = '3';
-const SKEMA_VERSI = '9';
+const SKEMA_VERSI = '10';
 const MAKS_KARAKTER = 40; // jumlah karakter adat di assets/js/festival.js (saat ini 24, cadangan untuk tambahan)
 const WIB = 7 * 3600 * 1000;
 
@@ -78,6 +78,7 @@ const PENGATURAN = [
   ['monster_interval_ms', '1000', 'Jeda kirim batch tap (ms, 500-5000). Otomatis diperlambat saat pemain sangat banyak.'],
   ['monster_batas_tap', '10', 'Batas tap per detik per pemain yang dihitung server (anti-bot).'],
   ['monster_jurus_aktif', 'YA', 'YA = monster mengeluarkan jurus berkala yang mengurangi nyawa warga; nyawa habis = monster menang.'],
+  ['monster_jurus_anim', '1.6', 'Durasi animasi jurus monster (detik, 0.6-4): bersiap, ledakan, gelombang api.'],
   ['monster_jurus_detik', '8', 'Jeda antar jurus monster (detik, 4-60).'],
   ['monster_jurus_damage', '4', 'Nyawa warga yang hilang per jurus di level 1 (%, naik sesuai ukuran level). Tanpa perlawanan: 100/4 = 25 jurus.'],
   ['monster_perisai', '2', 'Perisai: tenaga yang terkumpul antar jurus sebanyak N% target level menahan hingga 80% damage.'],
@@ -87,6 +88,7 @@ const PENGATURAN = [
 ];
 const MONSTER_PILIHAN = {monster_pemicu: ['sebelum_live', 'jadwal', 'manual'], monster_darurat: ['NORMAL', 'MULAI', 'STOP'], monster_wujud: ['raja_batu', 'lucu']};
 const MONSTER_ANGKA = {monster_menit_sebelum: [1, 180], monster_durasi: [1, 180], monster_level: [1, 10], monster_target_dasar: [10, 1e9], monster_interval_ms: [500, 5000], monster_batas_tap: [3, 30], monster_tiket_min: [1, 1000000], monster_jurus_detik: [4, 60], monster_jurus_damage: [0, 100], monster_perisai: [0, 100]};
+const MONSTER_DESIMAL = {monster_jurus_anim: [0.6, 4]};
 const KUNCI_YA_TIDAK = ['pakai_link_cadangan', 'klaim_aktif', 'survei_aktif', 'dana_aktif', 'dana_tampilkan_sisa', 'popup_aktif', 'monster_aktif', 'monster_jurus_aktif'];
 const KUNCI_WAKTU = ['waktu_pengumuman', 'klaim_berlaku_hingga', 'survei_buka', 'waktu_acara_mulai', 'waktu_acara_selesai', 'monster_waktu'];
 const KUNCI_ANGKA = ['road_target', 'road_tambahan', 'dana_kuota'];
@@ -383,7 +385,7 @@ function monsterPublik_(cfg) {
     target: cfg.monster_target, level: cfg.monster_level, targetDasar: cfg.monster_target_dasar, targetKali: cfg.monster_target_kali,
     poin: cfg.monster_poin, skalaNaik: cfg.monster_skala_naik, interval: cfg.monster_interval_ms, batasTap: cfg.monster_batas_tap,
     nama: cfg.monster_nama || 'Raja Batu', wujud: cfg.monster_wujud || 'raja_batu', tiketMin: cfg.monster_tiket_min || '1',
-    jurus: cfg.monster_jurus_aktif == null ? true : ya_(cfg.monster_jurus_aktif), jurusDetik: cfg.monster_jurus_detik || '8', jurusDamage: cfg.monster_jurus_damage || '4', perisai: cfg.monster_perisai || '2'
+    jurus: cfg.monster_jurus_aktif == null ? true : ya_(cfg.monster_jurus_aktif), jurusDetik: cfg.monster_jurus_detik || '8', jurusDamage: cfg.monster_jurus_damage || '4', perisai: cfg.monster_perisai || '2', jurusAnim: cfg.monster_jurus_anim || '1.6'
   };
 }
 // Validasi satu nilai monster_*; hasil null = tidak valid.
@@ -391,6 +393,7 @@ function nilaiMonster_(k, v) {
   if (MONSTER_PILIHAN[k]) { const u = k === 'monster_darurat' ? v.toUpperCase() : v.toLowerCase(); return MONSTER_PILIHAN[k].indexOf(u) >= 0 ? u : null; }
   if (MONSTER_ANGKA[k]) { const n = Number(v); return /^\d{1,10}$/.test(v) && n >= MONSTER_ANGKA[k][0] && n <= MONSTER_ANGKA[k][1] ? v : null; }
   if (k === 'monster_target' || k === 'monster_poin') { const d = v.split(/[,;\s]+/).filter(String); return d.length <= 10 && d.every(x => /^\d{1,9}$/.test(x) && Number(x) > 0) ? d.join(',') : null; }
+  if (MONSTER_DESIMAL[k]) { const n = Number(v.replace(',', '.')); return v !== '' && isFinite(n) && n >= MONSTER_DESIMAL[k][0] && n <= MONSTER_DESIMAL[k][1] ? String(n) : null; }
   if (k === 'monster_target_kali' || k === 'monster_skala_naik') { const n = Number(v.replace(',', '.')); return isFinite(n) && n >= 0 && n <= 20 && v !== '' ? String(n) : null; }
   if (k === 'monster_mulai_manual') return /^\d{0,15}$/.test(v) ? v : null;
   if (k === 'monster_nama') return teks_(v, 40) || 'Raja Batu';
