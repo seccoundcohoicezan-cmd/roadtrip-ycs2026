@@ -404,6 +404,16 @@
                 </div>
               </div>
             </section>
+            <section class="set-card" aria-labelledby="g-mon-jurus">
+              <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-bolt"/></svg></span><div><h2 id="g-mon-jurus">Jurus &amp; nyawa warga</h2><p>Monster menembakkan jurus berkala yang menumbangkan warga. Nyawa warga habis = monster menang. Tenaga yang terkumpul antar jurus menjadi perisai.</p></div></header>
+              <div class="set-grid">
+                <label class="switch" for="m-monster_jurus_aktif"><span>Jurus monster aktif<small>Mati = monster hanya bisa kalah atau kabur.</small></span><input type="checkbox" id="m-monster_jurus_aktif" data-key="monster_jurus_aktif" data-type="bool"></label>
+                <div class="field"><label for="m-monster_jurus_detik">Jeda antar jurus (detik)</label><input class="input" type="number" min="4" max="60" step="1" id="m-monster_jurus_detik" data-key="monster_jurus_detik"></div>
+                <div class="field"><label for="m-monster_jurus_damage">Damage per jurus di level 1 (%)</label><input class="input" type="number" min="0" max="100" step="1" id="m-monster_jurus_damage" data-key="monster_jurus_damage"><p class="field__hint">Ikut naik sesuai ukuran level. Tanpa perlawanan, 4% = warga habis setelah 25 jurus.</p></div>
+                <div class="field"><label for="m-monster_perisai">Perisai (% target level antar jurus)</label><input class="input" type="number" min="0" max="100" step="1" id="m-monster_perisai" data-key="monster_perisai"><p class="field__hint">Bila tenaga sebanyak ini terkumpul di antara dua jurus, damage ditahan 80%.</p></div>
+                <p class="field__hint field--full" id="jurus-ringkas"></p>
+              </div>
+            </section>
             <section class="set-card" aria-labelledby="g-mon-tampil">
               <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-gear"/></svg></span><div><h2 id="g-mon-tampil">Tampilan &amp; perlindungan</h2><p>Wujud monster dan batas anti-spam.</p></div></header>
               <div class="set-grid">
@@ -736,6 +746,8 @@
       const a = window.YCSMonsterAturan.aturan({target: v.monster_target, level: v.monster_level, targetDasar: v.monster_target_dasar, targetKali: v.monster_target_kali, poin: v.monster_poin, skalaNaik: v.monster_skala_naik});
       $('#mon-pratinjau').innerHTML = a.target.map((t, i) => `<tr><td>${i + 1}</td><td>${nf.format(a.poin[i])}</td><td>${nf.format(t)}</td><td>${String(a.skala[i]).replace('.', ',')}×</td><td>±${nf.format(Math.ceil(t / a.poin[i] / 1000))} tap/orang</td></tr>`).join('');
       $$('#f-monster [data-pemicu]').forEach((el) => { el.hidden = !el.dataset.pemicu.split(' ').includes(v.monster_pemicu); });
+      const jd = Number(v.monster_jurus_detik) || 8, dm = Number(v.monster_jurus_damage) || 0;
+      $('#jurus-ringkas').textContent = v.monster_jurus_aktif !== 'YA' ? 'Jurus mati.' : dm ? `Tanpa perlawanan, warga habis dalam ±${Math.ceil(100 / dm) * jd} detik di level 1. Perisai level 1 = ${nf.format(Math.round(a.target[0] * (Number(v.monster_perisai) || 0) / 100))} tenaga per ${jd} detik.` : 'Damage 0: jurus hanya efek visual.';
       // Daftar kemunculan dari jadwal live (pemicu sebelum_live) atau waktu tertentu.
       const sekarang = data ? Date.parse(data.sekarang) : Date.now();
       let item = [];
@@ -790,7 +802,7 @@
       sibuk(btn, false);
     });
     // Status langsung dari /srv/monster (server data, endpoint publik yang sama dengan peserta).
-    const FASE = {mati: 'Tidak aktif', tidak_ada: 'Tidak ada event terjadwal', tunggu: 'Menunggu kemunculan', tanding: 'Sedang bertanding', menang: 'Monster sudah kalah', habis: 'Waktu habis (monster belum kalah)'};
+    const FASE = {mati: 'Tidak aktif', tidak_ada: 'Tidak ada event terjadwal', tunggu: 'Menunggu kemunculan', tanding: 'Sedang bertanding', menang: 'Monster sudah kalah (warga menang)', monster_menang: 'Monster menang (nyawa warga habis)', habis: 'Monster kabur (waktu habis)'};
     let monTimer = 0;
     async function statusMon() {
       clearTimeout(monTimer);
@@ -821,13 +833,17 @@
       spinData = d;
       $('#spin-event').innerHTML = d.events.length ? d.events.map((e) => `<option value="${esc(e.id)}"${e.id === d.event ? ' selected' : ''}>${e.uji ? 'UJI · ' : ''}${esc(e.id)} · ${nf.format(e.tiket)} tiket${e.kalah ? ' · menang' : ''}</option>`).join('') : '<option value="">Belum ada event</option>';
       renderTiket();
+      if (!hadiahEdit.length && !berputar) gambarRoda(rodaNama());
     }
+    // Tanpa hadiah: roda berisi nama peserta (maks 12 tiket aktif) agar tetap lingkaran yang berputar.
+    const rodaNama = () => (spinData ? spinData.tiket.filter((x) => x.status === 'aktif') : []).slice(0, 12).map((x) => ({id: x.nomor, nama: x.nama.split(/\s+/)[0] + ' ' + ((x.nama.split(/\s+/)[1] || '')[0] || '') + '.', bobot: 1, persen: 0}));
+    const rodaSekarang = (roda) => (roda && roda.length ? roda : rodaNama());
     async function muatHadiah() {
       const d = await monAdmin({aksi: 'spin-info'});
       if (!d.ok) return;
       hadiahEdit = d.hadiah.map((h) => ({id: h.id, nama: h.nama, stok: h.stok == null ? '' : String(h.stok), bobot: String(h.bobot), terpakai: h.terpakai}));
       $$('input[name="peluang"]').forEach((r) => { r.checked = r.value === d.peluang; });
-      renderHadiah(); gambarRoda(d.roda);
+      renderHadiah(); gambarRoda(rodaSekarang(d.roda));
     }
     // Daftar hadiah yang ikut diundi menurut isian form (untuk pratinjau persen & roda).
     const rodaDariEdit = () => {
@@ -852,10 +868,10 @@
       hadiahEdit[+tr.dataset.i][e.target.dataset.f] = e.target.value;
       const roda = rodaDariEdit();
       $$('#hadiah-body tr[data-i]').forEach((row) => { const h = hadiahEdit[+row.dataset.i]; const r = roda.find((x) => x.id === h.id && x.nama === h.nama.trim()); row.querySelector('.h-persen').textContent = r ? String(r.persen).replace('.', ',') + '%' : '0%'; });
-      gambarRoda(roda);
+      gambarRoda(rodaSekarang(roda));
       $('#hadiah-status').textContent = 'Ada perubahan yang belum disimpan.';
     });
-    $('#hadiah-body').addEventListener('click', (e) => { const b = e.target.closest('[data-hapus]'); if (!b) return; hadiahEdit.splice(+b.dataset.hapus, 1); renderHadiah(); gambarRoda(rodaDariEdit()); $('#hadiah-status').textContent = 'Ada perubahan yang belum disimpan.'; });
+    $('#hadiah-body').addEventListener('click', (e) => { const b = e.target.closest('[data-hapus]'); if (!b) return; hadiahEdit.splice(+b.dataset.hapus, 1); renderHadiah(); gambarRoda(rodaSekarang(rodaDariEdit())); $('#hadiah-status').textContent = 'Ada perubahan yang belum disimpan.'; });
     $('#hadiah-tambah').addEventListener('click', () => { hadiahEdit.push({id: 'h' + Math.random().toString(36).slice(2, 9), nama: '', stok: '', bobot: '1', terpakai: 0}); renderHadiah(); const n = $$('#hadiah-body .h-nama'); n[n.length - 1].focus(); });
     $('#hadiah-simpan').addEventListener('click', async (e) => {
       const btn = e.currentTarget;
@@ -866,7 +882,7 @@
       if (!d.ok) { $('#hadiah-status').textContent = d.error === 'nilai_tidak_valid' ? 'Stok/bobot tidak valid pada "' + d.hadiah + '".' : pesan(d); return; }
       $('#hadiah-status').textContent = 'Tersimpan.';
       hadiahEdit = d.hadiah.map((h) => ({id: h.id, nama: h.nama, stok: h.stok == null ? '' : String(h.stok), bobot: String(h.bobot), terpakai: h.terpakai}));
-      renderHadiah(); gambarRoda(d.roda);
+      renderHadiah(); gambarRoda(rodaSekarang(d.roda));
     });
     $$('input[name="peluang"]').forEach((r) => r.addEventListener('change', () => { $('#hadiah-status').textContent = 'Ada perubahan yang belum disimpan.'; }));
     $('#spin-gear').addEventListener('click', () => {
@@ -878,9 +894,13 @@
     function gambarRoda(roda, sudut = rodaSudut) {
       rodaTampil = roda || [];
       const c = $('#spin-roda'), x = c.getContext('2d'), R = c.width / 2;
-      $('#spin-roda-wrap').hidden = !rodaTampil.length;
       x.clearRect(0, 0, c.width, c.height);
-      if (!rodaTampil.length) return;
+      if (!rodaTampil.length) { // tetap lingkaran walau belum ada hadiah/tiket
+        x.beginPath(); x.arc(R, R, R - 8, 0, Math.PI * 2); x.fillStyle = 'rgba(255,255,255,.18)'; x.fill(); x.strokeStyle = '#FFFBF3'; x.lineWidth = 4; x.stroke();
+        x.fillStyle = '#fff'; x.font = '700 22px Poppins, system-ui, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('Belum ada tiket', R, R + 70);
+        x.beginPath(); x.arc(R, R, 34, 0, Math.PI * 2); x.fillStyle = '#FFFBF3'; x.fill(); x.fillStyle = '#5B0A16'; x.font = '800 18px Poppins, system-ui, sans-serif'; x.fillText('YCS', R, R);
+        return;
+      }
       const total = rodaTampil.reduce((t, h) => t + h.bobot, 0);
       let a = sudut - Math.PI / 2;
       rodaTampil.forEach((h, i) => {
@@ -892,7 +912,7 @@
         x.fillStyle = '#fff'; x.font = '800 ' + Math.max(14, Math.min(26, 300 / Math.max(6, h.nama.length))) + 'px Poppins, system-ui, sans-serif';
         x.textAlign = 'right'; x.textBaseline = 'middle'; x.shadowColor = 'rgba(0,0,0,.45)'; x.shadowBlur = 4;
         if (besar > 0.12) x.fillText(h.nama.length > 22 ? h.nama.slice(0, 21) + '…' : h.nama, R - 26, 0);
-        x.font = '700 14px Poppins, system-ui, sans-serif'; if (besar > 0.2) x.fillText(String(h.persen).replace('.', ',') + '%', R - 26, 22);
+        x.font = '700 14px Poppins, system-ui, sans-serif'; if (besar > 0.2 && h.persen) x.fillText(String(h.persen).replace('.', ',') + '%', R - 26, 22);
         x.restore();
         a += besar;
       });
@@ -949,14 +969,15 @@
       const lama = 4800, akhir = Date.now() + lama;
       const melambat = () => { jeda = Math.min(420, jeda * 1.12); if (Date.now() < akhir - 300) setTimeout(melambat, 200); };
       melambat();
-      await Promise.all([putarRoda(d.rodaPutar || [], d.hadiah && d.hadiah.id, lama), new Promise((r) => setTimeout(r, lama))]);
+      gambarRoda(d.rodaPutar || [], rodaSudut);
+      await Promise.all([putarRoda(d.rodaPutar || [], d.targetRoda || (d.hadiah && d.hadiah.id), lama), new Promise((r) => setTimeout(r, lama))]);
       putar = false;
       isi.innerHTML = `<span>🎉 ${esc(d.pemenang.nama)}</span>`;
       $('#spin-detail').textContent = `${d.pemenang.sekolah} · ${d.pemenang.provinsi} · tiket ${d.pemenang.nomor}`;
       $('#spin-hadiah').textContent = d.hadiah ? 'Hadiah: ' + d.hadiah.nama : '';
       $('#spin-info').textContent = d.latihan ? 'Latihan: hasil tidak dicatat.' : `Pemenang ke-${d.ke} tercatat di tab Tiket Monster.`;
       berputar = false;
-      gambarRoda(d.roda, rodaSudut);
+      if (d.hadiah) gambarRoda(rodaSekarang(d.roda), rodaSudut);
       if (!d.latihan) { muatTiket(d.event); muatHadiah(); } else $('#spin-putar').disabled = false;
     });
 

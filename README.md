@@ -158,6 +158,15 @@ Tombol darurat: **Mulai sekarang** (event baru dari nol), **Stop darurat**, **Ke
 - **Spin undian saat live:** tab **Spin Undian** (lihat di bawah). Pemenang tidak bisa menang dua kali.
 - Batasan jujur: orang yang membuka mode penyamaran / menghapus data browser mendapat ID perangkat baru, tapi emailnya tetap terikat ke perangkat pertama; orang dengan beberapa email + beberapa browser masih bisa mendapat lebih dari satu tiket (ditandai bila sidik jari + IP sama).
 
+### Gameplay (MRKT-56 r4)
+
+- **Tap harus tepat** mengenai monster atau warga yang masih berdiri; tap di area kosong menampilkan "Meleset!" dan tidak dihitung.
+- **Monster berkeliling** plaza (bukan diam di tengah), menghadap arah jalannya; warga di dekatnya **panik** (tanda seru, keringat, gemetar, lari menyebar ke sisi plaza).
+- **Jurus monster** (`monster_jurus_*`): tiap N detik (bawaan 8) monster bersiap (aura merah + "Awas!") lalu menembakkan cahaya ke samping yang menumbangkan warga. **Nyawa warga** (bar hijau di HUD) dihitung di server dengan jam server: damage bawaan 4% × skala level per jurus. **Perisai**: tenaga yang terkumpul antar jurus sebanyak `monster_perisai`% target level menahan hingga 80% damage. Jumlah warga tumbang di layar mengikuti nyawa server.
+- **Tiga akhir** dengan tampilan khusus: *Monster Terkalahkan!* (sinar dari langit, Raja Batu runtuh, konfeti), *Raja Batu Menang!* (nyawa warga habis: layar merah, monster membesar, semua warga tumbang), *Raja Batu Kabur!* (waktu habis: monster lari keluar plaza). Semua punya tombol live dan **Ajak teman**.
+- **Pemenang spin di landing**: kartu "Yang udah bawa pulang HP" di bawah panggung festival (`/srv/pemenang`, nama disingkat + provinsi + hadiah; pemenang HP disorot di atas).
+- Roda spin admin **selalu lingkaran**: tanpa hadiah, roda berisi nama peserta dan berhenti di nama pemenang.
+
 ### Mode uji monster
 
 Admin → Lawan Monster → **Mode uji monster** → durasi → **Mulai uji** → buka link `/?uji-monster=KODE#satu-kata` di HP. Event uji terpisah dari event asli: hanya terlihat oleh pembawa link (walau monster mati/STOP), tidak wajib membuka festival, perangkat tidak diikat, dan tiket uji (catatan `UJI`) tidak ditulis ke Sheet. Tiket uji bisa dicoba di tab Spin Undian (event berawalan "UJI").
@@ -178,11 +187,11 @@ Admin → Lawan Monster → **Mode uji monster** → durasi → **Mulai uji** �
 ### Uji
 
 ```bash
-node --test tests/*.cjs                       # 23 tes: Code.gs, monster (perangkat/tiket/spin), sinkron server data ↔ Sheet
+node --test tests/*.cjs                       # 25 tes: Code.gs, monster (perangkat/tiket/spin), sinkron server data ↔ Sheet
 node tools/dev-server.cjs 8787                # :8787 situs+api, :8788 server data, :8789 Sheet tiruan (GET /__sheet)
 node tools/uji-beban-monster.cjs http://127.0.0.1:8787 400 20   # setelah seed {"kata":400} + Mulai sekarang
 ```
 
-Hasil lokal: 400 pemain + 400 pemantau selama 20 detik, 0 galat, 400 tiket terbit dan diteruskan ke Sheet tiruan. E2E browser (scripts MRKT-56) 44/44, E2E lama MRKT-45 78/78.
+Hasil lokal: 400 pemain + 400 pemantau selama 20 detik, 0 galat, 400 tiket terbit dan diteruskan ke Sheet tiruan. E2E browser (scripts MRKT-56) 49/49, E2E lama MRKT-45 78/78.
 
 Checklist sebelum event: admin → Mulai sekarang → monster muncul di 2 HP (Android kelas bawah + iPhone), warga menyingkir → ketuk di kedua HP → tiket muncul → mode pesawat 10 detik sambil mengetuk → online, tenaga bertambah sekali → menang → tombol live → spin di layar penuh → cek tab Tiket Monster di Sheet → Stop darurat.

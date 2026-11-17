@@ -746,6 +746,27 @@
     .fest__info { grid-column: 1 / -1; display: flex; gap: .5rem; align-items: flex-start; margin: 0; padding-top: .75rem; border-top: 1px dashed var(--line); font-size: .8125rem; color: var(--text-muted); }
     .fest__info::before { content: "i"; display: grid; place-items: center; width: 1.125rem; height: 1.125rem; flex: none; margin-top: .0625rem; border-radius: 50%; background: var(--surface-soft); color: var(--primary); font-size: .6875rem; font-weight: 800; font-style: normal; }
     .fest__info:empty { display: none; }
+    /* ============ Pemenang undian (anak muda: tegas, simpel) ============ */
+    .juara { margin-top: var(--space-5); padding: clamp(1.25rem, 4vw, 2rem); border-radius: 1.5rem; background: #120A1F; color: #fff; box-shadow: var(--shadow-lg); }
+    .juara__judul { margin-top: .5rem; font-size: clamp(1.5rem, 4vw, 2.25rem); line-height: 1.1; color: #fff; }
+    .juara__kepala { max-width: 40rem; }
+    .juara__label { display: inline-block; padding: .25rem .75rem; border-radius: 999px; background: #FFC93C; color: #120A1F; font-size: .75rem; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+    .juara__sub { margin-top: .5rem; color: #CFC6E6; }
+    .juara__daftar { display: grid; gap: .75rem; margin: var(--space-5) 0 0; padding: 0; list-style: none; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); }
+    .juara__item { display: flex; align-items: center; gap: .75rem; padding: .875rem 1rem; border-radius: 1.125rem; background: #1F1433; border: 1px solid #33255A; }
+    .juara__item.is-hp { background: linear-gradient(135deg, #FF3D7F, #FF8A3D); border-color: transparent; box-shadow: 0 16px 34px -18px #FF3D7F; }
+    .juara__ava { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; flex: none; border-radius: 50%; background: #FFC93C; color: #120A1F; font-weight: 900; font-size: 1.125rem; }
+    .juara__item.is-hp .juara__ava { background: #fff; color: #FF3D7F; }
+    .juara__isi { min-width: 0; line-height: 1.2; }
+    .juara__isi strong { display: block; font-size: 1rem; }
+    .juara__isi small { display: block; color: #CFC6E6; font-size: .8125rem; }
+    .juara__item.is-hp .juara__isi small { color: #FFF1E6; }
+    .juara__hadiah { margin-left: auto; padding: .25rem .625rem; border-radius: 999px; background: rgb(255 255 255 / .12); font-size: .75rem; font-weight: 800; white-space: nowrap; max-width: 8.5rem; overflow: hidden; text-overflow: ellipsis; }
+    .juara__item.is-hp .juara__hadiah { background: #120A1F; color: #FFC93C; }
+    .juara__kosong { margin-top: var(--space-5); padding: 1.25rem; border-radius: 1.25rem; background: #1F1433; border: 1px dashed #4B3A7A; }
+    .juara__kosong[hidden], .juara__daftar:empty { display: none; }
+    .juara__langkah { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; margin: .875rem 0 1rem; padding: 0; list-style: none; color: #CFC6E6; font-size: .9375rem; }
+    .juara__langkah b { display: inline-grid; place-items: center; width: 1.5rem; height: 1.5rem; margin-right: .375rem; border-radius: 50%; background: #FFC93C; color: #120A1F; font-size: .8125rem; }
     /* ============ Lawan Monster (event sebelum live, di atas panggung festival) ============ */
     .mon { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
     .mon[hidden] { display: none; }
@@ -770,6 +791,23 @@
     .mon__pesan h3 { font-family: var(--font-brush); font-weight: 400; font-size: clamp(1.75rem, 5vw, 2.5rem); line-height: 1; color: #D7263D; }
     .mon__pesan p { margin: .5rem 0 1rem; font-size: .9375rem; color: var(--ink-muted); }
     .mon__pesan .btn { margin: .25rem; }
+    .mon__nyawa { display: flex; align-items: center; gap: .5rem; margin-top: .375rem; font-size: .75rem; font-weight: 700; color: #0B4F59; }
+    .mon__nyawa[hidden] { display: none; }
+    .mon__nbar { position: relative; flex: 1; height: .625rem; overflow: hidden; border-radius: 999px; background: #DDEBDF; }
+    .mon__nbar i { position: absolute; inset: 0; transform-origin: left; background: linear-gradient(90deg, #2BA84A, #7CD992); transition: transform .5s; }
+    .mon__nyawa.is-kritis { color: #D7263D; }
+    .mon__nyawa.is-kritis .mon__nbar i { background: linear-gradient(90deg, #D7263D, #FF8A3D); animation: mon-kritis .6s infinite alternate; }
+    @keyframes mon-kritis { to { opacity: .55; } }
+    .mon__npersen { min-width: 2.5rem; text-align: right; font-variant-numeric: tabular-nums; }
+    .mon__awas { position: absolute; left: 50%; top: 42%; margin: 0; padding: .5rem 1rem; transform: translate(-50%, -50%); border-radius: 999px; background: #D7263D; color: #fff; font-weight: 800; font-size: .9375rem; text-align: center; box-shadow: 0 0 0 4px rgb(255 201 60 / .6), 0 12px 30px -10px rgb(0 0 0 / .6); animation: mon-awas .35s infinite alternate; pointer-events: none; white-space: nowrap; max-width: calc(100% - 2rem); overflow: hidden; text-overflow: ellipsis; }
+    .mon__awas[hidden] { display: none; }
+    @keyframes mon-awas { to { transform: translate(-50%, -50%) scale(1.06); } }
+    .mon__pesan[data-jenis="monster"] { border-color: #D7263D; background: #1B0A0E; color: #FFE9E9; }
+    .mon__pesan[data-jenis="monster"] h3 { color: #FF5D5D; }
+    .mon__pesan[data-jenis="monster"] p { color: #F3C9C9; }
+    .mon__pesan[data-jenis="kabur"] { border-color: #0E5A66; }
+    .mon__pesan[data-jenis="kabur"] h3 { color: #0E5A66; }
+    @media (prefers-reduced-motion: reduce) { .mon__awas, .mon__nyawa.is-kritis .mon__nbar i { animation: none; } }
     .fest__stage.is-monster .fest-b { opacity: 0 !important; pointer-events: none !important; }
     .mon-banner { position: fixed; z-index: 44; left: max(1rem, env(safe-area-inset-left)); bottom: calc(1.25rem + env(safe-area-inset-bottom)); max-width: calc(100% - 7rem); display: flex; align-items: center; gap: .5rem; padding: .625rem 1rem; border: 2.5px solid #FFC93C; border-radius: var(--radius-pill); background: #5B0A16; color: #FFF3D6; font-size: .875rem; line-height: 1.2; text-decoration: none; box-shadow: 0 14px 30px -12px rgb(0 0 0 / .55); animation: pop-ok .5s cubic-bezier(.2, 1.4, .4, 1) both; }
     .mon-banner[hidden] { display: none; }
@@ -1672,6 +1710,20 @@
             <p class="dk-alert" id="fk-alert" role="alert"></p>
             <button class="btn btn--cta btn--block" type="submit" id="fk-kirim" style="margin-top:1rem">Kirim &amp; masuk festival <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
           </form>
+        </div>
+        <!-- Pemenang undian spin Lawan Monster (dari /srv/pemenang) -->
+        <div class="juara" id="pemenang" aria-labelledby="juara-title">
+          <div class="juara__kepala">
+            <span class="juara__label">Spin Lawan Monster</span>
+            <h3 class="juara__judul" id="juara-title">Yang udah bawa pulang <span class="scribble">HP</span></h3>
+            <p class="juara__sub" id="juara-sub">Lawan monster sebelum live, dapat tiket, ikut spin. Simpel.</p>
+          </div>
+          <ol class="juara__daftar" id="juara-daftar" aria-live="polite"></ol>
+          <div class="juara__kosong" id="juara-kosong">
+            <strong>Belum ada pemenang. Kamu bisa jadi yang pertama.</strong>
+            <ol class="juara__langkah"><li><b>1</b>Masuk festival</li><li><b>2</b>Lawan monster, dapat tiket</li><li><b>3</b>Menang di spin live</li></ol>
+            <a class="btn btn--cta btn--sm" href="#fest-form">Ikut sekarang</a>
+          </div>
         </div>
       </div>
     </section>
@@ -3079,6 +3131,26 @@
     muatFestival();
     setInterval(() => { if (!document.hidden && !fest.classList.contains('is-locked')) muatFestival(); }, 90000);
 
+    /* ---------- Pemenang undian Lawan Monster (publik, nama disingkat) ---------- */
+    const HP = /\b(hp|handphone|smartphone|ponsel|iphone|samsung|xiaomi|redmi|oppo|vivo|realme|infinix|poco)\b/i;
+    async function muatJuara() {
+      try {
+        const d = await fetch('/srv/pemenang', { headers: { Accept: 'application/json' } }).then((r) => r.json());
+        if (!d.ok) return;
+        const list = (d.pemenang || []).slice().sort((a, b) => (HP.test(b.hadiah) ? 1 : 0) - (HP.test(a.hadiah) ? 1 : 0));
+        const ul = $('#juara-daftar');
+        ul.innerHTML = list.map((p) => {
+          const hp = HP.test(p.hadiah);
+          const esc = (t) => String(t || '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+          return `<li class="juara__item${hp ? ' is-hp' : ''}"><span class="juara__ava" aria-hidden="true">${esc((p.nama || '?')[0].toUpperCase())}</span><span class="juara__isi"><strong>${esc(p.nama)}</strong><small>${esc(p.provinsi || 'Indonesia')}</small></span>${p.hadiah ? `<span class="juara__hadiah">${hp ? '📱 ' : ''}${esc(p.hadiah)}</span>` : ''}</li>`;
+        }).join('');
+        const nHp = list.filter((p) => HP.test(p.hadiah)).length;
+        $('#juara-kosong').hidden = list.length > 0;
+        $('#juara-sub').textContent = list.length ? (nHp ? `${nf.format(nHp)} pejuang udah dapat HP. Giliranmu di live berikutnya!` : `${nf.format(list.length)} pemenang spin. Giliranmu di live berikutnya!`) : 'Lawan monster sebelum live, dapat tiket, ikut spin. Simpel.';
+      } catch (e) { /* biarkan tampilan kosong */ }
+    }
+    muatJuara();
+    setInterval(() => { if (!document.hidden) muatJuara(); }, 60000);
     /* ---------- Lawan Monster: event kolaboratif sebelum live (assets/js/monster.js + /srv/monster → server data) ---------- */
     // Dipasang setelah halaman siap; bila skrip/endpoint gagal, festival tetap berjalan seperti biasa.
     window.addEventListener('DOMContentLoaded', () => {

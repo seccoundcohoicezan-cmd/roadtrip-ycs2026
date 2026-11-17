@@ -249,7 +249,7 @@
     }
     // Zona monster (Lawan Monster): {x, atas, kaki, lebar} dalam px layar. Warga tidak boleh menimpa monster:
     // yang berada di dalam zona menyingkir ke sisi terdekat, dan tidak ada yang berjalan menembusnya.
-    let zona = null;
+    let zona = null, panik = false;
     function diZona(x, y) {
       if (!zona || !W) return false;
       const py = area.y0 + y * (area.y1 - area.y0), px = x * W;
@@ -261,8 +261,9 @@
       let keKiri = w.x * W < zona.x;
       if (keKiri && kiri < 0.03) keKiri = false;
       if (!keKiri && kanan > 0.97) keKiri = kiri >= 0.03;
-      w.tx = keKiri ? Math.max(0.02, kiri - w.r() * 0.1) : Math.min(0.98, kanan + w.r() * 0.1);
-      w.ty = w.y;
+      // Sebar ke seluruh sisi plaza (bukan berbaris di tepi zona) agar kerumunan tetap natural.
+      w.tx = keKiri ? 0.02 + w.r() * Math.max(0.01, kiri - 0.02) : kanan + w.r() * Math.max(0.01, 0.98 - kanan);
+      w.ty = Math.min(1, Math.max(0, w.y + (w.r() - 0.5) * 0.6));
       w.jeda = 0; w.diam = false; w.kabur = true;
     }
     function siapkanWarga(e, i, dariGerbang) {
@@ -298,13 +299,16 @@
     function gerak(dt) {
       if (gerakMinim) return;
       for (const w of warga) {
+        if (w.mati) { w.jalan = false; continue; }
         if (zona && !w.kabur && diZona(w.x, w.y)) keluarZona(w);
+        // Panik: warga dekat monster lari menjauh (bukan sekadar keluar zona).
+        if (panik && zona && !w.kabur && w.layar && Math.abs(w.layar.x - zona.x) < zona.lebar * 1.6 && w.layar.kaki > zona.atas - zona.lebar * 0.3) keluarZona(w);
         if (w.diam) continue;
         if (w.jeda > 0) { w.jeda -= dt; w.jalan = false; continue; }
         const dx = w.tx - w.x, dy = (w.ty - w.y) * 0.6;
         const jarak = Math.hypot(dx, dy);
         if (jarak < 0.004) { w.kabur = false; tujuanBaru(w, w.r); continue; }
-        const s = (0.6 + 0.6 * w.y) * w.v * dt * (w.kabur ? 2.6 : 1);
+        const s = (0.6 + 0.6 * w.y) * w.v * dt * (w.kabur ? 2.6 : panik ? 1.5 : 1);
         const nx = w.x + (dx / jarak) * Math.min(s, jarak), ny = w.y + (dy / jarak) * Math.min(s, jarak) / 0.6;
         // Langkah berikutnya masuk zona monster → pilih tujuan lain (jangan menembus monster).
         if (zona && !w.kabur && diZona(nx, ny)) { tujuanBaru(w, w.r); w.jeda = 0; continue; }
@@ -335,8 +339,12 @@
         const naik = w.jalan ? Math.abs(Math.sin(w.langkahT * Math.PI)) * h * 0.03 : 0;
         const sp = sprite(w.c, langkah);
         const k = h / SPR_H, sw = SPR_W * k, sh = (SPR_H + SPR_ATAS + SPR_BAWAH) * k;
-        ctx.drawImage(sp, px - sw / 2, py - (SPR_H + SPR_ATAS) * k - naik, sw, sh);
+        if (w.mati) { gambarTumbang(w, sp, px, py, h, sw, sh, k, t); continue; }
+        const dekat = panik && zona && Math.abs(px - zona.x) < zona.lebar * 1.4;
+        const getar = dekat ? Math.sin(t / 26 + px) * Math.max(1, h * 0.03) : 0;
+        ctx.drawImage(sp, px - sw / 2 + getar, py - (SPR_H + SPR_ATAS) * k - naik, sw, sh);
         w.layar = { x: px, y: py - h - naik, kaki: py, h };
+        if (panik && (dekat ? hash((w.n || '') + w.k) % 3 === 0 : hash((w.n || '') + w.k) % 11 === 0)) gambarPanik(px + getar, py - h - naik, h, t, w);
       }
       for (const bl of balon) {
         if (!bl.pin) continue;
@@ -349,6 +357,41 @@
       gambarCahaya(t);
       aturBalon(t);
       if (opsi.onFrame) opsi.onFrame();
+    }
+
+    // Warga panik: tanda seru berkedip + tetes keringat di atas kepala.
+    function gambarPanik(x, y, h, t, w) {
+      const s = Math.max(6, h * 0.22), kedip = Math.sin(t / 90 + (w.r ? w.r() * 0 : 0) + x) > -0.3;
+      ctx.save();
+      if (kedip) {
+        ctx.fillStyle = '#FFE066'; ctx.strokeStyle = '#D7263D'; ctx.lineWidth = Math.max(1.5, s * 0.16);
+        ctx.beginPath(); ctx.arc(x + h * 0.18, y - s * 0.75, s * 0.62, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#D7263D'; ctx.font = '900 ' + Math.round(s) + 'px system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('!', x + h * 0.18, y - s * 0.72);
+      }
+      const jatuh = ((t / 500 + x * 0.01) % 1);
+      ctx.fillStyle = 'rgba(90,180,255,' + (0.9 - jatuh * 0.7) + ')';
+      ctx.beginPath(); ctx.ellipse(x - h * 0.2, y + h * 0.05 + jatuh * h * 0.2, s * 0.16, s * 0.24, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    }
+    // Warga tumbang kena jurus monster: rebah, pudar, arwah kecil naik sebentar.
+    function gambarTumbang(w, sp, px, py, h, sw, sh, k, t) {
+      const u = Math.min(1, (performance.now() - w.mati) / 450);
+      ctx.save();
+      ctx.globalAlpha = 1 - 0.45 * u;
+      ctx.translate(px, py);
+      ctx.rotate(-Math.PI / 2 * u * (w.x < 0.5 ? 1 : -1));
+      ctx.drawImage(sp, -sw / 2, -(SPR_H + SPR_ATAS) * k, sw, sh);
+      ctx.restore();
+      const a = (performance.now() - w.mati) / 1600;
+      if (a < 1) {
+        ctx.save(); ctx.globalAlpha = 0.75 * (1 - a); ctx.fillStyle = '#FFFFFF';
+        const gy = py - h * 0.6 - a * h * 1.2, r = h * 0.18;
+        ctx.beginPath(); ctx.arc(px, gy, r, Math.PI, 0); ctx.lineTo(px + r, gy + r * 1.3); ctx.lineTo(px, gy + r); ctx.lineTo(px - r, gy + r * 1.3); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = '#333'; ctx.beginPath(); ctx.arc(px - r * 0.35, gy, r * 0.13, 0, 7); ctx.arc(px + r * 0.35, gy, r * 0.13, 0, 7); ctx.fill();
+        ctx.restore();
+      }
+      w.layar = null; // tidak bisa diketuk
     }
 
     // Titik pusat teks "Youth Character Summit 2026" pada gambar latar.
@@ -666,6 +709,10 @@
       wargaDi,
       // Lawan Monster: zona = {x, atas, kaki, lebar} (px layar) atau null. Gerak minim → warga langsung dipindah.
       get zona() { return zona; },
+      // Lawan Monster: warga panik selama monster di plaza; tumbangkan/bangkitkan warga (w.mati = waktu tumbang).
+      setPanik(on) { panik = !!on; mulai(); },
+      tumbang(w) { if (w && !w.mati) { w.mati = performance.now(); w.diam = false; mulai(); } },
+      bangkitSemua() { warga.forEach((w) => { w.mati = 0; }); mulai(); },
       setZona(z) {
         zona = z && z.lebar > 0 ? z : null;
         if (!zona) { warga.forEach((w) => { w.kabur = false; }); return; }

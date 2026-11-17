@@ -4,7 +4,7 @@ const HEADERS_LAMA = ['Waktu', 'ID permintaan', 'Nama', 'Sekolah', 'Email', 'Bin
 const HEADERS = HEADERS_LAMA.concat(['Kota/Kabupaten', 'Provinsi']);
 const REKAP_NAME = 'Rekap';
 const REKAP_VERSI = '3';
-const SKEMA_VERSI = '8';
+const SKEMA_VERSI = '9';
 const MAKS_KARAKTER = 40; // jumlah karakter adat di assets/js/festival.js (saat ini 24, cadangan untuk tambahan)
 const WIB = 7 * 3600 * 1000;
 
@@ -77,13 +77,17 @@ const PENGATURAN = [
   ['monster_skala_naik', '0.3', 'Ukuran monster = 1 + naik x (level-1), maksimal 2,5x.'],
   ['monster_interval_ms', '1000', 'Jeda kirim batch tap (ms, 500-5000). Otomatis diperlambat saat pemain sangat banyak.'],
   ['monster_batas_tap', '10', 'Batas tap per detik per pemain yang dihitung server (anti-bot).'],
+  ['monster_jurus_aktif', 'YA', 'YA = monster mengeluarkan jurus berkala yang mengurangi nyawa warga; nyawa habis = monster menang.'],
+  ['monster_jurus_detik', '8', 'Jeda antar jurus monster (detik, 4-60).'],
+  ['monster_jurus_damage', '4', 'Nyawa warga yang hilang per jurus di level 1 (%, naik sesuai ukuran level). Tanpa perlawanan: 100/4 = 25 jurus.'],
+  ['monster_perisai', '2', 'Perisai: tenaga yang terkumpul antar jurus sebanyak N% target level menahan hingga 80% damage.'],
   ['monster_tiket_min', '1', 'Minimal poin kontribusi untuk mendapat 1 tiket undian per event (1 perangkat = 1 peserta = 1 tiket).'],
   ['monster_nama', 'Raja Batu', 'Nama monster yang tampil di layar.'],
   ['monster_wujud', 'raja_batu', 'raja_batu = ilustrasi Raja Batu dari panitia; lucu = monster kartun gambar kode (lebih ramah anak).']
 ];
 const MONSTER_PILIHAN = {monster_pemicu: ['sebelum_live', 'jadwal', 'manual'], monster_darurat: ['NORMAL', 'MULAI', 'STOP'], monster_wujud: ['raja_batu', 'lucu']};
-const MONSTER_ANGKA = {monster_menit_sebelum: [1, 180], monster_durasi: [1, 180], monster_level: [1, 10], monster_target_dasar: [10, 1e9], monster_interval_ms: [500, 5000], monster_batas_tap: [3, 30], monster_tiket_min: [1, 1000000]};
-const KUNCI_YA_TIDAK = ['pakai_link_cadangan', 'klaim_aktif', 'survei_aktif', 'dana_aktif', 'dana_tampilkan_sisa', 'popup_aktif', 'monster_aktif'];
+const MONSTER_ANGKA = {monster_menit_sebelum: [1, 180], monster_durasi: [1, 180], monster_level: [1, 10], monster_target_dasar: [10, 1e9], monster_interval_ms: [500, 5000], monster_batas_tap: [3, 30], monster_tiket_min: [1, 1000000], monster_jurus_detik: [4, 60], monster_jurus_damage: [0, 100], monster_perisai: [0, 100]};
+const KUNCI_YA_TIDAK = ['pakai_link_cadangan', 'klaim_aktif', 'survei_aktif', 'dana_aktif', 'dana_tampilkan_sisa', 'popup_aktif', 'monster_aktif', 'monster_jurus_aktif'];
 const KUNCI_WAKTU = ['waktu_pengumuman', 'klaim_berlaku_hingga', 'survei_buka', 'waktu_acara_mulai', 'waktu_acara_selesai', 'monster_waktu'];
 const KUNCI_ANGKA = ['road_target', 'road_tambahan', 'dana_kuota'];
 const LIVE_AWAL = [
@@ -378,7 +382,8 @@ function monsterPublik_(cfg) {
     durasi: cfg.monster_durasi, darurat: cfg.monster_darurat || 'NORMAL', mulaiManual: Number(cfg.monster_mulai_manual) || null,
     target: cfg.monster_target, level: cfg.monster_level, targetDasar: cfg.monster_target_dasar, targetKali: cfg.monster_target_kali,
     poin: cfg.monster_poin, skalaNaik: cfg.monster_skala_naik, interval: cfg.monster_interval_ms, batasTap: cfg.monster_batas_tap,
-    nama: cfg.monster_nama || 'Raja Batu', wujud: cfg.monster_wujud || 'raja_batu', tiketMin: cfg.monster_tiket_min || '1'
+    nama: cfg.monster_nama || 'Raja Batu', wujud: cfg.monster_wujud || 'raja_batu', tiketMin: cfg.monster_tiket_min || '1',
+    jurus: cfg.monster_jurus_aktif == null ? true : ya_(cfg.monster_jurus_aktif), jurusDetik: cfg.monster_jurus_detik || '8', jurusDamage: cfg.monster_jurus_damage || '4', perisai: cfg.monster_perisai || '2'
   };
 }
 // Validasi satu nilai monster_*; hasil null = tidak valid.

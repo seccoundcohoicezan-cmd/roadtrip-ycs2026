@@ -40,7 +40,8 @@ http.createServer(async (req, res) => {
     if (url.pathname === '/__seed' && req.method === 'POST') return seed(JSON.parse(await baca(req) || '{}'), res);
     if (url.pathname === '/__sheet') { res.setHeader('Content-Type', 'application/json'); return res.end(JSON.stringify(Object.fromEntries(Object.entries(sheet.sheets).map(([n, x]) => [n, x.rows])))); }
     if (url.pathname.startsWith('/srv/')) { // seperti rewrite vercel.json → server data
-      const r = await fetch(`http://127.0.0.1:${DATA_PORT}/` + url.pathname.slice(5) + url.search, {method: req.method, headers: {'content-type': 'application/json', 'x-forwarded-for': req.headers['x-forwarded-for'] || '127.0.0.1'}, body: req.method === 'POST' ? await baca(req) : undefined});
+      const tujuan = url.pathname === '/srv/pemenang' ? 'monster/pemenang' : url.pathname.slice(5);
+      const r = await fetch(`http://127.0.0.1:${DATA_PORT}/` + tujuan + url.search, {method: req.method, headers: {'content-type': 'application/json', 'x-forwarded-for': req.headers['x-forwarded-for'] || '127.0.0.1'}, body: req.method === 'POST' ? await baca(req) : undefined});
       res.statusCode = r.status;
       ['content-type', 'cache-control'].forEach((h) => r.headers.get(h) && res.setHeader(h, r.headers.get(h)));
       return res.end(await r.text());

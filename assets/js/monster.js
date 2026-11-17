@@ -35,9 +35,11 @@
         <div class="mon__baris"><strong class="mon__nama"></strong><span class="mon__lvl"></span><span class="mon__pemain"></span></div>
         <div class="mon__bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="Tenaga bersama"><i></i><b></b></div>
         <div class="mon__baris mon__baris--kecil"><span class="mon__angka"></span><span class="mon__saya"></span></div>
+        <div class="mon__nyawa" hidden><span>Nyawa warga</span><div class="mon__nbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="Nyawa warga"><i></i></div><b class="mon__npersen"></b></div>
       </div>
+      <p class="mon__awas" hidden></p>
       <p class="mon__ajak"></p>
-      <div class="mon__pesan" hidden><h3></h3><p></p><a class="btn btn--cta btn--sm" target="_blank" rel="noopener" hidden>Tonton Live</a><button type="button" class="btn btn--soft btn--sm mon__tutup">Kembali ke festival</button></div>`;
+      <div class="mon__pesan" hidden><h3></h3><p></p><a class="btn btn--cta btn--sm" target="_blank" rel="noopener" hidden>Tonton Live</a><button type="button" class="btn btn--soft btn--sm mon__bagi">Ajak teman</button><button type="button" class="btn btn--soft btn--sm mon__tutup">Kembali ke festival</button></div>`;
     stage.append(el);
     const kanvas = el.querySelector('.mon__kanvas'), ctx = kanvas.getContext('2d');
     const tangkap = el.querySelector('.mon__tangkap'), hud = el.querySelector('.mon__hud');
@@ -127,14 +129,36 @@
     const pending = () => antre.n + (antre.kirim ? antre.kirim.n : 0);
 
     // Posisi monster: tengah plaza, kaki di sekitar 80% lantai. Tinggi mengikuti skala level.
+    // Monster berkeliling plaza: posisi ternormalisasi (x 0..1 lebar, y 0..1 kedalaman lantai).
+    const jalan = { x: 0.5, y: 0.72, tx: 0.5, ty: 0.72, arah: 1, jeda: 0.8, bergerak: false };
+    const sinarJurus = [];   // pancaran jurus: {t0, x0, y0, x1, y1}
+    const konfeti = [];
+    let jurusDitembak = 0, jurusSinkron = 0;
+    const AWAL_JURUS = 1300; // telegraf (ms) sebelum jurus
+    const sisaJurus = () => (st && st.fase === 'tanding' && st.jurus && st.jurusBerikut ? st.jurusBerikut - now() : Infinity);
+    function gerakMonster(dt) {
+      jalan.bergerak = false;
+      if (!st || gerakMinim || !dt) return;
+      if (akhir && akhir.jenis === 'kabur') { jalan.arah = jalan.x < 0.5 ? -1 : 1; jalan.x += jalan.arah * dt * 0.5; jalan.bergerak = true; return; }
+      if (akhir || st.fase !== 'tanding' || sisaJurus() < AWAL_JURUS) return;
+      if (jalan.jeda > 0) { jalan.jeda -= dt; return; }
+      const dx = jalan.tx - jalan.x, dy = jalan.ty - jalan.y, d = Math.hypot(dx, dy);
+      if (d < 0.01) { jalan.tx = 0.24 + Math.random() * 0.52; jalan.ty = 0.6 + Math.random() * 0.24; jalan.jeda = 0.3 + Math.random() * 1.3; return; }
+      const v = 0.075 * (1 + 0.2 * levelIdx()) * dt;
+      jalan.x += dx / d * Math.min(v, d); jalan.y += dy / d * Math.min(v, d) * 0.6;
+      if (Math.abs(dx) > 0.004) jalan.arah = dx < 0 ? -1 : 1;
+      jalan.bergerak = true;
+    }
     function geometri() {
       const l = fest && fest.lantai ? fest.lantai() : { y0: H * 0.35, y1: H * 0.97 };
       const skala = st && st.skala ? st.skala[levelIdx()] : 1;
       const tt = Math.min(1, (performance.now() - tumbuh.t0) / 900);
       const s = tumbuh.dari + (tumbuh.ke - tumbuh.dari) * mudah(tt);
-      const tinggi = Math.min(H * 0.8, H * 0.3 * (tumbuh.t0 ? s : skala) * (W < 520 ? 1.15 : 1));
-      const kaki = l.y0 + (l.y1 - l.y0) * 0.72;
-      return { x: W / 2, kaki, tinggi, atas: kaki - tinggi };
+      const dalam = 0.88 + 0.5 * (jalan.y - 0.6); // makin dekat penonton makin besar
+      const besar = akhir && akhir.jenis === 'monster' ? 1 + 0.2 * Math.min(1, (performance.now() - akhir.t0) / 900) : 1;
+      const tinggi = Math.min(H * 0.82, H * 0.3 * (tumbuh.t0 ? s : skala) * (W < 520 ? 1.15 : 1) * dalam * besar);
+      const kaki = l.y0 + (l.y1 - l.y0) * jalan.y;
+      return { x: W * jalan.x, kaki, tinggi, atas: kaki - tinggi, lebar: tinggi * (st && st.wujud === 'lucu' ? 1.05 : 0.8) };
     }
     // Titik tujuan aliran tenaga di bar (koordinat panggung).
     function titikBar() {
@@ -203,12 +227,15 @@
       if (!sumber || !sumber.complete || !sumber.naturalWidth) return gambarMonsterLucu(g, t, kedip, mati);
       const n = sumber === runtuh ? 9 : 10;
       const fw = sumber.naturalWidth / n, fh = sumber.naturalHeight;
-      const i = sumber === runtuh ? Math.min(n - 1, Math.floor((mati || 0) * n)) : Math.floor(t / 200) % n;
+      const i = sumber === runtuh ? Math.min(n - 1, Math.floor((mati || 0) * n)) : Math.floor(t / (jalan.bergerak ? 170 : 520)) % n;
       const h = g.tinggi, w = h * fw / fh;
-      const goyang = kedip > 0 ? Math.sin(t / 18) * h * 0.012 : 0;
+      const siaga = sisaJurus() < AWAL_JURUS || (akhir && akhir.jenis === 'monster');
+      const goyang = kedip > 0 || siaga ? Math.sin(t / 18) * h * (siaga ? 0.02 : 0.012) : 0;
       ctx.save();
       ctx.fillStyle = 'rgba(60,40,20,.2)';
       ctx.beginPath(); ctx.ellipse(g.x, g.kaki, w * 0.42, h * 0.06, 0, 0, Math.PI * 2); ctx.fill();
+      if (siaga) gambarAura(g, t);
+      ctx.translate(g.x, 0); ctx.scale(jalan.arah < 0 && mati == null ? -1 : 1, 1); ctx.translate(-g.x, 0);
       if (mati != null && mati > 0.85) ctx.globalAlpha = Math.max(0, 1 - (mati - 0.85) / 0.15);
       ctx.drawImage(sumber, i * fw, 0, fw, fh, g.x - w / 2 + goyang, g.kaki - h, w, h);
       if (kedip > 0) { // kedip terang tipis di atas sprite
@@ -217,6 +244,77 @@
         ctx.drawImage(sumber, i * fw, 0, fw, fh, g.x - w / 2 + goyang, g.kaki - h, w, h);
       }
       ctx.restore();
+    }
+
+    // Aura jurus: lingkaran api berdenyut di belakang monster saat bersiap menyerang / menang.
+    function gambarAura(g, t) {
+      const r = g.tinggi * (0.55 + 0.08 * Math.sin(t / 70));
+      const cy = g.kaki - g.tinggi * 0.5;
+      const gr = ctx.createRadialGradient(g.x, cy, r * 0.2, g.x, cy, r);
+      gr.addColorStop(0, 'rgba(255,90,40,.55)'); gr.addColorStop(0.6, 'rgba(255,40,40,.25)'); gr.addColorStop(1, 'rgba(255,40,40,0)');
+      ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(g.x, cy, r, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+    }
+    // Pancaran jurus: garis cahaya cepat dari monster ke samping melewati korban.
+    function gambarPancaran(t) {
+      for (let i = sinarJurus.length - 1; i >= 0; i--) {
+        const b = sinarJurus[i], p = (t - b.t0) / 420;
+        if (p >= 1) { sinarJurus.splice(i, 1); continue; }
+        if (p < 0) continue;
+        const k = Math.min(1, p * 2.4), x = b.x0 + (b.x1 - b.x0) * k, y = b.y0 + (b.y1 - b.y0) * k;
+        ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 1 - Math.max(0, p - 0.45) / 0.55; ctx.lineCap = 'round';
+        ctx.strokeStyle = 'rgba(255,120,40,.55)'; ctx.lineWidth = 14; ctx.beginPath(); ctx.moveTo(b.x0, b.y0); ctx.lineTo(x, y); ctx.stroke();
+        ctx.strokeStyle = 'rgba(255,245,200,.95)'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(b.x0, b.y0); ctx.lineTo(x, y); ctx.stroke();
+        if (b.kena && k > 0.6) { ctx.fillStyle = 'rgba(255,200,120,.8)'; ctx.beginPath(); ctx.arc(b.kena.x, b.kena.y, 10 + p * 18, 0, Math.PI * 2); ctx.fill(); }
+        ctx.restore();
+      }
+    }
+    // Jumlah warga tumbang mengikuti nyawa dari server: kurang → tumbangkan (dengan pancaran), lebih → bangkitkan.
+    function sinkronTumbang(nyawa, animasi) {
+      if (!fest || !fest.tampil || !fest.tumbang) return;
+      const semua = fest.tampil;
+      if (!semua.length) return;
+      const perlu = Math.round(semua.length * (1 - Math.max(0, Math.min(100, nyawa)) / 100));
+      const mati = semua.filter((w) => w.mati);
+      if (mati.length > perlu) { mati.slice(0, mati.length - perlu).forEach((w) => { w.mati = 0; if (w.layar) teks.push({ s: 'Selamat!', x: w.layar.x, y: w.layar.y, t0: performance.now(), warna: '#7CFFB2' }); }); return; }
+      const g = geometri(), ox = g.x, oy = g.kaki - g.tinggi * 0.55;
+      const hidup = semua.filter((w) => !w.mati && w.layar).sort((a, b) => Math.abs(a.layar.kaki - g.kaki) - Math.abs(b.layar.kaki - g.kaki) + (Math.random() - 0.5) * 60);
+      const korban = hidup.slice(0, perlu - mati.length);
+      const t0 = performance.now();
+      korban.forEach((w, i) => {
+        if (animasi && !gerakMinim && i < 10) {
+          const tx = w.layar.x, ty = w.layar.y + w.layar.h * 0.5, ke = tx < ox ? -1 : 1;
+          const ujungX = ke < 0 ? -40 : W + 40, ujungY = oy + (ty - oy) * ((ujungX - ox) / ((tx - ox) || 1));
+          sinarJurus.push({ t0: t0 + i * 60, x0: ox, y0: oy, x1: ujungX, y1: ujungY, kena: { x: tx, y: ty } });
+          setTimeout(() => fest.tumbang(w), 120 + i * 60);
+        } else if (animasi) fest.tumbang(w);
+        else { fest.tumbang(w); w.mati = performance.now() - 5000; }
+      });
+      mulaiGambar();
+    }
+    // Saat waktu jurus tiba (jam server): tembakkan jurus sesuai perkiraan damage; server mengoreksi saat status masuk.
+    function cekJurus() {
+      if (!st || st.fase !== 'tanding' || !st.jurus || !st.jurusBerikut) return;
+      const awas = $('.mon__awas'), sisa = sisaJurus();
+      awas.hidden = !(sisa < AWAL_JURUS && sisa > -300);
+      if (!awas.hidden) awas.textContent = 'Awas! ' + st.nama + ' bersiap mengeluarkan jurus!';
+      const ke = (st.jurusKe || 0) + 1;
+      if (sisa <= 0 && jurusDitembak < ke) {
+        jurusDitembak = ke;
+        const dmg = st.jurusInfo ? st.jurusInfo.dmg : 4 * ((st.skala || [1])[levelIdx()] || 1);
+        sinkronTumbang(Math.max(0, (st.nyawa ?? 100) - dmg), true);
+        if (navigator.vibrate && !gerakMinim) try { navigator.vibrate([30, 40, 30]); } catch (e) {}
+        poll(250);
+      }
+    }
+    function tulisNyawa() {
+      const box = $('.mon__nyawa');
+      box.hidden = !st || !st.jurus || st.fase === 'tunggu';
+      if (box.hidden) return;
+      const n = Math.max(0, Math.min(100, st.nyawa ?? 100));
+      $('.mon__nbar i').style.transform = `scaleX(${n / 100})`;
+      $('.mon__nbar').setAttribute('aria-valuenow', String(Math.round(n)));
+      box.classList.toggle('is-kritis', n < 30);
+      $('.mon__npersen').textContent = String(Math.round(n)).replace('.', ',') + '%';
     }
 
     function gambarSinar(g, p) {
@@ -260,15 +358,19 @@
       tLalu = t;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, W, H);
+      gerakMonster(dt);
+      cekJurus();
       const g = geometri();
       const kedip = Math.max(0, 1 - (t - pukul) / 160);
       let mati = null;
-      if (akhir) mati = Math.max(0, Math.min(1, (t - akhir.t0 - 2000) / 2000));
-      const tampil = st.fase === 'tanding' || akhir || st.fase === 'menang';
-      if (tampil && !(st.fase === 'menang' && !akhir)) {
+      if (akhir && akhir.jenis === 'menang') mati = Math.max(0, Math.min(1, (t - akhir.t0 - 2000) / 2000));
+      const tampil = st.fase === 'tanding' || akhir;
+      if (tampil && !(akhir && akhir.jenis === 'kabur' && (jalan.x < -0.3 || jalan.x > 1.3))) {
+        if (akhir && akhir.jenis === 'monster') { ctx.fillStyle = `rgba(120,0,10,${0.35 * Math.min(1, (t - akhir.t0) / 800)})`; ctx.fillRect(0, 0, W, H); }
         (st.wujud === 'lucu' ? gambarMonsterLucu : gambarRajaBatu)(g, t, kedip, mati);
-        aturZona(akhir && akhir.selesai ? null : g);
+        aturZona(akhir && akhir.selesai && akhir.jenis !== 'monster' ? null : g);
       } else aturZona(null);
+      gambarPancaran(t);
       // partikel tenaga: langit → warga → bar
       const bar = partikel.length ? titikBar() : null;
       for (let i = partikel.length - 1; i >= 0; i--) {
@@ -294,22 +396,38 @@
         const a = teks[i], u = (t - a.t0) / 800;
         if (u >= 1) { teks.splice(i, 1); continue; }
         ctx.globalAlpha = 1 - u;
-        ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(91,10,22,.75)'; ctx.fillStyle = '#FFE066';
+        ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(91,10,22,.75)'; ctx.fillStyle = a.warna || '#FFE066';
         ctx.strokeText(a.s, a.x, a.y - u * 30); ctx.fillText(a.s, a.x, a.y - u * 30);
         ctx.globalAlpha = 1;
       }
       if (akhir) {
-        const p = Math.min(1, (t - akhir.t0) / 4400);
-        gambarSinar(g, p);
+        const lama = akhir.jenis === 'menang' ? 4400 : akhir.jenis === 'monster' ? 2800 : 2400;
+        const p = Math.min(1, (t - akhir.t0) / lama);
+        if (akhir.jenis === 'menang') { gambarSinar(g, p); if (p > 0.62 && !akhir.konfeti) { akhir.konfeti = true; tebarKonfeti(); } }
         if (p >= 1 && !akhir.selesai) { akhir.selesai = true; tampilPesan(); }
       }
+      gambarKonfeti(t, dt);
       // bar dianimasikan halus menuju nilai server + tap sendiri yang belum terkirim
       const tujuan = st.fase === 'menang' ? target() : Math.min(target(), (st.tenaga || 0) + pending() * poin());
       tampilTenaga = gerakMinim ? tujuan : tampilTenaga + (tujuan - tampilTenaga) * Math.min(1, dt * 6);
       tulisBar();
-      const hidup = partikel.length || teks.length || (akhir && !akhir.selesai) || (st.fase === 'tanding' && !gerakMinim) || (tumbuh.t0 && t - tumbuh.t0 < 900);
+      tulisNyawa();
+      const hidup = partikel.length || teks.length || sinarJurus.length || konfeti.length || (akhir && !akhir.selesai) || (st.fase === 'tanding' && !gerakMinim) || (tumbuh.t0 && t - tumbuh.t0 < 900);
       if (hidup && panggungTerlihat && !document.hidden) raf = requestAnimationFrame(gambar);
       else tLalu = 0;
+    }
+    function tebarKonfeti() {
+      if (gerakMinim) return;
+      const warna = ['#FFC93C', '#FF8A3D', '#2BA84A', '#00A6ED', '#D7263D', '#FFFFFF'];
+      for (let i = 0; i < 90; i++) konfeti.push({ x: Math.random() * W, y: -20 - Math.random() * H * 0.4, vx: (Math.random() - 0.5) * 60, vy: 90 + Math.random() * 120, r: Math.random() * 6, vr: (Math.random() - 0.5) * 8, w: 5 + Math.random() * 6, c: warna[i % warna.length] });
+    }
+    function gambarKonfeti(t, dt) {
+      for (let i = konfeti.length - 1; i >= 0; i--) {
+        const k = konfeti[i];
+        k.x += k.vx * dt; k.y += k.vy * dt; k.r += k.vr * dt;
+        if (k.y > H + 20) { konfeti.splice(i, 1); continue; }
+        ctx.save(); ctx.translate(k.x, k.y); ctx.rotate(k.r); ctx.fillStyle = k.c; ctx.fillRect(-k.w / 2, -k.w / 4, k.w, k.w / 2); ctx.restore();
+      }
     }
     const mulaiGambar = () => { if (!raf && st && !el.hidden) raf = requestAnimationFrame(gambar); };
     document.addEventListener('visibilitychange', () => { if (!document.hidden) { mulaiGambar(); poll(0); } });
@@ -354,14 +472,15 @@
       }
       const lama = st;
       st = baru;
-      const adaEvent = ['tanding', 'menang', 'habis', 'tunggu'].includes(st.fase);
+      const adaEvent = ['tanding', 'menang', 'monster_menang', 'habis', 'tunggu'].includes(st.fase);
       if (st.id && st.id !== idLama) {
         // event baru: reset tampilan & buang antrean milik event lain
         idLama = st.id; levelLama = st.level || 1; akhir = null; tampilTenaga = st.tenaga || 0; tumbuh = { dari: 1, ke: 1, t0: 0 };
+        selesaiTampil(); jurusDitembak = 0; jurusSinkron = 0; Object.assign(jalan, { x: 0.5, y: 0.72, tx: 0.5, ty: 0.72, jeda: 0.8 }); pesan.hidden = true;
         if (antre.e !== st.id) { antre = { e: st.id, n: 0, kirim: null, seq: 0 }; simpan(KUNCI_ANTRE, antre); }
         muatAset(st.wujud);
       }
-      if (st.fase === 'tanding' || st.fase === 'menang' || st.fase === 'habis') muatAset(st.wujud);
+      if (['tanding', 'menang', 'monster_menang', 'habis'].includes(st.fase)) muatAset(st.wujud);
       // naik level: monster membesar + kilatan kecil
       if (st.level && levelLama && st.level > levelLama) {
         const sk = st.skala || [];
@@ -371,11 +490,22 @@
       }
       if (st.level) levelLama = st.level;
       // menang: putar animasi sekali (bila halaman dibuka setelah menang, langsung tampil pesan)
-      if (st.fase === 'menang' && !akhir && ditutup !== st.id) {
+      // Tiga akhir: menang (monster tumbang), monster menang (nyawa warga habis), kabur (waktu habis).
+      const jenisAkhir = { menang: 'menang', monster_menang: 'monster', habis: 'kabur' }[st.fase];
+      if (jenisAkhir && !akhir && ditutup !== st.id) {
         const baruSaja = lama && lama.fase === 'tanding' && lama.id === st.id;
-        akhir = { t0: performance.now(), selesai: false };
-        if (!baruSaja || gerakMinim) { akhir.t0 -= 4500; }
+        akhir = { jenis: jenisAkhir, t0: performance.now(), selesai: false };
+        if (!baruSaja || gerakMinim) { akhir.t0 -= 5000; if (jenisAkhir === 'kabur') jalan.x = 2; }
+        if (jenisAkhir === 'monster') sinkronTumbang(0, baruSaja);
         opsi.saatMenang && opsi.saatMenang(st);
+      }
+      // Nyawa warga dari server (setelah jurus) → samakan jumlah warga tumbang.
+      if (st.jurus && st.fase === 'tanding' && st.jurusKe !== jurusSinkron) {
+        const pertama = !jurusSinkron && !lama;
+        jurusSinkron = st.jurusKe; jurusDitembak = Math.max(jurusDitembak, st.jurusKe);
+        sinkronTumbang(st.nyawa ?? 100, !pertama);
+        if (!pertama && st.jurusInfo && st.jurusInfo.tahan > 0) tampilAjak(`Perisai warga menahan ${st.jurusInfo.tahan}% jurus! Terus ketuk!`, 2200);
+        else if (!pertama && st.jurusInfo) tampilAjak('Warga tumbang! Ketuk lebih cepat untuk memasang perisai!', 2200);
       }
       tampilkan(adaEvent);
       // tenaga dari pemain lain → partikel ambient ke monster (maksimal 6 per pembaruan)
@@ -393,12 +523,13 @@
       el.hidden = !tampil;
       stage.classList.toggle('is-monster', tampil && st.fase !== 'tunggu');
       if (!tampil || st.fase === 'tunggu' || st.fase === 'habis') aturZona(null);
-      if (!tampil) { pesan.hidden = true; return; }
+      if (!tampil) { pesan.hidden = true; selesaiTampil(); return; }
       if (!W) ukur();
       el.dataset.fase = st.fase;
       hud.hidden = st.fase === 'tunggu';
       tangkap.hidden = !tanding;
       if (fest && fest.setBalon) fest.setBalon(!tanding && !!bolehTap());
+      if (fest && fest.setPanik) fest.setPanik(tanding || (akhir && akhir.jenis === 'monster' && !akhir.selesai));
       $('.mon__nama').textContent = (st.uji ? 'MODE UJI · ' : '') + st.nama;
       $('.mon__lvl').textContent = st.levelMaks ? `Level ${st.level || 1}/${st.levelMaks}` : '';
       $('.mon__pemain').textContent = st.pemain ? `${nf.format(st.pemain)} pejuang` : '';
@@ -408,8 +539,7 @@
       else if (tanding && !bolehTap()) tampilAjak('Buka festival dulu (isi data & satu kata di bawah) untuk ikut melawan.');
       else if (tanding && blokir) tampilAjak((PESAN_BLOKIR[blokir.error] || (() => 'Tidak bisa ikut dari perangkat ini.'))(blokir));
       else if (tanding && !navigator.onLine) tampilAjak(`Koneksi terputus. ${nf.format(pending())} tap disimpan dan dikirim saat tersambung.`);
-      else if (tanding) tampilAjak(ajakTetap ? '' : 'Ketuk warga festival untuk mengirim tenaga!');
-      else if (st.fase === 'habis') tampilPesan();
+      else if (tanding) tampilAjak(ajakTetap ? '' : 'Ketuk monster atau warga untuk mengirim tenaga!');
       else tampilAjak('');
     }
     let ajakTimer = 0, ajakTetap = false;
@@ -422,19 +552,36 @@
       if (ms) ajakTimer = setTimeout(() => { ajakTetap = false; tampilkan(true); }, ms);
     }
     function tampilPesan() {
-      const menang = st.fase === 'menang';
+      const jenis = akhir ? akhir.jenis : st.fase === 'menang' ? 'menang' : st.fase === 'monster_menang' ? 'monster' : 'kabur';
       pesan.hidden = false;
-      pesan.querySelector('h3').textContent = menang ? 'Monster Terkalahkan!' : 'Waktu habis!';
-      pesan.querySelector('p').textContent = menang
-        ? `Terima kasih, pejuang festival! ${sayaPoin ? 'Kamu menyumbang ' + nf.format(sayaPoin) + ' tenaga. ' : ''}${tiketSaya ? 'Tiket undianmu ' + tiketSaya + ', pantau spin saat live!' : 'Sekarang saatnya live.'}`
-        : `${st.nama} kabur sebelum dikalahkan. Tetap semangat, sampai jumpa di live!`;
+      pesan.dataset.jenis = jenis;
+      const tiketku = tiketSaya ? ` Tiket undianmu ${tiketSaya}, pantau spin saat live!` : '';
+      const sumbang = sayaPoin ? ` Kamu menyumbang ${nf.format(sayaPoin)} tenaga.` : '';
+      pesan.querySelector('h3').textContent = { menang: 'Monster Terkalahkan!', monster: st.nama + ' Menang!', kabur: st.nama + ' Kabur!' }[jenis];
+      pesan.querySelector('p').textContent = {
+        menang: `Kompak banget! Plaza aman lagi.${sumbang}${tiketku || ' Sekarang saatnya live.'}`,
+        monster: `Semua warga tumbang... ${st.nama} menguasai plaza. Ajak lebih banyak teman biar perisai makin kuat di live berikutnya!${tiketku}`,
+        kabur: `Waktunya habis, ${st.nama} lari sebelum tumbang. Dikit lagi! Balas di live berikutnya.${sumbang}${tiketku}`,
+      }[jenis];
       const a = pesan.querySelector('a');
       const link = st.live && st.live.link;
       a.hidden = !link;
       if (link) { a.href = link; a.textContent = Date.parse(st.live.mulai) > now() ? `Live mulai ${new Date(st.live.mulai).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB · Buka` : 'Tonton Live sekarang'; }
       tampilAjak('');
     }
-    $('.mon__tutup').addEventListener('click', () => { ditutup = st ? st.id : ''; pesan.hidden = true; el.hidden = true; stage.classList.remove('is-monster'); if (fest && fest.setBalon) fest.setBalon(!!bolehTap()); });
+    function selesaiTampil() {
+      if (!fest) return;
+      if (fest.bangkitSemua) fest.bangkitSemua();
+      if (fest.setPanik) fest.setPanik(false);
+      aturZona(null);
+    }
+    $('.mon__tutup').addEventListener('click', () => { ditutup = st ? st.id : ''; pesan.hidden = true; el.hidden = true; stage.classList.remove('is-monster'); selesaiTampil(); if (fest && fest.setBalon) fest.setBalon(!!bolehTap()); });
+    // Ajak teman: makin banyak pejuang, makin kuat perisai warga.
+    $('.mon__bagi').addEventListener('click', async () => {
+      const url = location.origin + '/#satu-kata';
+      const text = st && st.fase === 'tanding' ? `${st.nama} menyerang Festival YCS! Bantu aku lawan dan dapatkan tiket undian:` : `Ikut Festival Satu Kata YCS 2026, lawan monster bareng & menangkan hadiah di live:`;
+      try { if (navigator.share) await navigator.share({ title: 'Lawan Monster YCS 2026', text, url }); else { await navigator.clipboard.writeText(text + ' ' + url); tampilAjak('Link disalin, kirim ke temanmu!', 2500); } } catch (e) {}
+    });
 
     /* ---------- Tap ---------- */
     let sayaPoin = 0;
@@ -451,10 +598,14 @@
       if (blokir) { tampilkan(true); return; }
       const r = stage.getBoundingClientRect();
       const x = (ev.clientX ?? r.left + r.width / 2) - r.left, y = (ev.clientY ?? r.top + r.height * 0.7) - r.top;
-      // Cari warga terdekat agar tenaga "turun" ke orang yang diketuk; bila tidak ada, ke titik ketukan.
-      const w = fest && fest.wargaDi ? fest.wargaDi(x, y, 18) : null;
+      // Tap harus tepat mengenai monster atau warga (yang masih berdiri). Di luar itu = meleset, tidak dihitung.
+      const g = geometri();
+      const kenaMonster = Math.abs(x - g.x) < g.lebar * 0.45 && y > g.atas + g.tinggi * 0.04 && y < g.kaki;
+      const w = !kenaMonster && fest && fest.wargaDi ? fest.wargaDi(x, y, 3) : null;
+      if (!kenaMonster && !w) { teks.push({ s: 'Meleset!', x, y, t0: performance.now(), warna: '#E9E3DA' }); mulaiGambar(); return; }
       const pos = w && fest.posisi(w);
       const tx = pos ? pos.x : x, ty = pos ? pos.y + pos.h * 0.3 : y;
+      if (kenaMonster) pukul = performance.now();
       if (antre.n + (antre.kirim ? antre.kirim.n : 0) >= MAKS_ANTRE) { tampilAjak('Pelan-pelan, tenagamu sedang dikirim…', 1500); return; }
       antre.n++;
       simpanAntre();

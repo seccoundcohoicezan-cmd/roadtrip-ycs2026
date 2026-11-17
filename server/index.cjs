@@ -181,6 +181,7 @@ function buatPrimer(o = {}) {
       monster.segarkan();
       return kirim(res, 200, out);
     }
+    if (url.pathname === '/monster/pemenang') return kirim(res, 200, monster.pemenangPublik(), 'public, max-age=0, s-maxage=20, stale-while-revalidate=120', req);
     if (url.pathname === '/monster' || url.pathname === '/monster/admin') {
       if (req.method === 'GET') {
         const uji = url.searchParams.get('uji');

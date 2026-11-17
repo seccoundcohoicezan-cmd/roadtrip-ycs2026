@@ -201,3 +201,41 @@ test('spin: hadiah berbobot, stok habis tidak ikut, latihan tidak dicatat, pelua
   assert.ok(ani / 4000 > 0.85, 'peluang sebanding kontribusi (Ani 30 vs 1 vs 1): ' + ani / 4000);
   jam.now += 1;
 });
+
+test('jurus monster: nyawa warga turun, perisai menahan damage, nyawa habis = monster menang', () => {
+  const {jam, app, m} = siapkanMonster('5000,15000');
+  let s = m.lihat();
+  assert.equal(s.nyawa, 100); assert.equal(s.jurus, true); assert.ok(s.jurusBerikut > jam.now - 1000);
+  jam.now += 8000; s = m.lihat();
+  assert.equal(s.nyawa, 96, 'tanpa perlawanan: -4% per jurus'); assert.equal(s.jurusInfo.tahan, 0);
+  // perisai: 2% × 5000 = 100 tenaga antar jurus → tahan 80%
+  const tk = m.masuk({perangkat: 'dev-perisai-aaaaaaaa', email: 'ani@mail.com'}, '1.1.1.1').token;
+  let seq = 1;
+  for (let i = 0; i < 3; i++) { if (i) jam.now += 3000; m.tap({token: tk, n: 30, seq: seq++, e: s.id}); } // 90 tenaga sebelum jurus ke-2
+  jam.now += 1500; s = m.lihat();
+  assert.equal(s.jurusInfo.ke, 2); assert.equal(s.jurusInfo.tahan, 72, '90/100 × 80%'); assert.equal(s.nyawa, 94.9, 'damage 4 × 28% = 1,1');
+  // tanpa perlawanan lagi → monster menang
+  jam.now += 8000 * 200; s = m.lihat();
+  assert.equal(s.fase, 'monster_menang'); assert.equal(s.nyawa, 0); assert.ok(s.monsterMenang);
+  assert.equal(m.tap({token: tk, n: 5, seq: seq++, e: s.id}).terima, 0, 'tap setelah monster menang tidak dihitung');
+  assert.match(String(app.sheets['Monster Event'].rows[1][3]), /^MONSTER MENANG/);
+});
+
+test('pemenang publik: nama disingkat, hadiah, tanpa event uji', () => {
+  const {app, m} = siapkanMonster('100000');
+  const id = m.lihat().id;
+  const token = app.post({aksi: 'admin-login', sandi: app.sheets.Admin.rows[1][1]}).token;
+  const tk = m.masuk({perangkat: 'dev-pub-aaaaaaaaaaaa', email: 'ani@mail.com'}, '1.1.1.1').token;
+  m.tap({token: tk, n: 5, seq: 1, e: id});
+  m.admin({token, aksi: 'spin-atur', hadiah: [{nama: 'HP Android', stok: 1, bobot: 1}]});
+  const s = m.admin({token, aksi: 'spin', event: id});
+  assert.equal(s.targetRoda, s.hadiah.id);
+  const p = m.pemenangPublik().pemenang;
+  assert.equal(p.length, 1); assert.equal(p[0].nama, 'Ani L.'); assert.equal(p[0].hadiah, 'HP Android'); assert.ok(!JSON.stringify(p).includes('@'));
+  // tanpa hadiah → roda nama (lingkaran tetap ada)
+  m.admin({token, aksi: 'spin-atur', hadiah: []});
+  const tb = m.masuk({perangkat: 'dev-pub-bbbbbbbbbbbb', email: 'budi@mail.com'}, '1.1.1.2').token;
+  m.tap({token: tb, n: 5, seq: 1, e: id});
+  const s2 = m.admin({token, aksi: 'spin', event: id});
+  assert.ok(s2.rodaPutar.length >= 1); assert.equal(s2.targetRoda, s2.pemenang.nomor); assert.ok(s2.rodaPutar.some((x) => x.id === s2.pemenang.nomor));
+});
