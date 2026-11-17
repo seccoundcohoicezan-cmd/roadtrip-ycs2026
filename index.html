@@ -808,6 +808,13 @@
     .mon__pesan[data-jenis="kabur"] { border-color: #0E5A66; }
     .mon__pesan[data-jenis="kabur"] h3 { color: #0E5A66; }
     @media (prefers-reduced-motion: reduce) { .mon__awas, .mon__nyawa.is-kritis .mon__nbar i { animation: none; } }
+    .mon__hindar { position: absolute; left: 50%; bottom: 4.25rem; z-index: 2; min-width: 9rem; min-height: 3.25rem; padding: .5rem 1.5rem; transform: translateX(-50%); border: 4px solid #FFD84D; border-radius: 999px; background: #2BA84A; color: #fff; font-size: 1.25rem; font-weight: 900; letter-spacing: .06em; pointer-events: auto; cursor: pointer; box-shadow: 0 0 0 6px rgb(43 168 74 / .35), 0 14px 30px -10px rgb(0 0 0 / .6); animation: mon-hindar .45s infinite alternate; touch-action: manipulation; }
+    .mon__hindar[hidden] { display: none; }
+    .mon:has(.mon__hindar:not([hidden])) .mon__ajak { opacity: 0; }
+    .mon__hindar:disabled { background: #0E5A66; animation: none; cursor: default; }
+    .mon__hindar:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+    @keyframes mon-hindar { to { transform: translateX(-50%) scale(1.08); } }
+    @media (prefers-reduced-motion: reduce) { .mon__hindar { animation: none; } }
     .fest__stage.is-monster .fest-b { opacity: 0 !important; pointer-events: none !important; }
     .mon-banner { position: fixed; z-index: 44; left: max(1rem, env(safe-area-inset-left)); bottom: calc(1.25rem + env(safe-area-inset-bottom)); max-width: calc(100% - 7rem); display: flex; align-items: center; gap: .5rem; padding: .625rem 1rem; border: 2.5px solid #FFC93C; border-radius: var(--radius-pill); background: #5B0A16; color: #FFF3D6; font-size: .875rem; line-height: 1.2; text-decoration: none; box-shadow: 0 14px 30px -12px rgb(0 0 0 / .55); animation: pop-ok .5s cubic-bezier(.2, 1.4, .4, 1) both; }
     .mon-banner[hidden] { display: none; }
@@ -1685,7 +1692,7 @@
               <div class="field field--wide"><label for="fk-nama">Nama</label><input class="input" id="fk-nama" required minlength="2" maxlength="60" autocomplete="name" placeholder="Contoh: Fauzan Rahman" aria-describedby="fk-nama-error"><p class="field__error" id="fk-nama-error"></p></div>
               <div class="field field--wide"><label for="fk-sekolah">Sekolah</label><input class="input" id="fk-sekolah" required minlength="2" maxlength="100" placeholder="Contoh: SMAN 1 Semarang" aria-describedby="fk-sekolah-error"><p class="field__error" id="fk-sekolah-error"></p></div>
               <div class="field"><label for="fk-prov">Provinsi</label><select class="select" id="fk-prov" required aria-describedby="fk-prov-error"><option value="">Pilih provinsi</option></select><p class="field__error" id="fk-prov-error"></p></div>
-              <div class="field"><label for="fk-email">Email</label><input class="input" type="email" id="fk-email" required maxlength="254" autocomplete="email" inputmode="email" placeholder="nama@email.com" aria-describedby="fk-email-error"><p class="field__error" id="fk-email-error"></p></div>
+              <div class="field"><label for="fk-email">Email atau No. WhatsApp</label><input class="input" type="text" id="fk-email" required maxlength="254" autocomplete="email" placeholder="nama@email.com atau 0812xxxx" aria-describedby="fk-email-error"><p class="field__error" id="fk-email-error"></p></div>
               <div class="field field--wide"><label for="fk-kata">Satu kata harapanmu untuk Indonesia</label><input class="input fest__kata" id="fk-kata" required maxlength="20" placeholder="Contoh: sejahtera" autocomplete="off" autocapitalize="none" spellcheck="false" aria-describedby="fk-kata-error"><p class="field__error" id="fk-kata-error"></p></div>
             </div>
             <a class="fest-wa" id="fk-wa" href="https://whatsapp.com/channel/0029Vb5vVIaId7nEqecJ1I1G" target="_blank" rel="noopener" data-saluran aria-describedby="fk-wa-error">
@@ -3104,8 +3111,14 @@
       if (!d) return;
       [['nama', ['#fk-nama', '#dk-nama']], ['sekolah', ['#fk-sekolah', '#dk-sekolah']], ['email', ['#fk-email', '#dk-email']], ['provinsi', ['#fk-prov', '#dk-prov']]]
         .forEach(([k, sels]) => sels.forEach((sel) => { const el = $(sel); if (el && !el.value && d[k]) el.value = d[k]; }));
+      if (d.wa && !$('#fk-email').value) $('#fk-email').value = '0' + d.wa.slice(2);
     }
     const simpanIdentitas = (d) => { try { localStorage.setItem('ycs_identitas', JSON.stringify(d)); } catch (e) {} };
+    // Identitas festival: email ATAU nomor WhatsApp Indonesia (alternatif bagi yang tidak memakai email).
+    const emailOk = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+    const waNorm = (v) => { const d = String(v || '').replace(/[^\d+]/g, '').replace(/^\+/, ''); const n = d.startsWith('0') ? '62' + d.slice(1) : d; return /^628\d{7,12}$/.test(n) ? n : ''; };
+    const kontakOk = (v) => emailOk(v.trim()) || !!waNorm(v);
+    const PESAN_KONTAK = 'Isi email (nama@email.com) atau nomor WhatsApp (0812xxxx).';
 
     function bukaFestival() {
       fest.classList.remove('is-locked');
@@ -3159,6 +3172,7 @@
         window.YCSMonster.pasang({
           stage: $('.fest__stage'), festApi, now, endpoint: '/api/monster',
           identitas: () => { try { return JSON.parse(localStorage.getItem('ycs_identitas') || 'null'); } catch (e) { return null; } },
+          saya: () => saya, // karakter milik pengunjung di festival ({n, k}) → ditandai "KAMU" saat melawan monster
           bolehTap: () => !fest.classList.contains('is-locked'),
           saatTerkunci: () => { toast('Isi data & satu kata dulu untuk ikut melawan monster.'); $('#fest-form').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' }); },
         });
@@ -3177,7 +3191,7 @@
       ['fk-nama', $('#fk-nama').value.trim().length >= 2, 'Isi nama minimal 2 karakter.'],
       ['fk-sekolah', $('#fk-sekolah').value.trim().length >= 2, 'Isi nama sekolah.'],
       ['fk-prov', !!$('#fk-prov').value, 'Pilih provinsi.'],
-      ['fk-email', /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test($('#fk-email').value.trim()), 'Isi email yang valid, contoh: nama@email.com.'],
+      ['fk-email', kontakOk($('#fk-email').value), PESAN_KONTAK],
       ['fk-kata', /^[A-Za-zÀ-ɏ-]{2,20}$/.test($('#fk-kata').value.trim()), 'Tulis satu kata saja (2–20 huruf, tanpa spasi atau angka).'],
       ['fk-wa', waKlik, 'Ketuk kartu Saluran WhatsApp terlebih dahulu.'],
     ];
@@ -3245,7 +3259,7 @@
         ['fk-nama', $('#fk-nama').value.trim().length >= 2, 'Isi nama minimal 2 karakter.'],
         ['fk-sekolah', $('#fk-sekolah').value.trim().length >= 2, 'Isi nama sekolah.'],
         ['fk-prov', !!$('#fk-prov').value, 'Pilih provinsi.'],
-        ['fk-email', /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test($('#fk-email').value.trim()), 'Isi email yang valid, contoh: nama@email.com.'],
+        ['fk-email', kontakOk($('#fk-email').value), PESAN_KONTAK],
         ['fk-kata', /^[A-Za-zÀ-ɏ-]{2,20}$/.test(kata), 'Tulis satu kata saja (2–20 huruf, tanpa spasi atau angka).'],
         ['fk-wa', waKlik, 'Ketuk kartu Saluran WhatsApp terlebih dahulu.'],
         ['fk-karakter', karakter > 0, 'Pilih salah satu karakter.'],
@@ -3254,7 +3268,8 @@
       let first = null;
       cek.forEach(([id, ok, msg]) => { $('#' + id + '-error').textContent = ok ? '' : msg; $('#' + id).setAttribute('aria-invalid', String(!ok)); if (!ok && !first) first = $('#' + id); });
       if (first) { first.focus(); return; }
-      const ident = { nama: $('#fk-nama').value.trim(), sekolah: $('#fk-sekolah').value.trim(), provinsi: $('#fk-prov').value, email: $('#fk-email').value.trim() };
+      const kontak = $('#fk-email').value.trim();
+      const ident = { nama: $('#fk-nama').value.trim(), sekolah: $('#fk-sekolah').value.trim(), provinsi: $('#fk-prov').value, email: emailOk(kontak) ? kontak : '', wa: emailOk(kontak) ? '' : waNorm(kontak) };
       const btn = $('#fk-kirim');
       sibuk(btn, true);
       const d = await kirimJson(CONFIG.kataEndpoint, { aksi: 'kirim', kata, karakter, ...ident, channelClicked: true, consent: true, requestId: uuid(), perangkat, ref: sumber, website: $('#fk-website').value });

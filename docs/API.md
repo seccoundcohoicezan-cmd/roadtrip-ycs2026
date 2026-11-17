@@ -32,7 +32,7 @@ Formulir mengirim `requestId` (UUID) agar kiriman ulang tidak tercatat dua kali.
 
 | Endpoint | `aksi` | Field |
 |---|---|---|
-| `POST /api/kata` | `kirim` | `nama, sekolah, email, provinsi, kata, karakter, channelClicked, consent, ref, requestId, website, perangkat` |
+| `POST /api/kata` | `kirim` | `nama, sekolah, email` **atau** `wa` (No. WhatsApp), `provinsi, kata, karakter, channelClicked, consent, ref, requestId, website, perangkat` |
 | `POST /api/dana` | `akses` · `kirim` | `kodeAkses, nama, email, wa, sekolah, kota, provinsi, ref, requestId, consent, website, perangkat` |
 | `POST /api/klaim` | `cek` · `verifikasi` | `kode, email, perangkat` |
 | `POST /api/survei` | `kirim` | `destinasi, kegiatan, waktu, status, provinsi, impian, email, ref, requestId, website, perangkat` |
@@ -52,7 +52,7 @@ Field di luar daftar dibuang server. Aturan validasi (panjang, format email, kat
 ## Lawan Monster
 
 `GET /api/monster` →
-`{fase, nama, wujud, id, mulai, selesai, live, level, levelMaks, target[], poin[], skala[], tenaga, total, pemain, tiket, interval, nyawa, jurus, jurusMs, jurusAnimMs, jurusDmgMaks, jurusKe, jurusBerikut, jurusInfo, kalah, monsterMenang, uji?}`
+`{fase, nama, wujud, id, mulai, selesai, live, level, levelMaks, target[], poin[], skala[], tenaga, total, pemain, tiket, interval, hidup, totalWarga, nyawa (% hidup), jurus, hindarMs, jurusMs, jurusAnimMs, jurusDmgMaks, jurusKe, jurusBerikut, jurusInfo, kalah, monsterMenang, uji?}`
 
 `fase`:
 
@@ -67,12 +67,14 @@ Field di luar daftar dibuang server. Aturan validasi (panjang, format email, kat
 | `habis` | waktu habis, monster kabur |
 
 `POST /api/monster`:
-- `{aksi: "masuk", perangkat, email, fp, uji?}` → `{token, nama, tiket, saya}`. Galat:
+- `{aksi: "masuk", perangkat, email | wa, fp, uji?}` → `{token, nama, tiket, saya, mati}`. Galat:
   - `belum_festival`
   - `perangkat_dipakai` (+`nama`)
   - `email_perangkat_lain`
   - `uji_berakhir`
-- `{aksi: "tap", token, n (≤200), seq, e (id event), uji?}` → `{terima, dup, buang, saya, tiket, status}`.
+- `{aksi: "tap", token, n (≤200), seq, e (id event), uji?}` → `{terima, dup, buang, saya, tiket, mati, status}`. Karakter tumbang → `mati: true`, `terima: 0`.
+- `{aksi: "hindar", token, e, uji?}` → `{aman, ke}` hanya ≤ 2,5 dtk sebelum jurus (`bukan_waktunya` di luar itu).
+- `{aksi: "saya", token, uji?}` → `{mati, matiKe, tiket, saya}` status karakter sendiri (dipanggil setelah tiap jurus).
   - Server membatasi 10 tap/dtk/pemain.
   - `seq` lama = duplikat (aman dikirim ulang).
 

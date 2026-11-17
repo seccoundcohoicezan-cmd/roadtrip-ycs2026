@@ -202,23 +202,52 @@ test('spin: hadiah berbobot, stok habis tidak ikut, latihan tidak dicatat, pelua
   jam.now += 1;
 });
 
-test('jurus monster: nyawa warga turun, perisai menahan damage, nyawa habis = monster menang', () => {
-  const {jam, app, m} = siapkanMonster('5000,15000');
+test('karakter: jurus menumbangkan karakter, HINDAR menyelamatkan, karakter tumbang tidak bisa menyerang, semua tumbang = monster menang', () => {
+  const {jam, app, m} = siapkanMonster('100000');
+  const peng = app.sheets.Pengaturan.rows;
+  peng.find((x) => x[0] === 'monster_perisai')[1] = '0';
+  app.cache.remove('cfg'); m.segarkan();
   let s = m.lihat();
-  assert.equal(s.nyawa, 100); assert.equal(s.jurus, true); assert.ok(s.jurusBerikut > jam.now - 1000);
+  assert.equal(s.totalWarga, 3); assert.equal(s.hidup, 3);
+  const ta = m.masuk({perangkat: 'dev-karakter-aaaaaaa', email: 'ani@mail.com'}, '1.1.1.1').token;
+  // jurus 1: populasi 3 × 4% → dibulatkan 0 → minimal 1 karakter tumbang
   jam.now += 8000; s = m.lihat();
-  assert.equal(s.nyawa, 96, 'tanpa perlawanan: -4% per jurus'); assert.equal(s.jurusInfo.tahan, 0);
-  // perisai: 2% × 5000 = 100 tenaga antar jurus → tahan 80%
-  const tk = m.masuk({perangkat: 'dev-perisai-aaaaaaaa', email: 'ani@mail.com'}, '1.1.1.1').token;
-  let seq = 1;
-  for (let i = 0; i < 3; i++) { if (i) jam.now += 3000; m.tap({token: tk, n: 30, seq: seq++, e: s.id}); } // 90 tenaga sebelum jurus ke-2
-  jam.now += 1500; s = m.lihat();
-  assert.equal(s.jurusInfo.ke, 2); assert.equal(s.jurusInfo.tahan, 72, '90/100 × 80%'); assert.equal(s.nyawa, 94.9, 'damage 4 × 28% = 1,1');
-  // tanpa perlawanan lagi → monster menang
-  jam.now += 8000 * 200; s = m.lihat();
-  assert.equal(s.fase, 'monster_menang'); assert.equal(s.nyawa, 0); assert.ok(s.monsterMenang);
-  assert.equal(m.tap({token: tk, n: 5, seq: seq++, e: s.id}).terima, 0, 'tap setelah monster menang tidak dihitung');
-  assert.match(String(app.sheets['Monster Event'].rows[1][3]), /^MONSTER MENANG/);
+  assert.equal(s.hidup, 2); assert.equal(s.jurusInfo.tumbang, 1);
+  // HINDAR di luar jendela peringatan ditolak; di dalam jendela diterima
+  assert.equal(m.hindar({token: ta, e: s.id}).error, 'bukan_waktunya');
+  const awalAni = m.saya({token: ta}).mati;
+  if (!awalAni) {
+    jam.now += 6000; // 2 dtk sebelum jurus 2
+    const h = m.hindar({token: ta, e: s.id});
+    assert.equal(h.aman, true);
+    jam.now += 2500; s = m.lihat();
+    assert.equal(m.saya({token: ta}).mati, false, 'yang menghindar selamat');
+    assert.equal(s.jurusInfo.menghindar, 1);
+  }
+  // terus tanpa menghindar → semua tumbang → monster menang
+  jam.now += 8000 * 10; s = m.lihat();
+  assert.equal(s.fase, 'monster_menang'); assert.equal(s.hidup, 0);
+  const r = m.tap({token: ta, n: 5, seq: 9, e: s.id});
+  assert.equal(r.terima, 0);
+  assert.equal(m.saya({token: ta}).mati, true);
+});
+
+test('karakter tumbang di tengah event: tap ditolak (mati) walau event masih berjalan', () => {
+  const {jam, app, m} = siapkanMonster('100000');
+  // perbanyak populasi agar event tidak langsung selesai
+  const kt = app.sheets['Satu Kata'];
+  for (let i = 0; i < 40; i++) kt.rows.push(['2026-11-19', 'x' + i, 'maju', 'Bali', 'web', 'YA', 'Warga ' + i, 'SMA', 'w' + i + '@mail.com', 'Ya', 1]);
+  app.sheets.Pengaturan.rows.find((x) => x[0] === 'monster_jurus_damage')[1] = '50';
+  app.sheets.Pengaturan.rows.find((x) => x[0] === 'monster_perisai')[1] = '0';
+  app.cache.remove('cfg'); m.segarkan();
+  const tk = m.masuk({perangkat: 'dev-tumbang-aaaaaaaa', email: 'ani@mail.com'}, '1.1.1.1').token;
+  let mati = false, seq = 1, s = null;
+  for (let i = 0; i < 6 && !mati; i++) { jam.now += 8000; s = m.lihat(); mati = m.saya({token: tk}).mati; }
+  assert.ok(mati, 'Ani akhirnya tumbang');
+  if (s.fase === 'tanding') {
+    const r = m.tap({token: tk, n: 5, seq: seq++, e: s.id});
+    assert.equal(r.mati, true); assert.equal(r.terima, 0);
+  }
 });
 
 test('pemenang publik: nama disingkat, hadiah, tanpa event uji', () => {

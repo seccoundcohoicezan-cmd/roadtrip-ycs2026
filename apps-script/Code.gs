@@ -4,7 +4,7 @@ const HEADERS_LAMA = ['Waktu', 'ID permintaan', 'Nama', 'Sekolah', 'Email', 'Bin
 const HEADERS = HEADERS_LAMA.concat(['Kota/Kabupaten', 'Provinsi']);
 const REKAP_NAME = 'Rekap';
 const REKAP_VERSI = '3';
-const SKEMA_VERSI = '10';
+const SKEMA_VERSI = '11';
 const MAKS_KARAKTER = 40; // jumlah karakter adat di assets/js/festival.js (saat ini 24, cadangan untuk tambahan)
 const WIB = 7 * 3600 * 1000;
 
@@ -20,7 +20,7 @@ const KOLOM = {
   kode: ['Kode', 'Email', 'Nama', 'Status', 'Berlaku hingga (WIB)', 'Waktu klaim', 'Percobaan salah', 'Catatan'],
   dana: ['Waktu', 'ID permintaan', 'Nama', 'Email', 'Nomor WhatsApp', 'Sekolah', 'Kota/Kabupaten', 'Provinsi', 'Sumber'],
   survei: ['Waktu', 'ID permintaan', 'Destinasi pilihan', 'Kegiatan favorit', 'Waktu ideal', 'Status', 'Provinsi', 'Destinasi impian lain', 'Email', 'Sumber'],
-  kata: ['Waktu', 'ID permintaan', 'Kata', 'Provinsi', 'Sumber', 'Tampil', 'Nama', 'Sekolah', 'Email', 'Klik saluran WhatsApp', 'Karakter'],
+  kata: ['Waktu', 'ID permintaan', 'Kata', 'Provinsi', 'Sumber', 'Tampil', 'Nama', 'Sekolah', 'Email', 'Klik saluran WhatsApp', 'Karakter', 'WhatsApp'],
   log: ['Waktu', 'Aksi', 'Detail'],
   tiket: ['Waktu', 'Event', 'No tiket', 'Nama', 'Sekolah', 'Provinsi', 'Email', 'Perangkat', 'Kontribusi', 'Status', 'Catatan'],
   monster: ['Event', 'Mulai', 'Selesai', 'Kalah pada', 'Total tenaga', 'Pemain', 'Tiket', 'Pemenang'],
@@ -122,6 +122,12 @@ function cleanCell_(value) {
 }
 function teks_(v, maks) {
   return typeof v === 'string' ? v.trim().replace(/\s+/g, ' ').slice(0, maks) : '';
+}
+// Nomor WhatsApp Indonesia → "62…" (kosong bila tidak valid). Dipakai sebagai alternatif email.
+function waNorm_(v) {
+  const d = String(v || '').replace(/[^\d+]/g, '').replace(/^\+/, '');
+  const n = d.charAt(0) === '0' ? '62' + d.slice(1) : d;
+  return /^628\d{7,12}$/.test(n) ? n : '';
 }
 function emailValid_(e) {
   return e.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
@@ -452,9 +458,13 @@ function entriKata_(r) {
 function kataKirim_(p) {
   const cfg = bacaPengaturan_();
   const kata = teks_(p.kata, 30).toLowerCase().replace(/[^a-z\u00c0-\u024f-]/g, '');
-  const nama = teks_(p.nama, 60), sekolah = teks_(p.sekolah, 100), email = teks_(p.email, 254).toLowerCase();
+  const nama = teks_(p.nama, 60), sekolah = teks_(p.sekolah, 100);
+  // Identitas: email ATAU nomor WhatsApp (salah satu wajib). 1 email / 1 nomor = 1 warga.
+  const emailMentah = teks_(p.email, 254).toLowerCase();
+  const email = emailValid_(emailMentah) ? emailMentah : '';
+  const wa = waNorm_(p.wa) || (email ? '' : waNorm_(p.email));
   const prov = teks_(p.provinsi, 40), ref = teks_(p.ref, 40).replace(/[^\w-]/g, '');
-  if (!/^[a-z\u00c0-\u024f-]{2,20}$/.test(kata) || /\s/.test(teks_(p.kata, 30)) || nama.length < 2 || sekolah.length < 2 || !emailValid_(email) || !prov || p.channelClicked !== true || p.consent !== true || !/^[a-f0-9-]{36}$/i.test(p.requestId || '') || p.website) return {ok: false, error: 'validation'};
+  if (!/^[a-z\u00c0-\u024f-]{2,20}$/.test(kata) || /\s/.test(teks_(p.kata, 30)) || nama.length < 2 || sekolah.length < 2 || (!email && !wa) || !prov || p.channelClicked !== true || p.consent !== true || !/^[a-f0-9-]{36}$/i.test(p.requestId || '') || p.website) return {ok: false, error: 'validation'};
   // Karakter baju adat pilihan (1..MAKS_KARAKTER) wajib.
   const karakter = Number(p.karakter);
   if (!(karakter >= 1 && karakter <= MAKS_KARAKTER && Math.floor(karakter) === karakter)) return {ok: false, error: 'validation'};
@@ -466,10 +476,12 @@ function kataKirim_(p) {
     const last = sheet.getLastRow();
     if (last > 1) {
       const dup = sheet.getRange(2, 2, last - 1, 1).createTextFinder(p.requestId).matchEntireCell(true).findNext()
-        || sheet.getRange(2, 9, last - 1, 1).createTextFinder(email).matchEntireCell(true).matchCase(false).findNext();
+        || (email && sheet.getRange(2, 9, last - 1, 1).createTextFinder(email).matchEntireCell(true).matchCase(false).findNext())
+        || (wa && sheet.getRange(2, 12, last - 1, 1).createTextFinder("'" + wa).matchEntireCell(true).findNext())
+        || (wa && sheet.getRange(2, 12, last - 1, 1).createTextFinder(wa).matchEntireCell(true).findNext());
       if (dup) return {ok: true, sudah: true, entri: entriKata_(sheet.getRange(dup.getRow(), 1, 1, 11).getValues()[0])};
     }
-    const baris = [teksWib_(Date.now()), p.requestId, kata, cleanCell_(prov), ref || 'web', 'YA', cleanCell_(nama), cleanCell_(sekolah), cleanCell_(email), 'Ya', karakter];
+    const baris = [teksWib_(Date.now()), p.requestId, kata, cleanCell_(prov), ref || 'web', 'YA', cleanCell_(nama), cleanCell_(sekolah), cleanCell_(email), 'Ya', karakter, wa ? "'" + wa : ''];
     sheet.appendRow(baris);
     cache_().remove('kata');
     return {ok: true, entri: entriKata_(baris)};

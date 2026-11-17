@@ -249,7 +249,7 @@
     }
     // Zona monster (Lawan Monster): {x, atas, kaki, lebar} dalam px layar. Warga tidak boleh menimpa monster:
     // yang berada di dalam zona menyingkir ke sisi terdekat, dan tidak ada yang berjalan menembusnya.
-    let zona = null, panik = false;
+    let zona = null, panik = false, wargaSaya = null; // wargaSaya: karakter milik pengunjung (ditandai "KAMU" saat event)
     function diZona(x, y) {
       if (!zona || !W) return false;
       const py = area.y0 + y * (area.y1 - area.y0), px = x * W;
@@ -344,6 +344,7 @@
         const getar = dekat ? Math.sin(t / 26 + px) * Math.max(1, h * 0.03) : 0;
         ctx.drawImage(sp, px - sw / 2 + getar, py - (SPR_H + SPR_ATAS) * k - naik, sw, sh);
         w.layar = { x: px, y: py - h - naik, kaki: py, h };
+        if (w === wargaSaya) { gambarKamu(px, py - h - naik, h, t, w); continue; }
         if (panik && (dekat ? hash((w.n || '') + w.k) % 3 === 0 : hash((w.n || '') + w.k) % 11 === 0)) gambarPanik(px + getar, py - h - naik, h, t, w);
       }
       for (const bl of balon) {
@@ -359,6 +360,25 @@
       if (opsi.onFrame) opsi.onFrame();
     }
 
+    // Karakter milik pengunjung: cincin kuning di kaki + label "KAMU" memantul; saat menghindar muncul jejak gerak.
+    function gambarKamu(x, y, h, t, w) {
+      const lompat = Math.abs(Math.sin(t / 220)) * h * 0.08;
+      ctx.save();
+      ctx.strokeStyle = '#FFD84D'; ctx.lineWidth = Math.max(2, h * 0.05);
+      ctx.beginPath(); ctx.ellipse(x, y + h * 1.0, h * 0.34, h * 0.1, 0, 0, Math.PI * 2); ctx.stroke();
+      const ly = y - h * 0.35 - lompat, uk = Math.max(9, Math.round(h * 0.26));
+      ctx.font = '900 ' + uk + 'px system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+      const lb = ctx.measureText('KAMU').width + uk * 0.8;
+      ctx.fillStyle = '#5B0A16'; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x - lb / 2, ly - uk * 1.25, lb, uk * 1.3, uk * 0.4) : ctx.rect(x - lb / 2, ly - uk * 1.25, lb, uk * 1.3); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(x - uk * 0.3, ly + uk * 0.05); ctx.lineTo(x + uk * 0.3, ly + uk * 0.05); ctx.lineTo(x, ly + uk * 0.4); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#FFD84D'; ctx.fillText('KAMU', x, ly - uk * 0.05);
+      if (w.hindarT && performance.now() - w.hindarT < 700) {
+        const a = 1 - (performance.now() - w.hindarT) / 700;
+        ctx.globalAlpha = a; ctx.fillStyle = '#7CFFB2'; ctx.font = '900 ' + uk + 'px system-ui, sans-serif';
+        ctx.fillText('MENGHINDAR!', x, ly - uk * 1.5 - (1 - a) * h * 0.4);
+      }
+      ctx.restore();
+    }
     // Warga panik: tanda seru berkedip + tetes keringat di atas kepala.
     function gambarPanik(x, y, h, t, w) {
       const s = Math.max(6, h * 0.22), kedip = Math.sin(t / 90 + (w.r ? w.r() * 0 : 0) + x) > -0.3;
@@ -748,6 +768,21 @@
       setPanik(on) { panik = !!on; mulai(); },
       tumbang(w, arah) { if (w && !w.mati) { w.mati = performance.now(); w.matiArah = arah || 0; w.diam = false; mulai(); } },
       bangkitSemua() { warga.forEach((w) => { w.mati = 0; }); mulai(); },
+      // Karakter milik pengunjung (dari data festival {n, k}); null = sembunyikan penanda.
+      tandaiSaya(e) {
+        wargaSaya = e ? warga.find((w) => w.n === e.n && w.k === e.k) || null : null;
+        mulai();
+        return wargaSaya;
+      },
+      get saya() { return wargaSaya; },
+      // Menghindar: karakter melompat & melesat menjauh dari monster (efek lokal; keamanan diputuskan server).
+      menghindar(w) {
+        if (!w || w.mati) return;
+        w.hindarT = performance.now();
+        if (zona) keluarZona(w); else { w.tx = Math.min(0.97, Math.max(0.03, w.x + (w.x < 0.5 ? -0.15 : 0.15))); w.ty = w.y; w.kabur = true; }
+        w.diam = false; w.jeda = 0;
+        mulai();
+      },
       setZona(z) {
         zona = z && z.lebar > 0 ? z : null;
         if (!zona) { warga.forEach((w) => { w.kabur = false; }); return; }

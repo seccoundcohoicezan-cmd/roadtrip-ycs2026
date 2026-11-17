@@ -67,3 +67,19 @@ test('admin: aksi di luar daftar ditolak, sesi salah 401, login benar mendapat t
   const s = await rute['POST admin'].fn({aksi: 'admin-primer', token: l.body.token, perintah: 'status'}, '', url());
   assert.equal(s.body.ok, true);
 });
+
+test('daftar festival dengan nomor WhatsApp (tanpa email): valid, 1 nomor = 1 warga, bisa masuk Lawan Monster', async () => {
+  const {app, rute} = siapkan();
+  const kirim = (extra) => rute['POST kata'].fn({aksi: 'kirim', kata: 'maju', karakter: 2, nama: 'Raka Pratama', sekolah: 'SMA 1', provinsi: 'Bali', channelClicked: true, consent: true, requestId: crypto.randomUUID(), ...extra}, '9.9.9.9', url());
+  assert.equal((await kirim({wa: '12345'})).kode, 400, 'nomor tidak valid & tanpa email ditolak');
+  const a = await kirim({wa: '0812-3456-7890'});
+  assert.equal(a.kode, 200); assert.equal(a.body.ok, true);
+  const b = await kirim({wa: '+62 812 3456 7890'});
+  assert.equal(b.body.sudah, true, 'nomor yang sama (format lain) = warga yang sama');
+  const baris = app.sheets['Satu Kata'].rows.at(-1);
+  assert.equal(String(baris[11]), '6281234567890'); assert.equal(baris[8], '');
+  const {buatMonster} = require('../server/monster.cjs');
+  const m = buatMonster(app, {rahasia: 'r'.repeat(40)});
+  const masuk = m.masuk({perangkat: 'dev-wa-aaaaaaaaaaaaa', wa: '081234567890'}, '1.1.1.1');
+  assert.equal(masuk.ok, true); assert.equal(masuk.nama, 'Raka P.');
+});

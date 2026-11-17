@@ -35,9 +35,10 @@
         <div class="mon__baris"><strong class="mon__nama"></strong><span class="mon__lvl"></span><span class="mon__pemain"></span></div>
         <div class="mon__bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="Tenaga bersama"><i></i><b></b></div>
         <div class="mon__baris mon__baris--kecil"><span class="mon__angka"></span><span class="mon__saya"></span></div>
-        <div class="mon__nyawa" hidden><span>Nyawa warga</span><div class="mon__nbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="Nyawa warga"><i></i></div><b class="mon__npersen"></b></div>
+        <div class="mon__nyawa" hidden><span>Warga hidup</span><div class="mon__nbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="Warga hidup"><i></i></div><b class="mon__npersen"></b></div>
       </div>
       <p class="mon__awas" hidden></p>
+      <button type="button" class="mon__hindar" hidden>HINDAR!</button>
       <p class="mon__ajak"></p>
       <div class="mon__pesan" hidden><h3></h3><p></p><a class="btn btn--cta btn--sm" target="_blank" rel="noopener" hidden>Tonton Live</a><button type="button" class="btn btn--soft btn--sm mon__bagi">Ajak teman</button><button type="button" class="btn btn--soft btn--sm mon__tutup">Kembali ke festival</button></div>`;
     stage.append(el);
@@ -81,7 +82,7 @@
     let akhir = null;         // animasi kemenangan {t0}
     let levelLama = 0, idLama = '', ditutup = '';
     let token = baca(KUNCI_TOKEN);
-    let tiketSaya = null, blokir = null; // blokir: {error, nama} bila aturan 1 perangkat = 1 peserta menolak
+    let tiketSaya = null, blokir = null, karakterMati = false, hindarKe = 0; // karakter milik pemain: tumbang = tidak bisa menyerang // blokir: {error, nama} bila aturan 1 perangkat = 1 peserta menolak
 
     // Identitas perangkat: acak sekali, disimpan di localStorage + cookie (dipakai bersama halaman lain).
     function idPerangkat() {
@@ -159,8 +160,11 @@
       if (akhir || st.fase !== 'tanding' || sisaJurus() < AWAL_JURUS) return;
       if (jalan.jeda > 0) { jalan.jeda -= dt; return; }
       const dx = jalan.tx - jalan.x, dy = jalan.ty - jalan.y, d = Math.hypot(dx, dy);
-      if (d < 0.01) { jalan.tx = 0.24 + Math.random() * 0.52; jalan.ty = 0.6 + Math.random() * 0.24; jalan.jeda = 0.3 + Math.random() * 1.3; return; }
-      const v = 0.075 * (1 + 0.2 * levelIdx()) * dt;
+      if (d < 0.01) { jalan.tx = 0.24 + Math.random() * 0.52; jalan.ty = 0.6 + Math.random() * 0.24; jalan.jeda = 0.3 + Math.random() * 1.3; jalan.v = 0; return; }
+      // kecepatan naik-turun halus (ease) menuju target, melambat saat hampir sampai
+      const maks = 0.075 * (1 + 0.2 * levelIdx());
+      jalan.v = (jalan.v || 0) + (Math.min(maks, d * 1.6) - (jalan.v || 0)) * Math.min(1, dt * 3);
+      const v = jalan.v * dt;
       jalan.x += dx / d * Math.min(v, d); jalan.y += dy / d * Math.min(v, d) * 0.6;
       if (Math.abs(dx) > 0.004) jalan.arah = dx < 0 ? -1 : 1;
       jalan.bergerak = true;
@@ -360,10 +364,11 @@
       const semua = fest.tampil;
       if (!semua.length) return;
       const perlu = Math.round(semua.length * (1 - Math.max(0, Math.min(100, nyawa)) / 100));
-      const mati = semua.filter((w) => w.mati);
+      const milikku = fest.saya;
+      const mati = semua.filter((w) => w.mati && w !== milikku);
       if (mati.length > perlu) { mati.slice(0, mati.length - perlu).forEach((w) => { w.mati = 0; if (w.layar) teks.push({ s: 'Selamat!', x: w.layar.x, y: w.layar.y, t0: performance.now(), warna: '#7CFFB2' }); }); return; }
       const g = geometri(), ox = g.x, oy = g.kaki - g.tinggi * 0.55;
-      const hidup = semua.filter((w) => !w.mati && w.layar).sort((a, b) => Math.abs(a.layar.kaki - g.kaki) - Math.abs(b.layar.kaki - g.kaki) + (Math.random() - 0.5) * 60);
+      const hidup = semua.filter((w) => !w.mati && w.layar && w !== milikku).sort((a, b) => Math.abs(a.layar.kaki - g.kaki) - Math.abs(b.layar.kaki - g.kaki) + (Math.random() - 0.5) * 60);
       const korban = hidup.slice(0, perlu - mati.length);
       const t0 = performance.now();
       korban.forEach((w, i) => {
@@ -382,11 +387,14 @@
       if (!st || st.fase !== 'tanding' || !st.jurus || !st.jurusBerikut) return;
       const awas = $('.mon__awas'), sisa = sisaJurus();
       awas.hidden = !(sisa < AWAL_JURUS && sisa > -300);
+      const tombol = $('.mon__hindar'), ke = (st.jurusKe || 0) + 1;
+      const bisaHindar = !karakterMati && !!token && sisa < Math.min(st.hindarMs || 2500, 2500) && sisa > -200;
+      tombol.hidden = !bisaHindar;
+      if (bisaHindar) { tombol.disabled = hindarKe === ke; tombol.textContent = hindarKe === ke ? 'AMAN ✓' : 'HINDAR!'; }
       if (!awas.hidden) awas.textContent = 'Awas! ' + st.nama + ' bersiap mengeluarkan jurus!';
-      const ke = (st.jurusKe || 0) + 1;
       if (sisa <= 0 && jurusDitembak < ke) {
         jurusDitembak = ke;
-        const dmg = st.jurusInfo ? st.jurusInfo.dmg : (st.jurusDmgMaks ?? 4);
+        const dmg = st.jurusDmgMaks ?? 4; // perkiraan % warga yang tumbang; dikoreksi server
         const nyawaBaru = Math.max(0, (st.nyawa ?? 100) - dmg);
         prediksi = { ke, nyawa: nyawaBaru };
         st.nyawa = nyawaBaru; // bar langsung turun; server mengoreksi saat statusnya masuk
@@ -403,7 +411,7 @@
       $('.mon__nbar i').style.transform = `scaleX(${n / 100})`;
       $('.mon__nbar').setAttribute('aria-valuenow', String(Math.round(n)));
       box.classList.toggle('is-kritis', n < 30);
-      $('.mon__npersen').textContent = String(Math.round(n)).replace('.', ',') + '%';
+      $('.mon__npersen').textContent = st.totalWarga ? `${nf.format(Math.round((st.totalWarga || 0) * n / 100))}/${nf.format(st.totalWarga)}` : Math.round(n) + '%';
     }
 
     function gambarSinar(g, p) {
@@ -573,7 +581,7 @@
       if (st.id && st.id !== idLama) {
         // event baru: reset tampilan & buang antrean milik event lain
         idLama = st.id; levelLama = st.level || 1; akhir = null; tampilTenaga = st.tenaga || 0; tumbuh = { dari: 1, ke: 1, t0: 0 };
-        selesaiTampil(); jurusDitembak = 0; jurusSinkron = 0; Object.assign(jalan, { x: 0.5, y: 0.72, tx: 0.5, ty: 0.72, jeda: 0.8 }); pesan.hidden = true;
+        selesaiTampil(); jurusDitembak = 0; jurusSinkron = 0; karakterMati = false; hindarKe = 0; Object.assign(jalan, { x: 0.5, y: 0.72, tx: 0.5, ty: 0.72, jeda: 0.8 }); pesan.hidden = true;
         if (antre.e !== st.id) { antre = { e: st.id, n: 0, kirim: null, seq: 0 }; simpan(KUNCI_ANTRE, antre); }
         muatAset(st.wujud);
       }
@@ -593,7 +601,12 @@
         const baruSaja = lama && lama.fase === 'tanding' && lama.id === st.id;
         akhir = { jenis: jenisAkhir, t0: performance.now(), selesai: false };
         if (!baruSaja || gerakMinim) { akhir.t0 -= 5000; if (jenisAkhir === 'kabur') jalan.x = 2; }
-        if (jenisAkhir === 'monster') sinkronTumbang(0, baruSaja);
+        if (jenisAkhir === 'monster') {
+          sinkronTumbang(0, baruSaja);
+          const w = fest && fest.saya; // semua karakter tumbang, termasuk milikmu
+          if (w && !w.mati && fest.tumbang) { fest.tumbang(w, 1); if (!baruSaja) w.mati = performance.now() - 5000; }
+          karakterMati = !!token;
+        }
         opsi.saatMenang && opsi.saatMenang(st);
       }
       // Nyawa warga dari server (setelah jurus) → samakan jumlah warga tumbang.
@@ -601,8 +614,8 @@
         const pertama = !jurusSinkron && !lama;
         jurusSinkron = st.jurusKe; jurusDitembak = Math.max(jurusDitembak, st.jurusKe);
         sinkronTumbang(st.nyawa ?? 100, !pertama);
-        if (!pertama && st.jurusInfo && st.jurusInfo.tahan > 0) tampilAjak(`Perisai warga menahan ${st.jurusInfo.tahan}% jurus! Terus ketuk!`, 2200);
-        else if (!pertama && st.jurusInfo) tampilAjak('Warga tumbang! Ketuk lebih cepat untuk memasang perisai!', 2200);
+        cekKarakter();
+        if (!pertama && st.jurusInfo && !karakterMati) tampilAjak(st.jurusInfo.tahan > 0 ? `Perisai menahan ${st.jurusInfo.tahan}% jurus! ${nf.format(st.jurusInfo.tumbang || 0)} warga tumbang.` : `${nf.format(st.jurusInfo.tumbang || 0)} warga tumbang! Tekan HINDAR saat peringatan & terus serang.`, 2400);
       }
       tampilkan(adaEvent);
       // tenaga dari pemain lain → partikel ambient ke monster (maksimal 6 per pembaruan)
@@ -627,6 +640,7 @@
       tangkap.hidden = !tanding;
       if (fest && fest.setBalon) fest.setBalon(!tanding && !!bolehTap());
       if (fest && fest.setPanik) fest.setPanik(tanding || (akhir && akhir.jenis === 'monster' && !akhir.selesai));
+      if (fest && fest.tandaiSaya && tanding && opsi.saya && !fest.saya) fest.tandaiSaya(opsi.saya());
       $('.mon__nama').textContent = (st.uji ? 'MODE UJI · ' : '') + st.nama;
       $('.mon__lvl').textContent = st.levelMaks ? `Level ${st.level || 1}/${st.levelMaks}` : '';
       $('.mon__pemain').textContent = st.pemain ? `${nf.format(st.pemain)} pejuang` : '';
@@ -634,6 +648,7 @@
       if (tanding && bolehTap() && !token && !blokir && navigator.onLine) pastikanToken().catch(() => {});
       if (st.fase === 'tunggu') tampilAjak(`${st.nama} muncul dalam ${jam(Date.parse(st.mulai) - now())}. Siapkan jarimu!`);
       else if (tanding && !bolehTap()) tampilAjak('Buka festival dulu (isi data & satu kata di bawah) untuk ikut melawan.');
+      else if (tanding && karakterMati) tampilAjak('Karaktermu tumbang. Kamu tidak bisa menyerang lagi di event ini, tapi tetap bisa menonton & ajak teman!');
       else if (tanding && blokir) tampilAjak((PESAN_BLOKIR[blokir.error] || (() => 'Tidak bisa ikut dari perangkat ini.'))(blokir));
       else if (tanding && !navigator.onLine) tampilAjak(`Koneksi terputus. ${nf.format(pending())} tap disimpan dan dikirim saat tersambung.`);
       else if (tanding) tampilAjak(ajakTetap ? '' : 'Ketuk monster atau warga untuk mengirim tenaga!');
@@ -666,10 +681,41 @@
       if (link) { a.href = link; a.textContent = Date.parse(st.live.mulai) > now() ? `Live mulai ${new Date(st.live.mulai).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB · Buka` : 'Tonton Live sekarang'; }
       tampilAjak('');
     }
+    // HINDAR: minta server mengamankan karaktermu dari jurus berikutnya (hanya saat peringatan).
+    async function hindar() {
+      const ke = (st && st.jurusKe || 0) + 1;
+      if (!token || karakterMati || hindarKe === ke) return;
+      hindarKe = ke;
+      if (fest && fest.menghindar) fest.menghindar(fest.saya);
+      if (navigator.vibrate && !gerakMinim) try { navigator.vibrate(15); } catch (e) {}
+      try {
+        const d = await minta({ aksi: 'hindar', token, e: st.id, uji });
+        if (!d.ok) { hindarKe = 0; if (d.error === 'bukan_waktunya') tampilAjak('Terlambat! Tekan HINDAR saat peringatan muncul.', 1600); }
+        else if (d.mati) setMati(true);
+      } catch (e) { hindarKe = 0; }
+    }
+    $('.mon__hindar').addEventListener('click', hindar);
+    // Setelah tiap jurus: apakah karaktermu ikut tumbang?
+    async function cekKarakter() {
+      if (!token || karakterMati) return;
+      try {
+        const d = await minta({ aksi: 'saya', token, uji });
+        if (d.ok && d.mati) setMati(true);
+      } catch (e) { /* coba lagi di jurus berikutnya */ }
+    }
+    function setMati(animasi) {
+      karakterMati = true;
+      antre.n = 0; antre.kirim = null; simpan(KUNCI_ANTRE, antre);
+      const w = fest && fest.saya;
+      if (w && fest.tumbang && !w.mati) { const g = geometri(); fest.tumbang(w, w.layar && w.layar.x < g.x ? -1 : 1); if (!animasi) w.mati = performance.now() - 5000; }
+      tampilAjak('Karaktermu tumbang kena jurus! Kamu tidak bisa menyerang lagi di event ini. Ajak teman melanjutkan!', 4500);
+      if (st) tampilkan(true);
+    }
     function selesaiTampil() {
       if (!fest) return;
       if (fest.bangkitSemua) fest.bangkitSemua();
       if (fest.setPanik) fest.setPanik(false);
+      if (fest.tandaiSaya) fest.tandaiSaya(null);
       aturZona(null);
     }
     $('.mon__tutup').addEventListener('click', () => { ditutup = st ? st.id : ''; pesan.hidden = true; el.hidden = true; stage.classList.remove('is-monster'); selesaiTampil(); if (fest && fest.setBalon) fest.setBalon(!!bolehTap()); });
@@ -693,12 +739,14 @@
       if (ev.type === 'keydown') ev.preventDefault();
       if (!bolehTap()) { opsi.saatTerkunci && opsi.saatTerkunci(); return; }
       if (blokir) { tampilkan(true); return; }
+      if (karakterMati) { tampilAjak('Karaktermu tumbang, kamu tidak bisa menyerang lagi di event ini. Ajak teman melanjutkan!', 2600); return; }
       const r = stage.getBoundingClientRect();
       const x = (ev.clientX ?? r.left + r.width / 2) - r.left, y = (ev.clientY ?? r.top + r.height * 0.7) - r.top;
       // Tap harus tepat mengenai monster atau warga (yang masih berdiri). Di luar itu = meleset, tidak dihitung.
       const g = geometri();
       const kenaMonster = Math.abs(x - g.x) < g.lebar * 0.45 && y > g.atas + g.tinggi * 0.04 && y < g.kaki;
       const w = !kenaMonster && fest && fest.wargaDi ? fest.wargaDi(x, y, 3) : null;
+      if (w && w === fest.saya && !$('.mon__hindar').hidden) { hindar(); return; } // ketuk karaktermu saat peringatan = menghindar
       if (!kenaMonster && !w) { teks.push({ s: 'Meleset!', x, y, t0: performance.now(), warna: '#E9E3DA' }); mulaiGambar(); return; }
       const pos = w && fest.posisi(w);
       const tx = pos ? pos.x : x, ty = pos ? pos.y + pos.h * 0.3 : y;
@@ -735,8 +783,8 @@
       if (blokir) return Promise.reject(new Error(blokir.error));
       if (!masukJalan) masukJalan = (async () => {
         const idt = (opsi.identitas && opsi.identitas()) || {};
-        if (!idt.email && !uji) { blokir = { error: 'tanpa_identitas' }; throw new Error('tanpa_identitas'); }
-        const d = await minta({ aksi: 'masuk', perangkat: idPerangkat(), fp: await sidik(), email: idt.email || '', uji });
+        if (!idt.email && !idt.wa && !uji) { blokir = { error: 'tanpa_identitas' }; throw new Error('tanpa_identitas'); }
+        const d = await minta({ aksi: 'masuk', perangkat: idPerangkat(), fp: await sidik(), email: idt.email || '', wa: idt.wa || '', uji });
         if (!d.ok) {
           if (PESAN_BLOKIR[d.error]) { blokir = d; antre.n = 0; antre.kirim = null; simpan(KUNCI_ANTRE, antre); if (st) tampilkan(true); }
           throw new Error(d.error || 'masuk');
@@ -744,6 +792,7 @@
         token = d.token; simpan(KUNCI_TOKEN, token);
         if (d.tiket) tiketSaya = d.tiket;
         if (d.saya) sayaPoin = d.saya;
+        if (d.mati) setMati(false);
         if (st) tampilkan(true);
         return token;
       })().finally(() => { masukJalan = null; });
@@ -751,7 +800,7 @@
     }
     // Satu batch dalam perjalanan; gagal → dikirim ulang dengan seq yang sama.
     async function kirim() {
-      if (sedangKirim || !st || st.fase !== 'tanding' || !navigator.onLine || blokir) return;
+      if (sedangKirim || !st || st.fase !== 'tanding' || !navigator.onLine || blokir || karakterMati) return;
       if (!antre.kirim && antre.n <= 0) return;
       sedangKirim = true;
       try {
@@ -773,6 +822,7 @@
         if (d.buang) antre.n = 0; else antre.n = Math.min(MAKS_ANTRE, antre.n + Math.max(0, sisa));
         simpan(KUNCI_ANTRE, antre);
         if (d.saya) sayaPoin = d.saya;
+        if (d.mati && !karakterMati) setMati(true);
         if (d.tiket && d.tiket !== tiketSaya) { tiketSaya = d.tiket; tampilAjak(`Selamat! Kamu dapat tiket undian ${tiketSaya}. Pantau spin saat live YCS!`, 5000); }
         gagalBeruntun = 0;
         terapkan(d.status);

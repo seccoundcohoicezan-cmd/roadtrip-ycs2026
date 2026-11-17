@@ -12,7 +12,7 @@ Browser ──► Vercel (file statis) ──rewrite /api/*──► Server YCS 
 ```
 
 - **Satu backend**: `server/` (Node, tanpa dependensi). Tidak ada fungsi Vercel lagi.
-- **Kontrak API untuk frontend: [`docs/API.md`](docs/API.md)**. Semua halaman memanggil `/api/...` (path relatif).
+- **Kontrak API untuk frontend: [`docs/API.md`](docs/API.md)** · **alur pemain & aturan karakter: [`docs/ALUR.md`](docs/ALUR.md)**. Semua halaman memanggil `/api/...` (path relatif).
 - **Aturan bisnis** (validasi formulir, kuota, sesi admin, pengaturan) ada di `apps-script/Code.gs`. Server menjalankan file yang sama di memori; Apps Script asli hanya dipakai untuk impor awal & menerima salinan cadangan.
 - **Google Sheet = cadangan.** Ubah data lewat panel `/admin/`, bukan langsung di Sheet (akan tertimpa). Darurat: admin → Keamanan → *Ambil ulang dari Sheet*.
 
@@ -36,6 +36,7 @@ apps-script/Code.gs   aturan bisnis + endpoint cadangan (primer-ekspor / primer-
 tests/                node --test tests/*.cjs
 tools/dev-server.cjs  tiruan produksi lokal (statis + server + Sheet tiruan)
 docs/API.md           kontrak API
+docs/ALUR.md          skema alur pemain (mermaid) + aturan karakter
 vercel.json           header + rewrite /api/* → server
 ```
 
@@ -187,6 +188,10 @@ Tombol darurat: **Mulai sekarang** (event baru dari nol), **Stop darurat**, **Ke
 - **Tiga akhir** dengan tampilan khusus: *Monster Terkalahkan!* (sinar dari langit, Raja Batu runtuh, konfeti), *Raja Batu Menang!* (nyawa warga habis: layar merah, monster membesar, semua warga tumbang), *Raja Batu Kabur!* (waktu habis: monster lari keluar plaza). Semua punya tombol live dan **Ajak teman**.
 - **Pemenang spin di landing**: kartu "Yang udah bawa pulang HP" di bawah panggung festival (`/api/pemenang`, nama disingkat + provinsi + hadiah; pemenang HP disorot di atas).
 - Roda spin admin **selalu lingkaran**: tanpa hadiah, roda berisi nama peserta dan berhenti di nama pemenang.
+
+### Karakter (MRKT-56 r7)
+
+Setiap pendaftar festival = 1 karakter (identitas **email atau No. WhatsApp**). Untuk menyerang, karaktermu harus masih berdiri. Jurus menumbangkan karakter secara acak di server (dikurangi perisai tim). Tekan **HINDAR** saat peringatan agar aman. Karakter tumbang tidak bisa menyerang lagi di event itu. Semua karakter tumbang = monster menang. Detail: `docs/ALUR.md`.
 
 ### Mode uji monster
 

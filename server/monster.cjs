@@ -45,6 +45,11 @@ function jadwal(cfg, now) {
 
 const namaTampil = (n) => { const b = String(n || '').trim().split(/\s+/); return b.length > 1 ? b[0] + ' ' + b[b.length - 1][0] + '.' : b[0] || ''; };
 const bersihEmail = (e) => String(e || '').trim().toLowerCase();
+// Nomor WhatsApp Indonesia → 62xxxxxxxxxx (null bila tidak valid).
+const normWa = (v) => { const d = String(v || '').replace(/[^\d+]/g, '').replace(/^\+/, ''); const n = d.startsWith('0') ? '62' + d.slice(1) : d; return /^628\d{7,12}$/.test(n) ? n : null; };
+// Kunci kontak peserta: email (huruf kecil) atau "wa:62…".
+const kunciKontak = (email, wa) => { const e = bersihEmail(email); if (e && e.includes('@')) return e; const w = normWa(wa || email); return w ? 'wa:' + w : ''; };
+const kontakTampil = (k) => (String(k).startsWith('wa:') ? '+' + String(k).slice(3) : k);
 
 // app = mesin Apps Script di memori (server/gas-memori.cjs); simpan = fungsi menandai state berubah.
 function buatMonster(app, opsi = {}) {
@@ -83,17 +88,29 @@ function buatMonster(app, opsi = {}) {
   }
 
   // Identitas peserta festival dari tab Satu Kata (email kolom 9). Indeks dibangun ulang bila jumlah baris berubah.
-  let indeks = {n: -1, map: new Map()};
-  function peserta(email) {
+  let indeks = {n: -1, map: new Map(), kunci: []};
+  // Indeks warga festival dari tab Satu Kata (email kolom 9, WhatsApp kolom 12). Satu baris = satu karakter.
+  function bangunIndeks() {
     const sh = app.sheets['Satu Kata'];
     const rows = sh ? sh.rows : [];
-    if (rows.length !== indeks.n) {
-      const map = new Map();
-      rows.slice(1).forEach((r) => { const e = bersihEmail(r[8]); if (e && !map.has(e)) map.set(e, {nama: String(r[6] || ''), sekolah: String(r[7] || ''), provinsi: String(r[3] || '')}); });
-      indeks = {n: rows.length, map};
-    }
-    return indeks.map.get(bersihEmail(email)) || null;
+    if (rows.length === indeks.n) return indeks;
+    const map = new Map(), kunci = [];
+    rows.slice(1).forEach((r) => {
+      const e = bersihEmail(r[8]), w = normWa(r[11]);
+      const k = e && e.includes('@') ? e : w ? 'wa:' + w : '';
+      if (!k || map.has(k)) return;
+      const o = {kunci: k, nama: String(r[6] || ''), sekolah: String(r[7] || ''), provinsi: String(r[3] || ''), kata: String(r[2] || '')};
+      map.set(k, o); kunci.push(k);
+      if (e && e.includes('@') && w && !map.has('wa:' + w)) map.set('wa:' + w, o);
+    });
+    indeks = {n: rows.length, map, kunci};
+    return indeks;
   }
+  const peserta = (kunci) => bangunIndeks().map.get(kunci) || null;
+  // Populasi karakter sebuah event: semua warga festival (+ penguji pada mode uji).
+  const populasi = (j) => { const k = bangunIndeks().kunci; return j && j.uji ? k.concat(Object.keys(st.ujiPemain).map((pid) => 'uji:' + pid)) : k; };
+  // Kunci karakter milik seorang pemain (pid).
+  const kunciPemain = (pid) => (pid[0] === '~' ? 'uji:' + pid : (st.perangkat[pidKe.get(pid)] || {}).email || '');
 
   function ev(id) {
     if (!st.events[id]) st.events[id] = {lvl: 1, tenaga: 0, total: 0, kalah: 0, naik: 0, u: {}, tiket: {}, n: 0, final: false, nyawa: 100, jurusKe: 0, totalJurus: 0, monsterMenang: 0, jurusInfo: null};
@@ -123,27 +140,40 @@ function buatMonster(app, opsi = {}) {
   // Jurus monster: tiap J detik sejak event mulai, nyawa warga berkurang damage × skala level.
   // Perisai: tenaga yang terkumpul sejak jurus sebelumnya (≥ perisai% target level) menahan hingga 80% damage.
   // Diproses malas (saat status/tap diminta) dengan jam server, jadi semua HP melihat nyawa yang sama.
+  // Jurus monster: tiap J detik sejak event mulai, sejumlah KARAKTER warga tumbang.
+  //   jumlah tumbang = populasi awal × damage% × skala level × (1 − perisai), minimal 1 bila masih ada sasaran.
+  //   Perisai: tenaga terkumpul sejak jurus sebelumnya (≥ perisai% target level) menahan hingga 80%.
+  //   Karakter yang menekan HINDAR saat peringatan aman dari jurus itu. Karakter tumbang tidak bisa menyerang.
+  //   Semua karakter tumbang → monster menang. Diproses malas dengan jam server.
   function prosesJurus(c, j, e, t) {
     const m = mUntuk(c, j);
     if (!m.jurus || e.kalah || e.monsterMenang || !j.mulai) return;
-    if (e.nyawa == null) Object.assign(e, {nyawa: 100, jurusKe: 0, totalJurus: 0, monsterMenang: 0, jurusInfo: null});
+    if (!e.mati) Object.assign(e, {mati: {}, hindar: {}, jurusKe: e.jurusKe || 0, totalJurus: e.totalJurus || 0, monsterMenang: 0, jurusInfo: null});
     const J = angka(m.jurusDetik, 8, 4, 60) * 1000;
     const kMaks = Math.floor((Math.min(t, j.selesai) - j.mulai) / J);
     if (kMaks <= e.jurusKe) return;
-    const a = aturan(m);
+    const a = aturan(m), pop = populasi(j);
+    if (!e.populasiAwal) e.populasiAwal = pop.length;
     for (let k = e.jurusKe + 1; k <= kMaks; k++) {
       const li = Math.min(e.lvl, a.target.length) - 1;
       const perisaiTarget = a.target[li] * angka(m.perisai, 2, 0, 100) / 100;
       const dapat = Math.max(0, e.total - e.totalJurus);
       const tahan = perisaiTarget > 0 ? Math.min(0.8, 0.8 * dapat / perisaiTarget) : 0;
-      const dmg = Math.round(angka(m.jurusDamage, 4, 0, 100) * a.skala[li] * (1 - tahan) * 10) / 10;
-      e.nyawa = Math.max(0, Math.round((e.nyawa - dmg) * 10) / 10);
+      const aman = new Set(e.hindar[k] || []);
+      const sasaran = pop.filter((x) => !e.mati[x] && !aman.has(x));
+      const target = Math.round(Math.max(pop.length, e.populasiAwal) * angka(m.jurusDamage, 4, 0, 100) / 100 * a.skala[li] * (1 - tahan));
+      const n = Math.min(sasaran.length, sasaran.length ? Math.max(angka(m.jurusDamage, 4, 0, 100) > 0 ? 1 : 0, target) : 0);
+      for (let i = 0; i < n; i++) { const r = i + crypto.randomInt(sasaran.length - i); [sasaran[i], sasaran[r]] = [sasaran[r], sasaran[i]]; e.mati[sasaran[i]] = k; }
       e.totalJurus = e.total; e.jurusKe = k;
-      e.jurusInfo = {ke: k, dmg, tahan: Math.round(tahan * 100)};
-      if (e.nyawa <= 0) { e.monsterMenang = j.mulai + k * J; break; }
+      delete e.hindar[k];
+      const hidup = pop.filter((x) => !e.mati[x]).length;
+      e.jurusInfo = {ke: k, tumbang: n, menghindar: aman.size, tahan: Math.round(tahan * 100)};
+      e.hidup = hidup;
+      if (pop.length && hidup === 0) { e.monsterMenang = j.mulai + k * J; break; }
     }
     ubah();
   }
+
 
   function status(c, j, t) {
     const m = mUntuk(c, j);
@@ -161,7 +191,9 @@ function buatMonster(app, opsi = {}) {
     const pemain = jumlahAktif(j.id);
     out.fase = e.kalah ? 'menang' : e.monsterMenang ? 'monster_menang' : t < j.selesai ? 'tanding' : 'habis';
     const J = angka(m.jurusDetik, 8, 4, 60) * 1000;
-    Object.assign(out, {nyawa: e.nyawa ?? 100, jurus: !!m.jurus, jurusMs: J, jurusAnimMs: Math.round(angka(m.jurusAnim, 1.6, 0.6, 4) * 1000), jurusDmgMaks: Math.round(angka(m.jurusDamage, 4, 0, 100) * a.skala[Math.min(e.lvl || 1, a.target.length) - 1] * 10) / 10, jurusKe: e.jurusKe || 0, jurusBerikut: m.jurus && out.fase === 'tanding' ? j.mulai + ((e.jurusKe || 0) + 1) * J : null,
+    const pop = t >= j.mulai ? populasi(j).length : 0;
+    const hidupN = e.mati ? pop - Object.keys(e.mati).filter((k) => e.mati[k]).length : pop;
+    Object.assign(out, {hidup: Math.max(0, hidupN), totalWarga: pop, nyawa: pop ? Math.round(Math.max(0, hidupN) / pop * 1000) / 10 : 100, jurus: !!m.jurus, jurusMs: J, jurusAnimMs: Math.round(angka(m.jurusAnim, 1.6, 0.6, 4) * 1000), jurusDmgMaks: Math.round(angka(m.jurusDamage, 4, 0, 100) * a.skala[Math.min(e.lvl || 1, a.target.length) - 1] * 10) / 10, hindarMs: 2500, jurusKe: e.jurusKe || 0, jurusBerikut: m.jurus && out.fase === 'tanding' ? j.mulai + ((e.jurusKe || 0) + 1) * J : null,
       jurusInfo: e.jurusInfo || null, monsterMenang: e.monsterMenang ? new Date(e.monsterMenang).toISOString() : null});
     Object.assign(out, {level: Math.min(e.lvl, a.target.length), tenaga: e.tenaga, total: e.total, kalah: e.kalah ? new Date(e.kalah).toISOString() : null, naik: e.naik || null,
       pemain, tiket: e.n, interval: intervalUntuk(a.interval, pemain)});
@@ -177,7 +209,7 @@ function buatMonster(app, opsi = {}) {
   function masuk(p, ip) {
     const perangkat = String(p.perangkat || '');
     if (!/^[\w-]{16,64}$/.test(perangkat)) return {ok: false, error: 'validation'};
-    const email = bersihEmail(p.email);
+    const email = kunciKontak(p.email, p.wa); // kunci karakter: email atau "wa:62…"
     if (p.uji) {
       // Mode uji: tidak wajib peserta festival dan tidak mengikat perangkat (aturan 1 perangkat tetap utuh untuk event asli).
       if (!ujiSah(p.uji)) return {ok: false, error: 'uji_berakhir'};
@@ -186,7 +218,7 @@ function buatMonster(app, opsi = {}) {
       st.ujiPemain[pid] = {email, nama: orang.nama, sekolah: orang.sekolah, provinsi: orang.provinsi};
       pidKe.set(pid, perangkat);
       const j = jadwalUntuk(cfg(), now(), p.uji), e = j.id && st.events[j.id];
-      return {ok: true, uji: true, token: pid + '.' + tanda(pid), nama: namaTampil(orang.nama), tiket: e && e.tiket[pid] ? e.tiket[pid] : null, saya: e && e.u[pid] ? e.u[pid].p : 0};
+      return {ok: true, uji: true, token: pid + '.' + tanda(pid), nama: namaTampil(orang.nama), tiket: e && e.tiket[pid] ? e.tiket[pid] : null, saya: e && e.u[pid] ? e.u[pid].p : 0, mati: !!(e && e.mati && e.mati['uji:' + pid])};
     }
     const ada = st.perangkat[perangkat];
     if (!ada) {
@@ -198,18 +230,49 @@ function buatMonster(app, opsi = {}) {
     }
     const orang = peserta(email);
     if (!orang) return {ok: false, error: 'belum_festival'};
-    if (ada && ada.email !== email) return {ok: false, error: 'perangkat_dipakai', nama: namaTampil((peserta(ada.email) || {}).nama)};
-    if (!ada && st.email[email] && st.email[email] !== perangkat) return {ok: false, error: 'email_perangkat_lain'};
+    const kunci = orang.kunci; // karakter utama (email/WhatsApp yang dipakai saat daftar)
+    if (ada && ada.email !== kunci) return {ok: false, error: 'perangkat_dipakai', nama: namaTampil((peserta(ada.email) || {}).nama)};
+    if (!ada && st.email[kunci] && st.email[kunci] !== perangkat) return {ok: false, error: 'email_perangkat_lain'};
     if (!ada) {
-      st.perangkat[perangkat] = {email, fp: String(p.fp || '').slice(0, 40), ip: String(ip || '').slice(0, 40), t: now()};
-      st.email[email] = perangkat;
+      st.perangkat[perangkat] = {email: kunci, fp: String(p.fp || '').slice(0, 40), ip: String(ip || '').slice(0, 40), t: now()};
+      st.email[kunci] = perangkat;
       pidKe.set(pidDari(perangkat), perangkat);
       ubah();
     }
     const pid = pidDari(perangkat);
     const j = jadwal(cfg(), now());
     const e = j.id && st.events[j.id];
-    return {ok: true, token: pid + '.' + tanda(pid), nama: namaTampil(orang.nama), tiket: e && e.tiket[pid] ? e.tiket[pid] : null, saya: e && e.u[pid] ? e.u[pid].p : 0};
+    return {ok: true, token: pid + '.' + tanda(pid), nama: namaTampil(orang.nama), tiket: e && e.tiket[pid] ? e.tiket[pid] : null, saya: e && e.u[pid] ? e.u[pid].p : 0, mati: !!(e && e.mati && e.mati[kunci])};
+  }
+
+  // HINDAR: hanya saat peringatan jurus (≤ hindarMs sebelum jurus berikutnya). Karakter tumbang tidak bisa menghindar.
+  const HINDAR_MS = 2500;
+  function hindar(p) {
+    const pid = cekToken(p.token);
+    if (!pid) return {ok: false, error: 'sesi_habis'};
+    const c = cfg(), t = now(), j = jadwalUntuk(c, t, p.uji || null);
+    if (j.fase !== 'aktif' || p.e !== j.id) return {ok: false, error: 'bukan_waktunya'};
+    const e = ev(j.id);
+    prosesJurus(c, j, e, t);
+    const kunci = kunciPemain(pid);
+    if (!kunci) return {ok: false, error: 'sesi_habis'};
+    if (e.mati && e.mati[kunci]) return {ok: true, mati: true};
+    const m = mUntuk(c, j), J = angka(m.jurusDetik, 8, 4, 60) * 1000;
+    const ke = (e.jurusKe || 0) + 1, T = j.mulai + ke * J;
+    if (!m.jurus || t < T - HINDAR_MS || t > T + 300 || e.kalah || e.monsterMenang) return {ok: false, error: 'bukan_waktunya'};
+    const daftar = (e.hindar[ke] = e.hindar[ke] || []);
+    if (!daftar.includes(kunci)) { daftar.push(kunci); ubah(); }
+    return {ok: true, aman: true, ke};
+  }
+  // Status karakter milik pemain (dipanggil setelah tiap jurus): masih hidup atau sudah tumbang.
+  function saya(p) {
+    const pid = cekToken(p.token);
+    if (!pid) return {ok: false, error: 'sesi_habis'};
+    const c = cfg(), t = now(), j = jadwalUntuk(c, t, p.uji || null);
+    const e = j.id && st.events[j.id];
+    if (e && j.fase === 'aktif') prosesJurus(c, j, e, t);
+    const kunci = kunciPemain(pid);
+    return {ok: true, mati: !!(e && e.mati && e.mati[kunci]), matiKe: e && e.mati ? e.mati[kunci] || null : null, tiket: e && e.tiket[pid] ? e.tiket[pid] : null, saya: e && e.u[pid] ? e.u[pid].p : 0};
   }
 
   function terbitkanTiket(id, e, pid, a) {
@@ -233,7 +296,7 @@ function buatMonster(app, opsi = {}) {
       if (kembar) catatan = 'perangkat mirip ' + kembar[1];
     }
     const sh = app.sheets['Tiket Monster'] || app.ctx.tab_(app.ss, 'tiket');
-    sh.appendRow([new Date(now()), id, nomor, orang.nama || '', orang.sekolah || '', orang.provinsi || '', info.email || '', perangkat.slice(0, 8), e.u[pid].p, 'aktif', catatan]);
+    sh.appendRow([new Date(now()), id, nomor, orang.nama || '', orang.sekolah || '', orang.provinsi || '', kontakTampil(info.email || ''), perangkat.slice(0, 8), e.u[pid].p, 'aktif', catatan]);
     return nomor;
   }
 
@@ -247,6 +310,8 @@ function buatMonster(app, opsi = {}) {
     if ((pid[0] === '~') !== !!j.uji) return {ok: false, error: 'sesi_habis'}; // token uji hanya untuk event uji
     const a = aturan(mUntuk(c, j)), e = ev(j.id), maks = a.target.length;
     prosesJurus(c, j, e, t);
+    const kunciKu = kunciPemain(pid);
+    if (e.mati && kunciKu && e.mati[kunciKu]) return {ok: true, terima: 0, mati: true, saya: (e.u[pid] || {}).p || 0, tiket: e.tiket[pid] || null, status: status(c, j, t)};
     const u = e.u[pid] || (e.u[pid] = {p: 0, q: -1});
     let terima = 0;
     const dup = seq <= u.q;
@@ -273,7 +338,7 @@ function buatMonster(app, opsi = {}) {
     }
     if (!aktif.has(j.id)) aktif.set(j.id, new Map());
     aktif.get(j.id).set(pid, t);
-    return {ok: true, terima, dup, saya: u.p, tiket: e.tiket[pid] || null, status: status(c, j, t)};
+    return {ok: true, terima, dup, saya: u.p, tiket: e.tiket[pid] || null, mati: !!(e.mati && e.mati[kunciKu]), status: status(c, j, t)};
   }
 
   // Event selesai: kontribusi akhir ditulis ke tab tiket + satu baris ringkasan di tab Monster Event.
@@ -407,7 +472,7 @@ function buatMonster(app, opsi = {}) {
     }
     if (p.aksi === 'uji') return {ok: true, uji: infoUji()};
     if (p.aksi === 'lepas-perangkat') {
-      const email = bersihEmail(p.email);
+      const email = kunciKontak(p.email);
       const d = st.email[email];
       if (!d) return {ok: false, error: 'tidak_ditemukan'};
       delete st.email[email]; delete st.perangkat[d]; pidKe.delete(pidDari(d));
@@ -429,7 +494,7 @@ function buatMonster(app, opsi = {}) {
     return {ok: true, pemenang: out};
   }
 
-  return {lihat, masuk, tap, admin, pemenangPublik, state: st, jadwal, segarkan: () => { memo.t = 0; }};
+  return {lihat, masuk, tap, hindar, saya, admin, pemenangPublik, state: st, jadwal, segarkan: () => { memo.t = 0; }};
 }
 
 module.exports = {buatMonster, jadwal, PASCA, MENIT};

@@ -9,7 +9,7 @@ const STATUS_MONSTER = {sesi_habis: 401, rate_limit: 429, validation: 400};
 
 // Formulir: aksi publik → aksi Code.gs + field yang boleh diteruskan. Field lain dibuang.
 const FORMULIR = {
-  kata: {aksi: {kirim: 'kata-kirim'}, field: ['kata', 'karakter', 'nama', 'sekolah', 'email', 'provinsi', 'channelClicked', 'consent', 'ref', 'requestId', 'website', 'perangkat'], maks: 8192},
+  kata: {aksi: {kirim: 'kata-kirim'}, field: ['kata', 'karakter', 'nama', 'sekolah', 'email', 'wa', 'provinsi', 'channelClicked', 'consent', 'ref', 'requestId', 'website', 'perangkat'], maks: 8192},
   dana: {aksi: {akses: 'dana-akses', kirim: 'dana-kirim'}, field: ['kodeAkses', 'nama', 'email', 'wa', 'sekolah', 'kota', 'provinsi', 'ref', 'requestId', 'consent', 'website', 'perangkat'], maks: 8192},
   klaim: {aksi: {cek: 'klaim-cek', verifikasi: 'klaim-verifikasi'}, field: ['kode', 'email', 'perangkat'], maks: 8192},
   survei: {aksi: {kirim: 'survei-kirim'}, field: ['destinasi', 'kegiatan', 'waktu', 'status', 'provinsi', 'impian', 'email', 'ref', 'requestId', 'website', 'perangkat'], maks: 8192},
@@ -112,7 +112,8 @@ function buatApi(data) {
     return jawab(st, cache);
   }
   function monsterPost(p, ip, adminSaja) {
-    const out = adminSaja ? data.monster.admin(p || {}) : p && p.aksi === 'masuk' ? data.monster.masuk(p, ip) : p && p.aksi === 'tap' ? data.monster.tap(p) : {ok: false, error: 'validation'};
+    const aksi = {masuk: () => data.monster.masuk(p, ip), tap: () => data.monster.tap(p), hindar: () => data.monster.hindar(p), saya: () => data.monster.saya(p)}[p && p.aksi];
+    const out = adminSaja ? data.monster.admin(p || {}) : aksi ? aksi() : {ok: false, error: 'validation'};
     return jawab(out, CACHE.tidak, out.ok ? 200 : (STATUS_MONSTER[out.error] || 422));
   }
 
