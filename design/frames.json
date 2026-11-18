@@ -1,0 +1,80 @@
+[
+ {
+  "file": "m01-beranda.html",
+  "title": "M01 Beranda (mobile)",
+  "w": 390,
+  "h": 2060
+ },
+ {
+  "file": "m02-festival.html",
+  "title": "M02 Festival Satu Kata \u00b7 plaza",
+  "w": 390,
+  "h": 844
+ },
+ {
+  "file": "m03-gabung.html",
+  "title": "M03 Gabung Festival \u00b7 langkah 2/3",
+  "w": 390,
+  "h": 844
+ },
+ {
+  "file": "m04-kartu.html",
+  "title": "M04 Sukses gabung + kartu share",
+  "w": 390,
+  "h": 844
+ },
+ {
+  "file": "m05-monster.html",
+  "title": "M05 Lawan Monster \u00b7 saat jurus",
+  "w": 390,
+  "h": 844
+ },
+ {
+  "file": "m06-live.html",
+  "title": "M06 Live & jadwal",
+  "w": 390,
+  "h": 844
+ },
+ {
+  "file": "m07-finalis.html",
+  "title": "M07 Finalis",
+  "w": 390,
+  "h": 844
+ },
+ {
+  "file": "m08-dana-kaget.html",
+  "title": "M08 Dana Kaget \u00b7 form + validasi",
+  "w": 390,
+  "h": 844
+ },
+ {
+  "file": "m09-punya-kode.html",
+  "title": "M09 Punya kode? \u00b7 bottom sheet",
+  "w": 390,
+  "h": 844
+ },
+ {
+  "file": "m10-lainnya.html",
+  "title": "M10 Lainnya (menu)",
+  "w": 390,
+  "h": 844
+ },
+ {
+  "file": "d01-beranda.html",
+  "title": "D01 Beranda (desktop)",
+  "w": 1440,
+  "h": 1666
+ },
+ {
+  "file": "d02-festival.html",
+  "title": "D02 Festival Satu Kata (desktop)",
+  "w": 1440,
+  "h": 900
+ },
+ {
+  "file": "ds-design-system.html",
+  "title": "DS Design System \u00b7 Nusa Cerah",
+  "w": 1440,
+  "h": 2680
+ }
+]

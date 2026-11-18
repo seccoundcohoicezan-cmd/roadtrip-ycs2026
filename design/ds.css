@@ -1,0 +1,179 @@
+/* YCS 2026 — Design System "Nusa Cerah" v2.0
+   Sumber kebenaran token. Nama variabel = nama style/variable di Figma (Collection: ycs). */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Caveat:wght@700&display=swap');
+
+:root {
+  /* Brand */
+  --navy-950: #061840;
+  --navy-900: #0A2463;   /* ink / judul */
+  --navy-800: #11307E;
+  --blue-700: #1A4FC0;
+  --blue-600: #1F5FD6;   /* primary */
+  --blue-500: #2F7BFF;
+  --blue-200: #B9D3FF;
+  --blue-100: #DCEBFF;
+  --blue-50:  #EEF4FF;
+  --sun-500:  #F5B400;
+  --sun-400:  #FFC93C;   /* accent / CTA kuning */
+  --sun-100:  #FFF3CC;
+  --coral-500:#D92D20;   /* LIVE / bahaya */
+  --coral-100:#FFE3E0;
+  --green-600:#0F7A4F;   /* sukses */
+  --green-100:#DDF6EA;
+  --violet-600:#6A3DE8;  /* game / monster */
+  --violet-100:#ECE5FF;
+  /* Netral */
+  --ink:      #0F1B3D;
+  --ink-2:    #45506B;
+  --ink-3:    #5F6982;
+  --line:     #E1E7F2;
+  --line-2:   #CDD6E6;
+  --bg:       #F5F8FF;
+  --surface:  #FFFFFF;
+  /* Tipografi */
+  --font: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-script: 'Caveat', cursive;
+  /* Radius */
+  --r-sm: 10px; --r-md: 14px; --r-lg: 20px; --r-xl: 28px; --r-pill: 999px;
+  /* Elevasi */
+  --e1: 0 1px 2px rgba(10,36,99,.06), 0 2px 8px rgba(10,36,99,.05);
+  --e2: 0 2px 4px rgba(10,36,99,.05), 0 10px 28px rgba(10,36,99,.10);
+  --e3: 0 8px 16px rgba(10,36,99,.10), 0 24px 56px rgba(10,36,99,.18);
+  --ring: 0 0 0 3px rgba(47,123,255,.35);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #E9EEF8; }
+body { font-family: var(--font); color: var(--ink); -webkit-font-smoothing: antialiased; }
+img { display: block; max-width: 100%; }
+svg.i { width: 20px; height: 20px; flex: none; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+svg.i.s16 { width: 16px; height: 16px; } svg.i.s24 { width: 24px; height: 24px; } svg.i.s28 { width: 28px; height: 28px; }
+
+/* ===== Tipografi (Text styles Figma) ===== */
+.t-display { font-size: 40px; line-height: 44px; font-weight: 800; letter-spacing: -1.2px; color: var(--navy-900); }
+.t-h1 { font-size: 32px; line-height: 38px; font-weight: 800; letter-spacing: -.8px; color: var(--navy-900); }
+.t-h2 { font-size: 24px; line-height: 30px; font-weight: 800; letter-spacing: -.5px; color: var(--navy-900); }
+.t-h3 { font-size: 18px; line-height: 24px; font-weight: 700; letter-spacing: -.2px; color: var(--navy-900); }
+.t-body { font-size: 16px; line-height: 24px; font-weight: 500; color: var(--ink-2); }
+.t-sm { font-size: 14px; line-height: 20px; font-weight: 500; color: var(--ink-2); }
+.t-xs { font-size: 12px; line-height: 16px; font-weight: 600; color: var(--ink-3); }
+.t-over { font-size: 12px; line-height: 16px; font-weight: 800; letter-spacing: 1.4px; text-transform: uppercase; color: var(--blue-600); }
+.t-script { font-family: var(--font-script); font-weight: 700; }
+.t-num { font-variant-numeric: tabular-nums; }
+.hl { color: var(--blue-600); }
+.u-sun { background: linear-gradient(transparent 62%, var(--sun-400) 62%, var(--sun-400) 90%, transparent 90%); padding: 0 2px; }
+
+/* ===== Tombol ===== */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 48px; padding: 0 20px; border-radius: var(--r-pill); font: 700 15px/1 var(--font); border: 0; white-space: nowrap; }
+.btn-sm { height: 36px; padding: 0 14px; font-size: 13px; }
+.btn-lg { height: 56px; padding: 0 26px; font-size: 16px; }
+.btn-block { width: 100%; }
+.btn-primary { background: var(--blue-600); color: #fff; box-shadow: 0 6px 16px rgba(31,95,214,.32); }
+.btn-sun { background: var(--sun-400); color: var(--navy-900); box-shadow: 0 6px 16px rgba(245,180,0,.35); }
+.btn-dark { background: var(--navy-900); color: #fff; }
+.btn-ghost { background: var(--blue-50); color: var(--blue-700); }
+.btn-outline { background: #fff; color: var(--navy-900); box-shadow: inset 0 0 0 1.5px var(--line-2); }
+.btn-white { background: #fff; color: var(--navy-900); }
+.btn-danger { background: var(--coral-500); color: #fff; }
+.btn-disabled { background: #E6EAF2; color: #9AA3B8; box-shadow: none; }
+.btn-icon { width: 44px; height: 44px; padding: 0; border-radius: 50%; }
+.btn-focus { box-shadow: var(--ring); }
+
+/* ===== Chip, badge ===== */
+.chip { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: var(--r-pill); font: 700 13px/1 var(--font); background: #fff; color: var(--ink-2); box-shadow: inset 0 0 0 1.5px var(--line); white-space: nowrap; }
+.chip.on { background: var(--navy-900); color: #fff; box-shadow: none; }
+.badge { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 9px; border-radius: var(--r-pill); font: 800 11px/1 var(--font); letter-spacing: .4px; text-transform: uppercase; white-space: nowrap; }
+.b-sun { background: var(--sun-400); color: var(--navy-900); }
+.b-live { background: var(--coral-500); color: #fff; }
+.b-live::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #fff; }
+.b-blue { background: var(--blue-100); color: var(--blue-700); }
+.b-green { background: var(--green-100); color: var(--green-600); }
+.b-grey { background: #EDF0F6; color: var(--ink-3); }
+.b-violet { background: var(--violet-100); color: var(--violet-600); }
+.b-glass { background: rgba(255,255,255,.18); color: #fff; backdrop-filter: blur(8px); box-shadow: inset 0 0 0 1px rgba(255,255,255,.35); }
+
+/* ===== Kartu ===== */
+.card { background: var(--surface); border-radius: var(--r-lg); box-shadow: var(--e1); }
+.card-pad { padding: 16px; }
+.card-line { box-shadow: inset 0 0 0 1px var(--line); }
+
+/* ===== Input ===== */
+.field { display: grid; gap: 6px; }
+.field label { font: 700 13px/18px var(--font); color: var(--navy-900); }
+.field .hint { font: 500 12px/16px var(--font); color: var(--ink-3); }
+.field .err { font: 600 12px/16px var(--font); color: var(--coral-500); display: flex; gap: 4px; align-items: center; }
+.input { height: 48px; border-radius: var(--r-md); background: #fff; box-shadow: inset 0 0 0 1.5px var(--line-2); display: flex; align-items: center; gap: 10px; padding: 0 14px; font: 500 15px/1 var(--font); color: var(--ink); }
+.input .ph { color: #98A1B6; }
+.input.focus { box-shadow: inset 0 0 0 2px var(--blue-500), var(--ring); }
+.input.error { box-shadow: inset 0 0 0 2px var(--coral-500); }
+.input.ok { box-shadow: inset 0 0 0 1.5px var(--green-600); }
+.input svg.i { color: var(--ink-3); }
+
+/* ===== Frame ===== */
+.frame { position: relative; overflow: hidden; background: var(--bg); }
+.phone { width: 390px; }
+.desk { width: 1440px; }
+.status { height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px 0 28px; font: 700 15px/1 var(--font); color: var(--ink); }
+.status .sig { display: flex; gap: 6px; align-items: center; }
+.status.light { color: #fff; }
+
+/* Header aplikasi (mobile) */
+.appbar { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand svg { width: 38px; height: 38px; }
+.brand b { display: block; font: 800 14px/16px var(--font); color: var(--navy-900); letter-spacing: -.2px; }
+.brand span { display: block; font: 800 12px/14px var(--font); color: var(--blue-600); }
+.brand.light b, .brand.light span { color: #fff; }
+
+/* Bottom nav */
+.tabbar { position: absolute; left: 12px; right: 12px; bottom: 14px; height: 68px; background: rgba(255,255,255,.96); border-radius: 24px; box-shadow: var(--e3); display: grid; grid-template-columns: repeat(5, 1fr); align-items: center; padding: 0 6px; z-index: 20; }
+.tab { display: grid; justify-items: center; gap: 4px; font: 700 11px/1 var(--font); color: var(--ink-3); }
+.tab svg.i { width: 24px; height: 24px; }
+.tab.on { color: var(--blue-600); }
+.tab.on .pill { background: var(--blue-50); }
+.tab .pill { width: 52px; height: 30px; border-radius: 15px; display: grid; place-items: center; }
+.tab.main .pill { background: var(--sun-400); color: var(--navy-900); box-shadow: 0 6px 14px rgba(245,180,0,.4); }
+.home-ind { position: absolute; bottom: 4px; left: 50%; width: 134px; height: 5px; margin-left: -67px; border-radius: 3px; background: var(--ink); opacity: .9; z-index: 30; }
+
+/* Section util */
+.sec { padding: 0 16px; }
+.row { display: flex; align-items: center; }
+.between { justify-content: space-between; }
+.gap4 { gap: 4px; } .gap6 { gap: 6px; } .gap8 { gap: 8px; } .gap10 { gap: 10px; } .gap12 { gap: 12px; } .gap16 { gap: 16px; } .gap24 { gap: 24px; }
+.stack { display: grid; }
+.mt4{margin-top:4px}.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}.mt24{margin-top:24px}.mt32{margin-top:32px}.mt40{margin-top:40px}
+.grow { flex: 1; min-width: 0; }
+
+/* Countdown */
+.cd { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.cd div { background: var(--blue-50); border-radius: var(--r-md); text-align: center; padding: 10px 0 8px; }
+.cd b { display: block; font: 800 26px/30px var(--font); color: var(--navy-900); font-variant-numeric: tabular-nums; letter-spacing: -.5px; }
+.cd span { font: 600 11px/14px var(--font); color: var(--ink-3); }
+
+/* Ikon tile */
+.ico { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; flex: none; }
+.ico.blue { background: var(--blue-100); color: var(--blue-600); }
+.ico.sun { background: var(--sun-100); color: #B07C00; }
+.ico.coral { background: var(--coral-100); color: var(--coral-500); }
+.ico.green { background: var(--green-100); color: var(--green-600); }
+.ico.violet { background: var(--violet-100); color: var(--violet-600); }
+
+/* Avatar warga */
+.av { width: 40px; height: 40px; border-radius: 50%; background: var(--blue-50) center 18% / 170% no-repeat; flex: none; box-shadow: 0 0 0 2px #fff; }
+
+/* Bottom sheet */
+.scrim { position: absolute; inset: 0; background: rgba(6,24,64,.55); z-index: 40; }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; background: #fff; border-radius: 28px 28px 0 0; z-index: 41; padding: 10px 20px 34px; box-shadow: var(--e3); }
+.grab { width: 40px; height: 5px; border-radius: 3px; background: var(--line-2); margin: 0 auto 14px; }
+
+/* Toast */
+.toast { display: flex; align-items: center; gap: 10px; background: var(--navy-900); color: #fff; border-radius: var(--r-md); padding: 12px 14px; font: 600 14px/20px var(--font); box-shadow: var(--e3); }
+
+/* Desktop nav */
+.dnav { height: 76px; display: flex; align-items: center; justify-content: space-between; padding: 0 56px; }
+.dnav .links { display: flex; gap: 4px; background: rgba(255,255,255,.92); padding: 6px; border-radius: var(--r-pill); box-shadow: var(--e2); }
+.dnav .links a { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: var(--r-pill); font: 700 14px/1 var(--font); color: var(--navy-900); text-decoration: none; }
+.dnav .links a.on { background: var(--blue-600); color: #fff; }
+
+/* Annotation (lapisan catatan desainer; sembunyikan di Figma bila tak perlu) */
+.note { position: absolute; background: #FFE95C; color: #3A3000; font: 700 11px/14px var(--font); padding: 6px 8px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,.15); z-index: 99; max-width: 180px; }
