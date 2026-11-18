@@ -8,29 +8,30 @@
   <meta name="robots" content="noindex">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Plus+Jakarta+Sans:wght@600;800&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;800&display=swap">
   <script>
     // Tanpa ?display=1 halaman ini mengarah ke Festival di beranda (isi data + kirim kata).
     if (new URLSearchParams(location.search).get('display') !== '1') location.replace('/#satu-kata');
   </script>
+  <link rel="stylesheet" href="/assets/css/tokens.css">
   <style>
     * { box-sizing: border-box; }
-    html, body { margin: 0; height: 100%; background: #082C33; font-family: "Plus Jakarta Sans", system-ui, sans-serif; overflow: hidden; }
+    html, body { margin: 0; height: 100%; background: var(--navy-950); font-family: "Plus Jakarta Sans", system-ui, sans-serif; overflow: hidden; }
     #panggung { position: fixed; inset: 0; }
     #panggung > canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-    .info { position: fixed; left: 2vw; top: 2vh; z-index: 2; padding: 1vh 1.4vw; border-radius: 1.2vw; background: rgb(8 44 51 / .82); color: #fff; font-weight: 800; font-size: clamp(1rem, 1.6vw, 2rem); }
-    .info strong { color: #FFC93C; font-size: 1.5em; }
-    .ajak { position: fixed; right: 2vw; top: 2vh; z-index: 2; padding: 1vh 1.4vw; border-radius: 1.2vw; background: rgb(255 255 255 / .92); color: #082C33; font-weight: 800; font-size: clamp(.9rem, 1.3vw, 1.6rem); }
+    .info { position: fixed; left: 2vw; top: 2vh; z-index: 2; padding: 1vh 1.4vw; border-radius: 1.2vw; background: rgb(8 44 51 / .82); color: var(--white); font-weight: 800; font-size: clamp(1rem, 1.6vw, 2rem); }
+    .info strong { color: var(--sun-400); font-size: 1.5em; }
+    .ajak { position: fixed; right: 2vw; top: 2vh; z-index: 2; padding: 1vh 1.4vw; border-radius: 1.2vw; background: rgb(255 255 255 / .92); color: var(--navy-950); font-weight: 800; font-size: clamp(.9rem, 1.3vw, 1.6rem); }
     #panggung { background: #ECCEA4; }
-    .fest-b { position: absolute; z-index: 3; left: 0; top: 0; display: flex; gap: .6vw; align-items: center; max-width: 18vw; padding: .5vw .9vw .5vw .5vw; border: .2vw solid #FFC93C; border-radius: 1vw; background: #FFFBF3; color: #13232A; box-shadow: 0 1.2vh 2.4vh -1.2vh rgb(0 0 0 / .45); opacity: 0; transition: opacity 400ms ease; will-change: transform; }
+    .fest-b { position: absolute; z-index: 3; left: 0; top: 0; display: flex; gap: .6vw; align-items: center; max-width: 18vw; padding: .5vw .9vw .5vw .5vw; border: .2vw solid var(--sun-400); border-radius: 1vw; background: var(--white); color: var(--ink); box-shadow: 0 1.2vh 2.4vh -1.2vh rgb(0 0 0 / .45); opacity: 0; transition: opacity 400ms ease; will-change: transform; }
     .fest-b.is-on { opacity: 1; }
-    .fest-b::after { content: ""; position: absolute; left: var(--ekor, 50%); bottom: -.6vw; width: 1vw; height: 1vw; background: #FFFBF3; border-right: .2vw solid #FFC93C; border-bottom: .2vw solid #FFC93C; transform: translateX(-50%) rotate(45deg); }
-    .fest-b__ava { width: 2.8vw; height: 2.8vw; flex: none; border-radius: 50%; overflow: hidden; background: #FFD86B; }
+    .fest-b::after { content: ""; position: absolute; left: var(--ekor, 50%); bottom: -.6vw; width: 1vw; height: 1vw; background: var(--white); border-right: .2vw solid var(--sun-400); border-bottom: .2vw solid var(--sun-400); transform: translateX(-50%) rotate(45deg); }
+    .fest-b__ava { width: 2.8vw; height: 2.8vw; flex: none; border-radius: 50%; overflow: hidden; background: var(--sun-400); }
     .fest-b__ava canvas { width: 100%; height: 100%; display: block; }
     .fest-b strong { display: block; font-size: 1vw; }
-    .fest-b em { display: block; font-family: "Permanent Marker", cursive; font-style: normal; font-size: 1.5vw; color: #C2410C; line-height: 1.1; }
-    .fest-b small { display: block; font-size: .75vw; color: #4A5B62; }
-    .fest-b.is-pin { border-color: #C2410C; }
+    .fest-b em { display: block; font-family: var(--font-sans); font-weight: 800; text-transform: uppercase; font-style: normal; font-size: 1.5vw; color: var(--sun-700); line-height: 1.1; }
+    .fest-b small { display: block; font-size: .75vw; color: var(--ink-2); }
+    .fest-b.is-pin { border-color: var(--sun-700); }
   </style>
 </head>
 <body>

@@ -43,6 +43,9 @@
 .btn--live { --btn-bg: var(--coral-500); --btn-fg: var(--white); --btn-shadow: var(--glow-live); }
 .btn--live:hover { --btn-bg: var(--coral-700); }
 .btn--light { --btn-bg: var(--white); --btn-fg: var(--navy-900); }
+.btn--wa { --btn-bg: var(--wa-500); --btn-fg: var(--navy-950); }
+.btn--social { --btn-bg: rgb(255 255 255 / .08); --btn-fg: var(--white); --btn-shadow: inset 0 0 0 1.5px rgb(255 255 255 / .55); }
+.btn--social:hover { --btn-bg: var(--white); --btn-fg: var(--navy-900); }
 .btn--icon { width: var(--tap); min-height: var(--tap); height: var(--tap); padding: 0; border-radius: 50%; }
 .btn[disabled], .btn[aria-disabled="true"] { --btn-bg: var(--disabled-bg); --btn-fg: var(--disabled-fg); --btn-shadow: none; cursor: not-allowed; transform: none; }
 .btn[aria-busy="true"] { position: relative; color: transparent; }
@@ -72,7 +75,7 @@
 .badge--done { background: var(--surface-sunk); color: var(--text-3); }
 .badge--game { background: var(--game-bg); color: var(--game); }
 .badge--warn { background: var(--warning-bg); color: var(--warning); }
-.badge--err { background: var(--error-bg); color: var(--error); }
+.badge--err { background: var(--error-bg); color: var(--on-error-bg); }
 @keyframes k-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
 
 .chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
@@ -128,7 +131,7 @@
 /* ---------- Umpan balik ---------- */
 .alert { display: flex; gap: var(--space-3); align-items: flex-start; padding: 12px 14px; border-radius: var(--r-md); font: 600 var(--fs-sm)/var(--lh-sm) var(--font-sans); }
 .alert svg { width: 1.125rem; height: 1.125rem; flex: none; margin-top: 1px; }
-.alert--error, .alert--err { background: var(--error-bg); color: var(--error); }
+.alert--error, .alert--err { background: var(--error-bg); color: var(--on-error-bg); }
 .alert--success, .alert--ok { background: var(--success-bg); color: var(--success); }
 .alert--warn { background: var(--warning-bg); color: var(--warning); }
 .alert--info { background: var(--info-bg); color: var(--info); }

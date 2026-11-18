@@ -27,28 +27,28 @@
     .survey { padding: 0; overflow: hidden; }
     .survey__top { padding: var(--space-4) clamp(1.25rem, 4vw, 2.25rem); border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: var(--space-4); }
     .survey__top .meter { flex: 1; height: .5rem; }
-    .survey__count { font-size: .8125rem; font-weight: 800; color: var(--text-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .survey__count { font-size: .8125rem; font-weight: 800; color: var(--text-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
     .survey__body { padding: clamp(1.25rem, 4vw, 2.25rem); min-height: 24rem; }
     .q { border: 0; margin: 0; padding: 0; min-width: 0; }
     .q legend { padding: 0; font-size: clamp(1.25rem, 3.5vw, 1.625rem); font-weight: 800; line-height: 1.25; }
-    .q__hint { margin-top: var(--space-2); color: var(--text-muted); font-size: .9375rem; }
+    .q__hint { margin-top: var(--space-2); color: var(--text-2); font-size: .9375rem; }
     .q.fade-in { animation-duration: .35s; }
     .choices { display: grid; gap: var(--space-3); margin-top: var(--space-5); grid-template-columns: repeat(auto-fill, minmax(min(100%, 12rem), 1fr)); }
     .choice { position: relative; display: block; cursor: pointer; }
     .choice input { position: absolute; z-index: 1; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
-    .choice__box { display: flex; align-items: center; gap: var(--space-3); min-height: 56px; padding: .75rem 1rem; border-radius: var(--radius); border: 2px solid var(--line); background: var(--surface); font-weight: 700; transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease), transform var(--dur) var(--ease); }
+    .choice__box { display: flex; align-items: center; gap: var(--space-3); min-height: 56px; padding: .75rem 1rem; border-radius: var(--r-md); border: 2px solid var(--line); background: var(--surface); font-weight: 700; transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease), transform var(--dur) var(--ease); }
     .choice__box::before { content: ""; flex: none; width: 1.375rem; height: 1.375rem; border-radius: .375rem; border: 2px solid var(--line); background: var(--surface) center / 70% no-repeat; transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease); }
     .choice input[type="radio"] + .choice__box::before { border-radius: 50%; }
     .choice:hover .choice__box { border-color: color-mix(in srgb, var(--primary) 55%, var(--line)); transform: translateY(-1px); }
-    .choice input:checked + .choice__box { border-color: var(--teal-700); background: var(--surface-soft); }
-    .choice input:checked + .choice__box::before { background-color: var(--teal-700); border-color: var(--teal-700); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round' d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E"); }
-    .choice input:focus-visible + .choice__box { outline: 3px solid var(--focus); outline-offset: 2px; }
+    .choice input:checked + .choice__box { border-color: var(--blue-600); background: var(--surface-soft); }
+    .choice input:checked + .choice__box::before { background-color: var(--blue-600); border-color: var(--blue-600); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round' d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E"); }
+    .choice input:focus-visible + .choice__box { outline: 3px solid var(--blue-500); outline-offset: 2px; }
     .choice input:disabled + .choice__box { opacity: .45; cursor: not-allowed; transform: none; }
-    .choice small { display: block; font-weight: 500; color: var(--text-muted); font-size: .8125rem; }
+    .choice small { display: block; font-weight: 500; color: var(--text-2); font-size: .8125rem; }
     .q__error { margin-top: var(--space-3); }
     .survey__nav { display: flex; justify-content: space-between; gap: var(--space-3); padding: var(--space-4) clamp(1.25rem, 4vw, 2.25rem); border-top: 1px solid var(--line); background: var(--surface-soft); }
     .survey__nav .btn--cta { margin-left: auto; }
-    .kbd-hint { font-size: .75rem; color: var(--text-muted); align-self: center; }
+    .kbd-hint { font-size: .75rem; color: var(--text-2); align-self: center; }
     @media (max-width: 40rem) { .kbd-hint { display: none; } }
     .thanks { text-align: center; display: grid; gap: var(--space-4); justify-items: center; padding: var(--space-5) 0; }
     .thanks__art { width: 7rem; height: 7rem; }
@@ -70,7 +70,7 @@
   <header class="p-header">
     <div class="container p-header__inner">
       <a class="p-brand" href="/" aria-label="Youth Character Summit 2026, ke beranda">
-        <svg viewBox="0 0 48 48" aria-hidden="true"><g stroke="#FFC93C" stroke-width="3" stroke-linecap="round"><path d="M24 3v5M24 40v5M3 24h5M40 24h5M9.2 9.2l3.5 3.5M35.3 35.3l3.5 3.5M9.2 38.8l3.5-3.5M35.3 12.7l3.5-3.5"/></g><circle cx="24" cy="24" r="12.5" fill="#12707E"/><circle cx="24" cy="19.5" r="3.4" fill="#FFC93C"/><path d="M16.5 31c1.5-4.6 4.2-6.8 7.5-6.8s6 2.2 7.5 6.8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>
+        <svg viewBox="0 0 48 48" aria-hidden="true"><g style="stroke:var(--sun-400)" stroke-width="3" stroke-linecap="round"><path d="M24 3v5M24 40v5M3 24h5M40 24h5M9.2 9.2l3.5 3.5M35.3 35.3l3.5 3.5M9.2 38.8l3.5-3.5M35.3 12.7l3.5-3.5"/></g><circle cx="24" cy="24" r="12.5" style="fill:var(--blue-600)"/><circle cx="24" cy="19.5" r="3.4" style="fill:var(--sun-400)"/><path d="M16.5 31c1.5-4.6 4.2-6.8 7.5-6.8s6 2.2 7.5 6.8" fill="none" style="stroke:var(--white)" stroke-width="2.6" stroke-linecap="round"/></svg>
         <span><strong>Youth Character Summit</strong><span>YCS 2026</span></span>
       </a>
       <div class="p-header__tools">
@@ -113,7 +113,7 @@
           </div>
           <div id="v-tanya" hidden></div>
           <div id="v-selesai" hidden class="thanks">
-            <svg class="thanks__art" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="56" fill="#FFF3CC"/><path d="M34 62l17 17 36-38" fill="none" stroke="#C2410C" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><g fill="#0E5A66"><circle cx="18" cy="24" r="4"/><circle cx="104" cy="30" r="3"/><circle cx="98" cy="98" r="4"/></g></svg>
+            <svg class="thanks__art" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="56" style="fill:var(--sun-100)"/><path d="M34 62l17 17 36-38" fill="none" style="stroke:var(--sun-700)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><g style="fill:var(--blue-600)"><circle cx="18" cy="24" r="4"/><circle cx="104" cy="30" r="3"/><circle cx="98" cy="98" r="4"/></g></svg>
             <h2 tabindex="-1" id="selesai-judul">Terima kasih, suaramu tercatat!</h2>
             <p class="muted" style="max-width:30rem">Semakin banyak yang mengisi, semakin tepat rencana perjalanannya. Ajak teman sekelasmu ikut memilih:</p>
             <div class="share-row" id="bagikan">

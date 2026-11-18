@@ -1,7 +1,7 @@
 /* YCS 2026 — token "Nusa Cerah" v2.1 (satu-satunya sumber token situs).
    Nilai = design/ds.css + design/tokens.json (ds-design-system.png). Dipakai index.html dan semua halaman turunan.
    Komponen memakai token SEMANTIK (--heading, --text, --surface, --primary, …) agar mode gelap cukup menimpa token semantik.
-   Nama lama (--teal-*, --cta, --radius, --shadow …) dipetakan ke palet baru supaya CSS lama ikut berganti tanpa nilai hardcode. */
+   Nilai hardcode lama (teal/oranye) sudah diganti token ini di semua halaman. */
 :root {
   /* ---- Palet ---- */
   --navy-950: #061840;
@@ -65,6 +65,7 @@
   --warning-bg: var(--sun-100);
   --error: var(--coral-500);
   --error-bg: var(--coral-100);
+  --on-error-bg: var(--coral-700);
   --info: var(--blue-700);
   --info-bg: var(--blue-50);
   --live: var(--coral-500);
@@ -114,19 +115,7 @@
   --ease: cubic-bezier(.2, .7, .2, 1);
   --dur: 200ms;
 
-  /* ---- Alias nama lama → token baru (jangan dipakai di CSS baru) ---- */
-  --teal-950: var(--navy-950); --teal-900: var(--navy-900); --teal-800: var(--navy-800);
-  --teal-700: var(--blue-600); --teal-600: var(--blue-600); --teal-100: var(--blue-100); --teal-50: var(--blue-50);
-  --orange-700: var(--sun-700); --orange-600: var(--sun-500); --orange-500: var(--sun-400); --orange-400: var(--sun-400);
-  --yellow-400: var(--sun-400); --yellow-300: var(--sun-400); --yellow-100: var(--sun-100);
-  --sand-50: var(--bg); --sand-100: var(--blue-50);
-  --ink-muted: var(--ink-2);
   --text-muted: var(--text-2);
-  --cta: var(--sun-400); --cta-hover: var(--sun-500);
-  --focus: var(--blue-500);
-  --font-brush: var(--font-script);
-  --radius-sm: var(--r-sm); --radius: var(--r-md); --radius-lg: var(--r-lg); --radius-pill: var(--r-pill);
-  --shadow-sm: var(--e1); --shadow: var(--e2); --shadow-lg: var(--e3); --shadow-cta: var(--glow-sun);
 
   color-scheme: light;
 }
@@ -142,7 +131,7 @@
     --glass: rgb(12 26 66 / .94); --scrim: rgb(0 6 20 / .7); --placeholder: #7D89A8;
     --disabled-bg: #1A2a55; --disabled-fg: #6F7C9E;
     --success: #5FD4A0; --success-bg: #0F3A2C; --warning: #FFD66B; --warning-bg: #3A2E08;
-    --error: #FF8A80; --error-bg: #4A1512; --info: #9CC2FF; --info-bg: #13265A;
+    --error: #FF8A80; --error-bg: #4A1512; --on-error-bg: #FFB4AB; --info: #9CC2FF; --info-bg: #13265A;
     --game: #B9A2FF; --game-bg: #2A1E5C;
     --e1: 0 1px 2px rgb(0 0 0 / .3); --e2: 0 10px 28px rgb(0 0 0 / .45); --e3: 0 24px 56px rgb(0 0 0 / .55);
     color-scheme: dark;
@@ -157,8 +146,17 @@
   --glass: rgb(12 26 66 / .94); --scrim: rgb(0 6 20 / .7); --placeholder: #7D89A8;
   --disabled-bg: #1A2a55; --disabled-fg: #6F7C9E;
   --success: #5FD4A0; --success-bg: #0F3A2C; --warning: #FFD66B; --warning-bg: #3A2E08;
-  --error: #FF8A80; --error-bg: #4A1512; --info: #9CC2FF; --info-bg: #13265A;
+  --error: #FF8A80; --error-bg: #4A1512; --on-error-bg: #FFB4AB; --info: #9CC2FF; --info-bg: #13265A;
   --game: #B9A2FF; --game-bg: #2A1E5C;
   --e1: 0 1px 2px rgb(0 0 0 / .3); --e2: 0 10px 28px rgb(0 0 0 / .45); --e3: 0 24px 56px rgb(0 0 0 / .55);
   color-scheme: dark;
+}
+
+/* ---- Ilustrasi (warna yang harus menyatu dengan gambar bitmap; bukan warna UI) ---- */
+:root {
+  --ilus-langit: #6BC4F0;   /* langit gambar Road to Bali */
+  --ilus-aspal: #50637F;    /* aspal di bawah marka jalan bergerak */
+  --ilus-marka: #F2F6F9;    /* marka jalan */
+  --medali-perak: #C9D3D6;
+  --medali-perunggu: #E09A5B;
 }
