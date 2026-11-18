@@ -32,15 +32,16 @@
       <canvas class="mon__kanvas" aria-hidden="true"></canvas>
       <div class="mon__tangkap" role="button" tabindex="0" aria-label="Ketuk untuk mengirim tenaga ke monster"></div>
       <div class="mon__hud" aria-live="polite">
-        <div class="mon__baris"><strong class="mon__nama"></strong><span class="mon__lvl"></span><span class="mon__pemain"></span></div>
+        <div class="mon__baris"><span class="badge badge--live">Live</span><strong class="mon__nama"></strong><span class="mon__lvl"></span><span class="mon__pemain"></span></div>
         <div class="mon__bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="Tenaga bersama"><i></i><b></b></div>
         <div class="mon__baris mon__baris--kecil"><span class="mon__angka"></span><span class="mon__saya"></span></div>
         <div class="mon__nyawa" hidden><span>Warga hidup</span><div class="mon__nbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="Warga hidup"><i></i></div><b class="mon__npersen"></b></div>
       </div>
       <p class="mon__awas" hidden></p>
-      <button type="button" class="mon__hindar" hidden>HINDAR!</button>
+      <button type="button" class="mon__hindar" hidden><svg aria-hidden="true" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="14" cy="4.5" r="2"/><path d="m8 21 3-6 3 2v5M6 11l3-3 4 1 3 4 3 1M11 15l1-5"/></g></svg>HINDAR</button>
+      <div class="mon__tiket" hidden><small>Tiket kamu</small><strong></strong><span></span></div>
       <p class="mon__ajak"></p>
-      <div class="mon__pesan" hidden><h3></h3><p></p><a class="btn btn--cta btn--sm" target="_blank" rel="noopener" hidden>Tonton Live</a><button type="button" class="btn btn--soft btn--sm mon__bagi">Ajak teman</button><button type="button" class="btn btn--soft btn--sm mon__tutup">Kembali ke festival</button></div>`;
+      <div class="mon__pesan" hidden><h3></h3><p></p><a class="btn btn--live btn--sm" target="_blank" rel="noopener" hidden><svg aria-hidden="true" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5.5v13l11-6.5Z"/></svg>Tonton live</a><button type="button" class="btn btn--soft btn--sm mon__bagi">Ajak teman</button><button type="button" class="btn btn--soft btn--sm mon__tutup">Kembali ke festival</button></div>`;
     stage.append(el);
     const kanvas = el.querySelector('.mon__kanvas'), ctx = kanvas.getContext('2d');
     const tangkap = el.querySelector('.mon__tangkap'), hud = el.querySelector('.mon__hud');
@@ -690,6 +691,9 @@
       $('.mon__pemain').textContent = st.pemain ? `${nf.format(st.pemain)} pejuang` : '';
       const hati = st.jurus && hpSaya != null && token ? '♥'.repeat(Math.max(0, hpSaya)) + '♡'.repeat(Math.max(0, (st.hpMaks || 5) - hpSaya)) + ' · ' : '';
       $('.mon__saya').textContent = hati + (tiketSaya ? `Tiket ${tiketSaya} · ${nf.format(sayaPoin)} tenaga` : sayaPoin ? `Kontribusimu ${nf.format(sayaPoin)}` : `+${poin()} per tap`);
+      const kt = $('.mon__tiket');
+      kt.hidden = !tiketSaya || !tanding;
+      if (tiketSaya) { kt.querySelector('strong').textContent = String(tiketSaya).startsWith('#') ? tiketSaya : '#' + tiketSaya; kt.querySelector('span').textContent = `${nf.format(sayaPoin)} tenaga`; }
       if (tanding && bolehTap() && !token && !blokir && navigator.onLine) pastikanToken().catch(() => {});
       if (st.fase === 'tunggu') tampilAjak(`${st.nama} muncul dalam ${jam(Date.parse(st.mulai) - now())}. Siapkan jarimu!`);
       else if (tanding && !bolehTap()) tampilAjak('Buka festival dulu (isi data & satu kata di bawah) untuk ikut melawan.');
