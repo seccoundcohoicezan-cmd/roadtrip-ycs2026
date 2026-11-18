@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Youth Character Summit 2026 — Karakter Kuat. Langkah ke Bali.</title>
   <meta name="description" content="Youth Character Summit 2026: 150 delegasi pelajar SMA/SMK/MA se-Indonesia berangkat ke Bali, 23 Desember 2026 – 2 Januari 2027. Ikuti live, klaim Dana Kaget, dan kirim Satu Kata untuk Indonesia.">
-  <meta name="theme-color" content="#0E5A66">
+  <meta name="theme-color" content="#0A2463">
   <meta name="color-scheme" content="light dark">
   <link rel="canonical" href="https://events.stekom.ac.id/ycs2026">
 
@@ -22,7 +22,9 @@
   <link rel="preload" as="image" href="assets/img/ycs-delegasi-danau-800.webp" imagesrcset="assets/img/ycs-delegasi-danau-480.webp 480w, assets/img/ycs-delegasi-danau-800.webp 800w, assets/img/ycs-delegasi-danau-1600.webp 1600w" imagesizes="(min-width: 64rem) 34rem, 90vw">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap">
+  <link rel="stylesheet" href="assets/css/tokens.css">
 
   <script>
     // Terapkan tema tersimpan sebelum render agar tidak berkedip.
@@ -35,111 +37,6 @@
   </script>
 
   <style>
-    /* ============ Tokens ============ */
-    :root {
-      --teal-950: #082C33;
-      --teal-900: #0B3B44;
-      --teal-800: #0C4A55;
-      --teal-700: #0E5A66;
-      --teal-600: #12707E;
-      --teal-100: #D5ECEC;
-      --teal-50:  #EAF6F5;
-      --orange-700: #9A3412;
-      --orange-600: #C2410C;
-      --orange-500: #EA580C;
-      --orange-400: #FB923C;
-      --yellow-400: #FFC93C;
-      --yellow-300: #FFD86B;
-      --yellow-100: #FFF3CC;
-      --sand-50: #FFFBF3;
-      --sand-100: #FBF3E4;
-
-      --ink: #13232A;
-      --ink-muted: #4A5B62;
-      --line: #D9E4E5;
-
-      --success: #15803D;
-      --success-bg: #DCFCE7;
-      --warning: #92400E;
-      --warning-bg: #FEF3C7;
-      --error: #B91C1C;
-      --error-bg: #FEE2E2;
-      --live: #DC2626;
-
-      --bg: var(--sand-50);
-      --surface: #FFFFFF;
-      --surface-soft: var(--teal-50);
-      --text: var(--ink);
-      --text-muted: var(--ink-muted);
-      --primary: var(--teal-700);
-      --primary-strong: var(--teal-900);
-      --cta: var(--orange-600);
-      --cta-hover: var(--orange-700);
-      --accent: var(--yellow-400);
-      --focus: #F59E0B;
-
-      --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-      --font-brush: "Permanent Marker", "Comic Sans MS", "Segoe Print", cursive;
-
-      --space-1: .25rem;
-      --space-2: .5rem;
-      --space-3: .75rem;
-      --space-4: 1rem;
-      --space-5: 1.5rem;
-      --space-6: 2rem;
-      --space-7: 3rem;
-      --space-8: 4rem;
-      --space-9: 6rem;
-
-      --radius-sm: .5rem;
-      --radius: 1rem;
-      --radius-lg: 1.5rem;
-      --radius-pill: 999px;
-
-      --shadow-sm: 0 1px 2px rgb(8 44 51 / .08), 0 1px 3px rgb(8 44 51 / .06);
-      --shadow: 0 8px 24px -8px rgb(8 44 51 / .18), 0 2px 6px rgb(8 44 51 / .06);
-      --shadow-lg: 0 24px 48px -16px rgb(8 44 51 / .3);
-      --shadow-cta: 0 10px 24px -8px rgb(194 65 12 / .55);
-
-      --container: 76rem;
-      --header-h: 4.25rem;
-      --ease: cubic-bezier(.2, .7, .2, 1);
-      --dur: 200ms;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      :root:not([data-theme="light"]) {
-        --bg: #071F24;
-        --surface: #0D2C33;
-        --surface-soft: #113740;
-        --text: #EAF3F2;
-        --text-muted: #A9C0C2;
-        --line: #1E4650;
-        --primary: #5CC3C9;
-        --primary-strong: #CDEDEC;
-        --success-bg: #0F3B23; --success: #6EE7A0;
-        --warning-bg: #3D2E07; --warning: #FCD34D;
-        --error-bg: #431414;   --error: #FCA5A5;
-        --shadow: 0 8px 24px -8px rgb(0 0 0 / .55);
-        --shadow-lg: 0 24px 48px -16px rgb(0 0 0 / .6);
-      }
-    }
-    :root[data-theme="dark"] {
-      --bg: #071F24;
-      --surface: #0D2C33;
-      --surface-soft: #113740;
-      --text: #EAF3F2;
-      --text-muted: #A9C0C2;
-      --line: #1E4650;
-      --primary: #5CC3C9;
-      --primary-strong: #CDEDEC;
-      --success-bg: #0F3B23; --success: #6EE7A0;
-      --warning-bg: #3D2E07; --warning: #FCD34D;
-      --error-bg: #431414;   --error: #FCA5A5;
-      --shadow: 0 8px 24px -8px rgb(0 0 0 / .55);
-      --shadow-lg: 0 24px 48px -16px rgb(0 0 0 / .6);
-    }
-
     /* ============ Base ============ */
     *, *::before, *::after { box-sizing: border-box; }
     html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + 1rem); -webkit-text-size-adjust: 100%; }
@@ -202,35 +99,6 @@
     }
     html:not(.is-demo) .tag-demo { display: none; }
 
-    /* ============ Buttons ============ */
-    .btn {
-      --btn-bg: var(--surface);
-      --btn-fg: var(--text);
-      display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
-      min-height: 2.75rem; padding: .625rem 1.25rem;
-      border-radius: var(--radius-pill); border: 2px solid transparent;
-      background: var(--btn-bg); color: var(--btn-fg);
-      font-weight: 700; font-size: .9375rem; line-height: 1.2; text-decoration: none;
-      cursor: pointer;
-      transition: transform var(--dur) var(--ease), background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease);
-    }
-    .btn:hover { transform: translateY(-1px); }
-    .btn:active { transform: translateY(1px) scale(.98); }
-    .btn svg { width: 1.125rem; height: 1.125rem; flex: none; }
-    .btn--cta { --btn-bg: var(--cta); --btn-fg: #fff; box-shadow: var(--shadow-cta); }
-    .btn--cta:hover { --btn-bg: var(--cta-hover); }
-    .btn--primary { --btn-bg: var(--teal-700); --btn-fg: #fff; }
-    .btn--primary:hover { --btn-bg: var(--teal-900); }
-    .btn--ghost { --btn-bg: transparent; --btn-fg: var(--primary); border-color: currentColor; }
-    .btn--ghost:hover { --btn-bg: var(--surface-soft); }
-    .btn--soft { --btn-bg: var(--surface-soft); --btn-fg: var(--primary); }
-    .btn--soft:hover { --btn-bg: var(--teal-100); --btn-fg: var(--teal-900); }
-    .btn--live { --btn-bg: var(--live); --btn-fg: #fff; }
-    .btn--live:hover { --btn-bg: #B91C1C; }
-    .btn--sm { min-height: 2.75rem; padding: .5rem 1rem; font-size: .875rem; }
-    .btn--block { width: 100%; }
-    .btn[hidden] { display: none; }
-    .btn[disabled], .btn[aria-disabled="true"] { opacity: .6; cursor: not-allowed; transform: none; }
 
     .link-arrow {
       display: inline-flex; align-items: center; gap: .375rem;
@@ -240,55 +108,28 @@
     .link-arrow:hover svg { transform: translateX(3px); }
     .link-arrow:hover { text-decoration: underline; }
 
-    .card {
-      transition: transform 300ms var(--ease), box-shadow 300ms var(--ease);
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow);
-    }
 
-    /* ============ Header ============ */
-    .site-header {
-      position: sticky; top: 0; z-index: 50;
-      background: color-mix(in srgb, var(--surface) 92%, transparent);
-      backdrop-filter: saturate(1.4) blur(10px);
-      border-bottom: 1px solid var(--line);
-    }
-    .site-header__inner {
-      display: flex; align-items: center; gap: var(--space-4);
-      min-height: var(--header-h);
-    }
-    .brand { display: inline-flex; align-items: center; gap: var(--space-3); text-decoration: none; color: var(--text); margin-right: auto; }
-    .brand__logo { width: 2.5rem; height: 2.5rem; }
-    .brand__name { display: grid; line-height: 1.15; }
-    .brand__name strong { font-size: .9375rem; font-weight: 800; }
-    .brand__name span { font-size: .75rem; font-weight: 700; color: var(--primary); }
-
+    /* ============ Header: appbar seluler (m01) · nav pil desktop (d01) ============ */
+    .site-header { position: sticky; top: 0; z-index: 50; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: saturate(1.4) blur(12px); }
+    .site-header__inner { display: flex; align-items: center; gap: var(--space-4); min-height: var(--header-h); }
+    .brand { display: inline-flex; align-items: center; gap: 10px; margin-right: auto; color: var(--heading); text-decoration: none; border-radius: var(--r-md); }
+    .brand:focus-visible { outline: none; box-shadow: var(--ring); }
+    .brand__logo { width: 3rem; height: 3rem; flex: none; }
+    .brand__rays { stroke: var(--sun-400); }
+    .brand__disc { fill: var(--blue-600); }
+    .brand__head { fill: var(--sun-400); }
+    .brand__body { stroke: var(--white); }
+    .brand__arms { stroke: var(--sun-400); }
+    .brand__name { display: grid; max-width: 9.5rem; }
+    .brand__name strong { font-size: var(--fs-body); line-height: 1.15; font-weight: 800; letter-spacing: -.4px; color: var(--heading); }
+    .brand__name span { font-size: var(--fs-body); line-height: 1.2; font-weight: 800; letter-spacing: -.4px; color: var(--primary); }
     .nav { display: none; }
-    .nav__list { list-style: none; display: flex; gap: var(--space-1); }
-    .nav__link {
-      position: relative; display: inline-flex; align-items: center; min-height: 2.75rem; padding: 0 .75rem;
-      color: var(--text); text-decoration: none; font-size: .875rem; font-weight: 600; border-radius: var(--radius-sm);
-      transition: color var(--dur) var(--ease), background-color var(--dur) var(--ease);
-    }
-    .nav__link:hover { background: var(--surface-soft); color: var(--primary); }
-    .nav__link[aria-current="true"] { color: var(--primary); font-weight: 800; }
-    .nav__link[aria-current="true"]::after {
-      content: ""; position: absolute; left: .75rem; right: .75rem; bottom: .375rem; height: 3px;
-      border-radius: 3px; background: var(--accent);
-    }
-
-    .header-tools { display: flex; align-items: center; gap: var(--space-1); }
-    .icon-btn {
-      display: inline-grid; place-items: center; width: 2.75rem; height: 2.75rem;
-      border-radius: var(--radius-pill); border: 0; background: transparent; color: var(--text); cursor: pointer;
-      transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
-    }
-    .icon-btn:hover { background: var(--surface-soft); color: var(--primary); }
-    .icon-btn svg { width: 1.25rem; height: 1.25rem; }
-    .header-socials { display: none; }
-
+    .nav__list .nav__link { position: relative; }
+    .nav__dot { width: .5rem; height: .5rem; margin-left: 2px; border-radius: 50%; background: var(--coral-500); animation: k-pulse 1.4s infinite; }
+    .header-tools { display: flex; align-items: center; gap: var(--space-3); }
+    .header-tools .header-game, .header-tools .theme-toggle, .header-tools .nav-code { display: none; }
+    .header-tools .menu-toggle { width: 3.25rem; height: 3.25rem; border-radius: var(--r-md); box-shadow: var(--e2); }
+    .menu-toggle svg { width: 1.625rem; height: 1.625rem; }
     .theme-toggle .icon-sun { display: none; }
     :root[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
     :root[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
@@ -296,103 +137,207 @@
       :root:not([data-theme="light"]) .theme-toggle .icon-sun { display: block; }
       :root:not([data-theme="light"]) .theme-toggle .icon-moon { display: none; }
     }
-
-    .menu-toggle .icon-close { display: none; }
-    .menu-toggle[aria-expanded="true"] .icon-close { display: block; }
-    .menu-toggle[aria-expanded="true"] .icon-menu { display: none; }
-
-    .mobile-nav {
-      border-top: 1px solid var(--line);
-      background: var(--surface);
-      padding-block: var(--space-3) var(--space-5);
-    }
-    .mobile-nav[hidden] { display: none; }
-    .mobile-nav ul { list-style: none; display: grid; gap: var(--space-1); }
-    .mobile-nav a {
-      display: flex; align-items: center; min-height: 3rem; padding: 0 var(--space-4);
-      border-radius: var(--radius); color: var(--text); text-decoration: none; font-weight: 600;
-    }
-    .mobile-nav a:hover, .mobile-nav a[aria-current="true"] { background: var(--surface-soft); color: var(--primary); }
-    .mobile-nav__socials { display: flex; gap: var(--space-2); padding: var(--space-3) var(--space-4) 0; }
-
     @media (min-width: 64rem) {
+      .brand__name strong, .brand__name span { font-size: var(--fs-h3); }
+      .site-header { background: transparent; backdrop-filter: none; pointer-events: none; }
+      .site-header__inner > * { pointer-events: auto; }
+      .site-header.is-scrolled { background: color-mix(in srgb, var(--bg) 90%, transparent); backdrop-filter: saturate(1.4) blur(12px); }
       .nav { display: block; }
-      .menu-toggle { display: none; }
-      .mobile-nav { display: none; }
+      .header-tools .menu-toggle { display: none; }
+      .header-tools .header-game { display: inline-flex; min-height: var(--btn-md); padding: 0 1.5rem; }
+      .header-game svg { width: 1.5rem; height: 1.5rem; }
+      .header-tools .theme-toggle { display: inline-grid; width: var(--btn-md); height: var(--btn-md); }
+      .header-tools .nav-code { display: inline-flex; }
+      .brand { margin-right: var(--space-5); }
     }
-    @media (min-width: 80rem) {
-      .header-socials { display: flex; }
+    @media (min-width: 64rem) and (max-width: 87.5rem) {
+      .header-tools .nav-code, .header-tools .header-game { font-size: 0; gap: 0; padding: 0; width: var(--btn-md); }
+      .dnav a { padding: 0 12px; }
+      .dnav a svg { display: none; }
+      .site-header__inner { gap: var(--space-2); }
+    }
+    @media (max-width: 22.5rem) { .brand__name strong, .brand__name span { font-size: var(--fs-body); } .brand__logo { width: 2.5rem; height: 2.5rem; } }
+    body { padding-bottom: calc(var(--tabbar-h) + 2.5rem + env(safe-area-inset-bottom)); }
+    @media (min-width: 64rem) { body { padding-bottom: 0; } }
+
+    /* ============ Menu Lainnya (m10) ============ */
+    dialog.lainnya { max-width: 30rem; background: var(--bg); padding-inline: var(--margin-m); }
+    @media (max-width: 47.99rem) { dialog.lainnya { max-height: 94dvh; } }
+    .lainnya__tools { display: flex; gap: var(--space-2); }
+    .lainnya .menu-list + .lainnya__label { margin: var(--space-5) var(--space-3) var(--space-3); color: var(--text-3); }
+    .lainnya .menu-list .badge { margin-left: auto; }
+    .wa-card { display: flex; align-items: center; gap: 14px; margin-top: var(--space-5); padding: 16px; border-radius: var(--r-lg); background: var(--success-bg); color: var(--heading); text-decoration: none; }
+    .wa-card:focus-visible { outline: none; box-shadow: var(--ring); }
+    .wa-card__ico { display: grid; place-items: center; width: var(--tap); height: var(--tap); flex: none; border-radius: var(--r-md); background: var(--wa-500); color: var(--white); }
+    .wa-card__ico svg { width: 1.5rem; height: 1.5rem; }
+    .wa-card__txt { display: grid; flex: 1; }
+    .wa-card__txt strong { font-weight: 800; }
+    .wa-card__txt small { font-size: var(--fs-sm); line-height: var(--lh-sm); color: var(--text-2); }
+    .wa-card__btn { display: inline-grid; place-items: center; min-height: var(--tap); padding: 0 var(--space-4); border-radius: var(--r-pill); background: var(--green-600); color: var(--white); font-weight: 800; }
+    .lainnya__sosmed { display: flex; justify-content: center; gap: var(--space-2); margin-top: var(--space-4); }
+
+    /* ============ Punya kode? (m09, bottom sheet) ============ */
+    .kode-dialog form { display: grid; gap: var(--space-3); }
+    .kode-dialog .sheet__head { margin-bottom: 0; }
+    .kode-dialog__close { background: var(--surface-soft); color: var(--primary); box-shadow: none; }
+    .kode-kotak { position: relative; margin-top: var(--space-2); }
+    .kode-dialog__input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; border: 0; font-size: var(--fs-body); text-transform: uppercase; cursor: text; }
+    .kode-kotak__isi { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 6px; }
+    .kode-kotak__isi span { display: grid; place-items: center; aspect-ratio: 1 / 1.1; min-height: var(--tap); border-radius: var(--r-md); background: var(--surface); box-shadow: inset 0 0 0 1.5px var(--line-strong); font: 800 var(--fs-h2)/1 var(--font-sans); color: var(--heading); }
+    .kode-kotak__isi span.is-aktif { box-shadow: inset 0 0 0 2px var(--blue-500), var(--ring); }
+    .kode-kotak:has(.kode-dialog__input[aria-invalid="true"]) .kode-kotak__isi span { box-shadow: inset 0 0 0 1.5px var(--error); }
+    .kode-jenis { list-style: none; margin: 0; padding: 4px 0; border-radius: var(--r-lg); box-shadow: inset 0 0 0 1.5px var(--line); }
+    .kode-jenis a { display: flex; align-items: center; gap: 14px; min-height: 64px; padding: 8px 16px; color: var(--heading); text-decoration: none; border-radius: var(--r-lg); }
+    .kode-jenis a:focus-visible { outline: none; box-shadow: inset var(--ring); }
+    .kode-jenis .badge { margin-left: auto; }
+
+    /* ============ Beranda (m01 · d01) ============ */
+    .hero { position: relative; padding-block: var(--space-2) var(--space-7); }
+    .hero__wrap { display: grid; gap: var(--space-4); }
+    .hero__carousel { position: relative; }
+    .hero__track { display: grid; grid-auto-flow: column; grid-auto-columns: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; border-radius: var(--r-xl); box-shadow: var(--e2); overscroll-behavior-x: contain; }
+    .hero__track::-webkit-scrollbar { display: none; }
+    .hero__slide { position: relative; isolation: isolate; overflow: hidden; scroll-snap-align: start; min-height: 13rem; padding: var(--space-6) 40% var(--space-5) 1.375rem; background: linear-gradient(180deg, var(--blue-50) 0%, var(--white) 100%); }
+    .hero__img { position: absolute; z-index: -1; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 70% 40%; -webkit-mask-image: linear-gradient(90deg, transparent 18%, rgb(0 0 0 / .55) 40%, #000 58%); mask-image: linear-gradient(90deg, transparent 18%, rgb(0 0 0 / .55) 40%, #000 58%); }
+    .hero__slide::before, .hero__slide::after { content: ""; position: absolute; z-index: -1; pointer-events: none; }
+    .hero__slide::before { left: -3.5rem; bottom: -4.5rem; width: 9rem; height: 7rem; border-radius: 50%; border-top: .75rem solid var(--blue-600); background: var(--navy-900); transform: rotate(18deg); }
+    .hero__slide::after { right: -3.5rem; top: -4rem; width: 9rem; height: 7rem; border-radius: 50%; border-bottom: .625rem solid var(--sun-400); background: var(--navy-900); transform: rotate(18deg); }
+    .hero__copy { position: relative; display: grid; justify-items: start; gap: var(--space-2); min-width: 13rem; }
+    .hero__copy .hero__pill { display: none; }
+    .hero__pill svg { width: 1rem; height: 1rem; }
+    .hero__title { display: grid; color: var(--navy-900); }
+    .hero__title span { font-size: var(--fs-h3); line-height: var(--lh-h3); font-weight: 800; letter-spacing: var(--ls-h2); }
+    .hero__title strong { font-size: var(--fs-display); line-height: var(--lh-display); font-weight: 800; letter-spacing: var(--ls-display); color: var(--navy-950); }
+    .hero__title--sm { font-size: var(--fs-h2); line-height: var(--lh-h2); font-weight: 800; letter-spacing: var(--ls-h2); max-width: 12ch; }
+    .hero__lead { max-width: 15rem; font-size: var(--fs-xs); line-height: var(--lh-xs); font-weight: 600; color: var(--navy-900); text-shadow: 0 0 6px var(--white); }
+    .hero__copy .t-over { color: var(--blue-700); }
+    .hero__cta { margin-top: var(--space-2); }
+    .hero__script { position: absolute; right: .75rem; top: 1.25rem; z-index: 1; font: 700 var(--fs-script)/.85 var(--font-script); color: var(--navy-900); transform: rotate(-9deg); text-shadow: 0 0 10px var(--white), 0 0 3px var(--white); }
+    .hero__script::after { content: ""; display: block; width: 4.5rem; height: .5rem; margin: .25rem 0 0 1.5rem; border-radius: 1rem; border-bottom: .3rem solid var(--sun-400); }
+    .hero__dots { display: flex; justify-content: center; gap: 0; margin-top: var(--space-1); }
+    .hero__dots button { display: grid; place-items: center; width: 1.75rem; height: 1.75rem; padding: 0; border: 0; background: none; cursor: pointer; border-radius: 50%; }
+    .hero__dots button::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--line-strong); transition: width var(--dur) var(--ease), background-color var(--dur) var(--ease); }
+    .hero__dots button[aria-current]::before { background: var(--heading); }
+    .hero__dots button:focus-visible { outline: none; box-shadow: var(--ring); }
+    @media (max-width: 26rem) { .hero__slide { padding-right: 36%; } .hero__title strong { font-size: var(--fs-h1); line-height: var(--lh-h1); } }
+
+    .tiles { list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+    .tile { display: grid; justify-items: center; align-content: start; gap: 4px; height: 100%; min-height: 7.75rem; padding: 10px 4px 8px; border-radius: var(--r-lg); background: var(--surface); box-shadow: var(--e2); color: var(--heading); text-align: center; text-decoration: none; transition: transform var(--dur) var(--ease); }
+    .tile:hover { transform: translateY(-2px); }
+    .tile:focus-visible { outline: none; box-shadow: var(--e2), var(--ring); }
+    .tile__ico { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 50%; }
+    .tile__art { width: 2.5rem; height: 2.5rem; }
+    .tile__txt { display: grid; gap: 2px; }
+    .tile__txt strong { display: grid; place-items: center; min-height: 2rem; font-size: var(--fs-btn-sm); line-height: 1.1; font-weight: 800; letter-spacing: -.2px; }
+    .tile__txt small { font-size: var(--fs-tab); line-height: 1.25; font-weight: 500; color: var(--text-3); }
+    .tile__go { display: none; }
+
+    .hero__row { display: grid; gap: var(--space-4); margin-top: var(--space-3); }
+    .game-card { position: relative; isolation: isolate; overflow: hidden; display: grid; grid-template-columns: 5.25rem 1fr auto; align-items: center; gap: var(--space-3); min-height: 6rem; padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4); border-radius: 22px; background: linear-gradient(100deg, var(--navy-900) 0%, var(--navy-800) 55%, var(--blue-700) 100%); color: var(--white); text-decoration: none; box-shadow: var(--e2); }
+    .game-card::after { content: ""; position: absolute; z-index: -1; right: -3rem; top: -50%; width: 11rem; height: 200%; border-radius: 50%; background: var(--blue-600); opacity: .55; }
+    .game-card:focus-visible { outline: none; box-shadow: var(--e2), var(--ring); }
+    .game-card__art { position: relative; padding-right: var(--space-3); border-right: 1.5px solid rgb(255 255 255 / .35); }
+    .game-card__pad { width: 4.5rem; height: 3.125rem; filter: drop-shadow(0 6px 10px rgb(0 0 0 / .35)); }
+    .game-card__txt { display: grid; justify-items: start; gap: 2px; transform: rotate(-1.5deg); transform-origin: left center; }
+    .game-card__txt .badge { text-transform: none; letter-spacing: 0; font-size: var(--fs-tab); }
+    .game-card__txt strong { font-size: var(--fs-h3); line-height: var(--lh-h3); font-weight: 800; }
+    .game-card__txt small { font-size: var(--fs-xs); line-height: var(--lh-xs); font-weight: 600; max-width: 13rem; }
+    .game-card .game-card__btn, .game-card__kata { display: none; }
+    .game-card__go { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 50%; background: var(--white); color: var(--navy-900); }
+    .game-card__go svg, .game-card__btn svg { width: 1rem; height: 1rem; }
+
+    .info-acara { display: grid; grid-template-columns: 1fr auto; gap: var(--space-3); align-items: center; padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4); border-radius: 22px; box-shadow: var(--e2); }
+    .info-acara__kiri { padding-right: var(--space-3); border-right: 1.5px solid var(--line); align-self: stretch; display: grid; align-content: center; }
+    .info-acara__head { display: flex; align-items: center; gap: 6px; font-size: var(--fs-xs); font-weight: 800; color: var(--primary); }
+    .info-acara__head svg { width: 1.125rem; height: 1.125rem; color: var(--primary); }
+    .info-acara__tgl { margin-top: 6px; font-size: var(--fs-h3); line-height: 1.2; font-weight: 800; letter-spacing: -.4px; color: var(--heading); }
+    .info-acara__lok { display: flex; align-items: center; gap: 4px; margin-top: var(--space-2); font-size: var(--fs-xs); font-weight: 600; color: var(--heading); }
+    .info-acara__lok svg { width: 1rem; height: 1rem; color: var(--coral-500); }
+    .info-acara__kanan { min-width: 0; }
+    .countdown-card__head { text-align: center; font-size: var(--fs-xs); line-height: var(--lh-xs); font-weight: 700; color: var(--heading); }
+    .countdown { display: grid; grid-template-columns: repeat(4, minmax(2.5rem, 1fr)); gap: 5px; margin-top: var(--space-2); }
+    .countdown__unit { display: grid; justify-items: center; padding: 8px 2px 6px; border-radius: var(--r-sm); background: var(--surface-soft); }
+    .countdown__num { font-size: var(--fs-h3); line-height: 1.2; font-weight: 800; color: var(--heading); font-variant-numeric: tabular-nums; }
+    .countdown__label { font-size: var(--fs-tab); line-height: 1.2; font-weight: 500; color: var(--text-2); }
+    .countdown-actions .btn { flex: 1; min-height: var(--tap); }
+    .countdown-card [hidden] { display: none; }
+    @media (max-width: 47.99rem) {
+      .info-acara .countdown-actions .btn { flex: none; width: var(--tap); padding: 0; font-size: 0; gap: 0; }
+      .info-acara .countdown-actions .btn span { font-size: 0; }
+    }
+    @media (max-width: 23.5rem) { .info-acara { grid-template-columns: 1fr; } .info-acara__kiri { border-right: 0; border-bottom: 1.5px solid var(--line); padding: 0 0 var(--space-3); } }
+
+    @media (min-width: 48rem) {
+      .hero__slide { min-height: 20rem; padding: var(--space-7) 45% var(--space-6) var(--space-6); }
+      .hero__title span { font-size: var(--fs-h1); line-height: var(--lh-h1); letter-spacing: var(--ls-h1); }
+      .hero__title strong { font-size: calc(var(--fs-display) * 1.6); line-height: 1; }
+      .hero__lead { font-size: var(--fs-body); line-height: var(--lh-body); max-width: 22rem; }
+      .hero__script { font-size: calc(var(--fs-script) * 1.6); right: 2rem; top: 2rem; }
+      .game-card__txt strong { font-size: var(--fs-h2); line-height: var(--lh-h2); }
+    }
+    @media (min-width: 64rem) {
+      .hero { padding-top: 0; margin-top: calc(var(--header-h) * -1); }
+      .hero__wrap { gap: 0; }
+      .hero__carousel { margin-inline: calc((100vw - 100%) / -2); }
+      .hero__track { border-radius: 0; box-shadow: none; }
+      .hero__slide { min-height: 36rem; padding: calc(var(--header-h) + var(--space-6)) 55% 9rem max(var(--margin-d), calc((100vw - var(--container)) / 2)); background: var(--bg); }
+      .hero__img { -webkit-mask-image: linear-gradient(90deg, transparent 22%, rgb(0 0 0 / .6) 40%, #000 52%), linear-gradient(0deg, transparent 0, #000 22%); mask-image: linear-gradient(90deg, transparent 22%, rgb(0 0 0 / .6) 40%, #000 52%); object-position: 60% 45%; }
+      .hero__slide::before { left: -7rem; top: 72%; bottom: auto; width: 15rem; height: 16rem; border-top-width: 1.25rem; }
+      .hero__slide::after { right: -5rem; top: auto; bottom: 4rem; width: 14rem; height: 12rem; border-bottom: 0; border-top: .875rem solid var(--sun-400); background: var(--blue-600); }
+      .hero__copy .hero__pill { display: inline-flex; min-height: 2.5rem; padding: 0 1rem; font-size: var(--fs-sm); text-transform: none; letter-spacing: 0; }
+      .hero__title strong { font-size: 5rem; line-height: 1; letter-spacing: -2px; color: var(--blue-600); font-style: italic; }
+      .hero__title span { font-size: 3.5rem; line-height: 1.05; letter-spacing: -1.5px; }
+      .hero__title--sm { font-size: 3rem; line-height: 1.05; letter-spacing: -1.2px; max-width: 14ch; }
+      .hero__lead { font-size: var(--fs-h3); line-height: var(--lh-h3); font-weight: 500; max-width: 26rem; text-shadow: none; }
+      .hero__cta { min-height: var(--btn-lg); padding: 0 1.5rem; font-size: var(--fs-body); }
+      .hero__script { font-size: var(--fs-script-lg); right: 2%; top: 28%; color: var(--white); text-shadow: 0 2px 12px rgb(10 36 99 / .45); }
+      .hero__dots { position: absolute; left: max(var(--margin-d), calc((100vw - var(--container)) / 2)); bottom: 7.5rem; }
+      .tiles { position: relative; z-index: 2; margin-top: -6rem; grid-template-columns: repeat(4, 1fr); gap: var(--gutter-d); }
+      .tile { grid-template-columns: auto 1fr auto; justify-items: start; align-items: center; gap: var(--space-4); min-height: 6.75rem; padding: var(--space-4) var(--space-4) var(--space-4) var(--space-5); text-align: left; }
+      .tile__ico { width: 4.25rem; height: 4.25rem; }
+      .tile__ico--festival { background: var(--sun-100); }
+      .tile__ico--live { background: var(--coral-100); }
+      .tile__ico--dana { background: var(--sun-100); }
+      .tile__ico--finalis { background: var(--blue-100); }
+      .tile__txt strong { display: block; min-height: 0; font-size: var(--fs-body); }
+      .tile__txt small { font-size: var(--fs-btn-sm); }
+      .tile__go { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--line-strong); color: var(--heading); }
+      .tile__go svg { width: 1rem; height: 1rem; }
+      .hero__row { grid-template-columns: 1.4fr 1fr; gap: var(--gutter-d); margin-top: var(--space-5); }
+      .game-card { grid-template-columns: 11rem 1fr auto; min-height: 11.5rem; padding: var(--space-5) var(--space-6); background: linear-gradient(100deg, var(--blue-100) 0%, var(--blue-50) 60%, var(--white) 100%); color: var(--navy-900); }
+      .game-card::after { display: none; }
+      .game-card__art { border: 0; }
+      .game-card__pad { width: 10rem; height: 7rem; }
+      .game-card__txt strong { font-size: 2.25rem; line-height: 1.1; color: var(--navy-900); }
+      .game-card__txt small { color: var(--navy-900); max-width: 22rem; }
+      .game-card .game-card__btn { display: inline-flex; margin-top: var(--space-3); }
+      .game-card__go { display: none; }
+      .game-card__kata { display: flex; flex-wrap: wrap; gap: 6px; max-width: 13rem; transform: rotate(-4deg); }
+      .game-card__kata i { padding: 4px 12px; border-radius: var(--r-sm); font: 800 var(--fs-sm)/1.4 var(--font-sans); font-style: normal; box-shadow: var(--e1); }
+      .game-card__kata i:nth-child(1) { background: var(--white); color: var(--navy-900); }
+      .game-card__kata i:nth-child(2) { background: var(--violet-600); color: var(--white); }
+      .game-card__kata i:nth-child(3) { background: var(--sun-400); color: var(--navy-900); }
+      .game-card__kata i:nth-child(4) { background: var(--coral-500); color: var(--white); }
+      .game-card__kata i:nth-child(5) { background: var(--green-100); color: var(--green-600); }
+      .info-acara { padding: var(--space-5) var(--space-5) var(--space-5) var(--space-6); }
+      .info-acara__head { font-size: var(--fs-body); }
+      .info-acara__tgl { font-size: var(--fs-h1); line-height: var(--lh-h1); letter-spacing: var(--ls-h1); }
+      .info-acara__lok { font-size: var(--fs-body); }
+      .countdown-card__head { font-size: var(--fs-body); }
+      .countdown__num { font-size: var(--fs-num); }
+      .countdown__label { font-size: var(--fs-btn-sm); }
+      .countdown__unit { padding: 12px 6px 8px; border-radius: var(--r-md); }
+    }
+    @media (min-width: 64rem) and (max-width: 80rem) {
+      .tiles { grid-template-columns: repeat(2, 1fr); }
+      .hero__row { grid-template-columns: 1fr; }
     }
 
-    /* ============ Hero ============ */
-    .hero {
-      position: relative; isolation: isolate; overflow: hidden;
-      padding-bottom: calc(var(--space-8) + 2rem);
-      /* Foto Pura Ulun Danu Beratan (Wikimedia Commons, lihat Kredit foto di footer) */
-      background:
-        linear-gradient(180deg, rgb(8 44 51 / .55) 0, rgb(8 44 51 / .62) 40%, rgb(8 44 51 / .9) 75%, var(--teal-900) 100%),
-        url("assets/img/bali/bg-uludanu2-m.webp") 72% top / cover no-repeat,
-        var(--teal-900);
-      color: #fff;
-      padding-block: var(--space-6) calc(var(--space-8) + 1rem);
-    }
     /* Stiker ilustrasi dekoratif (aria-hidden), dipakai di banyak section */
     .sticker { position: absolute; z-index: 0; pointer-events: none; user-select: none; height: auto; filter: drop-shadow(0 6px 10px rgb(8 44 51 / .22)); }
     .sticker--float { animation: floaty 6s ease-in-out infinite; }
     .sticker--sway { animation: sway 7s ease-in-out infinite; transform-origin: 50% 0; }
     @keyframes sway { 0%, 100% { rotate: -6deg; } 50% { rotate: 6deg; } }
-    .hero .sticker--kite { width: clamp(3.25rem, 7vw, 5.5rem); right: 4%; top: 1.5rem; }
-    .hero .sticker--canang { width: clamp(3rem, 6vw, 5rem); left: 46%; bottom: 3.5rem; rotate: -8deg; }
-    .hero .sticker--fr1 { width: 2.75rem; left: 47%; top: 52%; }
-    .hero .sticker--fr2 { width: 1.75rem; left: 40%; top: 9%; }
-    .hero__grid { position: relative; z-index: 1; }
-    .hero__title, .hero__lead, .hero__eyebrow { text-shadow: 0 2px 12px rgb(0 0 0 / .35); }
-    .hero__eyebrow { text-shadow: none; }
-    @media (min-width: 48rem) {
-      .hero { background:
-        linear-gradient(180deg, rgb(8 44 51 / .3) 0, rgb(8 44 51 / .75) 38vw, var(--teal-900) 62.5vw),
-        url("assets/img/bali/bg-uludanu2-1440.webp") center top / 100% auto no-repeat, var(--teal-900); }
-    }
-    @media (min-width: 64rem) {
-      .hero { background:
-        linear-gradient(90deg, rgb(8 44 51 / .93) 0%, rgb(8 44 51 / .8) 40%, rgb(8 44 51 / .3) 72%, rgb(8 44 51 / .15) 100%),
-        linear-gradient(0deg, rgb(8 44 51 / .85) 0%, transparent 35%),
-        url("assets/img/bali/bg-uludanu2-1440.webp") center 45% / cover no-repeat, var(--teal-900); }
-    }
-    @media (max-width: 47.99rem) {
-      .hero .sticker--canang, .hero .sticker--fr1, .hero .sticker--fr2 { display: none; }
-      .hero .sticker--kite { top: .5rem; right: 3%; }
-    }
-    .hero__strokes { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
-    .hero__strokes svg { position: absolute; }
-    .hero__stroke-1 { width: 26rem; left: -14rem; bottom: 10rem; opacity: .55; }
-    .hero__stroke-2 { width: 22rem; right: -6rem; bottom: -2rem; opacity: .85; }
-
-    .hero__grid {
-      display: grid; gap: var(--space-6); align-items: center;
-      grid-template-areas: "text" "cta" "media" "count";
-    }
-    .hero__text { grid-area: text; }
-    .hero__media { grid-area: media; }
-    .hero__cta-wrap { grid-area: cta; }
-    .countdown-card { grid-area: count; }
-    .hero__eyebrow {
-      display: inline-block; color: var(--teal-950); padding: .5rem 1.25rem .5rem 1rem;
-      background: url("assets/svg/brush-yellow.svg") center / 100% 100% no-repeat; transform: rotate(-2deg);
-    }
-    .hero__title {
-      margin-top: var(--space-3);
-      font-family: var(--font-brush); font-weight: 400;
-      font-size: clamp(2.375rem, 5vw + .75rem, 4.25rem); line-height: 1.05;
-      transform: rotate(-2deg); transform-origin: left center;
-    }
-    .hero__title > span { display: block; }
-    .hero__title .hl { color: var(--yellow-400); }
-    .hero__lead { margin-top: var(--space-5); max-width: 34rem; font-size: clamp(1rem, .4vw + .9rem, 1.125rem); color: #E4F2F2; }
-    .hero__lead strong { color: var(--yellow-300); }
-
-    .hero__media { position: relative; padding-bottom: clamp(3rem, 9vw, 5rem); }
-
     /* Polaroid: kartu foto miring dengan selotip, dipakai di hero & galeri */
     .polaroid {
       --tilt: 0deg;
@@ -412,24 +357,12 @@
     }
     .polaroid:hover { transform: rotate(0deg) scale(1.03); box-shadow: 0 30px 50px -18px rgb(8 44 51 / .45); z-index: 3; }
 
-    .hero__photo { --tilt: 2deg; width: 88%; margin-left: auto; padding-bottom: .5rem; }
-    .hero__photo img { aspect-ratio: 5 / 4; }
-    .hero__pol-a, .hero__pol-b { position: absolute; bottom: 0; width: 42%; z-index: 1; }
-    .hero__pol-a { --tilt: -7deg; left: 0; }
-    .hero__pol-b { --tilt: 6deg; right: 4%; width: 36%; bottom: -1rem; }
-    .hero__pol-a::before, .hero__pol-b::before { width: 3.5rem; height: 1.125rem; }
-
     /* Doodle dekoratif */
     .doodle { position: absolute; pointer-events: none; color: var(--yellow-400); }
     .doodle--float { animation: floaty 5s ease-in-out infinite; }
     .doodle--spin { animation: spin-slow 14s linear infinite; }
     @keyframes floaty { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-8px) rotate(4deg); } }
     @keyframes spin-slow { to { transform: rotate(360deg); } }
-    .hero__doodle-star { width: 2.5rem; left: 2%; top: 8%; }
-    .hero__doodle-arrow { width: 5rem; left: -1rem; top: 46%; color: #fff; transform: rotate(-12deg); display: none; }
-    .hero__doodle-spark { width: 1.75rem; right: 2%; bottom: 40%; color: var(--orange-400); }
-    @media (min-width: 64rem) { .hero__doodle-arrow { display: block; } }
-
     /* Gelombang pemisah section */
     .wave { position: absolute; left: 0; width: 100%; height: clamp(1.75rem, 4vw, 4rem); color: var(--bg); pointer-events: none; }
     .wave path { fill: currentColor; }
@@ -443,56 +376,6 @@
     .scribble {
       background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'%3E%3Cpath d='M2 8c40-6 80-6 120-3s60 2 76-2' fill='none' stroke='%23FFC93C' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E") left 100% / 100% .5em no-repeat;
       padding-bottom: .15em;
-    }
-    .hero__date-note {
-      position: absolute; z-index: 2; right: .5rem; top: -.5rem;
-      font-family: var(--font-brush); font-size: clamp(1.125rem, 1vw + .9rem, 1.5rem); line-height: 1.15;
-      color: #fff; text-align: right; transform: rotate(-6deg);
-      background: var(--teal-950); padding: .5rem .875rem; border-radius: 1rem; box-shadow: var(--shadow);
-    }
-
-    .hero__cta-wrap { display: grid; gap: var(--space-3); justify-items: start; }
-    .btn--hero {
-      min-height: 4rem; padding: .875rem 1.25rem .875rem 1rem; gap: var(--space-4);
-      font-size: 1.25rem; border-radius: var(--radius-pill); text-align: left;
-    }
-    .btn--hero .btn__icon {
-      display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 50%;
-      background: rgb(255 255 255 / .18);
-    }
-    .btn--hero .btn__icon svg { width: 1.5rem; height: 1.5rem; }
-    .btn--hero small { display: block; font-size: .8125rem; font-weight: 600; opacity: .95; }
-    .btn--hero .btn__arrow { width: 1.5rem; height: 1.5rem; transition: transform var(--dur) var(--ease); }
-    .btn--hero:hover .btn__arrow { transform: translateX(4px); }
-    .hero__script { font-family: var(--font-brush); color: var(--yellow-300); font-size: 1.25rem; transform: rotate(-4deg); }
-
-    /* Countdown */
-    .countdown-card {
-      background: var(--surface); color: var(--text);
-      border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
-      padding: var(--space-5);
-    }
-    .countdown-card__head { display: flex; align-items: center; gap: var(--space-2); font-weight: 700; color: var(--primary); }
-    .countdown-card__head svg { width: 1.25rem; height: 1.25rem; color: var(--cta); }
-    .countdown { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-2); margin-top: var(--space-4); }
-    .countdown__unit {
-      display: grid; justify-items: center; padding: var(--space-3) var(--space-1);
-      border-radius: var(--radius); background: var(--surface-soft); border: 1px solid var(--line);
-    }
-    .countdown__num { font-size: clamp(1.5rem, 3vw + .75rem, 2.25rem); font-weight: 800; line-height: 1.1; color: var(--primary-strong); font-variant-numeric: tabular-nums; }
-    .countdown__label { font-size: .8125rem; color: var(--text-muted); font-weight: 600; }
-
-
-    @media (min-width: 40rem) {
-    }
-    @media (min-width: 64rem) {
-      .hero { padding-block: var(--space-7) calc(var(--space-9) + 2rem); }
-      .hero__grid {
-        grid-template-columns: 1.08fr 1fr; gap: var(--space-6) var(--space-7);
-        grid-template-areas: "text media" "count cta";
-      }
-      .hero__media { padding-top: var(--space-5); align-self: start; }
-      .hero__cta-wrap { align-self: start; justify-items: center; margin-top: var(--space-5); }
     }
 
     /* ============ Latar foto Bali (dimuat saat mendekati layar: .is-bg) ============ */
@@ -587,16 +470,6 @@
     .sec-title { font-size: clamp(1.375rem, 1.2vw + 1rem, 1.75rem); font-weight: 800; color: var(--text); display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
     .sec-sub { color: var(--text-muted); margin-top: var(--space-1); }
 
-    .badge {
-      display: inline-flex; align-items: center; gap: .375rem;
-      padding: .25rem .625rem; border-radius: var(--radius-pill);
-      font-size: .75rem; font-weight: 800; letter-spacing: .03em; text-transform: uppercase; line-height: 1.2;
-    }
-    .badge--live { background: var(--live); color: #fff; }
-    .badge--live .dot { width: .5rem; height: .5rem; border-radius: 50%; background: #fff; animation: pulse 1.4s infinite; }
-    .badge--soon { background: var(--yellow-100); color: #7A4A00; }
-    .badge--done { background: var(--surface-soft); color: var(--text-muted); }
-    .badge--brand { background: var(--yellow-400); color: var(--teal-950); transform: rotate(-3deg); }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
 
     /* ============ Live ============ */
@@ -702,13 +575,6 @@
     .dk-state p { color: var(--text-muted); max-width: 26rem; }
 
     /* ============ Festival Satu Kata: 1 data = 1 warga kecil di plaza Bali ============ */
-    .fest-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: var(--space-3); }
-    .fest-head .sec-sub { max-width: 40rem; }
-    .fest-count { font-weight: 700; color: var(--text-muted); }
-    .fest-count strong { display: block; font-size: clamp(1.75rem, 4vw, 2.5rem); line-height: 1; color: var(--cta); font-variant-numeric: tabular-nums; }
-    .fest { position: relative; margin-top: var(--space-5); }
-    .fest__stage { position: relative; overflow: hidden; aspect-ratio: 4 / 5; border-radius: 1.5rem; background: #ECCEA4; box-shadow: var(--shadow-lg); }
-    @media (min-width: 40rem) { .fest__stage { aspect-ratio: 1654 / 951; } }
     .fest__stage > canvas { position: absolute; inset: 0; width: 100%; height: 100%; transition: filter 700ms var(--ease); }
     .fest.is-locked .fest__stage > canvas { filter: blur(7px) saturate(1.15); }
     .fest-b { position: absolute; z-index: 3; left: 0; top: 0; display: flex; gap: .5rem; align-items: center; max-width: 13rem; padding: .375rem .75rem .375rem .375rem; border: 2.5px solid #FFC93C; border-radius: .875rem; background: #FFFBF3; color: var(--ink); box-shadow: 0 10px 22px -10px rgb(0 0 0 / .45); opacity: 0; transition: opacity 300ms var(--ease); cursor: pointer; will-change: transform; }
@@ -730,22 +596,6 @@
     .fest-b.is-pin em { font-size: 1.375rem; }
     .fest-b small { display: block; font-size: .6875rem; color: var(--ink-muted); }
     .fest-b__tag { position: absolute; top: -.7rem; right: -.4rem; padding: .1rem .5rem; border-radius: var(--radius-pill); background: var(--cta); color: #fff; font-size: .6875rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
-    /* Bilah alat menempel di bawah panggung: satu kartu utuh, rapi. */
-    .fest:not(.is-locked) .fest__stage { border-radius: 1.5rem 1.5rem 0 0; box-shadow: none; }
-    .fest:not(.is-locked) { border-radius: 1.5rem; box-shadow: var(--shadow-lg); }
-    .fest__alat { display: grid; gap: .75rem; padding: 1rem; border: 1px solid var(--line); border-top: 0; border-radius: 0 0 1.5rem 1.5rem; background: var(--surface); }
-    @media (min-width: 48rem) { .fest__alat { grid-template-columns: minmax(0, 1fr) auto; align-items: center; padding: 1rem 1.25rem; } }
-    .fest.is-locked .fest__alat { display: none; }
-    .fest__cari { position: relative; display: flex; min-width: 0; }
-    .fest__cari > svg { position: absolute; left: .875rem; top: 50%; translate: 0 -50%; width: 1.125rem; height: 1.125rem; color: var(--text-muted); pointer-events: none; }
-    .fest__cari .input { flex: 1; min-width: 0; min-height: 2.875rem; padding-left: 2.625rem; border-radius: .875rem 0 0 .875rem; border-right: 0; }
-    .fest__cari .btn { min-height: 2.875rem; border-radius: 0 .875rem .875rem 0; padding: 0 1.125rem; box-shadow: none; }
-    .fest__aksi { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
-    .fest__aksi .btn { min-height: 2.875rem; border-radius: .875rem; box-shadow: none; }
-    @media (min-width: 48rem) { .fest__aksi { display: flex; } }
-    .fest__info { grid-column: 1 / -1; display: flex; gap: .5rem; align-items: flex-start; margin: 0; padding-top: .75rem; border-top: 1px dashed var(--line); font-size: .8125rem; color: var(--text-muted); }
-    .fest__info::before { content: "i"; display: grid; place-items: center; width: 1.125rem; height: 1.125rem; flex: none; margin-top: .0625rem; border-radius: 50%; background: var(--surface-soft); color: var(--primary); font-size: .6875rem; font-weight: 800; font-style: normal; }
-    .fest__info:empty { display: none; }
     /* ============ Pemenang undian (anak muda: tegas, simpel) ============ */
     .juara { margin-top: var(--space-5); padding: clamp(1.25rem, 4vw, 2rem); border-radius: 1.5rem; background: #120A1F; color: #fff; box-shadow: var(--shadow-lg); }
     .juara__judul { margin-top: .5rem; font-size: clamp(1.5rem, 4vw, 2.25rem); line-height: 1.1; color: #fff; }
@@ -823,70 +673,183 @@
     .mon-banner__dot { width: .625rem; height: .625rem; flex: none; border-radius: 50%; background: #FF5D5D; box-shadow: 0 0 0 0 rgb(255 93 93 / .7); animation: mon-denyut 1.4s infinite; }
     @keyframes mon-denyut { to { box-shadow: 0 0 0 .625rem rgb(255 93 93 / 0); } }
     @media (prefers-reduced-motion: reduce) { .mon__bar b, .mon-banner__dot, .mon-banner, .mon__pesan { animation: none; } }
-    @media (max-width: 39.99rem) { .fest.is-locked .fest__stage { aspect-ratio: 16 / 11; } .fest__gerbang h3 { font-size: 1.1875rem; } }
-    .orb.is-sembunyi { opacity: 0; pointer-events: none; transform: scale(.6); }
-    .orb { transition: opacity 250ms var(--ease), transform 250ms var(--ease); }
-    .fest__gerbang { position: relative; z-index: 5; margin: -1.5rem .5rem 0; padding: clamp(1.25rem, 4vw, 1.75rem); border-radius: 1.5rem; background: var(--surface); color: var(--text); box-shadow: 0 30px 60px -24px rgb(8 44 51 / .55); }
-    @media (min-width: 64rem) { .fest.is-locked .fest__stage { min-height: 50rem; } }
-    @media (min-width: 64rem) { .fest__gerbang { position: absolute; top: 50%; left: 50%; width: min(34rem, 92%); max-height: 92%; margin: 0; overflow: auto; transform: translate(-50%, -50%); } }
+    /* ---- Festival: kepala, plaza, sheet alat (m02 · d02) ---- */
+    .fest-head { display: grid; gap: var(--space-2); }
+    .fest-head__badges { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+    .fest-head .sec-sub { max-width: 40rem; }
+    .fest { position: relative; margin-top: var(--space-5); }
+    .fest__stage { position: relative; overflow: hidden; aspect-ratio: 4 / 5; border-radius: var(--r-xl); background: var(--sun-100); box-shadow: var(--e2); }
+    @media (min-width: 40rem) { .fest__stage { aspect-ratio: 1654 / 951; } }
+    .fest__online { position: absolute; z-index: 6; top: var(--space-3); left: 50%; translate: -50% 0; display: inline-flex; align-items: center; gap: 8px; min-height: 2.5rem; padding: 0 var(--space-4); border-radius: var(--r-pill); background: var(--glass); box-shadow: var(--e2); font-size: var(--fs-sm); font-weight: 600; color: var(--text-2); white-space: nowrap; }
+    .fest__online strong { font-size: var(--fs-body); font-weight: 800; color: var(--heading); font-variant-numeric: tabular-nums; }
+    .fest__online .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--green-600); }
+    .fest__share { position: absolute; z-index: 6; top: var(--space-3); right: var(--space-3); }
+    .fest__kunci { position: absolute; z-index: 6; left: 50%; top: 50%; translate: -50% -50%; display: none; align-items: center; gap: 8px; padding: 10px 16px; border-radius: var(--r-pill); background: var(--navy-900); color: var(--white); font-weight: 700; font-size: var(--fs-sm); box-shadow: var(--e3); white-space: nowrap; }
+    .fest__kunci svg { width: 1rem; height: 1rem; color: var(--sun-400); }
+    .fest.is-locked .fest__kunci { display: inline-flex; }
+    .fest.is-locked .fest__share { display: none; }
+    .fest-b { border-color: var(--white); background: var(--white); box-shadow: var(--e2); color: var(--heading); }
+    .fest-b::after { background: var(--white); border-color: var(--white); }
+    .fest-b em { font-family: var(--font-sans); font-weight: 800; font-size: var(--fs-body); letter-spacing: .2px; text-transform: uppercase; color: var(--blue-600); }
+    .fest-b.is-pin { border-color: var(--sun-400); }
+    .fest-b.is-pin::after { border-color: var(--sun-400); }
+    .fest-b.is-pin em { font-size: var(--fs-h3); }
+    .fest-b small { color: var(--text-3); }
+    .fest-b__ava { background: var(--sun-100); }
+    .fest-b__tag { background: var(--sun-400); color: var(--navy-900); }
+    .fest:not(.is-locked) .fest__stage { border-radius: var(--r-xl) var(--r-xl) 0 0; box-shadow: none; }
+    .fest:not(.is-locked) { border-radius: var(--r-xl); box-shadow: var(--e2); }
+    .fest__alat { position: relative; z-index: 6; display: grid; gap: var(--space-3); margin-top: -1.75rem; padding: 10px var(--space-5) var(--space-5); border-radius: var(--r-xl); background: var(--surface); box-shadow: 0 -8px 24px rgb(10 36 99 / .08); }
+    .fest__alat .sheet__grab { margin-bottom: 4px; }
+    .fest.is-locked .fest__alat { display: none; }
+    .fest__cari { display: grid; grid-template-columns: 1fr auto; gap: var(--space-2); }
+    .fest__cari .input { min-height: var(--btn-md); }
+    .fest__chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding: 2px; }
+    .fest__aksi { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); }
+    .fest__info { display: flex; gap: .5rem; align-items: flex-start; margin: 0; font-size: var(--fs-sm); color: var(--text-2); }
+    .fest__info::before { content: "i"; display: grid; place-items: center; width: 1.125rem; height: 1.125rem; flex: none; margin-top: .0625rem; border-radius: 50%; background: var(--surface-soft); color: var(--primary); font-size: .6875rem; font-weight: 800; }
+    .fest__info:empty { display: none; }
+    @media (min-width: 64rem) {
+      .fest__alat { grid-template-columns: minmax(0, 1.3fr) auto auto; align-items: center; margin-top: 0; padding: var(--space-4) var(--space-5); border-radius: 0 0 var(--r-xl) var(--r-xl); box-shadow: none; border-top: 1px solid var(--line); }
+      .fest__alat .sheet__grab { display: none; }
+      .fest__aksi { display: flex; }
+      .fest__info { grid-column: 1 / -1; }
+    }
+
+    /* ---- Gabung Festival: wizard 3 langkah (m03) ---- */
+    .fest__gerbang { position: relative; z-index: 5; margin: -2rem 0 0; padding: var(--space-5) var(--margin-m) var(--space-5); border-radius: var(--r-xl); background: var(--surface); color: var(--text); box-shadow: var(--e3); }
     .fest:not(.is-locked) .fest__gerbang { display: none; }
-    .fest__gerbang h3 { display: flex; align-items: center; gap: .5rem; font-size: 1.375rem; }
-    .fest__gerbang h3 svg { width: 1.25rem; height: 1.25rem; color: var(--cta); }
-    .fest__gerbang > p { margin-top: .25rem; font-size: .9375rem; color: var(--text-muted); }
-    .fest__fields { display: grid; gap: var(--space-3); margin-top: var(--space-4); }
+    @media (max-width: 39.99rem) { .fest.is-locked .fest__stage { aspect-ratio: 16 / 11; } }
+    @media (min-width: 64rem) {
+      .fest.is-locked .fest__stage { min-height: 52rem; }
+      .fest__gerbang { position: absolute; top: 50%; left: 50%; width: min(36rem, 92%); max-height: 94%; margin: 0; overflow: auto; transform: translate(-50%, -50%); }
+    }
+    .wizard__top { display: grid; grid-template-columns: var(--tap) 1fr var(--tap); align-items: center; gap: var(--space-2); }
+    .wizard__top .t-h3 { text-align: center; font-size: var(--fs-h2); line-height: var(--lh-h2); font-weight: 800; }
+    .wizard__kembali svg { transform: rotate(180deg); }
+    .wizard__kembali[hidden] { display: inline-grid; visibility: hidden; }
+    .wizard__no { justify-self: end; font-size: var(--fs-sm); font-weight: 700; color: var(--text-3); }
+    .wizard__bar { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: var(--space-4); }
+    .wizard__bar li { display: grid; gap: 8px; font-size: var(--fs-xs); font-weight: 600; color: var(--text-3); }
+    .wizard__bar li:nth-child(2) { text-align: center; }
+    .wizard__bar li:nth-child(3) { text-align: right; }
+    .wizard__bar li::before { content: ""; height: 5px; border-radius: 3px; background: var(--line); }
+    .wizard__bar li.is-done { color: var(--primary); }
+    .wizard__bar li.is-done::after { content: " ✓"; }
+    .wizard__bar li.is-done, .wizard__bar li[aria-current] { }
+    .wizard__bar li.is-done::before, .wizard__bar li[aria-current]::before { background: var(--blue-600); }
+    .wizard__bar li[aria-current] { color: var(--heading); font-weight: 700; }
+    .wizard__step { margin: var(--space-5) 0 0; padding: 0; border: 0; min-width: 0; }
+    .wizard__step > legend { padding: 0; float: left; width: 100%; color: var(--heading); }
+    .wizard__step > legend:focus-visible { outline: none; text-decoration: underline; text-decoration-color: var(--blue-500); }
+    .wizard__step > legend + * { clear: both; padding-top: var(--space-2); }
+    .wizard__step > .t-body { color: var(--text-2); }
+    .wizard__aksi { margin-top: var(--space-5); }
+    .fest__fields { display: grid; gap: var(--space-4); margin-top: var(--space-4); }
     @media (min-width: 36rem) { .fest__fields { grid-template-columns: 1fr 1fr; } .fest__fields .field--wide { grid-column: 1 / -1; } }
-    .fest__kata { min-height: 3.5rem; font-size: 1.25rem; font-weight: 800; }
-    .karakter { margin: var(--space-4) 0 0; padding: 0; border: 0; min-width: 0; }
-    .karakter legend { padding: 0; font-weight: 700; font-size: .875rem; }
-    .karakter legend .opt { font-weight: 500; color: var(--text-muted); }
-    .karakter__info { display: flex; gap: .5rem; align-items: center; margin-top: .375rem; font-size: .8125rem; color: var(--text-muted); }
-    .karakter__info svg { width: 1rem; height: 1rem; flex: none; color: var(--cta); }
-    .karakter.is-buka .karakter__info { display: none; }
-    .karakter__daftar { display: grid; grid-auto-flow: column; grid-template-rows: repeat(2, auto); grid-auto-columns: 4.75rem; gap: .5rem; margin: .5rem -.25rem 0; padding: .25rem .25rem .625rem; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
-    @media (min-width: 64rem) { .karakter__daftar { grid-auto-flow: row; grid-template-rows: none; grid-template-columns: repeat(6, 1fr); grid-auto-columns: auto; max-height: 21rem; overflow: auto; } }
-    .karakter__nama { display: grid; gap: .0625rem; }
-    .karakter__nama strong { font-size: .6875rem; }
-    .karakter__nama small { font-size: .5625rem; font-weight: 600; color: var(--text-muted); }
-    .karakter__saran { margin-top: .25rem; font-size: .8125rem; font-weight: 600; color: var(--success); }
+    .wizard .field { margin-top: var(--space-4); }
+    .fest__fields .field { margin-top: 0; }
+    .kata-wrap { position: relative; }
+    .fest__kata { min-height: 3.5rem; padding-right: 4rem; font-size: var(--fs-h3); font-weight: 800; text-transform: uppercase; color: var(--heading); }
+    .kata-wrap__n { position: absolute; right: 14px; top: 50%; translate: 0 -50%; font-size: var(--fs-sm); font-weight: 600; color: var(--text-3); }
+    .kata-ramai { margin-top: var(--space-4); display: grid; gap: var(--space-2); }
+    .kata-ramai .t-sm { color: var(--text-3); }
+    .kata-ramai .chip { font-size: var(--fs-sm); }
+    .karakter { margin: var(--space-5) 0 0; padding: 0; border: 0; min-width: 0; }
+    .karakter__head { display: flex; width: 100%; justify-content: space-between; align-items: baseline; gap: var(--space-2); padding: 0; }
+    .karakter__saran { font-size: var(--fs-sm); font-weight: 500; color: var(--text-3); text-align: right; }
     .karakter__saran:empty { display: none; }
-    .karakter__opsi { position: relative; display: grid; justify-items: center; gap: .125rem; min-height: 44px; padding: .375rem .25rem .5rem; border: 2px solid var(--line); border-radius: var(--radius); background: var(--surface-soft); font: inherit; font-size: .6875rem; font-weight: 700; line-height: 1.2; text-align: center; color: var(--text); cursor: pointer; scroll-snap-align: start; transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease); }
+    .karakter__info { display: flex; gap: .5rem; align-items: center; margin-top: var(--space-2); font-size: var(--fs-sm); color: var(--text-2); }
+    .karakter__info svg { width: 1rem; height: 1rem; flex: none; color: var(--sun-700); }
+    .karakter.is-buka .karakter__info { display: none; }
+    .karakter__daftar { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gutter-m); margin-top: var(--space-3); }
+    .karakter__daftar:not(.is-semua) .karakter__opsi:nth-child(n + 9) { display: none; }
+    .karakter__opsi { position: relative; display: grid; justify-items: center; gap: 2px; min-height: var(--tap); padding: 8px 4px; border: 0; border-radius: var(--r-md); background: var(--surface); box-shadow: inset 0 0 0 1.5px var(--line); color: var(--heading); cursor: pointer; transition: transform var(--dur) var(--ease); }
     .karakter__opsi canvas { width: 3.25rem; height: auto; max-width: none; }
     .karakter__opsi:hover { transform: translateY(-2px); }
-    .karakter__opsi[aria-checked="true"] { border-color: var(--cta); background: var(--yellow-100); }
-    .karakter__opsi[aria-checked="true"]::after { content: "✓"; position: absolute; top: .25rem; right: .3rem; width: 1.125rem; height: 1.125rem; border-radius: 50%; background: var(--cta); color: #fff; font-size: .6875rem; line-height: 1.125rem; }
+    .karakter__opsi:focus-visible { outline: none; box-shadow: inset 0 0 0 2px var(--blue-500), var(--ring); }
+    .karakter__opsi[aria-checked="true"] { background: var(--surface-soft); box-shadow: inset 0 0 0 3px var(--blue-600); }
+    .karakter__opsi[aria-checked="true"]::after { content: "✓"; position: absolute; top: 6px; right: 6px; display: grid; place-items: center; width: 1.375rem; height: 1.375rem; border-radius: 50%; background: var(--blue-600); color: var(--white); font-size: .75rem; font-weight: 800; }
     .karakter:not(.is-buka) .karakter__opsi { filter: grayscale(.55); opacity: .75; }
-    :root[data-theme="dark"] .karakter__opsi[aria-checked="true"] { background: #3D2E07; }
-    .fest-wa { display: grid; grid-template-columns: auto 1fr auto; gap: var(--space-3); align-items: center; margin-top: var(--space-4); padding: var(--space-3) var(--space-4); border: 2px dashed #25D366; border-radius: var(--radius); background: #F0FDF4; color: #14532D; text-decoration: none; transition: background var(--dur) var(--ease); }
-    .fest-wa:hover { background: #DCFCE7; }
-    .fest-wa__ico { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 50%; background: #25D366; color: #fff; }
-    .fest-wa__ico svg { width: 1.375rem; height: 1.375rem; }
-    .fest-wa small { display: block; font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #15803D; }
-    .fest-wa strong { display: block; }
-    .fest-wa span span { display: block; font-size: .8125rem; color: #166534; }
-    .fest-wa__cek { display: grid; place-items: center; width: 1.75rem; height: 1.75rem; border-radius: 50%; border: 2px solid #86EFAC; color: transparent; }
+    .karakter__nama { display: grid; gap: 1px; text-align: center; }
+    .karakter__nama strong { font-size: var(--fs-tab); line-height: 1.2; }
+    .karakter__nama small { font-size: var(--fs-tab); line-height: 1.2; font-weight: 500; color: var(--text-3); }
+    .karakter__semua { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; min-height: var(--tap); margin-top: var(--space-2); border: 0; background: none; color: var(--primary); font: 700 var(--fs-body)/1 var(--font-sans); cursor: pointer; border-radius: var(--r-md); }
+    .karakter__semua svg { width: 1.125rem; height: 1.125rem; transition: transform var(--dur) var(--ease); }
+    .karakter__semua[aria-expanded="true"] svg { transform: rotate(180deg); }
+    .karakter__semua:focus-visible { outline: none; box-shadow: var(--ring); }
+    @media (min-width: 64rem) { .karakter__daftar { grid-template-columns: repeat(6, 1fr); } .karakter__daftar:not(.is-semua) .karakter__opsi:nth-child(n + 9) { display: grid; } .karakter__daftar:not(.is-semua) .karakter__opsi:nth-child(n + 13) { display: none; } }
+    .fest-wa { display: grid; grid-template-columns: auto 1fr auto; gap: var(--space-3); align-items: center; margin-top: var(--space-4); padding: var(--space-4); border-radius: var(--r-lg); background: var(--success-bg); color: var(--heading); text-decoration: none; box-shadow: inset 0 0 0 2px var(--success-bg); }
+    .fest-wa:hover { box-shadow: inset 0 0 0 2px var(--success); }
+    .fest-wa:focus-visible { outline: none; box-shadow: inset 0 0 0 2px var(--success), var(--ring); }
+    .fest-wa__ico { display: grid; place-items: center; width: var(--tap); height: var(--tap); border-radius: var(--r-md); background: var(--wa-500); color: var(--white); }
+    .fest-wa__ico svg { width: 1.5rem; height: 1.5rem; }
+    .fest-wa small { display: block; font-size: var(--fs-xs); font-weight: 800; letter-spacing: var(--ls-over); text-transform: uppercase; color: var(--success); }
+    .fest-wa strong { display: block; font-weight: 800; }
+    .fest-wa span span { display: block; font-size: var(--fs-sm); color: var(--text-2); }
+    .fest-wa__cek { display: grid; place-items: center; width: 1.75rem; height: 1.75rem; border-radius: 50%; box-shadow: inset 0 0 0 2px var(--success); color: transparent; }
     .fest-wa__cek svg { width: 1rem; height: 1rem; }
-    .fest-wa.is-done { border-style: solid; }
-    .fest-wa.is-done .fest-wa__cek { background: #16A34A; border-color: #16A34A; color: #fff; }
-    :root[data-theme="dark"] .fest-wa { background: #0F3B23; color: #DCFCE7; }
+    .fest-wa.is-done .fest-wa__cek { background: var(--success); color: var(--surface); }
+    #fk-alert { margin-top: var(--space-4); }
+
+    /* ---- Festival desktop (d02): panggung + ringkasan samping ---- */
+    .fest-samping { display: none; }
+    .fest__kunci { top: 42%; }
+    @media (min-width: 64rem) {
+      .fest-grid { display: grid; grid-template-columns: minmax(0, 1fr) 23.75rem; gap: var(--gutter-d); align-items: start; margin-top: var(--space-5); }
+      .fest-grid .fest { margin-top: 0; }
+      .fest.is-locked .fest__stage { aspect-ratio: auto; height: 52rem; min-height: 0; }
+      .fest__kunci { display: none !important; }
+      .fest:not(.is-locked) { box-shadow: var(--e2); }
+      .fest:not(.is-locked) .fest__stage { border-radius: var(--r-xl); }
+      .fest__online { display: none; }
+      .fest:not(.is-locked) .fest__alat { position: static; display: block; padding: 0; border: 0; background: none; box-shadow: none; }
+      .fest:not(.is-locked) .fest__cari { position: absolute; z-index: 6; right: 0; top: calc(-1 * (var(--btn-md) + var(--space-4))); width: min(26rem, 60%); }
+      .fest:not(.is-locked) .fest__chips { position: absolute; z-index: 6; left: var(--space-4); bottom: var(--space-4); max-width: 45%; }
+      .fest:not(.is-locked) .fest__aksi { position: absolute; z-index: 6; right: var(--space-4); bottom: var(--space-4); }
+      .fest__chips .chip:not([aria-pressed="true"]) { box-shadow: var(--e1); }
+      .fest:not(.is-locked) .fest__aksi .btn--soft { --btn-bg: var(--white); --btn-fg: var(--navy-900); box-shadow: var(--e1); }
+      .fest:not(.is-locked) .fest__info { position: absolute; z-index: 6; left: var(--space-4); bottom: calc(var(--space-4) + var(--tap) + var(--space-3)); max-width: 60%; padding: 8px 12px; border-radius: var(--r-md); background: var(--glass); box-shadow: var(--e1); }
+      .fest-samping { display: grid; gap: var(--space-4); }
+      .fest-samping__kartu { padding: var(--space-5); border-radius: var(--r-lg); }
+      .fest-samping__judul { display: flex; justify-content: space-between; align-items: center; gap: var(--space-2); font-size: var(--fs-h3); line-height: var(--lh-h3); font-weight: 700; letter-spacing: var(--ls-h3); color: var(--heading); }
+      .fest-samping__judul .badge svg { width: .75rem; height: .75rem; }
+      .fest-samping__angka { margin-top: var(--space-2); font-size: var(--fs-display); line-height: var(--lh-display); font-weight: 800; letter-spacing: var(--ls-display); color: var(--heading); font-variant-numeric: tabular-nums; }
+      .fest-samping__kata { margin-top: var(--space-3); }
+      .fs-skel { width: 60%; height: 2rem; }
+      .fs-chip { min-height: var(--btn-sm); font-size: var(--fs-btn-sm); color: var(--heading); }
+      .fs-chip.is-1 { min-height: var(--tap); padding: 0 var(--space-3); background: var(--blue-600); color: var(--white); box-shadow: none; font-size: var(--fs-h3); font-weight: 800; }
+      .fs-chip.is-2 { min-height: var(--tap); background: var(--blue-100); color: var(--blue-700); box-shadow: none; font-size: var(--fs-body); }
+      .fest-samping__monster { display: grid; justify-items: start; gap: var(--space-2); padding: var(--space-5); border-radius: var(--r-lg); background: linear-gradient(135deg, var(--violet-600) -40%, var(--navy-950) 70%); color: var(--white); }
+      .fest-samping__monster .t-h3, .fest-samping__monster .t-sm { color: var(--white); }
+      .fest-samping__monster .t-sm { opacity: .9; }
+    }
+    /* ---- Sukses gabung + kartu share (m04) ---- */
+    dialog.sukses { width: 100%; max-width: 30rem; max-height: 100dvh; margin: auto; padding: var(--space-6) var(--margin-m) var(--space-5); border: 0; border-radius: var(--r-xl); overflow: auto; background: linear-gradient(180deg, var(--blue-500) 0%, var(--blue-600) 45%, var(--navy-900) 100%); color: var(--white); text-align: center; }
+    dialog.sukses::backdrop { background: var(--scrim); }
+    @media (max-width: 30rem) { dialog.sukses { height: 100dvh; border-radius: 0; } }
+    .sukses__tutup { position: absolute; top: var(--space-4); left: var(--space-4); background: rgb(255 255 255 / .18); color: var(--white); box-shadow: none; }
+    .sukses__badge { margin-top: var(--space-6); min-height: 2rem; padding: 0 var(--space-4); font-size: var(--fs-sm); }
+    .sukses__badge svg { width: 1rem; height: 1rem; }
+    .sukses__judul { margin-top: var(--space-3); font-size: var(--fs-h1); line-height: var(--lh-h1); letter-spacing: var(--ls-h1); font-weight: 800; }
+    .kartu-warga { margin: var(--space-6) var(--space-3) 0; overflow: hidden; border-radius: var(--r-xl); background: var(--white); color: var(--navy-900); box-shadow: var(--e3); transform: rotate(-2deg); text-align: center; }
+    .kartu-warga__latar { position: relative; height: 9.5rem; background: url("assets/img/festival/latar-900.webp") center top / cover no-repeat, var(--sun-100); }
+    .kartu-warga__orang { position: absolute; left: 50%; bottom: -2.25rem; translate: -50% 0; width: 4.5rem; }
+    .kartu-warga__orang canvas { width: 100%; height: auto; }
+    .kartu-warga__over { margin-top: 2.75rem; font-size: var(--fs-xs); font-weight: 800; letter-spacing: var(--ls-over); text-transform: uppercase; color: var(--blue-600); }
+    .kartu-warga__kata { font-size: var(--fs-display); line-height: var(--lh-display); font-weight: 800; letter-spacing: var(--ls-display); text-transform: uppercase; overflow-wrap: anywhere; padding-inline: var(--space-3); }
+    .kartu-warga__kaki { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); margin: var(--space-3) var(--space-5) var(--space-4); padding-top: var(--space-3); border-top: 1.5px dashed var(--line-2); text-align: left; }
+    .kartu-warga__kaki strong { display: block; font-size: var(--fs-h3); font-weight: 800; }
+    .kartu-warga__kaki small { display: block; font-size: var(--fs-sm); color: var(--ink-3); }
+    .kartu-warga__kaki img { width: 4rem; height: 4rem; image-rendering: pixelated; }
+    .sukses__aksi { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); margin-top: var(--space-6); }
+    .sukses__aksi .btn--block { grid-column: 1 / -1; }
+    .sukses__plaza { --btn-bg: rgb(255 255 255 / .16); --btn-fg: var(--white); }
 
     /* ============ Forms (shared) ============ */
-    .field { display: grid; gap: .375rem; }
-    .field label, .field .label { font-size: .875rem; font-weight: 700; color: var(--text); }
-    .req { color: var(--error); }
-    .input, .select {
-      width: 100%; min-height: 2.875rem; padding: .625rem .875rem;
-      border-radius: var(--radius-sm); border: 1.5px solid var(--line); background: var(--surface); color: var(--text);
-      transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
-    }
-    .input::placeholder { color: #5F7077; }
-    .input:hover, .select:hover { border-color: var(--teal-600); }
-    .input:focus, .select:focus { outline: none; border-color: var(--teal-600); box-shadow: 0 0 0 4px rgb(18 112 126 / .22); }
-    .input[aria-invalid="true"], .select[aria-invalid="true"] { border-color: var(--error); }
-    .input[aria-invalid="true"]:focus, .select[aria-invalid="true"]:focus { box-shadow: 0 0 0 4px rgb(185 28 28 / .18); }
-    .field__hint { font-size: .8125rem; color: var(--text-muted); }
-    .field__error { display: flex; gap: .375rem; align-items: center; font-size: .8125rem; font-weight: 600; color: var(--error); }
+    .field__hint { font-size: var(--fs-xs); color: var(--text-3); }
+    .field__error { display: flex; gap: 4px; align-items: center; font-size: var(--fs-xs); font-weight: 600; color: var(--error); }
     .field__error:empty { display: none; }
-    .field__error::before { content: "!"; display: inline-grid; place-items: center; width: 1rem; height: 1rem; border-radius: 50%; background: var(--error); color: #fff; font-size: .6875rem; font-weight: 800; flex: none; }
 
     .check { display: grid; grid-template-columns: auto 1fr; gap: var(--space-3); align-items: start; font-size: .875rem; color: var(--text-muted); }
     .check input { width: 1.25rem; height: 1.25rem; margin: .125rem 0 0; accent-color: var(--teal-700); }
@@ -906,8 +869,8 @@
     .road__map { position: relative; margin-top: var(--space-2); }
     .road__map svg { width: 100%; height: auto; }
     .road__progress { padding: var(--space-4) var(--space-5) var(--space-5); }
-    .meter { height: .75rem; border-radius: var(--radius-pill); background: rgb(14 90 102 / .15); overflow: hidden; }
-    .meter__fill { height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg, var(--teal-600), var(--orange-500)); transition: width 1.2s var(--ease); }
+    .meter { height: .75rem; border-radius: var(--radius-pill); background: var(--primary-soft); overflow: hidden; }
+    .meter__fill { height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg, var(--blue-600), var(--blue-500)); transition: width 1.2s var(--ease); }
     .road__stats { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-2); margin-top: var(--space-2); font-size: .875rem; color: #33464D; }
     .road__stats strong { color: var(--teal-900); }
     .road .link-arrow { color: var(--teal-800); }
@@ -1002,13 +965,7 @@
     .form-grid { display: grid; gap: var(--space-4); margin-top: var(--space-5); }
     @media (min-width: 40rem) { .form-grid { grid-template-columns: 1fr 1fr; } .form-grid .span-2 { grid-column: 1 / -1; } }
 
-    .alert { display: flex; gap: var(--space-3); align-items: flex-start; padding: var(--space-4); border-radius: var(--radius); font-size: .9375rem; }
-    .alert svg { width: 1.25rem; height: 1.25rem; flex: none; margin-top: .125rem; }
-    .alert--error { background: var(--error-bg); color: var(--error); }
-    .alert--success { background: var(--success-bg); color: var(--success); }
-    .alert[hidden] { display: none; }
 
-    .spinner { width: 1.125rem; height: 1.125rem; border-radius: 50%; border: 2.5px solid rgb(255 255 255 / .45); border-top-color: #fff; animation: spin .8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     .success-state { display: grid; gap: var(--space-4); justify-items: start; padding-top: var(--space-5); }
@@ -1133,48 +1090,6 @@
     .credits summary { cursor: pointer; font-weight: 700; color: #fff; min-height: 2.75rem; display: flex; align-items: center; }
     .credits p { font-size: .8125rem; }
 
-    /* ============ Pusat energi: tombol bulat dengan 4 menu cepat ============ */
-    .orb { position: fixed; z-index: 45; right: max(1rem, env(safe-area-inset-right)); bottom: calc(1rem + env(safe-area-inset-bottom)); width: 4.25rem; height: 4.25rem; }
-    .orb__core { position: relative; z-index: 2; display: grid; place-items: center; width: 100%; height: 100%; border: 0; border-radius: 50%; cursor: pointer; color: var(--teal-950);
-      background: radial-gradient(circle at 35% 30%, #FFF3CC 0, var(--yellow-400) 38%, var(--orange-500) 100%);
-      box-shadow: 0 0 0 4px rgb(255 255 255 / .9), 0 14px 32px -8px rgb(234 88 12 / .7), inset 0 -6px 12px rgb(154 52 18 / .35);
-      transition: transform 300ms var(--ease), box-shadow 300ms var(--ease); }
-    .orb__core:hover { transform: scale(1.06); }
-    .orb__core svg { width: 1.875rem; height: 1.875rem; transition: transform 400ms var(--ease), opacity 200ms var(--ease); }
-    .orb__core .orb__x { position: absolute; opacity: 0; transform: rotate(-90deg); }
-    .orb.is-open .orb__core .orb__bolt { opacity: 0; transform: rotate(90deg) scale(.6); }
-    .orb.is-open .orb__core .orb__x { opacity: 1; transform: none; }
-    .orb.is-open .orb__core { transform: scale(.92); }
-    /* Cincin energi berdenyut */
-    .orb::before, .orb::after { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: 50%; border: 2px solid var(--orange-400); opacity: 0; animation: denyut 2.6s ease-out infinite; pointer-events: none; }
-    .orb::after { animation-delay: 1.3s; }
-    .orb.is-open::before, .orb.is-open::after { animation: none; }
-    @keyframes denyut { 0% { transform: scale(1); opacity: .7; } 100% { transform: scale(1.9); opacity: 0; } }
-    .orb__hint { position: absolute; right: calc(100% + .75rem); top: 50%; translate: 0 -50%; z-index: 2; white-space: nowrap; padding: .375rem .75rem; border-radius: var(--radius-pill); background: var(--teal-950); color: #fff; font-size: .8125rem; font-weight: 700; box-shadow: var(--shadow); transition: opacity 300ms var(--ease); pointer-events: none; }
-    .orb.is-open .orb__hint, .orb.is-seen .orb__hint { opacity: 0; }
-    .orb__menu { list-style: none; position: absolute; inset: 0; z-index: 3; pointer-events: none; }
-    .orb__item { position: absolute; left: 50%; top: 50%; translate: -50% -50%; opacity: 0; pointer-events: none; transform: translateY(0) scale(.4); transition: transform 380ms cubic-bezier(.2, 1.3, .4, 1), opacity 220ms var(--ease); transition-delay: calc(var(--i) * 40ms); }
-    /* Menu tidak pernah menutupi tombol tengah: hanya item yang bisa diklik saat terbuka. */
-    .orb.is-open .orb__item { opacity: 1; pointer-events: auto; transform: translateY(var(--y)); }
-    .orb__item:nth-child(1) { --i: 0; --y: -5rem; }
-    .orb__item:nth-child(2) { --i: 1; --y: -9rem; }
-    .orb__item:nth-child(3) { --i: 2; --y: -13rem; }
-    .orb__item:nth-child(4) { --i: 3; --y: -17rem; }
-    .orb__link { position: relative; display: grid; place-items: center; width: 3.25rem; height: 3.25rem; border-radius: 50%; color: #fff; text-decoration: none; box-shadow: 0 10px 22px -8px rgb(8 44 51 / .6); transition: transform var(--dur) var(--ease); }
-    .orb__link:hover { transform: scale(1.1); }
-    .orb__link svg { width: 1.5rem; height: 1.5rem; }
-    .orb__item--tw .orb__link { background: linear-gradient(135deg, var(--yellow-400), #F59E0B); color: var(--teal-950); }
-    .orb__item--live .orb__link { background: linear-gradient(135deg, #EF4444, #B91C1C); }
-    .orb__item--dana .orb__link { background: linear-gradient(135deg, var(--orange-500), var(--orange-700)); }
-    .orb__item--wild .orb__link { background: linear-gradient(135deg, var(--teal-600), var(--teal-900)); }
-    .orb__label { position: absolute; display: grid; white-space: nowrap; padding: .45rem .875rem; border-radius: .75rem; background: var(--surface); color: var(--text); font-size: .8125rem; font-weight: 800; line-height: 1.2; box-shadow: var(--shadow); }
-    .orb__label small { font-size: .6875rem; font-weight: 600; color: var(--text-muted); }
-    .orb__label { right: calc(100% + .75rem); top: 50%; translate: 0 -50%; min-width: 10.5rem; text-align: right; }
-    .orb__live-dot { position: absolute; top: .125rem; right: .125rem; width: .75rem; height: .75rem; border-radius: 50%; background: #fff; border: 2px solid #DC2626; animation: pulse 1.4s infinite; }
-    .orb-backdrop { position: fixed; inset: 0; z-index: 44; background: radial-gradient(circle at calc(100% - 3rem) calc(100% - 3rem), rgb(8 44 51 / .35), rgb(8 44 51 / .7)); backdrop-filter: blur(3px); opacity: 0; pointer-events: none; transition: opacity 300ms var(--ease); }
-    .orb-backdrop.is-on { opacity: 1; pointer-events: auto; }
-    @media (prefers-reduced-motion: reduce) { .orb::before, .orb::after { display: none; } }
-
     /* ============ Pop-up informasi (diatur dari admin) ============ */
     .info-pop { width: min(100% - 2rem, 26rem); padding: 0; border: 0; border-radius: 1.5rem; overflow: hidden; background: var(--surface); color: var(--text); box-shadow: 0 40px 80px -24px rgb(8 44 51 / .6); }
     .info-pop[open] { animation: muncul-pop .35s cubic-bezier(.2, 1.2, .4, 1); }
@@ -1191,37 +1106,16 @@
     .info-pop__close { position: absolute; top: .625rem; right: .625rem; background: rgb(255 255 255 / .9); color: var(--teal-950); }
     @media (max-width: 30rem) { .info-pop { margin-bottom: 0; width: 100%; max-width: 100%; border-radius: 1.5rem 1.5rem 0 0; } }
 
-    /* ============ Toast ============ */
-    .toast {
-      position: fixed; z-index: 60; left: 50%; top: calc(var(--header-h) + .75rem); translate: -50% 0;
-      max-width: calc(100% - 2rem); padding: .75rem 1rem; border-radius: var(--radius);
-      background: var(--teal-950); color: #fff; font-weight: 600; font-size: .9375rem; box-shadow: var(--shadow-lg);
-      opacity: 0; transform: translateY(-8px); pointer-events: none;
-      transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
-    }
-    .toast.is-visible { opacity: 1; transform: none; }
 
 
     /* ============ Fase pengumuman (pra = sebelum, pasca = sesudah; diatur dari jam server) ============ */
     html:not([data-fase="pasca"]) [data-fase="pasca"], html[data-fase="pasca"] [data-fase="pra"] { display: none; }
 
-    .nav__link--klaim { color: var(--cta); font-weight: 800; }
-    :root[data-theme="dark"] .nav__link--klaim { color: var(--orange-400); }
-    .mobile-nav .is-hot { color: var(--cta); font-weight: 800; }
 
-    .countdown-card__when { margin-top: .25rem; font-size: .875rem; color: var(--text-muted); font-weight: 600; }
-    .countdown-card [hidden] { display: none; }
-    @media (max-width: 30rem) { .countdown-card { padding: var(--space-4); } .countdown__unit { padding: var(--space-2) 0; } .countdown-actions .btn { flex: 1; } }
-    .countdown-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-4); }
-    .countdown-wait { display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-4); padding: var(--space-4); border-radius: var(--radius); background: var(--yellow-100); color: #5B3B00; font-weight: 700; }
+    .countdown-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-2); margin-top: var(--space-2); }
+    .countdown-card__released { font-size: var(--fs-sm); color: var(--text-2); text-align: center; }
+    .countdown-wait { display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-3); padding: var(--space-3); border-radius: var(--r-md); background: var(--warning-bg); color: var(--warning); font-weight: 700; font-size: var(--fs-sm); }
     .countdown-wait[hidden] { display: none; }
-    .spinner { width: 1.25rem; height: 1.25rem; flex: none; border-radius: 50%; border: 3px solid rgb(91 59 0 / .25); border-top-color: currentColor; animation: spin-slow .8s linear infinite; }
-    .countdown-card__released { margin-top: .25rem; font-size: .9375rem; color: var(--text-muted); }
-
-    .hero__klaim { display: inline-flex; align-items: center; gap: .375rem; min-height: 2.75rem; color: #fff; font-weight: 600; text-decoration: none; }
-    .hero__klaim strong { color: var(--yellow-300); text-decoration: underline; text-underline-offset: .25em; }
-    .hero__klaim svg { width: 1rem; height: 1rem; transition: transform var(--dur) var(--ease); }
-    .hero__klaim:hover svg { transform: translateX(3px); }
 
     /* Panggung kartu finalis di hero (fase pasca) */
     .stage { padding-bottom: var(--space-4); }
@@ -1262,10 +1156,6 @@
     .finalis__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: var(--space-3); }
     .finalis__tools { display: grid; gap: var(--space-3); margin-top: var(--space-5); }
     @media (min-width: 48rem) { .finalis__tools { grid-template-columns: 1.4fr 1fr auto; align-items: center; } }
-    .chips { display: flex; flex-wrap: wrap; gap: .375rem; }
-    .chip { min-height: 2.75rem; padding: 0 1rem; border-radius: var(--radius-pill); border: 1.5px solid var(--line); background: var(--surface); font-weight: 700; font-size: .875rem; color: var(--text); cursor: pointer; transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease); }
-    .chip:hover { border-color: var(--primary); }
-    .chip[aria-pressed="true"] { background: var(--teal-700); border-color: var(--teal-700); color: #fff; }
     .fgrid { list-style: none; display: grid; gap: var(--space-4); grid-template-columns: repeat(auto-fill, minmax(min(100%, 10.5rem), 1fr)); margin-top: var(--space-4); }
     .fitem { overflow: hidden; border-radius: var(--radius); border: 1px solid var(--line); background: var(--surface); transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
     .fitem:hover { transform: translateY(-3px) rotate(-1deg); box-shadow: var(--shadow); }
@@ -1333,54 +1223,7 @@
     @keyframes jatuh { to { transform: translate3d(var(--dx, 0), 112vh, 0) rotate(var(--r, 540deg)); } }
 
 
-    /* ============ Menu ringkas + tombol kode (putaran 2) ============ */
-    .site-header { background: color-mix(in srgb, var(--surface) 82%, transparent); backdrop-filter: saturate(1.6) blur(14px); }
-    .nav__list { gap: .25rem; padding: .3rem; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--surface-soft) 70%, transparent); border: 1px solid var(--line); }
-    .nav__link { min-height: 2.5rem; padding: 0 1.125rem; border-radius: var(--radius-pill); font-size: .9375rem; }
-    .nav__link:hover { background: var(--surface); }
-    .nav__link[aria-current="true"] { background: var(--surface); box-shadow: var(--shadow-sm); }
-    .nav__link[aria-current="true"]::after { display: none; }
-    .nav__dot { width: .5rem; height: .5rem; margin-left: .375rem; border-radius: 50%; background: var(--cta); animation: pulse 1.4s infinite; }
-    .nav-code { display: inline-flex; align-items: center; gap: .5rem; min-height: 2.75rem; padding: 0 1.125rem 0 .875rem; border: 0; border-radius: var(--radius-pill); background: var(--teal-950); color: #fff; font: inherit; font-weight: 800; font-size: .9375rem; cursor: pointer; box-shadow: 0 6px 16px -8px rgb(8 44 51 / .6); transition: transform var(--dur) var(--ease), background-color var(--dur) var(--ease); }
-    .nav-code svg { width: 1.125rem; height: 1.125rem; color: var(--yellow-400); }
-    .nav-code:hover { transform: translateY(-1px); background: var(--teal-800); }
-    :root[data-theme="dark"] .nav-code { background: var(--yellow-400); color: var(--teal-950); }
-    :root[data-theme="dark"] .nav-code svg { color: var(--teal-950); }
-    @media (max-width: 30rem) { .nav-code span { display: none; } .nav-code { width: 2.75rem; padding: 0; justify-content: center; } }
-    .mobile-nav { padding-block: var(--space-4) var(--space-5); }
-    .mobile-code { display: grid; grid-template-columns: auto 1fr auto; gap: var(--space-3); align-items: center; width: 100%; padding: var(--space-3) var(--space-4); border: 0; border-radius: var(--radius-lg); background: linear-gradient(120deg, var(--teal-950), var(--teal-700)); color: #fff; font: inherit; text-align: left; cursor: pointer; }
-    .mobile-code__icon { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 50%; background: var(--yellow-400); color: var(--teal-950); }
-    .mobile-code__icon svg, .mobile-code__arrow { width: 1.25rem; height: 1.25rem; }
-    .mobile-code strong { display: block; }
-    .mobile-code small { display: block; font-size: .8125rem; opacity: .85; }
-    .mobile-nav__main { grid-template-columns: 1fr 1fr; margin-top: var(--space-3); }
-    .mobile-nav__main a { justify-content: center; background: var(--surface-soft); font-weight: 700; }
-    .mobile-nav__utama { grid-column: 1 / -1; }
-    .mobile-nav__utama a { background: var(--cta); color: #fff; }
-    .nav__link--utama { color: var(--cta); font-weight: 800; }
     .fest-utama { display: inline-flex; align-items: center; gap: .375rem; margin-left: .375rem; padding: .25rem .625rem; border-radius: var(--radius-pill); background: var(--cta); color: #fff; font-size: .6875rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; vertical-align: middle; }
-    .mobile-nav__label { margin: var(--space-4) var(--space-4) var(--space-1); font-size: .75rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); }
-    .mobile-nav__more { grid-template-columns: repeat(3, 1fr); }
-    .mobile-nav__more a { justify-content: center; min-height: 2.75rem; font-size: .875rem; color: var(--text-muted); }
-
-    .kode-dialog { width: min(100% - 2rem, 26rem); padding: 0; border: 0; border-radius: 1.75rem; background: var(--surface); color: var(--text); box-shadow: 0 40px 80px -24px rgb(8 44 51 / .55); }
-    .kode-dialog[open] { animation: muncul-dialog .28s var(--ease); }
-    @keyframes muncul-dialog { from { opacity: 0; transform: translateY(16px) scale(.97); } }
-    .kode-dialog::backdrop { background: rgb(8 44 51 / .6); backdrop-filter: blur(4px); }
-    .kode-dialog form { position: relative; display: grid; gap: var(--space-3); padding: var(--space-6) var(--space-5) var(--space-5); text-align: center; }
-    .kode-dialog__icon { justify-self: center; display: grid; place-items: center; width: 3.5rem; height: 3.5rem; border-radius: 1.125rem; background: var(--yellow-100); color: var(--orange-700); transform: rotate(-6deg); }
-    .kode-dialog__icon svg { width: 1.75rem; height: 1.75rem; }
-    .kode-dialog h2 { font-size: 1.5rem; }
-    .kode-dialog__sub { font-size: .9375rem; color: var(--text-muted); }
-    .kode-dialog__input { min-height: 3.75rem; text-align: center; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 1.375rem; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; }
-    .kode-dialog__input::placeholder { letter-spacing: .12em; font-weight: 500; }
-    .kode-dialog__alt { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); margin-top: var(--space-2); padding-top: var(--space-4); border-top: 1px dashed var(--line); }
-    .kode-dialog__alt a { display: flex; gap: var(--space-2); align-items: center; padding: var(--space-3); border-radius: var(--radius); background: var(--surface-soft); color: var(--text); text-decoration: none; text-align: left; transition: transform var(--dur) var(--ease); }
-    .kode-dialog__alt a:hover { transform: translateY(-2px); }
-    .kode-dialog__alt svg { width: 1.25rem; height: 1.25rem; flex: none; color: var(--cta); }
-    .kode-dialog__alt strong { display: block; font-size: .8125rem; }
-    .kode-dialog__alt small { display: block; font-size: .75rem; color: var(--text-muted); }
-    .kode-dialog__close { position: absolute; top: .75rem; right: .75rem; }
 
     /* Road to Bali ringkas: progres bar + titik target, tanpa peta besar */
     .road__progress { padding-top: var(--space-5); }
@@ -1434,6 +1277,7 @@
       .doodle--float, .doodle--spin { animation: none; }
     }
   </style>
+  <link rel="stylesheet" href="assets/css/komponen.css">
 </head>
 
 <body>
@@ -1471,188 +1315,178 @@
     <symbol id="i-chat" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M4 5h16v11H9l-5 4V5Z"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M8 9.5h8M8 12.5h5"/></symbol>
     <symbol id="i-pause" viewBox="0 0 24 24"><path fill="currentColor" d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></symbol>
     <symbol id="i-whatsapp" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.2-.2-.5-.3Z"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3.5 10.5 12 3.5l8.5 7V20a1 1 0 0 1-1 1H15v-6h-6v6H4.5a1 1 0 0 1-1-1Z"/></symbol>
+    <symbol id="i-live" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="2.2" fill="currentColor"/><path d="M8.3 15.7a5.2 5.2 0 0 1 0-7.4M15.7 8.3a5.2 5.2 0 0 1 0 7.4M5.5 18.5a9.2 9.2 0 0 1 0-13M18.5 5.5a9.2 9.2 0 0 1 0 13"/></g></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></g></symbol>
+    <symbol id="i-game" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10a5 5 0 0 1 4.8 6.4l-1 3.4a2.6 2.6 0 0 1-4.4 1.1L14 15.5h-4l-2.4 2.4a2.6 2.6 0 0 1-4.4-1.1l-1-3.4A5 5 0 0 1 7 7Z"/><path d="M8 10v3M6.5 11.5h3"/><circle cx="15.5" cy="10.5" r=".6" fill="currentColor"/><circle cx="17" cy="12.5" r=".6" fill="currentColor"/></g></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></g></symbol>
+    <symbol id="i-map" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="m3 6 6-2.5 6 2.5 6-2.5v14.5L15 20.5 9 18l-6 2.5ZM9 3.5V18M15 6v14.5"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.6 2.6 0 1 1 3.6 2.4c-.7.3-1.1.9-1.1 1.6v.5"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></g></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M12 3 4.5 6v5.5c0 4.6 3.1 8.2 7.5 9.5 4.4-1.3 7.5-4.9 7.5-9.5V6Z"/></symbol>
+    <symbol id="i-bus" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="3.5" width="15" height="14" rx="3"/><path d="M4.5 10.5h15M7.5 17.5v2.5M16.5 17.5v2.5"/><circle cx="8.5" cy="14" r=".7" fill="currentColor"/><circle cx="15.5" cy="14" r=".7" fill="currentColor"/></g></symbol>
+    <symbol id="i-chevron-right" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" d="m9 6 6 6-6 6"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></symbol>
+    <symbol id="i-trophy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 4h9v5a4.5 4.5 0 0 1-9 0Z"/><path d="M7.5 6H4.5a3 3 0 0 0 3 4M16.5 6h3a3 3 0 0 1-3 4M12 13.5V17M8.5 20.5h7M9.5 17h5v3.5h-5z"/></g></symbol>
   </svg>
 
-  <!-- ========== HEADER ========== -->
+  <!-- ========== HEADER (m01 appbar · d01 nav pil) ========== -->
   <header class="site-header">
     <div class="container site-header__inner">
       <a class="brand" href="#beranda" aria-label="Youth Character Summit 2026, ke beranda">
+        <!-- Logo sementara (dummy) — akan diganti panitia -->
         <svg class="brand__logo" viewBox="0 0 48 48" aria-hidden="true">
-          <g stroke="#FFC93C" stroke-width="3" stroke-linecap="round">
-            <path d="M24 3v5M24 40v5M3 24h5M40 24h5M9.2 9.2l3.5 3.5M35.3 35.3l3.5 3.5M9.2 38.8l3.5-3.5M35.3 12.7l3.5-3.5"/>
+          <g class="brand__rays" stroke-width="3.4" stroke-linecap="round">
+            <path d="M24 2.5v5.5M24 40v5.5M2.5 24H8M40 24h5.5M8.8 8.8l3.9 3.9M35.3 35.3l3.9 3.9M8.8 39.2l3.9-3.9M35.3 12.7l3.9-3.9"/>
           </g>
-          <circle cx="24" cy="24" r="12.5" fill="#0E5A66"/>
-          <circle cx="24" cy="19.5" r="3.4" fill="#FFC93C"/>
-          <path d="M16.5 31c1.5-4.6 4.2-6.8 7.5-6.8s6 2.2 7.5 6.8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/>
-          <path d="M18 24.5 24 27l6-2.5" fill="none" stroke="#FFC93C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle class="brand__disc" cx="24" cy="24" r="12.5"/>
+          <circle class="brand__head" cx="24" cy="19.5" r="3.4"/>
+          <path class="brand__body" d="M16.5 31c1.5-4.6 4.2-6.8 7.5-6.8s6 2.2 7.5 6.8" fill="none" stroke-width="2.6" stroke-linecap="round"/>
+          <path class="brand__arms" d="M18 24.5 24 27l6-2.5" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         <span class="brand__name"><strong>Youth Character Summit</strong><span>YCS 2026</span></span>
       </a>
 
       <nav class="nav" aria-label="Navigasi utama">
-        <ul class="nav__list">
-          <li><a class="nav__link nav__link--utama" href="#satu-kata">Festival Satu Kata</a></li>
-          <li><a class="nav__link" href="#live">Live</a></li>
-          <li><a class="nav__link" href="#dana">Dana Kaget</a></li>
-          <li><a class="nav__link" href="#delegasi">Finalis<span class="nav__dot" data-fase="pasca" aria-hidden="true"></span></a></li>
+        <ul class="dnav nav__list">
+          <li><a class="nav__link" href="#beranda"><svg aria-hidden="true"><use href="#i-home"/></svg>Beranda</a></li>
+          <li><a class="nav__link nav__link--utama" href="#satu-kata"><svg aria-hidden="true"><use href="#i-chat"/></svg>Festival Satu Kata</a></li>
+          <li><a class="nav__link" href="#live"><svg aria-hidden="true"><use href="#i-live"/></svg>Live</a></li>
+          <li><a class="nav__link" href="#dana"><svg aria-hidden="true"><use href="#i-gift"/></svg>Dana Kaget</a></li>
+          <li><a class="nav__link" href="#delegasi"><svg aria-hidden="true"><use href="#i-users"/></svg>Finalis<span class="nav__dot" data-fase="pasca" aria-hidden="true"></span></a></li>
         </ul>
       </nav>
 
       <div class="header-tools">
-        <button class="nav-code" type="button" data-kode-open aria-haspopup="dialog">
+        <a class="btn btn--dark header-game" href="#satu-kata" data-ke-festival><svg aria-hidden="true"><use href="#i-game"/></svg>Game</a>
+        <button class="icon-btn theme-toggle" type="button" aria-label="Mode gelap" aria-pressed="false" hidden>
+          <svg class="icon-moon" aria-hidden="true"><use href="#i-moon"/></svg>
+          <svg class="icon-sun" aria-hidden="true"><use href="#i-sun"/></svg>
+        </button>
+        <button class="btn btn--cta nav-code" type="button" data-kode-open aria-haspopup="dialog">
           <svg aria-hidden="true"><use href="#i-key"/></svg><span>Punya kode?</span>
         </button>
-        <button class="icon-btn theme-toggle" type="button" aria-label="Ganti tema terang/gelap" aria-pressed="false" hidden>
-          <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"/></svg>
-          <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></g></svg>
-        </button>
-        <button class="icon-btn menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav" aria-label="Buka menu" hidden>
-          <svg class="icon-menu" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"/></svg>
-          <svg class="icon-close" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></svg>
+        <button class="icon-btn menu-toggle" type="button" aria-expanded="false" aria-controls="lainnya" aria-haspopup="dialog" aria-label="Buka menu Lainnya">
+          <svg aria-hidden="true"><use href="#i-menu"/></svg>
         </button>
       </div>
     </div>
-
-    <nav class="mobile-nav" id="mobile-nav" aria-label="Navigasi utama (seluler)" hidden>
-      <div class="container">
-        <button class="mobile-code" type="button" data-kode-open>
-          <span class="mobile-code__icon" aria-hidden="true"><svg><use href="#i-key"/></svg></span>
-          <span><strong>Punya kode?</strong><small>Kode wildcard dari email atau kode Dana Kaget</small></span>
-          <svg class="mobile-code__arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
-        </button>
-        <ul class="mobile-nav__main">
-          <li class="mobile-nav__utama"><a href="#satu-kata">Festival Satu Kata</a></li>
-          <li><a href="#live">Live</a></li>
-          <li><a href="#dana">Dana Kaget</a></li>
-          <li><a href="#delegasi">Finalis</a></li>
-          <li><a href="klaim/">Klaim wildcard</a></li>
-          <li><a href="survei/">Survei</a></li>
-        </ul>
-        <p class="mobile-nav__label">Lainnya</p>
-        <ul class="mobile-nav__more">
-          <li><a href="#road-to-bali">Road to Bali</a></li>
-          <li><a href="#leaderboard">Leaderboard</a></li>
-          <li><a href="#faq">FAQ</a></li>
-        </ul>
-        <div class="mobile-nav__socials">
-          <a class="icon-btn" href="https://www.instagram.com/universitasstekom" target="_blank" rel="noopener" aria-label="Instagram (tab baru)"><svg aria-hidden="true"><use href="#i-instagram"/></svg></a>
-          <a class="icon-btn" href="https://www.tiktok.com/@universitasstekom" target="_blank" rel="noopener" aria-label="TikTok (tab baru)"><svg aria-hidden="true"><use href="#i-tiktok"/></svg></a>
-          <a class="icon-btn" href="https://www.youtube.com/@universitasstekom" target="_blank" rel="noopener" aria-label="YouTube (tab baru)"><svg aria-hidden="true"><use href="#i-youtube"/></svg></a>
-        </div>
-      </div>
-    </nav>
   </header>
 
   <main id="konten" tabindex="-1">
 
-    <!-- ========== HERO ========== -->
+    <!-- ========== BERANDA (m01 · d01) ========== -->
     <section class="hero" id="beranda" aria-labelledby="hero-title">
-      <div class="hero__strokes" aria-hidden="true">
-        <svg class="hero__stroke-1" viewBox="0 0 400 160"><path d="M10 120C80 40 200 10 390 30" fill="none" stroke="#FFC93C" stroke-width="34" stroke-linecap="round" opacity=".9"/></svg>
-        <svg class="hero__stroke-2" viewBox="0 0 400 160"><path d="M10 130C120 90 260 120 390 20" fill="none" stroke="#FFC93C" stroke-width="26" stroke-linecap="round" opacity=".75"/></svg>
-        <img class="sticker sticker--kite sticker--sway" src="assets/svg/kite.svg" alt="" width="200" height="300">
-      </div>
-
-      <div class="container hero__grid">
-        <div class="hero__text">
-          <p class="eyebrow hero__eyebrow" data-fase="pra">Youth Character Summit 2026</p>
-          <p class="eyebrow hero__eyebrow" data-fase="pasca">Pengumuman resmi YCS 2026</p>
-          <h1 class="hero__title" id="hero-title">
-            <span data-fase="pra">Karakter Kuat.</span>
-            <span class="hl" data-fase="pra">Langkah ke Bali.</span>
-            <span data-fase="pasca">Selamat,</span>
-            <span class="hl" data-fase="pasca">Para Finalis!</span>
-          </h1>
-          <p class="hero__lead" data-fase="pasca">Inilah pelajar terpilih yang akan melangkah ke Bali, <strong>23 Desember 2026 – 2 Januari 2027</strong>. Cari namamu atau teman sekolahmu, lalu rayakan bersama!</p>
-          <p class="hero__lead" data-fase="pra">
-            Jadilah bagian dari <strong>150 delegasi</strong> dan ribuan anak muda lainnya yang siap membangun Indonesia dengan karakter, kolaborasi, dan aksi nyata.
-          </p>
-
-        </div>
-
-        <div class="hero__media stage" data-fase="pasca" role="region" aria-roledescription="carousel" aria-label="Kartu finalis YCS 2026">
-          <div class="stage__deck" id="stage-deck"></div>
-          <div class="stage__controls" id="stage-controls" hidden>
-            <button class="stage__btn stage__btn--prev" type="button" id="stage-prev" aria-label="Finalis sebelumnya"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
-            <span class="stage__count" id="stage-count" aria-live="off"></span>
-            <button class="stage__btn" type="button" id="stage-toggle" aria-pressed="false" aria-label="Jeda pergantian kartu"><svg aria-hidden="true"><use href="#i-pause"/></svg></button>
-            <button class="stage__btn" type="button" id="stage-next" aria-label="Finalis berikutnya"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+      <div class="container hero__wrap">
+        <div class="hero__carousel" role="region" aria-roledescription="carousel" aria-label="Sorotan YCS 2026">
+          <div class="hero__track" id="hero-track">
+            <article class="hero__slide" id="hero-s1" aria-roledescription="slide" aria-label="1 dari 3">
+              <img class="hero__img" src="assets/img/bali/bg-uludanu2-800.webp" srcset="assets/img/bali/bg-uludanu2-800.webp 800w, assets/img/bali/bg-uludanu2-1440.webp 1440w" sizes="(min-width: 64rem) 100vw, 94vw" width="1440" height="900" alt="Pura Ulun Danu Beratan di tepi danau, Bali" fetchpriority="high">
+              <div class="hero__copy">
+                <p class="badge badge--sun hero__pill"><svg aria-hidden="true"><use href="#i-trophy"/></svg>Youth Character Summit 2026</p>
+                <h1 class="hero__title" id="hero-title"><span>Selamat Datang di</span> <strong>YCS 2026!</strong></h1>
+                <p class="hero__lead">Bersama, kita wujudkan generasi muda berkarakter, berprestasi, dan berdampak.</p>
+                <a class="btn btn--cta hero__cta" href="#satu-kata">Mulai Jelajahi<svg aria-hidden="true"><use href="#i-chevron-right"/></svg></a>
+              </div>
+              <p class="hero__script" aria-hidden="true">Indonesia<br>Juara</p>
+            </article>
+            <article class="hero__slide" id="hero-s2" aria-roledescription="slide" aria-label="2 dari 3">
+              <img class="hero__img" src="assets/img/ycs-delegasi-danau-800.webp" srcset="assets/img/ycs-delegasi-danau-800.webp 800w, assets/img/ycs-delegasi-danau-1600.webp 1600w" sizes="(min-width: 64rem) 100vw, 94vw" width="1600" height="1066" alt="Enam pelajar berpose ceria di dermaga tepi danau Bali" loading="lazy" decoding="async">
+              <div class="hero__copy">
+                <p class="t-over" data-fase="pasca">Pengumuman resmi</p>
+                <p class="t-over" data-fase="pra">Segera diumumkan</p>
+                <h2 class="hero__title hero__title--sm" data-fase="pasca">Selamat, para finalis!</h2>
+                <h2 class="hero__title hero__title--sm" data-fase="pra">Menuju 100 finalis</h2>
+                <p class="hero__lead" data-fase="pasca">Pelajar terpilih melangkah ke Bali. Cari namamu atau teman sekolahmu.</p>
+                <p class="hero__lead" data-fase="pra">Pengumuman <span data-umum-teks>Senin, 16 November 2026 · 19.00 WIB</span>.</p>
+                <a class="btn btn--dark hero__cta" href="#delegasi" data-fase="pasca">Lihat finalis<svg aria-hidden="true"><use href="#i-chevron-right"/></svg></a>
+                <a class="btn btn--dark hero__cta" href="#info-acara" data-fase="pra">Hitung mundur<svg aria-hidden="true"><use href="#i-chevron-right"/></svg></a>
+              </div>
+            </article>
+            <article class="hero__slide" id="hero-s3" aria-roledescription="slide" aria-label="3 dari 3">
+              <img class="hero__img" src="assets/img/ycs-main-air-800.webp" srcset="assets/img/ycs-main-air-800.webp 800w, assets/img/ycs-main-air-1600.webp 1600w" sizes="(min-width: 64rem) 100vw, 94vw" width="1600" height="1066" alt="Rombongan pelajar berpelampung tertawa di air laut" loading="lazy" decoding="async">
+              <div class="hero__copy">
+                <p class="t-over">Live &amp; Dana Kaget</p>
+                <h2 class="hero__title hero__title--sm">Tonton live, klaim kejutannya</h2>
+                <p class="hero__lead">Kode Dana Kaget dibagikan saat live dan di saluran WhatsApp YCS.</p>
+                <a class="btn btn--dark hero__cta" href="#live">Lihat jadwal<svg aria-hidden="true"><use href="#i-chevron-right"/></svg></a>
+              </div>
+            </article>
+          </div>
+          <div class="hero__dots" id="hero-dots">
+            <button type="button" aria-controls="hero-s1" aria-label="Tampilkan slide 1" aria-current="true"></button>
+            <button type="button" aria-controls="hero-s2" aria-label="Tampilkan slide 2"></button>
+            <button type="button" aria-controls="hero-s3" aria-label="Tampilkan slide 3"></button>
           </div>
         </div>
 
-        <div class="hero__media" data-fase="pra">
-          <p class="hero__date-note" aria-hidden="true">Bali<br>23 Des 2026<br>– 2 Jan 2027</p>
-          <figure class="polaroid hero__photo">
-            <img src="assets/img/ycs-delegasi-danau-800.webp" srcset="assets/img/ycs-delegasi-danau-480.webp 480w, assets/img/ycs-delegasi-danau-800.webp 800w, assets/img/ycs-delegasi-danau-1600.webp 1600w" sizes="(min-width: 64rem) 34rem, 90vw" width="1600" height="1066" alt="Enam pelajar berpose ceria di dermaga tepi danau Bali saat perjalanan Duta Teladan STEKOM" fetchpriority="high">
-          </figure>
-          <figure class="polaroid hero__pol-a">
-            <img src="assets/img/ycs-busana-bali-800.webp" srcset="assets/img/ycs-busana-bali-480.webp 480w, assets/img/ycs-busana-bali-800.webp 800w, assets/img/ycs-busana-bali-1600.webp 1600w" sizes="(min-width: 64rem) 15rem, 40vw" width="1600" height="1066" alt="Tiga pelajar berbusana adat Bali duduk di tangga pura" loading="lazy" decoding="async">
-            <figcaption>Belajar budaya</figcaption>
-          </figure>
-          <figure class="polaroid hero__pol-b">
-            <img src="assets/img/ycs-main-air-800.webp" srcset="assets/img/ycs-main-air-480.webp 480w, assets/img/ycs-main-air-800.webp 800w, assets/img/ycs-main-air-1600.webp 1600w" sizes="(min-width: 64rem) 13rem, 34vw" width="1600" height="1066" alt="Rombongan pelajar berpelampung tertawa di air laut" loading="lazy" decoding="async">
-            <figcaption>Seru bareng!</figcaption>
-          </figure>
-          <svg class="doodle doodle--spin hero__doodle-star" aria-hidden="true"><use href="#d-star"/></svg>
-          <svg class="doodle hero__doodle-arrow" aria-hidden="true"><use href="#d-arrow"/></svg>
-          <svg class="doodle doodle--float hero__doodle-spark" aria-hidden="true"><use href="#d-spark"/></svg>
-        </div>
+        <ul class="tiles" aria-label="Fitur utama">
+          <li><a class="tile" href="#satu-kata"><span class="tile__ico tile__ico--festival"><svg class="tile__art" viewBox="0 0 48 48" aria-hidden="true"><path d="M13 9h22v4c3.5-.6 6.6.4 6.6 4.2 0 5-4.6 8-9.4 8.4A12 12 0 0 1 26.5 31v4h5.5a2 2 0 0 1 2 2v3H14v-3a2 2 0 0 1 2-2h5.5v-4a12 12 0 0 1-5.7-5.4C11 25.2 6.4 22.2 6.4 17.2c0-3.8 3.1-4.8 6.6-4.2Zm-.2 7.5c-2-.3-3 .2-3 1.2 0 2.4 1.9 4.3 4.6 5a20 20 0 0 1-1.6-6.2Zm22.4 0a20 20 0 0 1-1.6 6.2c2.7-.7 4.6-2.6 4.6-5 0-1-1-1.5-3-1.2Z" style="fill:var(--sun-400)"/><path d="M14 37h20v3H14z" style="fill:var(--sun-500)"/><path d="M19 13.5c0 6 1.6 10 4 12" fill="none" style="stroke:var(--sun-100)" stroke-width="2.4" stroke-linecap="round"/></svg></span><span class="tile__txt"><strong>Festival Satu Kata</strong><small>Rangkai kata, tunjukkan semangatmu!</small></span><span class="tile__go" aria-hidden="true"><svg><use href="#i-chevron-right"/></svg></span></a></li>
+          <li><a class="tile" href="#live"><span class="tile__ico tile__ico--live"><svg class="tile__art" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="6" style="fill:var(--coral-500)"/><g fill="none" style="stroke:var(--coral-500)" stroke-width="4.2" stroke-linecap="round"><path d="M15.5 32.5a12 12 0 0 1 0-17M32.5 15.5a12 12 0 0 1 0 17M9.5 38.5a20.5 20.5 0 0 1 0-29M38.5 9.5a20.5 20.5 0 0 1 0 29"/></g></svg></span><span class="tile__txt"><strong>Live</strong><small>Saksikan langsung keseruan YCS 2026</small></span><span class="tile__go" aria-hidden="true"><svg><use href="#i-chevron-right"/></svg></span></a></li>
+          <li><a class="tile" href="#dana"><span class="tile__ico tile__ico--dana"><svg class="tile__art" viewBox="0 0 48 48" aria-hidden="true"><rect x="9" y="22" width="30" height="20" rx="2.5" style="fill:var(--blue-600)"/><rect x="6.5" y="15" width="35" height="9" rx="2.5" style="fill:var(--blue-700)"/><rect x="21" y="15" width="6" height="27" style="fill:var(--sun-400)"/><path d="M24 15c-3.5-7-11-8-11.5-3.6C12.2 14.6 17 15 24 15Zm0 0c3.5-7 11-8 11.5-3.6.3 3.2-4.5 3.6-11.5 3.6Z" fill="none" style="stroke:var(--sun-400)" stroke-width="3.2" stroke-linejoin="round"/></svg></span><span class="tile__txt"><strong>Dana Kaget</strong><small>Dapatkan kejutan spesial dari YCS!</small></span><span class="tile__go" aria-hidden="true"><svg><use href="#i-chevron-right"/></svg></span></a></li>
+          <li><a class="tile" href="#delegasi"><span class="tile__ico tile__ico--finalis"><svg class="tile__art" viewBox="0 0 48 48" aria-hidden="true"><circle cx="13" cy="15.5" r="5.5" style="fill:var(--blue-600)"/><circle cx="35" cy="15.5" r="5.5" style="fill:var(--blue-600)"/><path d="M2.5 34c.6-6.8 4.6-10.5 10.5-10.5 3 0 5.4 1 7.2 2.8A14 14 0 0 0 15 36H4.5a2 2 0 0 1-2-2Zm43 0c-.6-6.8-4.6-10.5-10.5-10.5-3 0-5.4 1-7.2 2.8A14 14 0 0 1 33 36h10.5a2 2 0 0 0 2-2Z" style="fill:var(--blue-600)"/><circle cx="24" cy="14" r="7.5" style="fill:var(--blue-700)"/><path d="M10.5 38c.8-8.6 6-13.5 13.5-13.5S36.7 29.4 37.5 38a2 2 0 0 1-2 2.2h-23a2 2 0 0 1-2-2.2Z" style="fill:var(--blue-700)"/></svg></span><span class="tile__txt"><strong>Finalis</strong><small>Kenali para finalis terbaik YCS 2026</small></span><span class="tile__go" aria-hidden="true"><svg><use href="#i-chevron-right"/></svg></span></a></li>
+        </ul>
 
-        <div class="hero__cta-wrap">
-          <a class="btn btn--cta btn--hero" href="#satu-kata" data-fase="pasca">
-            <span class="btn__icon"><svg aria-hidden="true"><use href="#i-chat"/></svg></span>
-            <span>Masuk Festival Satu Kata<small>Kirim 1 kata, temukan dirimu</small></span>
-            <svg class="btn__arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
+        <div class="hero__row">
+          <a class="game-card" href="#satu-kata" aria-label="Game interaktif Festival 1 Kata: main sekarang">
+            <span class="game-card__art" aria-hidden="true"><svg class="game-card__pad" viewBox="0 0 120 80" aria-hidden="true"><defs><linearGradient id="hero-padg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--white)"/><stop offset="1" style="stop-color:var(--blue-100)"/></linearGradient></defs>
+<path d="M30 14h60c14 0 22 10 25 26 3 15 3 30-8 32-8 1.5-13-6-19-13H32c-6 7-11 14.5-19 13C2 70 2 55 5 40 8 24 16 14 30 14Z" fill="url(#hero-padg)" style="stroke:var(--line-2)" stroke-width="1.5"/>
+<path d="M34 30v18M25 39h18" style="stroke:var(--navy-900)" stroke-width="6" stroke-linecap="round"/>
+<circle cx="84" cy="31" r="4.6" style="fill:var(--navy-900)"/><circle cx="95" cy="40" r="4.6" style="fill:var(--navy-900)"/><circle cx="73" cy="40" r="4.6" style="fill:var(--navy-900)"/><circle cx="84" cy="49" r="4.6" style="fill:var(--navy-900)"/></svg></span>
+            <span class="game-card__txt">
+              <span class="badge badge--sun">Game Interaktif</span>
+              <strong>Festival 1 Kata</strong>
+              <small>Rangkai kata terbaikmu, dan jadilah yang terhebat!</small>
+              <span class="btn btn--dark btn--sm game-card__btn" aria-hidden="true"><svg><use href="#i-play"/></svg>Main Sekarang<svg><use href="#i-arrow"/></svg></span>
+            </span>
+            <span class="game-card__kata" aria-hidden="true"><i>Maju</i><i>Satu Kata</i><i>Bersama</i><i>Indonesia</i><i>Untuk</i></span>
+            <span class="game-card__go" aria-hidden="true"><svg><use href="#i-chevron-right"/></svg></span>
           </a>
-          <a class="hero__klaim" href="#delegasi" data-fase="pasca">Lihat <strong>daftar finalis</strong><svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
-          <a class="btn btn--cta btn--hero" href="#satu-kata" data-fase="pra">
-            <span class="btn__icon"><svg aria-hidden="true"><use href="#i-chat"/></svg></span>
-            <span>Masuk Festival Satu Kata<small>Kirim 1 kata, temukan dirimu</small></span>
-            <svg class="btn__arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
-          </a>
-          <p class="hero__script" aria-hidden="true" data-fase="pra">Bersama kita bisa!</p>
-        </div>
 
-        <div class="countdown-card" aria-labelledby="countdown-title">
-          <div data-fase="pasca">
-            <p class="countdown-card__head" id="cd2-head"><svg aria-hidden="true"><use href="#i-pin"/></svg><span id="cd2-judul">Menuju keberangkatan ke Bali</span></p>
-            <p class="countdown-card__when" id="cd2-when">Rabu, 23 Desember 2026 · 08.00 WIB</p>
-            <div class="countdown" id="cd2" aria-hidden="true">
-              <div class="countdown__unit"><span class="countdown__num" data-unit2="d">--</span><span class="countdown__label">Hari</span></div>
-              <div class="countdown__unit"><span class="countdown__num" data-unit2="h">--</span><span class="countdown__label">Jam</span></div>
-              <div class="countdown__unit"><span class="countdown__num" data-unit2="m">--</span><span class="countdown__label">Menit</span></div>
-              <div class="countdown__unit"><span class="countdown__num" data-unit2="s">--</span><span class="countdown__label">Detik</span></div>
+          <div class="card info-acara countdown-card" id="info-acara" aria-labelledby="info-acara-title">
+            <div class="info-acara__kiri">
+              <p class="info-acara__head" id="info-acara-title"><svg aria-hidden="true"><use href="#i-calendar"/></svg>Informasi Acara</p>
+              <p class="info-acara__tgl" id="acara-tanggal">23 Des –<br>2 Jan 2027</p>
+              <p class="info-acara__lok"><svg aria-hidden="true"><use href="#i-pin"/></svg>Bali, Indonesia</p>
             </div>
-            <p class="countdown-card__released" id="cd2-selesai" hidden>Terima kasih sudah menjadi bagian dari Youth Character Summit 2026!</p>
-            <p class="visually-hidden" id="cd2-sr" aria-live="off"></p>
-            <div class="countdown-actions">
-              <button class="btn btn--primary btn--sm" type="button" id="cd2-ingat"><svg aria-hidden="true"><use href="#i-bell"/></svg><span>Ingatkan saya</span></button>
-              <button class="btn btn--soft btn--sm" type="button" data-share-open="pasca"><svg aria-hidden="true"><use href="#i-share"/></svg>Bagikan</button>
+            <div class="info-acara__kanan">
+              <div data-fase="pasca">
+                <p class="countdown-card__head" id="cd2-head"><span id="cd2-judul">Menuju YCS 2026</span></p>
+                <p class="countdown-card__when visually-hidden" id="cd2-when">Rabu, 23 Desember 2026 · 08.00 WIB</p>
+                <div class="countdown" id="cd2" aria-hidden="true">
+                  <div class="countdown__unit"><span class="countdown__num" data-unit2="d">--</span><span class="countdown__label">Hari</span></div>
+                  <div class="countdown__unit"><span class="countdown__num" data-unit2="h">--</span><span class="countdown__label">Jam</span></div>
+                  <div class="countdown__unit"><span class="countdown__num" data-unit2="m">--</span><span class="countdown__label">Menit</span></div>
+                  <div class="countdown__unit"><span class="countdown__num" data-unit2="s">--</span><span class="countdown__label">Detik</span></div>
+                </div>
+                <p class="countdown-card__released" id="cd2-selesai" hidden>Terima kasih sudah menjadi bagian dari Youth Character Summit 2026!</p>
+                <p class="visually-hidden" id="cd2-sr" aria-live="off"></p>
+                <div class="countdown-actions">
+                  <button class="btn btn--soft btn--sm" type="button" id="cd2-ingat"><svg aria-hidden="true"><use href="#i-bell"/></svg><span>Ingatkan saya</span></button>
+                  <button class="btn btn--soft btn--sm" type="button" data-share-open="pasca"><svg aria-hidden="true"><use href="#i-share"/></svg>Bagikan</button>
+                </div>
+              </div>
+              <div data-fase="pra">
+                <p class="countdown-card__head" id="countdown-title">Menuju pengumuman finalis</p>
+                <p class="countdown-card__when visually-hidden" data-umum-teks>Senin, 16 November 2026 · 19.00 WIB</p>
+                <div class="countdown" data-countdown="2026-11-16T19:00:00+07:00" aria-hidden="true">
+                  <div class="countdown__unit"><span class="countdown__num" data-unit="d">--</span><span class="countdown__label">Hari</span></div>
+                  <div class="countdown__unit"><span class="countdown__num" data-unit="h">--</span><span class="countdown__label">Jam</span></div>
+                  <div class="countdown__unit"><span class="countdown__num" data-unit="m">--</span><span class="countdown__label">Menit</span></div>
+                  <div class="countdown__unit"><span class="countdown__num" data-unit="s">--</span><span class="countdown__label">Detik</span></div>
+                </div>
+                <p class="visually-hidden" id="countdown-sr">Pengumuman 100 finalis pada Senin, 16 November 2026 pukul 19.00 WIB.</p>
+                <div class="countdown-wait" id="cd-wait" role="status" hidden><span class="spinner" aria-hidden="true"></span><span id="cd-wait-text">Waktunya tiba! Membuka daftar finalis…</span></div>
+                <div class="countdown-actions">
+                  <button class="btn btn--soft btn--sm" type="button" data-remind><svg aria-hidden="true"><use href="#i-bell"/></svg><span>Ingatkan saya</span></button>
+                  <button class="btn btn--soft btn--sm" type="button" data-share-open="pra"><svg aria-hidden="true"><use href="#i-share"/></svg>Bagikan</button>
+                </div>
+              </div>
             </div>
           </div>
-          <div data-fase="pra">
-          <p class="countdown-card__head" id="countdown-title">
-            <svg aria-hidden="true"><use href="#i-megaphone"/></svg>
-            Menuju pengumuman 100 finalis
-          </p>
-          <p class="countdown-card__when" data-umum-teks>Senin, 16 November 2026 · 19.00 WIB</p>
-          <div class="countdown" data-countdown="2026-11-16T19:00:00+07:00" aria-hidden="true">
-            <div class="countdown__unit"><span class="countdown__num" data-unit="d">--</span><span class="countdown__label">Hari</span></div>
-            <div class="countdown__unit"><span class="countdown__num" data-unit="h">--</span><span class="countdown__label">Jam</span></div>
-            <div class="countdown__unit"><span class="countdown__num" data-unit="m">--</span><span class="countdown__label">Menit</span></div>
-            <div class="countdown__unit"><span class="countdown__num" data-unit="s">--</span><span class="countdown__label">Detik</span></div>
-          </div>
-          <p class="visually-hidden" id="countdown-sr">Pengumuman 100 finalis pada Senin, 16 November 2026 pukul 19.00 WIB.</p>
-          <div class="countdown-wait" id="cd-wait" role="status" hidden><span class="spinner" aria-hidden="true"></span><span id="cd-wait-text">Waktunya tiba! Membuka daftar finalis…</span></div>
-          <div class="countdown-actions">
-            <button class="btn btn--primary btn--sm" type="button" data-remind><svg aria-hidden="true"><use href="#i-bell"/></svg><span>Ingatkan saya</span></button>
-            <button class="btn btn--soft btn--sm" type="button" data-share-open="pra"><svg aria-hidden="true"><use href="#i-share"/></svg>Bagikan countdown</button>
-          </div>
-          </div>
-
         </div>
       </div>
-      <svg class="wave wave--bottom" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true"><path d="M0 46C180 78 360 10 560 30s380 50 560 26 240-46 320-34V80H0Z"/></svg>
     </section>
 
     <!-- ========== FESTIVAL SATU KATA (1 data = 1 warga; hasil terbuka setelah mengirim data + kata) ========== -->
@@ -1660,63 +1494,128 @@
       <div class="container">
         <div class="fest-head reveal">
           <div>
-            <span class="badge" style="background:#FFD86B;color:#5B0A16">#SatuKataUntukIndonesia</span><span class="fest-utama">Kampanye utama</span>
-            <h2 class="sec-title" id="sk-title" style="margin-top:.5rem">Festival <span class="scribble">Satu Kata</span></h2>
-            <p class="sec-sub">Satu orang, satu kata. Kirim data dan satu kata harapanmu, lalu masuklah ke Festival YCS di Bali: kamu hidup sebagai satu warga festival bersama ribuan pelajar se-Indonesia.</p>
+            <p class="fest-head__badges"><span class="badge badge--sun">Kampanye utama</span><span class="badge badge--soon">#SatuKataUntukIndonesia</span></p>
+            <h2 class="t-h1" id="sk-title">Festival Satu Kata</h2>
+            <p class="sec-sub">Satu orang, satu kata. Kirim satu kata harapanmu dan hiduplah sebagai warga festival bersama ribuan pelajar se-Indonesia.</p>
           </div>
-          <p class="fest-count"><strong id="fest-total">0</strong> warga festival</p>
         </div>
 
+        <div class="fest-grid">
         <div class="fest is-locked" id="fest">
           <div class="fest__stage">
             <canvas id="fest-canvas" role="img" aria-label="Ilustrasi Festival YCS di Bali. Setiap orang kecil adalah satu pelajar yang sudah mengirim kata."></canvas>
+            <p class="fest__online"><span class="dot" aria-hidden="true"></span><strong id="fest-total">0</strong> warga festival</p>
+            <button class="icon-btn fest__share" type="button" data-share-open="kata" aria-label="Ajak teman ke festival"><svg aria-hidden="true"><use href="#i-share"/></svg></button>
+            <p class="fest__kunci"><svg aria-hidden="true"><use href="#i-lock"/></svg>Gabung dulu untuk masuk plaza</p>
           </div>
           <div class="fest__alat" id="fest-alat">
+            <div class="sheet__grab" aria-hidden="true"></div>
             <form class="fest__cari" id="fest-cari" role="search">
-              <svg aria-hidden="true"><use href="#i-search"/></svg>
-              <label class="visually-hidden" for="fest-q">Cari nama di festival</label>
-              <input class="input" id="fest-q" type="search" placeholder="Cari namamu atau temanmu…" autocomplete="off" enterkeyhint="search">
-              <button class="btn btn--primary btn--sm" type="submit">Temukan</button>
+              <div class="input-wrap">
+                <svg aria-hidden="true"><use href="#i-search"/></svg>
+                <label class="visually-hidden" for="fest-q">Cari nama teman di festival</label>
+                <input class="input" id="fest-q" type="search" placeholder="Cari nama teman" autocomplete="off" enterkeyhint="search">
+              </div>
+              <button class="btn btn--primary" type="submit">Temukan</button>
             </form>
+            <div class="chips fest__chips" role="group" aria-label="Sorot warga">
+              <button class="chip" type="button" data-sorot="" aria-pressed="true">Semua</button>
+              <button class="chip" type="button" data-sorot="prov" aria-pressed="false">Provinsiku</button>
+              <button class="chip" type="button" data-sorot="kata" aria-pressed="false">Kata samaku</button>
+            </div>
             <div class="fest__aksi">
-              <button class="btn btn--soft btn--sm" type="button" id="fest-unduh"><svg aria-hidden="true"><use href="#i-download"/></svg>Unduh kartu</button>
-              <button class="btn btn--soft btn--sm" type="button" data-share-open="kata"><svg aria-hidden="true"><use href="#i-share"/></svg>Ajak teman</button>
+              <button class="btn btn--soft" type="button" id="fest-unduh"><svg aria-hidden="true"><use href="#i-download"/></svg>Unduh kartu</button>
+              <button class="btn btn--cta" type="button" data-share-open="kata"><svg aria-hidden="true"><use href="#i-users"/></svg>Ajak teman</button>
             </div>
             <p class="fest__info" id="fest-info" role="status"></p>
           </div>
 
-          <form class="fest__gerbang" id="fest-form" novalidate>
-            <h3><svg aria-hidden="true"><use href="#i-lock"/></svg>Festival masih terkunci</h3>
-            <p>Isi data, pilih karakter, lalu kirim satu kata harapan. Kamu akan muncul sebagai warga festival dan bisa menemukan namamu.</p>
-            <div class="fest__fields">
-              <div class="field field--wide"><label for="fk-nama">Nama</label><input class="input" id="fk-nama" required minlength="2" maxlength="60" autocomplete="name" placeholder="Contoh: Fauzan Rahman" aria-describedby="fk-nama-error"><p class="field__error" id="fk-nama-error"></p></div>
-              <div class="field field--wide"><label for="fk-sekolah">Sekolah</label><input class="input" id="fk-sekolah" required minlength="2" maxlength="100" placeholder="Contoh: SMAN 1 Semarang" aria-describedby="fk-sekolah-error"><p class="field__error" id="fk-sekolah-error"></p></div>
-              <div class="field"><label for="fk-prov">Provinsi</label><select class="select" id="fk-prov" required aria-describedby="fk-prov-error"><option value="">Pilih provinsi</option></select><p class="field__error" id="fk-prov-error"></p></div>
-              <div class="field"><label for="fk-email">Email atau No. WhatsApp</label><input class="input" type="text" id="fk-email" required maxlength="254" autocomplete="email" placeholder="nama@email.com atau 0812xxxx" aria-describedby="fk-email-error"><p class="field__error" id="fk-email-error"></p></div>
-              <div class="field field--wide"><label for="fk-kata">Satu kata harapanmu untuk Indonesia</label><input class="input fest__kata" id="fk-kata" required maxlength="20" placeholder="Contoh: sejahtera" autocomplete="off" autocapitalize="none" spellcheck="false" aria-describedby="fk-kata-error"><p class="field__error" id="fk-kata-error"></p></div>
+          <form class="fest__gerbang wizard" id="fest-form" novalidate data-langkah="1" aria-labelledby="fk-judul">
+            <div class="wizard__top">
+              <button class="icon-btn wizard__kembali" type="button" id="fk-kembali" aria-label="Kembali ke langkah sebelumnya" hidden><svg aria-hidden="true"><use href="#i-chevron-right"/></svg></button>
+              <h3 class="t-h3" id="fk-judul">Gabung Festival</h3>
+              <span class="wizard__no" id="fk-no" aria-live="polite">1/3</span>
             </div>
-            <a class="fest-wa" id="fk-wa" href="https://whatsapp.com/channel/0029Vb5vVIaId7nEqecJ1I1G" target="_blank" rel="noopener" data-saluran aria-describedby="fk-wa-error">
-              <span class="fest-wa__ico" aria-hidden="true"><svg><use href="#i-whatsapp"/></svg></span>
-              <span><small>Syarat wajib</small><strong>Ikuti Saluran WhatsApp YCS</strong><span id="fk-wa-state">Ketuk kartu ini, syarat langsung tercentang</span></span>
-              <span class="fest-wa__cek" aria-hidden="true"><svg><use href="#i-check"/></svg></span>
-            </a>
-            <p class="field__error" id="fk-wa-error"></p>
-            <fieldset class="karakter" id="fk-karakter-set" aria-describedby="fk-karakter-info fk-karakter-error">
-              <legend>Pilih karaktermu <span class="opt">(24 baju adat Nusantara · geser untuk melihat semua)</span></legend>
-              <p class="karakter__info" id="fk-karakter-info"><svg aria-hidden="true"><use href="#i-lock"/></svg><span>Lengkapi data di atas dan ketuk Saluran WhatsApp untuk membuka pilihan karakter.</span></p>
-              <div class="karakter__daftar" id="fk-karakter" role="radiogroup" aria-label="Karakter baju adat"></div>
-              <p class="karakter__saran" id="fk-karakter-saran" role="status"></p>
-              <p class="field__error" id="fk-karakter-error"></p>
+            <ol class="wizard__bar" aria-label="Langkah gabung">
+              <li data-bar="1" aria-current="step">Data diri</li>
+              <li data-bar="2">Kata &amp; karakter</li>
+              <li data-bar="3">Gabung</li>
+            </ol>
+
+            <fieldset class="wizard__step" data-step="1">
+              <legend class="t-h2" tabindex="-1">Kenalan dulu, yuk</legend>
+              <p class="t-body">Nama panggilan dan provinsimu tampil di festival. Email/nomor WA tidak pernah ditampilkan.</p>
+              <div class="fest__fields">
+                <div class="field field--wide"><label for="fk-nama">Nama</label><input class="input" id="fk-nama" required minlength="2" maxlength="60" autocomplete="name" placeholder="Contoh: Fauzan Rahman" aria-describedby="fk-nama-error"><p class="field-error" id="fk-nama-error"></p></div>
+                <div class="field field--wide"><label for="fk-sekolah">Sekolah</label><input class="input" id="fk-sekolah" required minlength="2" maxlength="100" placeholder="Contoh: SMAN 1 Semarang" aria-describedby="fk-sekolah-error"><p class="field-error" id="fk-sekolah-error"></p></div>
+                <div class="field"><label for="fk-prov">Provinsi</label><select class="select" id="fk-prov" required aria-describedby="fk-prov-error"><option value="">Pilih provinsi</option></select><p class="field-error" id="fk-prov-error"></p></div>
+                <div class="field"><label for="fk-email">Email atau No. WhatsApp</label><input class="input" type="text" id="fk-email" required maxlength="254" autocomplete="email" placeholder="nama@email.com atau 0812xxxx" aria-describedby="fk-email-error"><p class="field-error" id="fk-email-error"></p></div>
+              </div>
             </fieldset>
-            <label class="check" for="fk-setuju" style="margin-top:1rem">
-              <input type="checkbox" id="fk-setuju" required aria-describedby="fk-setuju-error">
-              <span>Saya setuju data disimpan panitia sesuai <a href="privasi/" target="_blank">Kebijakan Privasi</a>. Nama panggilan, provinsi, dan kataku tampil di festival; email tidak pernah ditampilkan. Jika di bawah 18 tahun, saya sudah mendapat izin orang tua/wali.</span>
-            </label>
-            <p class="field__error" id="fk-setuju-error"></p>
-            <div hidden><label for="fk-website">Website</label><input id="fk-website" tabindex="-1" autocomplete="off"></div>
-            <p class="dk-alert" id="fk-alert" role="alert"></p>
-            <button class="btn btn--cta btn--block" type="submit" id="fk-kirim" style="margin-top:1rem">Kirim &amp; masuk festival <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+
+            <fieldset class="wizard__step" data-step="2" hidden>
+              <legend class="t-h2" tabindex="-1">Satu kata buat Indonesia</legend>
+              <p class="t-body">Kata ini akan muncul di atas kepala karaktermu. Pilih yang paling kamu banget.</p>
+              <div class="field">
+                <label for="fk-kata">Kata harapanmu</label>
+                <div class="kata-wrap"><input class="input fest__kata" id="fk-kata" required maxlength="20" placeholder="Contoh: sejahtera" autocomplete="off" autocapitalize="none" spellcheck="false" aria-describedby="fk-kata-hint fk-kata-error"><span class="kata-wrap__n" id="fk-kata-n" aria-hidden="true">0/20</span></div>
+                <p class="field-hint" id="fk-kata-hint">1 kata saja, tanpa spasi. Kata kasar otomatis ditolak.</p>
+                <p class="field-error" id="fk-kata-error"></p>
+              </div>
+              <div class="kata-ramai" id="fk-ramai-wrap" hidden>
+                <p class="t-sm">Lagi ramai:</p>
+                <div class="chips" id="fk-ramai"></div>
+              </div>
+              <fieldset class="karakter" id="fk-karakter-set" aria-describedby="fk-karakter-info fk-karakter-error">
+                <legend class="karakter__head"><span class="t-h3">Pilih karakter adat</span><span class="karakter__saran" id="fk-karakter-saran" role="status"></span></legend>
+                <p class="karakter__info" id="fk-karakter-info"><svg aria-hidden="true"><use href="#i-lock"/></svg><span>Lengkapi data diri dulu untuk memilih karakter.</span></p>
+                <div class="karakter__daftar" id="fk-karakter" role="radiogroup" aria-label="Karakter baju adat"></div>
+                <button class="karakter__semua" type="button" id="fk-karakter-semua" aria-expanded="false" aria-controls="fk-karakter">Lihat 24 karakter<svg aria-hidden="true"><use href="#i-chevron-down"/></svg></button>
+                <p class="field-error" id="fk-karakter-error"></p>
+              </fieldset>
+            </fieldset>
+
+            <fieldset class="wizard__step" data-step="3" hidden>
+              <legend class="t-h2" tabindex="-1">Satu langkah lagi</legend>
+              <p class="t-body">Ikuti saluran WhatsApp YCS: kode Dana Kaget dan info live keluar di sana duluan.</p>
+              <a class="fest-wa" id="fk-wa" href="https://whatsapp.com/channel/0029Vb5vVIaId7nEqecJ1I1G" target="_blank" rel="noopener" data-saluran aria-describedby="fk-wa-error">
+                <span class="fest-wa__ico" aria-hidden="true"><svg><use href="#i-whatsapp"/></svg></span>
+                <span><small>Syarat wajib</small><strong>Ikuti Saluran WhatsApp YCS</strong><span id="fk-wa-state">Ketuk kartu ini, syarat langsung tercentang</span></span>
+                <span class="fest-wa__cek" aria-hidden="true"><svg><use href="#i-check"/></svg></span>
+              </a>
+              <p class="field-error" id="fk-wa-error"></p>
+              <label class="check" for="fk-setuju">
+                <input type="checkbox" id="fk-setuju" required aria-describedby="fk-setuju-error">
+                <span>Saya setuju data disimpan panitia sesuai <a href="privasi/" target="_blank">Kebijakan Privasi</a>. Nama panggilan, provinsi, dan kataku tampil di festival; email tidak pernah ditampilkan. Jika di bawah 18 tahun, saya sudah mendapat izin orang tua/wali.</span>
+              </label>
+              <p class="field-error" id="fk-setuju-error"></p>
+              <div hidden><label for="fk-website">Website</label><input id="fk-website" tabindex="-1" autocomplete="off"></div>
+            </fieldset>
+
+            <p class="alert alert--error" id="fk-alert" role="alert"></p>
+            <div class="wizard__aksi">
+              <button class="btn btn--primary btn--lg btn--block" type="button" id="fk-lanjut">Lanjut<svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+              <button class="btn btn--primary btn--lg btn--block" type="submit" id="fk-kirim" hidden>Gabung festival<svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+            </div>
           </form>
+        </div>
+        <aside class="fest-samping" aria-label="Ringkasan festival">
+          <div class="card fest-samping__kartu">
+            <p class="fest-samping__judul">Warga festival <span class="badge badge--open" id="fs-terdaftar" hidden><svg aria-hidden="true"><use href="#i-check"/></svg>Kamu terdaftar</span></p>
+            <p class="fest-samping__angka" id="fs-total">0</p>
+            <p class="t-sm" id="fs-prov">pelajar se-Indonesia</p>
+          </div>
+          <div class="card fest-samping__kartu">
+            <p class="fest-samping__judul">Kata terpopuler</p>
+            <div class="chips fest-samping__kata" id="fs-kata"><span class="skeleton fs-skel"></span></div>
+          </div>
+          <div class="fest-samping__monster">
+            <span class="badge badge--game">Pra-live</span>
+            <p class="t-h3">Lawan Monster, dapat tiket spin</p>
+            <p class="t-sm">Monster muncul sebelum live. Tap bareng, hindari jurusnya, kumpulkan tiket undian.</p>
+            <a class="btn btn--light btn--sm" href="#live"><svg aria-hidden="true"><use href="#i-calendar"/></svg>Lihat jadwal live</a>
+          </div>
+        </aside>
         </div>
         <!-- Pemenang undian spin Lawan Monster (dari /api/pemenang) -->
         <div class="juara" id="pemenang" aria-labelledby="juara-title">
@@ -1971,6 +1870,15 @@
             </div>
             <button class="btn btn--soft btn--sm" type="button" data-share-open="daftar"><svg aria-hidden="true"><use href="#i-share"/></svg>Bagikan daftar</button>
           </div>
+          <div class="stage finalis__stage" data-fase="pasca" role="region" aria-roledescription="carousel" aria-label="Kartu finalis YCS 2026">
+            <div class="stage__deck" id="stage-deck"></div>
+            <div class="stage__controls" id="stage-controls" hidden>
+              <button class="stage__btn stage__btn--prev" type="button" id="stage-prev" aria-label="Finalis sebelumnya"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+              <span class="stage__count" id="stage-count" aria-live="off"></span>
+              <button class="stage__btn" type="button" id="stage-toggle" aria-pressed="false" aria-label="Jeda pergantian kartu"><svg aria-hidden="true"><use href="#i-pause"/></svg></button>
+              <button class="stage__btn" type="button" id="stage-next" aria-label="Finalis berikutnya"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+            </div>
+          </div>
           <div class="finalis__tools">
             <div class="search">
               <label class="visually-hidden" for="dl-search">Cari finalis berdasarkan nama, sekolah, atau daerah</label>
@@ -2200,20 +2108,76 @@
   </footer>
 
   <!-- ========== ACTION BAR ========== -->
-  <div class="orb-backdrop" id="orb-backdrop" hidden></div>
-  <nav class="orb" id="orb" aria-label="Menu cepat">
-    <span class="orb__hint" aria-hidden="true">Menu cepat</span>
-    <ul class="orb__menu" id="orb-menu">
-      <li class="orb__item orb__item--tw"><a class="orb__link" href="#satu-kata" tabindex="-1"><svg aria-hidden="true"><use href="#i-chat"/></svg><span class="orb__label">Satu Kata<small>Masuk festival</small></span></a></li>
-      <li class="orb__item orb__item--live"><a class="orb__link" href="#live" id="orb-live" tabindex="-1"><svg aria-hidden="true"><use href="#i-play"/></svg><span class="orb__label">Tonton Live<small id="orb-live-sub">Jadwal siaran</small></span></a></li>
-      <li class="orb__item orb__item--dana"><a class="orb__link" href="#dana" tabindex="-1"><svg aria-hidden="true"><use href="#i-gift"/></svg><span class="orb__label">Klaim Dana Kaget<small id="orb-dana-sub">Pakai kode akses</small></span></a></li>
-      <li class="orb__item orb__item--wild"><a class="orb__link" href="klaim/" tabindex="-1"><svg aria-hidden="true"><use href="#i-ticket"/></svg><span class="orb__label">Klaim Wildcard<small id="orb-wild-sub">Untuk yang belum lolos</small></span></a></li>
+  <!-- ========== BOTTOM NAV seluler (5 item, design system) ========== -->
+  <nav class="tabbar-wrap" aria-label="Navigasi bawah">
+    <ul class="tabbar" id="tabbar">
+      <li><a href="#beranda" data-tab="beranda"><span class="pill"><svg aria-hidden="true"><use href="#i-home"/></svg></span>Beranda</a></li>
+      <li><a href="#satu-kata" data-tab="satu-kata"><span class="pill"><svg aria-hidden="true"><use href="#i-chat"/></svg></span>Festival</a></li>
+      <li><a href="#live" data-tab="live"><span class="pill"><svg aria-hidden="true"><use href="#i-live"/></svg></span>Live</a></li>
+      <li><a href="#delegasi" data-tab="delegasi"><span class="pill"><svg aria-hidden="true"><use href="#i-users"/></svg></span>Finalis</a></li>
+      <li><button type="button" data-lainnya-open aria-haspopup="dialog" aria-expanded="false" aria-controls="lainnya"><span class="pill"><svg aria-hidden="true"><use href="#i-grid"/></svg></span>Lainnya</button></li>
     </ul>
-    <button class="orb__core" type="button" id="orb-core" aria-expanded="false" aria-controls="orb-menu" aria-label="Buka menu cepat: Satu Kata, Tonton Live, Klaim Dana Kaget, Klaim Wildcard">
-      <svg class="orb__bolt" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M13.2 2.5 5 13.2h5.6L9.8 21.5 18 10.8h-5.6l.8-8.3Z"/></svg>
-      <svg class="orb__x" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></svg>
-    </button>
   </nav>
+
+  <!-- ========== SUKSES GABUNG + KARTU (m04) ========== -->
+  <dialog class="sukses" id="fest-sukses" aria-labelledby="sukses-title">
+    <button class="icon-btn sukses__tutup" type="button" data-sukses-tutup aria-label="Tutup"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+    <p class="badge badge--sun sukses__badge"><svg aria-hidden="true"><use href="#i-check"/></svg>Kamu resmi jadi warga!</p>
+    <h2 class="sukses__judul" id="sukses-title">Selamat datang di Festival Satu Kata</h2>
+    <div class="kartu-warga" id="kartu-warga">
+      <div class="kartu-warga__latar"><span class="kartu-warga__orang" id="kw-orang"></span></div>
+      <p class="kartu-warga__over">Aku bagian dari Festival 1 Kata</p>
+      <p class="kartu-warga__kata" id="kw-kata"></p>
+      <div class="kartu-warga__kaki">
+        <p><strong id="kw-nama"></strong><small id="kw-prov"></small></p>
+        <img src="assets/img/festival/qr-festival.png" width="64" height="64" alt="Kode QR menuju Festival 1 Kata" loading="lazy">
+      </div>
+    </div>
+    <div class="sukses__aksi">
+      <button class="btn btn--cta btn--lg btn--block" type="button" id="sukses-ajak"><svg aria-hidden="true"><use href="#i-share"/></svg>Ajak teman</button>
+      <button class="btn btn--light btn--lg" type="button" id="sukses-unduh"><svg aria-hidden="true"><use href="#i-download"/></svg>Unduh kartu</button>
+      <button class="btn btn--lg sukses__plaza" type="button" data-sukses-tutup>Lihat plaza</button>
+    </div>
+  </dialog>
+
+  <!-- ========== LAINNYA (m10) ========== -->
+  <dialog class="sheet lainnya" id="lainnya" aria-labelledby="lainnya-title">
+    <div class="sheet__grab" aria-hidden="true"></div>
+    <div class="sheet__head">
+      <h2 class="t-h1" id="lainnya-title">Lainnya</h2>
+      <div class="lainnya__tools">
+        <button class="icon-btn theme-toggle" type="button" aria-label="Mode gelap" aria-pressed="false">
+          <svg class="icon-moon" aria-hidden="true"><use href="#i-moon"/></svg>
+          <svg class="icon-sun" aria-hidden="true"><use href="#i-sun"/></svg>
+        </button>
+        <button class="icon-btn" type="button" data-lainnya-close aria-label="Tutup menu"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+      </div>
+    </div>
+    <ul class="menu-list">
+      <li><button type="button" class="lainnya__kode" data-kode-open><span class="ico ico--wildcard"><svg aria-hidden="true"><use href="#i-key"/></svg></span><span class="menu-list__txt"><strong>Punya kode?</strong><small>Kode wildcard dari email atau kode Dana Kaget</small></span><svg class="menu-list__go" aria-hidden="true"><use href="#i-chevron-right"/></svg></button></li>
+      <li><a href="#dana"><span class="ico ico--dana"><svg aria-hidden="true"><use href="#i-gift"/></svg></span><span class="menu-list__txt"><strong>Dana Kaget</strong><small id="lain-dana-sub">Klaim pakai kode akses</small></span><span class="badge badge--open" id="lain-dana-badge" hidden>Buka</span><svg class="menu-list__go" aria-hidden="true"><use href="#i-chevron-right"/></svg></a></li>
+      <li><a href="klaim/"><span class="ico ico--wildcard"><svg aria-hidden="true"><use href="#i-ticket"/></svg></span><span class="menu-list__txt"><strong>Tiket Wildcard</strong><small id="lain-wild-sub">Untuk yang belum lolos</small></span><svg class="menu-list__go" aria-hidden="true"><use href="#i-chevron-right"/></svg></a></li>
+      <li><a href="#road-to-bali"><span class="ico ico--road"><svg aria-hidden="true"><use href="#i-bus"/></svg></span><span class="menu-list__txt"><strong>Road to Bali</strong><small id="lain-road-sub">Dukungan menuju Bali</small></span><svg class="menu-list__go" aria-hidden="true"><use href="#i-chevron-right"/></svg></a></li>
+      <li><a href="#leaderboard"><span class="ico ico--road"><svg aria-hidden="true"><use href="#i-trophy"/></svg></span><span class="menu-list__txt"><strong>Leaderboard</strong><small>Provinsi dan sekolah teraktif</small></span><svg class="menu-list__go" aria-hidden="true"><use href="#i-chevron-right"/></svg></a></li>
+      <li><a href="survei/"><span class="ico ico--survei"><svg aria-hidden="true"><use href="#i-compass"/></svg></span><span class="menu-list__txt"><strong>Survei destinasi</strong><small>1 menit · Ke mana YCS berikutnya?</small></span><svg class="menu-list__go" aria-hidden="true"><use href="#i-chevron-right"/></svg></a></li>
+    </ul>
+    <p class="t-over lainnya__label">Tentang YCS</p>
+    <ul class="menu-list">
+      <li><a href="#jejak"><span class="ico ico--road"><svg aria-hidden="true"><use href="#i-map"/></svg></span><span class="menu-list__txt"><strong>Jejak Bali 2025</strong><small>Galeri perjalanan sebelumnya</small></span><svg class="menu-list__go" aria-hidden="true"><use href="#i-chevron-right"/></svg></a></li>
+      <li><a href="#faq"><span class="ico ico--faq"><svg aria-hidden="true"><use href="#i-help"/></svg></span><span class="menu-list__txt"><strong>FAQ &amp; syarat delegasi</strong><small>Gratis? Siapa yang bisa ikut?</small></span><svg class="menu-list__go" aria-hidden="true"><use href="#i-chevron-right"/></svg></a></li>
+      <li><a href="privasi/"><span class="ico ico--privasi"><svg aria-hidden="true"><use href="#i-shield"/></svg></span><span class="menu-list__txt"><strong>Kebijakan privasi</strong><small>Data apa yang kami simpan</small></span><svg class="menu-list__go" aria-hidden="true"><use href="#i-chevron-right"/></svg></a></li>
+    </ul>
+    <a class="wa-card" href="https://whatsapp.com/channel/0029Vb5vVIaId7nEqecJ1I1G" target="_blank" rel="noopener" data-saluran>
+      <span class="wa-card__ico" aria-hidden="true"><svg><use href="#i-whatsapp"/></svg></span>
+      <span class="wa-card__txt"><strong>Saluran WhatsApp YCS</strong><small>Kode Dana Kaget keluar di sini duluan</small></span>
+      <span class="wa-card__btn">Ikuti</span>
+    </a>
+    <div class="lainnya__sosmed">
+      <a class="icon-btn" href="https://www.instagram.com/universitasstekom" target="_blank" rel="noopener" aria-label="Instagram (tab baru)"><svg aria-hidden="true"><use href="#i-instagram"/></svg></a>
+      <a class="icon-btn" href="https://www.tiktok.com/@universitasstekom" target="_blank" rel="noopener" aria-label="TikTok (tab baru)"><svg aria-hidden="true"><use href="#i-tiktok"/></svg></a>
+      <a class="icon-btn" href="https://www.youtube.com/@universitasstekom" target="_blank" rel="noopener" aria-label="YouTube (tab baru)"><svg aria-hidden="true"><use href="#i-youtube"/></svg></a>
+    </div>
+  </dialog>
 
   <dialog class="info-pop" id="info-pop" aria-labelledby="info-pop-title">
     <a id="info-pop-img-link" href="#" tabindex="-1" aria-hidden="true"><img class="info-pop__img" id="info-pop-img" alt="" width="800" height="450" hidden></a>
@@ -2229,20 +2193,25 @@
     <button class="icon-btn info-pop__close" type="button" data-pop-close aria-label="Tutup informasi"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></svg></button>
   </dialog>
 
-  <dialog class="kode-dialog" id="kode-dialog" aria-labelledby="kode-title">
+  <dialog class="sheet kode-dialog" id="kode-dialog" aria-labelledby="kode-title">
+    <div class="sheet__grab" aria-hidden="true"></div>
     <form id="kode-form" novalidate>
-      <span class="kode-dialog__icon" aria-hidden="true"><svg><use href="#i-key"/></svg></span>
-      <h2 id="kode-title">Masukkan kodemu</h2>
-      <p class="kode-dialog__sub">Tempel kode dari email panitia atau kode akses Dana Kaget. Kami arahkan ke halaman yang tepat.</p>
-      <label class="visually-hidden" for="kode-input">Kode</label>
-      <input class="input kode-dialog__input" id="kode-input" maxlength="40" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false" placeholder="Contoh: AB12CD34" aria-describedby="kode-error">
-      <p class="field__error" id="kode-error" role="alert"></p>
-      <button class="btn btn--cta btn--block" type="submit">Lanjut <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
-      <div class="kode-dialog__alt">
-        <a href="klaim/"><svg aria-hidden="true"><use href="#i-ticket"/></svg><span><strong>Kode wildcard</strong><small>8 karakter, dari email</small></span></a>
-        <a href="dana-kaget/"><svg aria-hidden="true"><use href="#i-gift"/></svg><span><strong>Kode Dana Kaget</strong><small>Dari live / saluran WA</small></span></a>
+      <div class="sheet__head">
+        <h2 class="t-h1" id="kode-title">Punya kode?</h2>
+        <button class="icon-btn kode-dialog__close" type="button" data-kode-close aria-label="Tutup"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
       </div>
-      <button class="icon-btn kode-dialog__close" type="button" data-kode-close aria-label="Tutup"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <p class="t-body kode-dialog__sub">Ketik kode dari live, WhatsApp, atau email. Kami arahkan ke tempat yang tepat.</p>
+      <label class="visually-hidden" for="kode-input">Kode</label>
+      <div class="kode-kotak">
+        <input class="kode-dialog__input" id="kode-input" maxlength="40" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false" placeholder="YCS-XXXXX" aria-describedby="kode-error kode-jenis">
+        <div class="kode-kotak__isi" id="kode-kotak" aria-hidden="true"></div>
+      </div>
+      <p class="field-error" id="kode-error" role="alert"></p>
+      <ul class="kode-jenis" id="kode-jenis">
+        <li data-jenis="dana"><a href="dana-kaget/"><span class="ico ico--dana"><svg aria-hidden="true"><use href="#i-gift"/></svg></span><span class="menu-list__txt"><strong>YCS-XXXXX</strong><small>Kode Dana Kaget</small></span><span class="badge badge--open" hidden>Cocok</span></a></li>
+        <li data-jenis="wild"><a href="klaim/"><span class="ico ico--wildcard"><svg aria-hidden="true"><use href="#i-ticket"/></svg></span><span class="menu-list__txt"><strong>8 karakter</strong><small>Tiket wildcard dari email</small></span><span class="badge badge--open" hidden>Cocok</span></a></li>
+      </ul>
+      <button class="btn btn--primary btn--lg btn--block" type="submit"><span id="kode-lanjut">Lanjut</span><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
     </form>
   </dialog>
 
@@ -2302,32 +2271,35 @@
       toastTimer = setTimeout(() => toastEl.classList.remove('is-visible'), 3200);
     }
 
-    /* ---------- Tema ---------- */
-    const themeBtn = $('.theme-toggle');
-    themeBtn.hidden = false;
+    /* ---------- Tema (tombol bulat di header desktop + di menu Lainnya) ---------- */
+    const themeBtns = $$('.theme-toggle');
+    themeBtns.forEach((b) => { b.hidden = false; });
     const isDark = () => doc.dataset.theme ? doc.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
-    const syncTheme = () => themeBtn.setAttribute('aria-pressed', String(isDark()));
+    const syncTheme = () => themeBtns.forEach((b) => {
+      b.setAttribute('aria-pressed', String(isDark()));
+      b.setAttribute('aria-label', isDark() ? 'Mode terang' : 'Mode gelap');
+    });
     syncTheme();
-    themeBtn.addEventListener('click', () => {
+    themeBtns.forEach((b) => b.addEventListener('click', () => {
       const next = isDark() ? 'light' : 'dark';
       doc.dataset.theme = next;
       try { localStorage.setItem('ycs-theme', next); } catch (e) {}
       syncTheme();
-    });
+    }));
 
-    /* ---------- Menu seluler ---------- */
-    const menuBtn = $('.menu-toggle');
-    const mobileNav = $('#mobile-nav');
-    menuBtn.hidden = false;
+    /* ---------- Menu Lainnya (m10): tombol menu di header + tab Lainnya ---------- */
+    const lainnya = $('#lainnya');
+    const lainnyaBtns = $$('.menu-toggle, [data-lainnya-open]');
+    const syncMenuBtn = () => lainnyaBtns.forEach((b) => b.setAttribute('aria-expanded', String(lainnya.open)));
     const setMenu = (open) => {
-      menuBtn.setAttribute('aria-expanded', String(open));
-      menuBtn.setAttribute('aria-label', open ? 'Tutup menu' : 'Buka menu');
-      mobileNav.hidden = !open;
+      if (open && !lainnya.open) { if (lainnya.showModal) lainnya.showModal(); else lainnya.setAttribute('open', ''); }
+      if (!open && lainnya.open) lainnya.close();
+      syncMenuBtn();
     };
-    menuBtn.addEventListener('click', () => setMenu(menuBtn.getAttribute('aria-expanded') !== 'true'));
-    mobileNav.addEventListener('click', (e) => { if (e.target.closest('a')) setMenu(false); });
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && menuBtn.getAttribute('aria-expanded') === 'true') { setMenu(false); menuBtn.focus(); }
+    lainnyaBtns.forEach((b) => b.addEventListener('click', () => setMenu(true)));
+    lainnya.addEventListener('close', syncMenuBtn);
+    lainnya.addEventListener('click', (e) => {
+      if (e.target === lainnya || e.target.closest('[data-lainnya-close]') || e.target.closest('a')) setMenu(false);
     });
 
     /* ---------- Dialog "Punya kode?" ---------- */
@@ -2340,6 +2312,26 @@
       $('#kode-input').focus();
     }));
     $('[data-kode-close]').addEventListener('click', () => kodeDlg.close());
+    // Tampilan kotak per karakter (m09) dari satu input sungguhan; jenis kode ditandai "Cocok" saat diketik.
+    const kodeIn = $('#kode-input'), kodeKotak = $('#kode-kotak');
+    function jenisKode(v) {
+      const m = v.trim().toUpperCase(), b = m.replace(/[^A-Z0-9]/g, '');
+      if (/^YCS-?[A-Z0-9]{0,5}$/.test(m) && m.length >= 3) return 'dana';
+      if (b.length === 8 && !/^YCS/.test(m)) return 'wild';
+      return '';
+    }
+    function syncKode() {
+      const v = kodeIn.value.toUpperCase();
+      const n = Math.max(9, Math.min(v.length + 1, 12));
+      const aktif = document.activeElement === kodeIn ? Math.min(v.length, n - 1) : -1;
+      kodeKotak.innerHTML = Array.from({ length: n }, (_, i) => `<span class="${i === aktif ? 'is-aktif' : ''}">${v[i] ? v[i].replace(/[<&]/g, '') : ''}</span>`).join('');
+      const j = jenisKode(v);
+      $$('#kode-jenis li').forEach((li) => { li.querySelector('.badge').hidden = li.dataset.jenis !== j; li.classList.toggle('is-cocok', li.dataset.jenis === j); });
+      $('#kode-lanjut').textContent = j === 'dana' ? 'Lanjut ke Dana Kaget' : j === 'wild' ? 'Lanjut ke klaim wildcard' : 'Lanjut';
+    }
+    ['input', 'focus', 'blur'].forEach((ev) => kodeIn.addEventListener(ev, syncKode));
+    kodeDlg.addEventListener('close', () => { kodeIn.value = ''; syncKode(); });
+    syncKode();
     kodeDlg.addEventListener('click', (e) => { if (e.target === kodeDlg) kodeDlg.close(); });
     $('#kode-form').addEventListener('submit', (e) => {
       e.preventDefault();
@@ -2351,14 +2343,47 @@
       location.href = 'klaim/?kode=' + encodeURIComponent(bersih);
     });
 
-    /* ---------- Scrollspy ---------- */
-    const navLinks = $$('.nav__link, .mobile-nav a');
-    const spyIds = ['live', 'dana', 'satu-kata', 'road-to-bali', 'delegasi', 'faq'];
+    /* ---------- Carousel hero (3 titik): geser/scroll-snap, titik bisa diklik, ganti otomatis bila gerak tidak dibatasi ---------- */
+    (() => {
+      const track = $('#hero-track'), dots = $$('#hero-dots button'), slides = $$('.hero__slide', track);
+      let idx = 0, timer = 0, jeda = false;
+      const ke = (i, halus = true) => {
+        idx = (i + slides.length) % slides.length;
+        track.scrollTo({ left: slides[idx].offsetLeft - track.offsetLeft, behavior: halus && !reduceMotion ? 'smooth' : 'auto' });
+      };
+      const tandai = (i) => {
+        idx = i;
+        dots.forEach((d, j) => d.toggleAttribute('aria-current', j === i));
+        slides.forEach((sl, j) => { sl.inert = j !== i; });
+      };
+      tandai(0);
+      dots.forEach((d, i) => d.addEventListener('click', () => { jeda = true; ke(i); }));
+      if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting && e.intersectionRatio > .6) tandai(slides.indexOf(e.target)); }), { root: track, threshold: [.6, .9] });
+        slides.forEach((sl) => io.observe(sl));
+      }
+      const mulai = () => { clearInterval(timer); if (!reduceMotion) timer = setInterval(() => { if (!jeda && !document.hidden) ke(idx + 1); }, 6500); };
+      ['pointerenter', 'focusin', 'touchstart'].forEach((ev) => track.parentElement.addEventListener(ev, () => { jeda = true; }, { passive: true }));
+      track.parentElement.addEventListener('pointerleave', () => { jeda = false; });
+      mulai();
+    })();
+
+    /* ---------- Scrollspy: nav pil desktop + bottom nav ---------- */
+    const navLinks = $$('.nav__link');
+    const tabLinks = $$('#tabbar a[data-tab]');
+    const spyIds = ['beranda', 'satu-kata', 'live', 'dana', 'road', 'delegasi', 'jejak', 'faq'];
     const spyTargets = spyIds.map((id) => document.getElementById(id)).filter(Boolean);
-    const setCurrent = (id) => navLinks.forEach((a) => {
-      if (a.getAttribute('href') === '#' + id) a.setAttribute('aria-current', 'true');
-      else a.removeAttribute('aria-current');
-    });
+    const setCurrent = (id) => {
+      navLinks.forEach((a) => {
+        if (a.getAttribute('href') === '#' + id) a.setAttribute('aria-current', 'true');
+        else a.removeAttribute('aria-current');
+      });
+      tabLinks.forEach((a) => {
+        if (a.dataset.tab === id) a.setAttribute('aria-current', 'page');
+        else a.removeAttribute('aria-current');
+      });
+    };
+    setCurrent('beranda');
     const spy = new IntersectionObserver((entries) => {
       const visible = entries.filter((e) => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
       if (visible) setCurrent(visible.target.id);
@@ -2496,7 +2521,7 @@
     let acaraMulai = Date.parse('2026-12-23T08:00:00+07:00'), acaraSelesai = Date.parse('2027-01-02T23:59:00+07:00');
     function tahapAcara() {
       const t = now();
-      if (t < acaraMulai) return { target: acaraMulai, judul: 'Menuju keberangkatan ke Bali', sr: 'Keberangkatan ke Bali' };
+      if (t < acaraMulai) return { target: acaraMulai, judul: 'Menuju YCS 2026', sr: 'Keberangkatan ke Bali' };
       if (t < acaraSelesai) return { target: acaraSelesai, judul: 'YCS 2026 sedang berlangsung · selesai dalam', sr: 'Acara YCS 2026 selesai' };
       return null;
     }
@@ -2518,6 +2543,14 @@
       $('#cd2-sr').textContent = `${st.sr} pada ${teksWaktu(st.target)}.`;
     }
     setInterval(tickAcara, 1000);
+    // Tanggal di kartu "Informasi Acara" mengikuti pengaturan admin (waktu_acara_mulai/selesai).
+    function isiTanggalAcara() {
+      const a = new Date(acaraMulai), z = new Date(acaraSelesai);
+      const f = (d, th) => d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', timeZone: 'Asia/Jakarta', ...(th ? { year: 'numeric' } : {}) }).replace('.', '');
+      $('#acara-tanggal').innerHTML = `${f(a, false)} –<br>${f(z, true)}`;
+    }
+    isiTanggalAcara();
+    setInterval(isiTanggalAcara, 60000);
     $('#cd2-ingat').addEventListener('click', (e) => {
       downloadIcs({ dataset: { start: new Date(acaraMulai).toISOString(), end: new Date(acaraSelesai).toISOString(), title: 'Youth Character Summit 2026 di Bali', platform: 'Acara', url: location.origin } });
       $('span', e.currentTarget).textContent = 'Pengingat diunduh';
@@ -3130,6 +3163,38 @@
     // Warga berjalan berpindah tempat; banyak balon kata tampil bersamaan tanpa saling menutupi.
     if (window.YCSFestival) festApi = window.YCSFestival($('#fest-canvas'), { wadahBalon: $('.fest__stage'), balonAktif: !!saya });
 
+    function isiKataRamai(list) {
+      const hit = new Map();
+      list.forEach((e) => { const k = (e.k || '').toLowerCase(); if (k) hit.set(k, (hit.get(k) || 0) + 1); });
+      const top = [...hit.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4);
+      const wadah = $('#fk-ramai');
+      wadah.textContent = '';
+      top.forEach(([k]) => {
+        const b = Object.assign(document.createElement('button'), { type: 'button', className: 'chip', textContent: k.charAt(0).toUpperCase() + k.slice(1) });
+        b.addEventListener('click', () => { const i = $('#fk-kata'); i.value = b.textContent; i.dispatchEvent(new Event('input', { bubbles: true })); i.focus(); });
+        wadah.append(b);
+      });
+      $('#fk-ramai-wrap').hidden = !top.length;
+      // Ringkasan samping (desktop d02)
+      $('#fs-total').textContent = nf.format(list.length);
+      const prov = new Set(list.map((e) => e.p).filter(Boolean)).size;
+      $('#fs-prov').textContent = prov ? `pelajar dari ${prov} provinsi` : 'pelajar se-Indonesia';
+      $('#fs-terdaftar').hidden = !saya;
+      const fk = $('#fs-kata');
+      fk.textContent = '';
+      [...hit.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6).forEach(([k], i) => {
+        const b = Object.assign(document.createElement('button'), { type: 'button', className: 'chip fs-chip' + (i === 0 ? ' is-1' : i === 1 ? ' is-2' : ''), textContent: k.toUpperCase() });
+        b.setAttribute('aria-label', `Sorot warga dengan kata ${k}`);
+        let pos = 0;
+        b.addEventListener('click', () => {
+          if (!festApi || fest.classList.contains('is-locked')) { toast('Gabung festival dulu untuk melihat warganya.'); return; }
+          const daftar = festApi.tampil.filter((w) => (w.k || '').toLowerCase() === k);
+          if (daftar.length) festApi.sorot(daftar[pos++ % daftar.length], 8000, '');
+        });
+        fk.append(b);
+      });
+      if (!fk.children.length) fk.innerHTML = '<p class="t-sm">Belum ada kata. Jadilah yang pertama!</p>';
+    }
     async function muatFestival() {
       try {
         const r = await fetch(CONFIG.kataEndpoint, { headers: { Accept: 'application/json' }, cache: 'no-cache' });
@@ -3138,6 +3203,7 @@
         const list = (d.orang || []).map(([n, k, pv, m]) => ({ n, k, p: pv, m }));
         if (saya && !list.some((e) => e.n === saya.n && e.k === saya.k)) list.unshift(saya);
         if (festApi) festApi.setWarga(list);
+        isiKataRamai(list);
         $('#fest-total').textContent = nf.format(Math.max(d.total || 0, list.length));
       } catch (e) { /* tetap tampil latar festival */ }
     }
@@ -3187,13 +3253,12 @@
 
     // Pilihan 10 karakter adat: selalu terlihat, tapi baru bisa dipilih setelah data lengkap + saluran dicentang.
     let karakter = 0;
+    // Karakter terbuka setelah data diri (langkah 1) lengkap.
     const cekData = () => [
       ['fk-nama', $('#fk-nama').value.trim().length >= 2, 'Isi nama minimal 2 karakter.'],
       ['fk-sekolah', $('#fk-sekolah').value.trim().length >= 2, 'Isi nama sekolah.'],
       ['fk-prov', !!$('#fk-prov').value, 'Pilih provinsi.'],
       ['fk-email', kontakOk($('#fk-email').value), PESAN_KONTAK],
-      ['fk-kata', /^[A-Za-zÀ-ɏ-]{2,20}$/.test($('#fk-kata').value.trim()), 'Tulis satu kata saja (2–20 huruf, tanpa spasi atau angka).'],
-      ['fk-wa', waKlik, 'Ketuk kartu Saluran WhatsApp terlebih dahulu.'],
     ];
     const dataLengkap = () => cekData().every(([, ok]) => ok);
     function syncKarakter() { $('#fk-karakter-set').classList.toggle('is-buka', dataLengkap()); }
@@ -3219,7 +3284,8 @@
           // Arahkan ke satu kolom yang belum lengkap (tanpa memunculkan semua pesan error sekaligus).
           const [id, , msg] = cekData().find(([, ok]) => !ok);
           $('#' + id + '-error').textContent = msg;
-          $('#fk-karakter-error').textContent = id === 'fk-wa' ? 'Ketuk kartu Saluran WhatsApp di atas dulu, lalu pilih karakter.' : 'Lengkapi data di atas dulu, lalu pilih karakter.';
+          $('#fk-karakter-error').textContent = 'Lengkapi data diri dulu, lalu pilih karakter.';
+          keLangkah(1);
           const el = $('#' + id);
           el.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
           el.focus({ preventScroll: true });
@@ -3233,7 +3299,7 @@
     function pilihKarakter(id, manual) {
       karakter = id;
       if (manual) karakterManual = true;
-      $$('.karakter__opsi').forEach((x) => { const on = Number(x.dataset.id) === id; x.setAttribute('aria-checked', String(on)); if (on && !manual) x.scrollIntoView({ block: 'nearest', inline: 'center' }); });
+      $$('.karakter__opsi').forEach((x, i) => { const on = Number(x.dataset.id) === id; x.setAttribute('aria-checked', String(on)); if (on && i >= 8) bukaSemuaKarakter(true); });
       $('#fk-karakter-error').textContent = '';
       $('#fk-karakter-saran').textContent = '';
     }
@@ -3243,11 +3309,62 @@
       if (!id || karakterManual) return;
       pilihKarakter(id, false);
       const m = window.YCSFestival.MODEL.find((x) => x.id === id);
-      $('#fk-karakter-saran').textContent = `Otomatis dipilih sesuai provinsimu: ${m.nama}. Boleh diganti.`;
+      $('#fk-karakter-saran').textContent = `Saran untuk ${$('#fk-prov').value}: ${m.nama.split(' (')[0]}`;
     });
     $('#fest-form').addEventListener('input', syncKarakter);
     $('#fest-form').addEventListener('change', syncKarakter);
     syncKarakter();
+
+    // Wizard 3 langkah (m03): data diri → kata & karakter → gabung. Data tetap satu form & satu kiriman.
+    const LANGKAH = {
+      1: () => cekData(),
+      2: () => [
+        ['fk-kata', /^[A-Za-zÀ-ɏ-]{2,20}$/.test($('#fk-kata').value.trim()), 'Tulis satu kata saja (2–20 huruf, tanpa spasi atau angka).'],
+        ['fk-karakter', karakter > 0, 'Pilih salah satu karakter.'],
+      ],
+    };
+    let langkah = 1;
+    function keLangkah(n, fokus) {
+      langkah = n;
+      const f = $('#fest-form');
+      f.dataset.langkah = n;
+      $$('.wizard__step', f).forEach((st) => { st.hidden = Number(st.dataset.step) !== n; });
+      $$('.wizard__bar li', f).forEach((li) => {
+        const b = Number(li.dataset.bar);
+        li.classList.toggle('is-done', b < n);
+        if (b === n) li.setAttribute('aria-current', 'step'); else li.removeAttribute('aria-current');
+      });
+      $('#fk-no').textContent = `${n}/3`;
+      $('#fk-kembali').hidden = n === 1;
+      $('#fk-lanjut').hidden = n === 3;
+      $('#fk-kirim').hidden = n !== 3;
+      if (fokus) { $(`.wizard__step[data-step="${n}"] legend`, f).focus({ preventScroll: true }); f.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' }); }
+    }
+    function tandaiCek(cek) {
+      let first = null;
+      cek.forEach(([id, ok, msg]) => { $('#' + id + '-error').textContent = ok ? '' : msg; $('#' + id).setAttribute('aria-invalid', String(!ok)); if (!ok && !first) first = $('#' + id); });
+      return first;
+    }
+    $('#fk-lanjut').addEventListener('click', () => {
+      const first = tandaiCek(LANGKAH[langkah]());
+      if (first) { (first.matches('input, select') ? first : $('.karakter__opsi[aria-checked="true"]') || $('.karakter__opsi') || first).focus(); return; }
+      keLangkah(langkah + 1, true);
+    });
+    $('#fk-kembali').addEventListener('click', () => keLangkah(Math.max(1, langkah - 1), true));
+    // Penghitung huruf kata.
+    const hitungKata = () => { $('#fk-kata-n').textContent = `${$('#fk-kata').value.length}/20`; };
+    $('#fk-kata').addEventListener('input', hitungKata);
+    hitungKata();
+    // 8 karakter tampil dulu; "Lihat 24 karakter" membuka semua.
+    function bukaSemuaKarakter(buka) {
+      $('#fk-karakter').classList.toggle('is-semua', buka);
+      const b = $('#fk-karakter-semua');
+      b.setAttribute('aria-expanded', String(buka));
+      b.firstChild.textContent = buka ? 'Tampilkan lebih sedikit' : `Lihat ${$$('.karakter__opsi').length} karakter`;
+    }
+    $('#fk-karakter-semua').addEventListener('click', () => bukaSemuaKarakter($('#fk-karakter-semua').getAttribute('aria-expanded') !== 'true'));
+    bukaSemuaKarakter(false);
+    keLangkah(1);
 
     // Pesan error hilang begitu kolomnya diperbaiki.
     $('#fest-form').addEventListener('input', (e) => { const err = e.target.id && $('#' + e.target.id + '-error'); if (err) { err.textContent = ''; e.target.removeAttribute('aria-invalid'); } $('#fk-alert').textContent = ''; });
@@ -3265,9 +3382,13 @@
         ['fk-karakter', karakter > 0, 'Pilih salah satu karakter.'],
         ['fk-setuju', $('#fk-setuju').checked, 'Centang persetujuan untuk melanjutkan.'],
       ];
-      let first = null;
-      cek.forEach(([id, ok, msg]) => { $('#' + id + '-error').textContent = ok ? '' : msg; $('#' + id).setAttribute('aria-invalid', String(!ok)); if (!ok && !first) first = $('#' + id); });
-      if (first) { first.focus(); return; }
+      const first = tandaiCek(cek);
+      if (first) {
+        const st = first.closest('.wizard__step');
+        if (st) keLangkah(Number(st.dataset.step));
+        (first.id === 'fk-karakter' ? $('.karakter__opsi') : first).focus();
+        return;
+      }
       const kontak = $('#fk-email').value.trim();
       const ident = { nama: $('#fk-nama').value.trim(), sekolah: $('#fk-sekolah').value.trim(), provinsi: $('#fk-prov').value, email: emailOk(kontak) ? kontak : '', wa: emailOk(kontak) ? '' : waNorm(kontak) };
       const btn = $('#fk-kirim');
@@ -3289,7 +3410,41 @@
       $('#fest-info').textContent = d.sudah ? `Kamu sudah ada di festival sebagai "${saya.n}" dengan kata "${saya.k}".` : `Selamat datang di festival, ${saya.n}! Itu kamu yang ditandai.`;
       document.getElementById('satu-kata').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
       if (w) setTimeout(() => festApi.sorot(w, 12000, 'Ini kamu!'), 400);
+      bukaSukses();
     });
+
+    /* ---------- Sukses gabung + kartu (m04) ---------- */
+    const sukses = $('#fest-sukses');
+    function bukaSukses() {
+      if (!saya || !sukses.showModal) return;
+      $('#kw-kata').textContent = saya.k;
+      $('#kw-nama').textContent = saya.n;
+      $('#kw-prov').textContent = saya.p || '';
+      if (window.YCSFestival) window.YCSFestival.gambarModel($('#kw-orang'), saya.m || karakter || 1);
+      sukses.showModal();
+    }
+    $$('[data-sukses-tutup]', sukses).forEach((b) => b.addEventListener('click', () => {
+      sukses.close();
+      $('.fest__stage').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+    }));
+    $('#sukses-ajak').addEventListener('click', () => bagikanKartu());
+    $('#sukses-unduh').addEventListener('click', () => $('#fest-unduh').click());
+
+    /* ---------- Chip sorot warga: Provinsiku / Kata samaku ---------- */
+    let sorotDaftar = [], sorotPos = 0;
+    $$('.fest__chips .chip').forEach((c) => c.addEventListener('click', () => {
+      $$('.fest__chips .chip').forEach((x) => x.setAttribute('aria-pressed', String(x === c)));
+      const info = $('#fest-info'), mode = c.dataset.sorot;
+      if (!mode || !festApi) { sorotDaftar = []; info.textContent = ''; return; }
+      if (!saya) { info.textContent = 'Gabung festival dulu agar kami tahu provinsi dan katamu.'; return; }
+      const semua = festApi.tampil;
+      const baru = mode === 'prov' ? semua.filter((w) => w.p === saya.p) : semua.filter((w) => (w.k || '').toLowerCase() === saya.k.toLowerCase());
+      if (baru !== sorotDaftar) { sorotDaftar = baru; sorotPos = 0; }
+      if (!sorotDaftar.length) { info.textContent = 'Belum ada warga lain yang cocok.'; return; }
+      const w = sorotDaftar[sorotPos++ % sorotDaftar.length];
+      info.textContent = `${mode === 'prov' ? 'Warga ' + saya.p : 'Kata "' + saya.k + '"'}: ${sorotDaftar.length} orang · ketuk lagi untuk berikutnya (${w.n})`;
+      festApi.sorot(w, 8000, w === festApi.saya ? 'Ini kamu!' : '');
+    }));
 
     let hasilCari = [], posCari = 0, qTerakhir = '';
     $('#fest-cari').addEventListener('submit', (e) => {
@@ -3308,50 +3463,52 @@
     // Kartu festival 1080×1350: potongan panggung + kata milikmu + QR menuju Festival 1 Kata.
     const muatGambar = (src) => new Promise((ok) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ok(null); i.src = src; });
     async function buatKartu() {
-      if (document.fonts) await Promise.all([document.fonts.load('400 80px "Permanent Marker"'), document.fonts.load('800 60px "Plus Jakarta Sans"')]).catch(() => {});
+      if (document.fonts) await Promise.all([document.fonts.load('800 60px "Plus Jakarta Sans"'), document.fonts.load('700 60px "Plus Jakarta Sans"')]).catch(() => {});
+      const css = getComputedStyle(document.documentElement);
+      const T = (n) => css.getPropertyValue('--' + n).trim();
       const W = 1080, H = 1350, c = document.createElement('canvas');
       c.width = W; c.height = H;
       const x = c.getContext('2d');
-      const g = x.createLinearGradient(0, 0, W, H);
-      g.addColorStop(0, '#0B3B44'); g.addColorStop(1, '#082C33');
+      const kotak = (X, Y, w, h, r) => { x.beginPath(); if (x.roundRect) x.roundRect(X, Y, w, h, r); else x.rect(X, Y, w, h); };
+      const g = x.createLinearGradient(0, 0, 0, H);
+      g.addColorStop(0, T('blue-500')); g.addColorStop(1, T('navy-900'));
       x.fillStyle = g; x.fillRect(0, 0, W, H);
       x.textAlign = 'center';
-      x.fillStyle = '#FFD86B'; x.font = '800 32px "Plus Jakarta Sans", sans-serif';
-      x.fillText('#SATUKATAUNTUKINDONESIA', W / 2, 90);
-      x.fillStyle = '#fff'; x.font = '400 66px "Permanent Marker", cursive';
-      x.fillText('Festival Satu Kata YCS 2026', W / 2, 175, W - 100);
+      x.fillStyle = T('white'); x.font = '800 58px "Plus Jakarta Sans", sans-serif';
+      x.fillText('Festival Satu Kata · YCS 2026', W / 2, 110, W - 120);
+      // Kartu putih
+      const kx = 90, ky = 160, kw = W - 180, kh = 1100;
+      x.save(); x.shadowColor = 'rgba(6,24,64,.35)'; x.shadowBlur = 50; x.shadowOffsetY = 20;
+      x.fillStyle = T('white'); kotak(kx, ky, kw, kh, 56); x.fill(); x.restore();
+      // Potongan panggung festival di bagian atas kartu
       const saw = saya && festApi ? festApi.tampil.find((w) => w.n === saya.n && w.k === saya.k) : null;
       if (saw) festApi.sorot(saw, 4000, 'Ini kamu!');
       await new Promise((r) => setTimeout(r, 120));
       const src = $('#fest-canvas');
-      const tw = W - 100, th = 560, r = Math.max(tw / src.width, th / src.height);
-      x.save();
-      x.beginPath(); if (x.roundRect) x.roundRect(50, 215, tw, th, 36); else x.rect(50, 215, tw, th); x.clip();
-      x.drawImage(src, 50 + (tw - src.width * r) / 2, 215 + (th - src.height * r) / 2, src.width * r, src.height * r);
+      const tw = kw, th = 560, r = Math.max(tw / src.width, th / src.height);
+      x.save(); kotak(kx, ky, kw, kh, 56); x.clip();
+      x.drawImage(src, kx + (tw - src.width * r) / 2, ky + (th - src.height * r) / 2, src.width * r, src.height * r);
       x.restore();
       if (saya) {
-        x.fillStyle = 'rgba(255,255,255,.82)'; x.font = '700 34px "Plus Jakarta Sans", sans-serif';
-        x.fillText(`${saya.n} · ${saya.p}`, W / 2, 850);
-        x.font = '800 110px "Plus Jakarta Sans", sans-serif';
-        const lebar = Math.min(W - 140, x.measureText(saya.k).width + 90);
-        x.fillStyle = '#FFC93C'; x.beginPath(); if (x.roundRect) x.roundRect((W - lebar) / 2, 880, lebar, 142, 36); else x.rect((W - lebar) / 2, 880, lebar, 142); x.fill();
-        x.fillStyle = '#082C33'; x.fillText(saya.k, W / 2, 992, W - 200);
+        x.fillStyle = T('blue-600'); x.font = '800 34px "Plus Jakarta Sans", sans-serif';
+        if ('letterSpacing' in x) x.letterSpacing = '4px';
+        x.fillText('AKU BAGIAN DARI FESTIVAL 1 KATA', W / 2, ky + 650, kw - 80);
+        if ('letterSpacing' in x) x.letterSpacing = '0px';
+        x.fillStyle = T('navy-900'); x.font = '800 150px "Plus Jakarta Sans", sans-serif';
+        x.fillText(saya.k.toUpperCase(), W / 2, ky + 820, kw - 100);
+        x.strokeStyle = T('line-2'); x.setLineDash([12, 10]); x.lineWidth = 3;
+        x.beginPath(); x.moveTo(kx + 60, ky + 890); x.lineTo(kx + kw - 60, ky + 890); x.stroke(); x.setLineDash([]);
+        x.textAlign = 'left';
+        x.fillStyle = T('navy-900'); x.font = '800 52px "Plus Jakarta Sans", sans-serif';
+        x.fillText(saya.n, kx + 60, ky + 990, kw - 380);
+        x.fillStyle = T('ink-3'); x.font = '600 38px "Plus Jakarta Sans", sans-serif';
+        x.fillText(saya.p || 'Indonesia', kx + 60, ky + 1050, kw - 380);
       }
-      // Bagian bawah: kalimat kampanye (kiri) + QR (kanan).
-      x.fillStyle = 'rgba(255,255,255,.12)'; x.fillRect(50, 1072, W - 100, 2);
-      x.textAlign = 'left';
-      x.fillStyle = 'rgba(255,255,255,.85)'; x.font = '700 36px "Plus Jakarta Sans", sans-serif';
-      x.fillText('Aku bagian dari', 60, 1150);
-      x.fillStyle = '#FFC93C'; x.font = '400 72px "Permanent Marker", cursive';
-      x.fillText('Festival 1 Kata', 56, 1232, 640);
-      x.fillStyle = 'rgba(255,255,255,.7)'; x.font = '600 26px "Plus Jakarta Sans", sans-serif';
-      x.fillText('Scan QR & kirim katamu juga', 60, 1286);
       const qr = await muatGambar('assets/img/festival/qr-festival.png');
-      if (qr) {
-        const q = 210, qx = W - 60 - q, qy = 1098;
-        x.fillStyle = '#fff'; x.beginPath(); if (x.roundRect) x.roundRect(qx - 12, qy - 12, q + 24, q + 24, 22); else x.rect(qx - 12, qy - 12, q + 24, q + 24); x.fill();
-        x.imageSmoothingEnabled = false; x.drawImage(qr, qx, qy, q, q); x.imageSmoothingEnabled = true;
-      }
+      if (qr) { x.imageSmoothingEnabled = false; x.drawImage(qr, kx + kw - 60 - 200, ky + 920, 200, 200); x.imageSmoothingEnabled = true; }
+      x.textAlign = 'center';
+      x.fillStyle = T('sun-400'); x.font = '700 40px "Plus Jakarta Sans", sans-serif';
+      x.fillText('Scan QR & kirim katamu juga', W / 2, H - 36);
       return new Promise((ok) => c.toBlob(ok, 'image/png'));
     }
     const namaKartu = () => `festival-1-kata${saya ? '-' + saya.k : ''}.png`;
@@ -3414,52 +3571,21 @@
       lazyBgs.forEach((el) => bgIo.observe(el));
     } else lazyBgs.forEach((el) => el.classList.add('is-bg'));
 
-    /* ---------- Pusat energi (menu cepat bulat) ---------- */
-    const orb = $('#orb'), orbCore = $('#orb-core'), orbBg = $('#orb-backdrop');
-    const orbLinks = $$('.orb__link');
-    function setOrb(open, fokus) {
-      orb.classList.toggle('is-open', open);
-      orbCore.setAttribute('aria-expanded', String(open));
-      orbCore.setAttribute('aria-label', open ? 'Tutup menu cepat' : 'Buka menu cepat: Satu Kata, Tonton Live, Klaim Dana Kaget, Klaim Wildcard');
-      orbBg.hidden = false;
-      orbBg.classList.toggle('is-on', open);
-      orbLinks.forEach((a) => { a.tabIndex = open ? 0 : -1; });
-      if (open) { orb.classList.add('is-seen'); if (fokus) orbLinks[0].focus(); }
-    }
-    orbCore.addEventListener('click', (e) => setOrb(!orb.classList.contains('is-open'), e.detail === 0));
-    orbBg.addEventListener('click', () => setOrb(false));
-    orbLinks.forEach((a) => a.addEventListener('click', () => setOrb(false)));
-    orb.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && orb.classList.contains('is-open')) { setOrb(false); orbCore.focus(); }
-    });
-    setTimeout(() => orb.classList.add('is-seen'), 6000);
-    // Di HP tombol bulat disembunyikan saat mengetik / saat form festival & Dana Kaget di layar agar tidak menutupi isian.
-    let formTerlihat = 0;
-    const syncOrb2 = () => orb.classList.toggle('is-sembunyi', !orb.classList.contains('is-open') && (formTerlihat > 0 || document.activeElement?.matches?.('input, select, textarea')));
-    document.addEventListener('focusin', syncOrb2);
-    document.addEventListener('focusout', () => setTimeout(syncOrb2, 50));
-    if ('IntersectionObserver' in window && matchMedia('(max-width: 47.99rem)').matches) {
-      const io = new IntersectionObserver((es) => { es.forEach((e) => { formTerlihat += e.isIntersecting ? 1 : -1; }); formTerlihat = Math.max(0, formTerlihat); syncOrb2(); }, { threshold: 0.15 });
-      ['#fest-form', '#dk-step1', '#dk-step2'].forEach((sel) => { const el = document.querySelector(sel); if (el) io.observe(el); });
-    }
-    // Keterangan kecil di tiap menu mengikuti status dari admin.
+    /* ---------- Bottom nav: sembunyi saat mengetik agar tidak menutupi isian (HP) ---------- */
+    const tabbar = $('#tabbar');
+    const syncTabbar = () => tabbar.classList.toggle('is-hidden', !!document.activeElement?.matches?.('input, select, textarea'));
+    document.addEventListener('focusin', syncTabbar);
+    document.addEventListener('focusout', () => setTimeout(syncTabbar, 50));
+    // Keterangan kecil di menu Lainnya mengikuti status dari admin.
     function syncOrb() {
       if (!cfg) return;
       const nowMs = now();
-      const liveSekarang = (cfg.live || []).find((l) => nowMs >= Date.parse(l.mulai) && nowMs < Date.parse(l.selesai));
-      const liveBerikut = (cfg.live || []).find((l) => Date.parse(l.mulai) > nowMs);
-      const liveA = $('#orb-live');
-      liveA.querySelector('.orb__live-dot')?.remove();
-      if (liveSekarang) {
-        $('#orb-live-sub').textContent = 'Sedang live!';
-        liveA.href = liveSekarang.link; liveA.target = '_blank'; liveA.rel = 'noopener';
-        liveA.insertAdjacentHTML('beforeend', '<span class="orb__live-dot" aria-hidden="true"></span>');
-      } else {
-        $('#orb-live-sub').textContent = liveBerikut ? fmtHari.format(new Date(liveBerikut.mulai)) : 'Jadwal siaran';
-        liveA.href = '#live'; liveA.removeAttribute('target');
-      }
-      $('#orb-dana-sub').textContent = !cfg.dana.saklar ? 'Belum dibuka' : cfg.dana.penuh ? 'Kuota habis' : cfg.dana.sisa != null ? `Tersisa ${nf.format(cfg.dana.sisa)}` : 'Pakai kode akses';
-      $('#orb-wild-sub').textContent = nowMs < target ? 'Dibuka ' + fmtTglPendek.format(new Date(target)) : 'Untuk yang belum lolos';
+      const buka = cfg.dana.saklar && !cfg.dana.penuh;
+      $('#lain-dana-sub').textContent = !cfg.dana.saklar ? 'Belum dibuka' : cfg.dana.penuh ? 'Kuota habis' : cfg.dana.sisa != null ? `Tersisa ${nf.format(cfg.dana.sisa)} · pakai kode akses` : 'Klaim pakai kode akses';
+      $('#lain-dana-badge').hidden = !buka;
+      $('#lain-wild-sub').textContent = nowMs < target ? 'Dibuka ' + fmtTglPendek.format(new Date(target)) : 'Untuk yang belum lolos';
+      const road = ($('#road-current') || {}).textContent || '', roadT = ($('#road-target') || {}).textContent || '';
+      if (/\d/.test(road)) $('#lain-road-sub').textContent = `${road.trim()} / ${roadT.trim()} dukungan`;
     }
 
     /* ---------- Pop-up informasi ---------- */
