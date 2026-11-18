@@ -1,0 +1,96 @@
+/* YCS 2026 — panggung festival (balon warga) + overlay Lawan Monster. Dipakai beranda (#satu-kata) dan /game/. Hanya token. */
+.fest__stage > canvas { position: absolute; inset: 0; width: 100%; height: 100%; transition: filter 700ms var(--ease); }
+.fest.is-locked .fest__stage > canvas { filter: blur(7px) saturate(1.15); }
+.fest-b { position: absolute; z-index: 3; left: 0; top: 0; display: flex; gap: .5rem; align-items: center; max-width: 13rem; padding: .375rem .75rem .375rem .375rem; border: 2.5px solid var(--sun-400); border-radius: var(--r-md); background: var(--white); color: var(--ink); box-shadow: 0 10px 22px -10px color-mix(in srgb, var(--navy-950) 45%, transparent); opacity: 0; transition: opacity 300ms var(--ease); cursor: pointer; will-change: transform; }
+.fest-b:not(.is-on) { pointer-events: none; }
+.fest-b.is-on:hover { border-color: var(--sun-400); }
+.fest:not(.is-locked) .fest__stage > canvas { cursor: pointer; }
+.fest-b.is-on { opacity: 1; }
+.fest-b::after { content: ""; position: absolute; left: var(--ekor, 50%); bottom: -8px; width: 13px; height: 13px; background: var(--white); border-right: 2.5px solid var(--sun-400); border-bottom: 2.5px solid var(--sun-400); transform: translateX(-50%) rotate(45deg); }
+.fest-b.is-pin { z-index: 4; max-width: 16rem; padding: .5rem .875rem .5rem .5rem; border-width: 3px; border-color: var(--sun-400); }
+.fest-b.is-pin::after { border-color: var(--sun-400); }
+.fest.is-locked .fest-b { display: none; }
+.fest-b__ava { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; flex: none; overflow: hidden; border-radius: 50%; background: var(--sun-400); }
+.fest-b.is-pin .fest-b__ava { width: 3rem; height: 3rem; }
+.fest-b__ava canvas { width: 100%; height: 100%; max-width: none; }
+.fest-b__isi { min-width: 0; line-height: 1.15; }
+.fest-b strong { display: block; font-size: var(--fs-btn-sm); }
+.fest-b em { display: block; font-style: normal; font-size: var(--fs-body); color: var(--sun-500); overflow-wrap: anywhere; }
+.fest-b.is-pin strong { font-size: var(--fs-body); }
+.fest-b.is-pin em { font-size: var(--fs-h2); }
+.fest-b small { display: block; font-size: var(--fs-tab); color: var(--ink-2); }
+.fest-b__tag { position: absolute; top: -.7rem; right: -.4rem; padding: .1rem .5rem; border-radius: var(--r-pill); background: var(--sun-400); color: var(--white); font-size: var(--fs-tab); font-weight: 800; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+/* ============ Lawan Monster (m05): tema gelap di atas panggung festival ============ */
+.mon { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+.mon[hidden] { display: none; }
+.mon::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, color-mix(in srgb, var(--navy-950) 55%, transparent) 0%, color-mix(in srgb, var(--navy-950) 15%, transparent) 35%, color-mix(in srgb, var(--navy-950) 45%, transparent) 100%); pointer-events: none; }
+.mon__kanvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.mon__tangkap { position: absolute; inset: 0; pointer-events: auto; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.mon__tangkap:focus-visible { outline: none; box-shadow: inset 0 0 0 3px var(--blue-500); border-radius: var(--r-xl); }
+.mon__hud { position: absolute; top: var(--space-3); left: 50%; width: min(30rem, calc(100% - 1.5rem)); transform: translateX(-50%); padding: var(--space-3) var(--space-4); border-radius: var(--r-lg); background: color-mix(in srgb, var(--navy-950) 88%, transparent); color: var(--white); box-shadow: var(--e3), inset 0 0 0 1px color-mix(in srgb, var(--white) 12%, transparent); backdrop-filter: blur(8px); }
+.mon__baris { display: flex; align-items: center; gap: var(--space-2); font-size: var(--fs-sm); line-height: 1.2; }
+.mon__baris--kecil { justify-content: space-between; margin-top: var(--space-2); font-size: var(--fs-xs); color: var(--blue-100); font-variant-numeric: tabular-nums; }
+.mon__nama { font-size: var(--fs-body); font-weight: 800; color: var(--white); }
+.mon__lvl { font-size: var(--fs-xs); font-weight: 700; color: var(--blue-100); }
+.mon__pemain { margin-left: auto; font-weight: 800; color: var(--sun-400); font-variant-numeric: tabular-nums; }
+.mon__bar { position: relative; height: .75rem; margin-top: var(--space-2); overflow: hidden; border-radius: var(--r-pill); background: color-mix(in srgb, var(--white) 15%, transparent); }
+.mon__bar i { position: absolute; inset: 0; transform-origin: left; transform: scaleX(0); background: linear-gradient(90deg, var(--coral-500), var(--sun-500)); }
+.mon__bar b { position: absolute; inset: 0; background: repeating-linear-gradient(115deg, color-mix(in srgb, var(--white) 20%, transparent) 0 .5rem, transparent .5rem 1rem); animation: mon-geser 1.2s linear infinite; }
+@keyframes mon-geser { to { background-position: 2.2rem 0; } }
+.mon__ajak { pointer-events: none; position: absolute; left: 50%; bottom: var(--space-3); max-width: calc(100% - 1.5rem); margin: 0; padding: 8px 14px; transform: translateX(-50%); border-radius: var(--r-pill); background: color-mix(in srgb, var(--navy-950) 88%, transparent); color: var(--white); font-size: var(--fs-sm); font-weight: 700; text-align: center; box-shadow: var(--e2); }
+.mon__ajak[hidden], .mon__ajak:empty { display: none; }
+.mon[data-fase="tunggu"] .mon__ajak { top: var(--space-3); bottom: auto; background: var(--navy-900); }
+.mon__pesan { position: absolute; left: 50%; top: 50%; width: min(24rem, calc(100% - 2rem)); padding: var(--space-5); transform: translate(-50%, -50%); border-radius: var(--r-xl); background: var(--white); color: var(--navy-900); text-align: center; pointer-events: auto; box-shadow: var(--e3); animation: mon-masuk .4s var(--ease); }
+@keyframes mon-masuk { from { opacity: 0; transform: translate(-50%, -46%); } }
+.mon__pesan[hidden] { display: none; }
+.mon__pesan h3 { font-size: var(--fs-h1); line-height: var(--lh-h1); font-weight: 800; letter-spacing: var(--ls-h1); color: var(--navy-900); }
+.mon__pesan p { margin: var(--space-2) 0 var(--space-4); font-size: var(--fs-sm); color: var(--ink-2); }
+.mon__pesan .btn { margin: var(--space-1); }
+.mon__nyawa { display: flex; align-items: center; gap: var(--space-2); margin-top: var(--space-2); font-size: var(--fs-xs); font-weight: 700; color: var(--blue-100); }
+.mon__nyawa[hidden] { display: none; }
+.mon__nbar { position: relative; flex: 1; height: .5rem; overflow: hidden; border-radius: var(--r-pill); background: color-mix(in srgb, var(--white) 15%, transparent); }
+.mon__nbar i { position: absolute; inset: 0; transform-origin: left; background: var(--green-600); transition: transform .5s; }
+.mon__nyawa.is-kritis { color: var(--coral-100); }
+.mon__nyawa.is-kritis .mon__nbar i { background: var(--coral-500); animation: mon-kritis .6s infinite alternate; }
+@keyframes mon-kritis { to { opacity: .55; } }
+.mon__npersen { min-width: 2.5rem; text-align: right; color: var(--white); font-variant-numeric: tabular-nums; }
+.mon__awas { position: absolute; left: 50%; top: 34%; display: flex; align-items: center; gap: 10px; margin: 0; padding: 12px 18px; transform: translate(-50%, -50%); border-radius: var(--r-md); background: var(--navy-900); color: var(--white); font-weight: 700; font-size: var(--fs-body); text-align: center; white-space: nowrap; box-shadow: var(--e3); animation: mon-awas .5s infinite alternate; }
+.mon__awas::before { content: "⚠"; color: var(--sun-400); font-size: var(--fs-h3); line-height: 1; }
+.mon__awas[hidden] { display: none; }
+@keyframes mon-awas { to { transform: translate(-50%, -50%) scale(1.04); } }
+.mon__pesan[data-jenis="monster"] { background: var(--navy-950); color: var(--white); }
+.mon__pesan[data-jenis="monster"] h3 { color: var(--coral-100); }
+.mon__pesan[data-jenis="monster"] p { color: var(--blue-100); }
+.mon__pesan[data-jenis="kabur"] h3 { color: var(--blue-600); }
+.mon__hindar { position: absolute; right: var(--space-3); bottom: var(--space-3); z-index: 2; display: grid; place-items: center; align-content: center; gap: 2px; width: min(48%, 12rem); min-height: 5.5rem; padding: var(--space-2); border: 0; border-radius: var(--r-xl); background: linear-gradient(180deg, var(--sun-400), var(--sun-500)); color: var(--navy-900); font: 800 var(--fs-h2)/1 var(--font-sans); letter-spacing: .02em; pointer-events: auto; cursor: pointer; box-shadow: 0 0 0 5px color-mix(in srgb, var(--sun-400) 35%, transparent), var(--e3); animation: mon-hindar .5s infinite alternate; }
+.mon__hindar svg { width: 1.75rem; height: 1.75rem; }
+.mon__hindar[hidden] { display: none; }
+.mon:has(.mon__hindar:not([hidden])) .mon__ajak { opacity: 0; }
+.mon__hindar:disabled { background: var(--disabled-bg); color: var(--disabled-fg); box-shadow: none; animation: none; cursor: default; }
+.mon__hindar:focus-visible { outline: none; box-shadow: 0 0 0 5px color-mix(in srgb, var(--sun-400) 35%, transparent), var(--ring); }
+@keyframes mon-hindar { to { transform: scale(1.04); } }
+.mon__tiket { position: absolute; left: var(--space-3); bottom: var(--space-3); z-index: 2; display: grid; min-width: 8rem; padding: var(--space-3) var(--space-4); border-radius: var(--r-lg); background: color-mix(in srgb, var(--navy-950) 90%, transparent); color: var(--white); box-shadow: var(--e2), inset 0 0 0 1px color-mix(in srgb, var(--white) 12%, transparent); }
+.mon__tiket[hidden] { display: none; }
+.mon__tiket small { font-size: var(--fs-sm); color: var(--violet-100); }
+.mon__tiket strong { font-size: var(--fs-h1); line-height: 1.1; font-weight: 800; font-variant-numeric: tabular-nums; }
+.mon__tiket span { font-size: var(--fs-sm); color: var(--violet-100); }
+@media (prefers-reduced-motion: reduce) { .mon__awas, .mon__hindar, .mon__nyawa.is-kritis .mon__nbar i { animation: none; } }
+.fest__stage.is-monster .fest-b { opacity: 0 !important; pointer-events: none !important; }
+.fest__stage.is-monster .fest__online, .fest__stage.is-monster .fest__share, .fest__stage.is-monster .fest__kunci { display: none !important; }
+.mon-banner { position: fixed; z-index: 44; left: 50%; translate: -50% 0; bottom: calc(var(--tabbar-h) + 24px + env(safe-area-inset-bottom)); max-width: calc(100% - 2rem); display: flex; align-items: center; gap: var(--space-2); padding: 10px 16px; border: 0; border-radius: var(--r-pill); background: var(--navy-900); color: var(--white); font-size: var(--fs-sm); font-weight: 600; text-decoration: none; box-shadow: var(--e3); cursor: pointer; }
+.mon-banner[hidden] { display: none; }
+.mon-banner strong { color: var(--sun-400); }
+.mon-banner__jam { font-variant-numeric: tabular-nums; font-weight: 800; }
+.mon-banner__dot { width: .625rem; height: .625rem; flex: none; border-radius: 50%; background: var(--coral-500); box-shadow: 0 0 0 0 color-mix(in srgb, var(--coral-500) 70%, transparent); animation: mon-denyut 1.4s infinite; }
+@keyframes mon-denyut { to { box-shadow: 0 0 0 .625rem color-mix(in srgb, var(--coral-500) 0%, transparent); } }
+@media (prefers-reduced-motion: reduce) { .mon__bar b, .mon-banner__dot, .mon-banner, .mon__pesan { animation: none; } }
+.fest__stage { position: relative; overflow: hidden; aspect-ratio: 4 / 5; border-radius: var(--r-xl); background: var(--sun-100); box-shadow: var(--e2); }
+.fest-b { border-color: var(--white); background: var(--white); box-shadow: var(--e2); color: var(--navy-900); }
+.fest-b::after { background: var(--white); border-color: var(--white); }
+.fest-b em { font-family: var(--font-sans); font-weight: 800; font-size: var(--fs-body); letter-spacing: .2px; text-transform: uppercase; color: var(--blue-600); }
+.fest-b.is-pin { border-color: var(--sun-400); }
+.fest-b.is-pin::after { border-color: var(--sun-400); }
+.fest-b.is-pin em { font-size: var(--fs-h3); }
+.fest-b small { color: var(--ink-3); }
+.fest-b__ava { background: var(--sun-100); }
+.fest-b__tag { background: var(--sun-400); color: var(--navy-900); }

@@ -47,3 +47,23 @@ Tanpa frame (token + komponen saja, tata letak lama): Road to Bali, Leaderboard,
 - m01 bottom nav 4 item vs ds/m02 5 item → 5 item (ds menang, Jadwal masuk Live).
 - m09 header seluler punya tombol "Punya kode?" sedangkan m01 tombol menu → mengikuti m01; "Punya kode?" ada di menu Lainnya dan di desktop.
 - Judul ds "v2.0" vs paket v2.1 → v2.1.
+
+## Putaran 2 (MRKT-62): game terpisah, gladi, perapian
+
+### Game `/game/` — Lawan Raja Batu
+- Lobi bergaya game harian: status bos + hitung mundur (dari jadwal monster/live), tombol **Main latihan**, **Kode undianku**, **Misi pejuang** (lencana), pemenang spin. Suara pendek (WebAudio) + getar, bisa dimatikan.
+- **Arena event asli** = panggung festival + overlay monster yang sama (`assets/js/monster.js`, jam & aturan server). Beranda tidak lagi memasang monster; saat bos muncul/menjelang, beranda menampilkan banner yang menaut ke `/game/`.
+- **Skema hadiah:** ikut menyerang → kode undian dicadangkan → **sah bila Raja Batu tumbang** → diundi saat live (admin Spin Undian). Bos menang/kabur → kode hangus (server + tampilan).
+- **Mode latihan** (`assets/js/latihan.js`): 40 detik, tap bos (combo, kritis), HINDAR saat jurus, 3 nyawa, skor & rekor, "Tantang teman". Lokal, tanpa kode undian. Maks ±12 tap/detik dihitung (anti auto-klik).
+- CSS bersama panggung + monster dipindah ke `assets/css/arena.css` (beranda & game).
+
+### Mode Gladi seluruh web (`assets/js/gladi.js`)
+- Admin → Lawan Monster → **Mode uji & gladi** → *Mulai uji* menghasilkan satu kode untuk: link game uji `/game/?uji-monster=KODE` dan **link gladi** `/?gladi=KODE`.
+- Dengan link gladi, halaman asli dijalankan apa adanya; yang dicegat hanya: `GET /api/config` (diberi skenario) dan semua `POST` formulir (kata, dana, klaim, survei, twibbon → jawaban tiruan, tidak masuk server/Sheet). `localStorage ycs_*` dipisah ke `sessionStorage gladi:*`.
+- Skenario (bar ungu → **Atur**): fase pengumuman, live (sedang tayang / 10 menit lagi), Dana Kaget (buka/belum/habis), waktu acara (berlangsung/selesai), pop-up admin. Kode Dana Kaget apa pun diterima kecuali yang mengandung "SALAH" (uji pesan galat).
+- Game dalam gladi memakai event uji Raja Batu di server (tiket uji hanya di memori, bisa dicoba di Spin Undian event "UJI").
+
+### Perapian
+- HP sempit (≤360 px): kolom cari & tombol bottom sheet festival tidak lagi melebar keluar layar.
+- Desktop: kolom cari festival pindah ke kepala bagian (tidak menimpa teks); 1024–1280 px alat festival di bawah panggung; header desktop mendapat latar saat digulir.
+- Roda spin admin memakai warna token (teks navy di juring kuning).

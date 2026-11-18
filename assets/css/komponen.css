@@ -214,3 +214,12 @@ dialog.sheet[open] { animation: k-sheet 260ms var(--ease); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
+
+/* ---------- Mode gladi (assets/js/gladi.js) ---------- */
+.gladi-bar { position: fixed; z-index: 95; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: var(--space-2); min-height: 44px; padding: 4px var(--space-3); background: var(--violet-600); color: var(--white); font-size: var(--fs-xs); line-height: 1.3; }
+.gladi-bar .badge { background: var(--white); color: var(--violet-600); }
+.gladi-bar__teks { flex: 1; min-width: 0; }
+html.is-gladi body { padding-top: 44px; }
+html.is-gladi .site-header, html.is-gladi .g-bar, html.is-gladi .p-header { top: 44px; }
+.gladi-panel__isi { display: grid; gap: var(--space-3); margin-top: var(--space-4); }
+.gladi-panel__aksi { display: grid; gap: var(--space-2); margin-top: var(--space-5); }

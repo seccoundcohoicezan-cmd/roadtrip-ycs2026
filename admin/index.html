@@ -431,12 +431,13 @@
             <div class="savebar"><p id="mon-set-status" role="status">Tidak ada perubahan.</p><button class="btn btn--cta btn--sm" type="submit" id="btn-simpan-mon">Simpan pengaturan monster</button></div>
           </form>
           <section class="set-card" aria-labelledby="g-mon-uji">
-            <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-play"/></svg></span><div><h2 id="g-mon-uji">Mode uji monster</h2><p>Coba monster kapan saja tanpa terlihat pengunjung. Hanya HP yang membuka link uji yang melihat monster; tidak wajib isi festival, perangkat tidak diikat, tiket uji tidak masuk Sheet. Memakai pengaturan level di atas.</p></div></header>
+            <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-play"/></svg></span><div><h2 id="g-mon-uji">Mode uji &amp; gladi</h2><p>Satu kode untuk dua link: <b>link game</b> (Raja Batu uji di /game/) dan <b>link gladi</b> (seluruh web seperti saat acara: live tayang, Dana Kaget buka, festival, pop-up — semua isian hanya disimulasikan, tidak masuk Sheet). Coba monster kapan saja tanpa terlihat pengunjung. Hanya HP yang membuka link uji yang melihat monster; tidak wajib isi festival, perangkat tidak diikat, tiket uji tidak masuk Sheet. Memakai pengaturan level di atas.</p></div></header>
             <div class="set-grid">
               <div class="field"><label for="uji-menit">Durasi uji (menit)</label><input class="input" type="number" min="1" max="120" step="1" id="uji-menit" value="10"></div>
               <div class="field"><label for="uji-target">Target tap uji <span class="opt">(per level, pisahkan koma)</span></label><input class="input input--mono" id="uji-target" placeholder="kosong = ikut pengaturan, mis. 50,150"><p class="field__hint">Hanya untuk uji; event asli tetap memakai target di atas.</p></div>
               <div class="mon-adm-aksi" style="align-self:end"><button class="btn btn--cta btn--sm" type="button" id="uji-mulai">Mulai uji</button><button class="btn btn--soft btn--sm mon-adm-stop" type="button" id="uji-stop">Hentikan uji</button></div>
               <div class="field field--full"><span class="label">Link uji</span><div class="uji-link"><input class="input input--mono" id="uji-link" readonly placeholder="Tekan Mulai uji untuk membuat link"><button class="btn btn--soft btn--sm" type="button" id="uji-salin">Salin</button><a class="btn btn--soft btn--sm" id="uji-buka" target="_blank" rel="noopener">Buka</a></div><p class="field__hint" id="uji-status">Tidak ada uji berjalan.</p></div>
+              <div class="field field--full"><span class="label">Link gladi seluruh web</span><div class="uji-link"><input class="input input--mono" id="gladi-link" readonly placeholder="Muncul setelah Mulai uji"><button class="btn btn--soft btn--sm" type="button" id="gladi-salin">Salin</button><a class="btn btn--soft btn--sm" id="gladi-buka" target="_blank" rel="noopener">Buka</a></div><p class="field__hint">Bagikan ke tim untuk gladi resik di HP masing-masing. Skenario (live, Dana Kaget, fase, acara, pop-up) diatur dari tombol "Atur" di bar ungu.</p></div>
             </div>
           </section>
           <section class="set-card" aria-labelledby="g-mon-perangkat">
@@ -830,7 +831,12 @@
     }
     /* ---------- Tiket & spin undian (tab Spin Undian) ---------- */
     let spinData = null, berputar = false, hadiahEdit = [], rodaSudut = 0;
-    const WARNA = ['#FF8A3D', '#0E5A66', '#FFC93C', '#D7263D', '#2BA84A', '#7B2CBF', '#00A6ED', '#F25F5C', '#8D6E63', '#3D5A80'];
+    // Warna roda dari token Nusa Cerah (tokens.css); teks di juring kuning memakai navy (putih tidak dipakai di atas Sun).
+    const tok = (n) => getComputedStyle(document.documentElement).getPropertyValue('--' + n).trim();
+    const WARNA_TOKEN = ['blue-600', 'sun-400', 'coral-500', 'green-600', 'violet-600', 'navy-900', 'blue-500', 'sun-500'];
+    const TERANG = ['sun-400', 'sun-500'];
+    const WARNA = WARNA_TOKEN.map(tok);
+    const TEKS_JURING = WARNA_TOKEN.map((n) => tok(TERANG.includes(n) ? 'navy-900' : 'white'));
     const monAdmin = (data) => api('admin-primer', {perintah: 'monster', data});
     async function muatTiket(event) {
       const d = await monAdmin({aksi: 'tiket', event: event || $('#spin-event').value || ''});
@@ -901,9 +907,9 @@
       const c = $('#spin-roda'), x = c.getContext('2d'), R = c.width / 2;
       x.clearRect(0, 0, c.width, c.height);
       if (!rodaTampil.length) { // tetap lingkaran walau belum ada hadiah/tiket
-        x.beginPath(); x.arc(R, R, R - 8, 0, Math.PI * 2); x.fillStyle = 'rgba(255,255,255,.18)'; x.fill(); x.strokeStyle = '#FFFBF3'; x.lineWidth = 4; x.stroke();
-        x.fillStyle = '#fff'; x.font = '700 22px Poppins, system-ui, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('Belum ada tiket', R, R + 70);
-        x.beginPath(); x.arc(R, R, 34, 0, Math.PI * 2); x.fillStyle = '#FFFBF3'; x.fill(); x.fillStyle = '#5B0A16'; x.font = '800 18px Poppins, system-ui, sans-serif'; x.fillText('YCS', R, R);
+        x.beginPath(); x.arc(R, R, R - 8, 0, Math.PI * 2); x.fillStyle = 'rgba(255,255,255,.18)'; x.fill(); x.strokeStyle = tok('white'); x.lineWidth = 4; x.stroke();
+        x.fillStyle = tok('white'); x.font = '700 22px "Plus Jakarta Sans", system-ui, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('Belum ada tiket', R, R + 70);
+        x.beginPath(); x.arc(R, R, 34, 0, Math.PI * 2); x.fillStyle = tok('white'); x.fill(); x.fillStyle = tok('navy-900'); x.font = '800 18px "Plus Jakarta Sans", system-ui, sans-serif'; x.fillText('YCS', R, R);
         return;
       }
       const total = rodaTampil.reduce((t, h) => t + h.bobot, 0);
@@ -912,17 +918,17 @@
         const besar = h.bobot / total * Math.PI * 2;
         x.beginPath(); x.moveTo(R, R); x.arc(R, R, R - 8, a, a + besar); x.closePath();
         x.fillStyle = WARNA[i % WARNA.length]; x.fill();
-        x.strokeStyle = '#FFFBF3'; x.lineWidth = 4; x.stroke();
+        x.strokeStyle = tok('white'); x.lineWidth = 4; x.stroke();
         x.save(); x.translate(R, R); x.rotate(a + besar / 2);
-        x.fillStyle = '#fff'; x.font = '800 ' + Math.max(14, Math.min(26, 300 / Math.max(6, h.nama.length))) + 'px Poppins, system-ui, sans-serif';
-        x.textAlign = 'right'; x.textBaseline = 'middle'; x.shadowColor = 'rgba(0,0,0,.45)'; x.shadowBlur = 4;
+        x.fillStyle = TEKS_JURING[i % WARNA.length]; x.font = '800 ' + Math.max(14, Math.min(26, 300 / Math.max(6, h.nama.length))) + 'px "Plus Jakarta Sans", system-ui, sans-serif';
+        x.textAlign = 'right'; x.textBaseline = 'middle'; x.shadowColor = 'rgba(6,24,64,.25)'; x.shadowBlur = 2;
         if (besar > 0.12) x.fillText(h.nama.length > 22 ? h.nama.slice(0, 21) + '…' : h.nama, R - 26, 0);
-        x.font = '700 14px Poppins, system-ui, sans-serif'; if (besar > 0.2 && h.persen) x.fillText(String(h.persen).replace('.', ',') + '%', R - 26, 22);
+        x.font = '700 14px "Plus Jakarta Sans", system-ui, sans-serif'; if (besar > 0.2 && h.persen) x.fillText(String(h.persen).replace('.', ',') + '%', R - 26, 22);
         x.restore();
         a += besar;
       });
-      x.beginPath(); x.arc(R, R, 34, 0, Math.PI * 2); x.fillStyle = '#FFFBF3'; x.fill();
-      x.fillStyle = '#5B0A16'; x.font = '800 18px Poppins, system-ui, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('YCS', R, R);
+      x.beginPath(); x.arc(R, R, 34, 0, Math.PI * 2); x.fillStyle = tok('white'); x.fill();
+      x.fillStyle = tok('navy-900'); x.font = '800 18px "Plus Jakarta Sans", system-ui, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('YCS', R, R);
     }
     // Putar roda sampai tengah juring hadiah pemenang berada di bawah penunjuk.
     function putarRoda(roda, idHadiah, ms) {
@@ -990,9 +996,11 @@
     let ujiTimer = 0;
     function tampilUji(u) {
       clearInterval(ujiTimer);
-      if (!u) { $('#uji-link').value = ''; $('#uji-buka').removeAttribute('href'); $('#uji-status').textContent = 'Tidak ada uji berjalan.'; return; }
-      const link = location.origin + '/?uji-monster=' + encodeURIComponent(u.kode) + '#satu-kata';
+      if (!u) { $('#uji-link').value = ''; $('#uji-buka').removeAttribute('href'); $('#gladi-link').value = ''; $('#gladi-buka').removeAttribute('href'); $('#uji-status').textContent = 'Tidak ada uji berjalan.'; return; }
+      const link = location.origin + '/game/?uji-monster=' + encodeURIComponent(u.kode);
       $('#uji-link').value = link; $('#uji-buka').href = link;
+      const gl = location.origin + '/?gladi=' + encodeURIComponent(u.kode);
+      $('#gladi-link').value = gl; $('#gladi-buka').href = gl;
       const tulis = () => {
         const sisa = Date.parse(u.sampai) - Date.now();
         $('#uji-status').textContent = sisa > 0 ? `Uji berjalan, sisa ${Math.floor(sisa / 60000)}:${String(Math.floor(sisa / 1000) % 60).padStart(2, '0')}${u.target ? ', target tap ' + u.target : ''}. ${nf.format(u.tiket)} tiket uji, tenaga ${nf.format(u.total)}${u.kalah ? ', monster sudah kalah' : u.monsterMenang ? ', monster menang' : ''}. Tiket uji bisa dicoba di tab Spin Undian (event "UJI").` : 'Waktu uji habis (hasil masih tampil 15 menit). Tekan Mulai uji untuk uji baru.';
@@ -1008,6 +1016,7 @@
       tampilUji(d.uji); toast('Uji monster dimulai. Buka link uji di HP.');
     });
     $('#uji-stop').addEventListener('click', async () => { const d = await monAdmin({aksi: 'uji-stop'}); if (d.ok) { tampilUji(null); toast('Uji dihentikan.'); } });
+    $('#gladi-salin').addEventListener('click', async () => { if (!$('#gladi-link').value) return; try { await navigator.clipboard.writeText($('#gladi-link').value); toast('Link gladi disalin.'); } catch (e) { $('#gladi-link').select(); } });
     $('#uji-salin').addEventListener('click', async () => { if (!$('#uji-link').value) return; try { await navigator.clipboard.writeText($('#uji-link').value); toast('Link uji disalin.'); } catch (e) { $('#uji-link').select(); } });
     $('#f-lepas').addEventListener('submit', async (e) => {
       e.preventDefault();

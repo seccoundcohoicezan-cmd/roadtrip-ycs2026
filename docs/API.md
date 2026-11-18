@@ -46,6 +46,7 @@ Field di luar daftar dibuang server. Aturan validasi (panjang, format email, kat
 - `tarik-sheet`: muat ulang isi Sheet.
 - `monster` + `data.aksi`:
   - `tiket`, `spin` (+`latihan`), `spin-info`, `spin-atur` (`hadiah[{nama, stok, bobot}]`, `peluang`)
+  - **Skema hadiah (MRKT-62):** kode undian (`#0001`) dicadangkan saat peserta ikut menyerang (status `aktif`). Bila event berakhir tanpa Raja Batu tumbang (monster menang / kabur), semua kode event itu diubah menjadi `hangus · bos tidak tumbang`. `spin` non-latihan pada event yang bosnya tidak tumbang → `{ok:false, error:"bos_tidak_tumbang"}`. Berlaku juga untuk event uji.
   - `uji-mulai` (`menit`, `target`), `uji-stop`, `uji`
   - `lepas-perangkat` (`email`)
 

@@ -163,6 +163,8 @@ test('mode uji: event terpisah lewat kode, tanpa ikatan perangkat, tiket tidak m
   assert.equal((app.sheets['Tiket Monster'] || {rows: [0]}).rows.length, 1, 'tiket uji tidak ditulis ke Sheet');
   const t = m.admin({token, aksi: 'tiket', event: s.id});
   assert.equal(t.tiket.length, 1); assert.equal(t.tiket[0].catatan, 'UJI');
+  assert.equal(m.admin({token, aksi: 'spin', event: s.id}).error, 'bos_tidak_tumbang', 'event uji mengikuti skema asli');
+  m.state.events[s.id].kalah = jam.now;
   assert.equal(m.admin({token, aksi: 'spin', event: s.id}).ok, true, 'tiket uji bisa dicoba di-spin');
   m.admin({token, aksi: 'uji-stop'});
   assert.equal(m.masuk({perangkat: 'dev-uji-aaaaaaaaaaaa', uji: u.kode}, '1.1.1.1').error, 'uji_berakhir');
@@ -177,6 +179,9 @@ test('spin: hadiah berbobot, stok habis tidak ikut, latihan tidak dicatat, pelua
     const tk = m.masuk({perangkat: 'dev-' + n.padEnd(16, 'x'), email: n + '@mail.com'}, '9.9.9.' + i).token;
     m.tap({token: tk, n: i === 0 ? 30 : 1, seq: 1, e: id});
   });
+  // skema hadiah: event yang bosnya belum/tidak tumbang tidak bisa diundi (latihan tetap boleh)
+  assert.equal(m.admin({token, aksi: 'spin', event: id}).error, 'bos_tidak_tumbang');
+  m.state.events[id].kalah = jam.now; // anggap Raja Batu tumbang
   assert.equal(m.admin({token, aksi: 'spin-atur', hadiah: [{nama: 'Voucher', stok: 'x', bobot: 1}]}).error, 'nilai_tidak_valid');
   const atur = m.admin({token, aksi: 'spin-atur', hadiah: [{nama: 'Voucher 100rb', stok: 1, bobot: 1}, {nama: 'Merchandise', stok: '', bobot: 3}], peluang: 'rata'});
   assert.deepEqual(atur.roda.map((h) => h.persen), [25, 75]);
@@ -252,6 +257,9 @@ test('pemenang publik: nama disingkat, hadiah, tanpa event uji', () => {
   const token = app.post({aksi: 'admin-login', sandi: app.sheets.Admin.rows[1][1]}).token;
   const tk = m.masuk({perangkat: 'dev-pub-aaaaaaaaaaaa', email: 'ani@mail.com'}, '1.1.1.1').token;
   m.tap({token: tk, n: 5, seq: 1, e: id});
+  const tb = m.masuk({perangkat: 'dev-pub-bbbbbbbbbbbb', email: 'budi@mail.com'}, '1.1.1.2').token;
+  m.tap({token: tb, n: 5, seq: 1, e: id});
+  m.state.events[id].kalah = Date.now(); // Raja Batu tumbang → kode sah diundi
   m.admin({token, aksi: 'spin-atur', hadiah: [{nama: 'HP Android', stok: 1, bobot: 1}]});
   const s = m.admin({token, aksi: 'spin', event: id});
   assert.equal(s.targetRoda, s.hadiah.id);
@@ -259,8 +267,6 @@ test('pemenang publik: nama disingkat, hadiah, tanpa event uji', () => {
   assert.equal(p.length, 1); assert.equal(p[0].nama, 'Ani L.'); assert.equal(p[0].hadiah, 'HP Android'); assert.ok(!JSON.stringify(p).includes('@'));
   // tanpa hadiah → roda nama (lingkaran tetap ada)
   m.admin({token, aksi: 'spin-atur', hadiah: []});
-  const tb = m.masuk({perangkat: 'dev-pub-bbbbbbbbbbbb', email: 'budi@mail.com'}, '1.1.1.2').token;
-  m.tap({token: tb, n: 5, seq: 1, e: id});
   const s2 = m.admin({token, aksi: 'spin', event: id});
   assert.ok(s2.rodaPutar.length >= 1); assert.equal(s2.targetRoda, s2.pemenang.nomor); assert.ok(s2.rodaPutar.some((x) => x.id === s2.pemenang.nomor));
 });
@@ -279,4 +285,20 @@ test('mode uji: target tap sendiri & durasi animasi jurus tervalidasi', () => {
   assert.equal(simpan({monster_jurus_anim: '2,5'}).ok, true);
   app.cache.remove('cfg'); m.segarkan();
   assert.equal(m.lihat(u.kode).jurusAnimMs, 2500);
+});
+
+test('skema hadiah: kode dicadangkan saat ikut menyerang, hangus bila monster menang (tidak ikut spin)', () => {
+  const {jam, app, m} = siapkanMonster('100000');
+  app.sheets.Pengaturan.rows.find((x) => x[0] === 'monster_perisai')[1] = '0';
+  app.cache.remove('cfg'); m.segarkan();
+  const id = m.lihat().id;
+  const ta = m.masuk({perangkat: 'dev-hangus-aaaaaaaaa', email: 'ani@mail.com'}, '1.1.1.1').token;
+  m.tap({token: ta, n: 3, seq: 1, e: id});
+  const baris = () => app.sheets['Tiket Monster'].rows.find((r) => r[1] === id);
+  assert.equal(baris()[9], 'aktif', 'kode dicadangkan dengan status aktif selama event');
+  jam.now += 8000 * 40; const s = m.lihat();
+  assert.equal(s.fase, 'monster_menang');
+  assert.match(baris()[9], /^hangus/, 'monster menang → kode hangus');
+  const token = app.post({aksi: 'admin-login', sandi: app.sheets.Admin.rows[1][1]}).token;
+  assert.equal(m.admin({token, aksi: 'spin', event: id}).error, 'bos_tidak_tumbang');
 });

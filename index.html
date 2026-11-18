@@ -25,6 +25,7 @@
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap">
   <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/arena.css">
 
   <script>
     // Terapkan tema tersimpan sebelum render agar tidak berkedip.
@@ -536,27 +537,6 @@
     }
 
     /* ============ Festival Satu Kata: 1 data = 1 warga kecil di plaza Bali ============ */
-    .fest__stage > canvas { position: absolute; inset: 0; width: 100%; height: 100%; transition: filter 700ms var(--ease); }
-    .fest.is-locked .fest__stage > canvas { filter: blur(7px) saturate(1.15); }
-    .fest-b { position: absolute; z-index: 3; left: 0; top: 0; display: flex; gap: .5rem; align-items: center; max-width: 13rem; padding: .375rem .75rem .375rem .375rem; border: 2.5px solid var(--sun-400); border-radius: var(--r-md); background: var(--white); color: var(--ink); box-shadow: 0 10px 22px -10px color-mix(in srgb, var(--navy-950) 45%, transparent); opacity: 0; transition: opacity 300ms var(--ease); cursor: pointer; will-change: transform; }
-    .fest-b:not(.is-on) { pointer-events: none; }
-    .fest-b.is-on:hover { border-color: var(--sun-400); }
-    .fest:not(.is-locked) .fest__stage > canvas { cursor: pointer; }
-    .fest-b.is-on { opacity: 1; }
-    .fest-b::after { content: ""; position: absolute; left: var(--ekor, 50%); bottom: -8px; width: 13px; height: 13px; background: var(--white); border-right: 2.5px solid var(--sun-400); border-bottom: 2.5px solid var(--sun-400); transform: translateX(-50%) rotate(45deg); }
-    .fest-b.is-pin { z-index: 4; max-width: 16rem; padding: .5rem .875rem .5rem .5rem; border-width: 3px; border-color: var(--sun-400); }
-    .fest-b.is-pin::after { border-color: var(--sun-400); }
-    .fest.is-locked .fest-b { display: none; }
-    .fest-b__ava { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; flex: none; overflow: hidden; border-radius: 50%; background: var(--sun-400); }
-    .fest-b.is-pin .fest-b__ava { width: 3rem; height: 3rem; }
-    .fest-b__ava canvas { width: 100%; height: 100%; max-width: none; }
-    .fest-b__isi { min-width: 0; line-height: 1.15; }
-    .fest-b strong { display: block; font-size: var(--fs-btn-sm); }
-    .fest-b em { display: block; font-style: normal; font-size: var(--fs-body); color: var(--sun-500); overflow-wrap: anywhere; }
-    .fest-b.is-pin strong { font-size: var(--fs-body); }
-    .fest-b.is-pin em { font-size: var(--fs-h2); }
-    .fest-b small { display: block; font-size: var(--fs-tab); color: var(--ink-2); }
-    .fest-b__tag { position: absolute; top: -.7rem; right: -.4rem; padding: .1rem .5rem; border-radius: var(--r-pill); background: var(--sun-400); color: var(--white); font-size: var(--fs-tab); font-weight: 800; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
     /* ============ Pemenang undian (anak muda: tegas, simpel) ============ */
     .juara { margin-top: var(--space-5); padding: clamp(1.25rem, 4vw, 2rem); border-radius: var(--r-lg); background: var(--navy-950); color: var(--white); box-shadow: var(--e3); }
     .juara__judul { margin-top: .5rem; font-size: var(--fs-h1); line-height: 1.1; color: var(--white); }
@@ -578,77 +558,12 @@
     .juara__kosong[hidden], .juara__daftar:empty { display: none; }
     .juara__langkah { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; margin: .875rem 0 1rem; padding: 0; list-style: none; color: var(--blue-100); font-size: var(--fs-btn); }
     .juara__langkah b { display: inline-grid; place-items: center; width: 1.5rem; height: 1.5rem; margin-right: .375rem; border-radius: 50%; background: var(--sun-400); color: var(--navy-900); font-size: var(--fs-btn-sm); }
-    /* ============ Lawan Monster (m05): tema gelap di atas panggung festival ============ */
-    .mon { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
-    .mon[hidden] { display: none; }
-    .mon::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, color-mix(in srgb, var(--navy-950) 55%, transparent) 0%, color-mix(in srgb, var(--navy-950) 15%, transparent) 35%, color-mix(in srgb, var(--navy-950) 45%, transparent) 100%); pointer-events: none; }
-    .mon__kanvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-    .mon__tangkap { position: absolute; inset: 0; pointer-events: auto; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
-    .mon__tangkap:focus-visible { outline: none; box-shadow: inset 0 0 0 3px var(--blue-500); border-radius: var(--r-xl); }
-    .mon__hud { position: absolute; top: var(--space-3); left: 50%; width: min(30rem, calc(100% - 1.5rem)); transform: translateX(-50%); padding: var(--space-3) var(--space-4); border-radius: var(--r-lg); background: color-mix(in srgb, var(--navy-950) 88%, transparent); color: var(--white); box-shadow: var(--e3), inset 0 0 0 1px color-mix(in srgb, var(--white) 12%, transparent); backdrop-filter: blur(8px); }
-    .mon__baris { display: flex; align-items: center; gap: var(--space-2); font-size: var(--fs-sm); line-height: 1.2; }
-    .mon__baris--kecil { justify-content: space-between; margin-top: var(--space-2); font-size: var(--fs-xs); color: var(--blue-100); font-variant-numeric: tabular-nums; }
-    .mon__nama { font-size: var(--fs-body); font-weight: 800; color: var(--white); }
-    .mon__lvl { font-size: var(--fs-xs); font-weight: 700; color: var(--blue-100); }
-    .mon__pemain { margin-left: auto; font-weight: 800; color: var(--sun-400); font-variant-numeric: tabular-nums; }
-    .mon__bar { position: relative; height: .75rem; margin-top: var(--space-2); overflow: hidden; border-radius: var(--r-pill); background: color-mix(in srgb, var(--white) 15%, transparent); }
-    .mon__bar i { position: absolute; inset: 0; transform-origin: left; transform: scaleX(0); background: linear-gradient(90deg, var(--coral-500), var(--sun-500)); }
-    .mon__bar b { position: absolute; inset: 0; background: repeating-linear-gradient(115deg, color-mix(in srgb, var(--white) 20%, transparent) 0 .5rem, transparent .5rem 1rem); animation: mon-geser 1.2s linear infinite; }
-    @keyframes mon-geser { to { background-position: 2.2rem 0; } }
-    .mon__ajak { position: absolute; left: 50%; bottom: var(--space-3); max-width: calc(100% - 1.5rem); margin: 0; padding: 8px 14px; transform: translateX(-50%); border-radius: var(--r-pill); background: color-mix(in srgb, var(--navy-950) 88%, transparent); color: var(--white); font-size: var(--fs-sm); font-weight: 700; text-align: center; box-shadow: var(--e2); }
-    .mon__ajak[hidden], .mon__ajak:empty { display: none; }
-    .mon[data-fase="tunggu"] .mon__ajak { top: var(--space-3); bottom: auto; background: var(--navy-900); }
-    .mon__pesan { position: absolute; left: 50%; top: 50%; width: min(24rem, calc(100% - 2rem)); padding: var(--space-5); transform: translate(-50%, -50%); border-radius: var(--r-xl); background: var(--white); color: var(--navy-900); text-align: center; pointer-events: auto; box-shadow: var(--e3); animation: mon-masuk .4s var(--ease); }
-    @keyframes mon-masuk { from { opacity: 0; transform: translate(-50%, -46%); } }
-    .mon__pesan[hidden] { display: none; }
-    .mon__pesan h3 { font-size: var(--fs-h1); line-height: var(--lh-h1); font-weight: 800; letter-spacing: var(--ls-h1); color: var(--navy-900); }
-    .mon__pesan p { margin: var(--space-2) 0 var(--space-4); font-size: var(--fs-sm); color: var(--ink-2); }
-    .mon__pesan .btn { margin: var(--space-1); }
-    .mon__nyawa { display: flex; align-items: center; gap: var(--space-2); margin-top: var(--space-2); font-size: var(--fs-xs); font-weight: 700; color: var(--blue-100); }
-    .mon__nyawa[hidden] { display: none; }
-    .mon__nbar { position: relative; flex: 1; height: .5rem; overflow: hidden; border-radius: var(--r-pill); background: color-mix(in srgb, var(--white) 15%, transparent); }
-    .mon__nbar i { position: absolute; inset: 0; transform-origin: left; background: var(--green-600); transition: transform .5s; }
-    .mon__nyawa.is-kritis { color: var(--coral-100); }
-    .mon__nyawa.is-kritis .mon__nbar i { background: var(--coral-500); animation: mon-kritis .6s infinite alternate; }
-    @keyframes mon-kritis { to { opacity: .55; } }
-    .mon__npersen { min-width: 2.5rem; text-align: right; color: var(--white); font-variant-numeric: tabular-nums; }
-    .mon__awas { position: absolute; left: 50%; top: 34%; display: flex; align-items: center; gap: 10px; margin: 0; padding: 12px 18px; transform: translate(-50%, -50%); border-radius: var(--r-md); background: var(--navy-900); color: var(--white); font-weight: 700; font-size: var(--fs-body); text-align: center; white-space: nowrap; box-shadow: var(--e3); animation: mon-awas .5s infinite alternate; }
-    .mon__awas::before { content: "⚠"; color: var(--sun-400); font-size: var(--fs-h3); line-height: 1; }
-    .mon__awas[hidden] { display: none; }
-    @keyframes mon-awas { to { transform: translate(-50%, -50%) scale(1.04); } }
-    .mon__pesan[data-jenis="monster"] { background: var(--navy-950); color: var(--white); }
-    .mon__pesan[data-jenis="monster"] h3 { color: var(--coral-100); }
-    .mon__pesan[data-jenis="monster"] p { color: var(--blue-100); }
-    .mon__pesan[data-jenis="kabur"] h3 { color: var(--blue-600); }
-    .mon__hindar { position: absolute; right: var(--space-3); bottom: var(--space-3); z-index: 2; display: grid; place-items: center; align-content: center; gap: 2px; width: min(48%, 12rem); min-height: 5.5rem; padding: var(--space-2); border: 0; border-radius: var(--r-xl); background: linear-gradient(180deg, var(--sun-400), var(--sun-500)); color: var(--navy-900); font: 800 var(--fs-h2)/1 var(--font-sans); letter-spacing: .02em; pointer-events: auto; cursor: pointer; box-shadow: 0 0 0 5px color-mix(in srgb, var(--sun-400) 35%, transparent), var(--e3); animation: mon-hindar .5s infinite alternate; }
-    .mon__hindar svg { width: 1.75rem; height: 1.75rem; }
-    .mon__hindar[hidden] { display: none; }
-    .mon:has(.mon__hindar:not([hidden])) .mon__ajak { opacity: 0; }
-    .mon__hindar:disabled { background: var(--disabled-bg); color: var(--disabled-fg); box-shadow: none; animation: none; cursor: default; }
-    .mon__hindar:focus-visible { outline: none; box-shadow: 0 0 0 5px color-mix(in srgb, var(--sun-400) 35%, transparent), var(--ring); }
-    @keyframes mon-hindar { to { transform: scale(1.04); } }
-    .mon__tiket { position: absolute; left: var(--space-3); bottom: var(--space-3); z-index: 2; display: grid; min-width: 8rem; padding: var(--space-3) var(--space-4); border-radius: var(--r-lg); background: color-mix(in srgb, var(--navy-950) 90%, transparent); color: var(--white); box-shadow: var(--e2), inset 0 0 0 1px color-mix(in srgb, var(--white) 12%, transparent); }
-    .mon__tiket[hidden] { display: none; }
-    .mon__tiket small { font-size: var(--fs-sm); color: var(--violet-100); }
-    .mon__tiket strong { font-size: var(--fs-h1); line-height: 1.1; font-weight: 800; font-variant-numeric: tabular-nums; }
-    .mon__tiket span { font-size: var(--fs-sm); color: var(--violet-100); }
-    @media (prefers-reduced-motion: reduce) { .mon__awas, .mon__hindar, .mon__nyawa.is-kritis .mon__nbar i { animation: none; } }
-    .fest__stage.is-monster .fest-b { opacity: 0 !important; pointer-events: none !important; }
-    .fest__stage.is-monster .fest__online, .fest__stage.is-monster .fest__share, .fest__stage.is-monster .fest__kunci { display: none !important; }
-    .mon-banner { position: fixed; z-index: 44; left: 50%; translate: -50% 0; bottom: calc(var(--tabbar-h) + 24px + env(safe-area-inset-bottom)); max-width: calc(100% - 2rem); display: flex; align-items: center; gap: var(--space-2); padding: 10px 16px; border: 0; border-radius: var(--r-pill); background: var(--navy-900); color: var(--white); font-size: var(--fs-sm); font-weight: 600; text-decoration: none; box-shadow: var(--e3); cursor: pointer; }
     @media (min-width: 64rem) { .mon-banner { bottom: var(--space-5); } }
-    .mon-banner[hidden] { display: none; }
-    .mon-banner strong { color: var(--sun-400); }
-    .mon-banner__jam { font-variant-numeric: tabular-nums; font-weight: 800; }
-    .mon-banner__dot { width: .625rem; height: .625rem; flex: none; border-radius: 50%; background: var(--coral-500); box-shadow: 0 0 0 0 color-mix(in srgb, var(--coral-500) 70%, transparent); animation: mon-denyut 1.4s infinite; }
-    @keyframes mon-denyut { to { box-shadow: 0 0 0 .625rem color-mix(in srgb, var(--coral-500) 0%, transparent); } }
-    @media (prefers-reduced-motion: reduce) { .mon__bar b, .mon-banner__dot, .mon-banner, .mon__pesan { animation: none; } }
     /* ---- Festival: kepala, plaza, sheet alat (m02 · d02) ---- */
     .fest-head { display: grid; gap: var(--space-2); }
     .fest-head__badges { display: flex; flex-wrap: wrap; gap: var(--space-2); }
     .fest-head .sec-sub { max-width: 40rem; }
     .fest { position: relative; margin-top: var(--space-5); }
-    .fest__stage { position: relative; overflow: hidden; aspect-ratio: 4 / 5; border-radius: var(--r-xl); background: var(--sun-100); box-shadow: var(--e2); }
     @media (min-width: 40rem) { .fest__stage { aspect-ratio: 1654 / 951; } }
     .fest__online { position: absolute; z-index: 6; top: var(--space-3); left: 50%; translate: -50% 0; display: inline-flex; align-items: center; gap: 8px; min-height: 2.5rem; padding: 0 var(--space-4); border-radius: var(--r-pill); background: var(--glass); box-shadow: var(--e2); font-size: var(--fs-sm); font-weight: 600; color: var(--text-2); white-space: nowrap; }
     .fest__online strong { font-size: var(--fs-body); font-weight: 800; color: var(--heading); font-variant-numeric: tabular-nums; }
@@ -658,15 +573,6 @@
     .fest__kunci svg { width: 1rem; height: 1rem; color: var(--sun-400); }
     .fest.is-locked .fest__kunci { display: inline-flex; }
     .fest.is-locked .fest__share { display: none; }
-    .fest-b { border-color: var(--white); background: var(--white); box-shadow: var(--e2); color: var(--navy-900); }
-    .fest-b::after { background: var(--white); border-color: var(--white); }
-    .fest-b em { font-family: var(--font-sans); font-weight: 800; font-size: var(--fs-body); letter-spacing: .2px; text-transform: uppercase; color: var(--blue-600); }
-    .fest-b.is-pin { border-color: var(--sun-400); }
-    .fest-b.is-pin::after { border-color: var(--sun-400); }
-    .fest-b.is-pin em { font-size: var(--fs-h3); }
-    .fest-b small { color: var(--ink-3); }
-    .fest-b__ava { background: var(--sun-100); }
-    .fest-b__tag { background: var(--sun-400); color: var(--navy-900); }
     .fest:not(.is-locked) .fest__stage { border-radius: var(--r-xl) var(--r-xl) 0 0; box-shadow: none; }
     .fest:not(.is-locked) { border-radius: var(--r-xl); box-shadow: var(--e2); }
     .fest__alat { position: relative; z-index: 6; display: grid; gap: var(--space-3); margin-top: -1.75rem; padding: 10px var(--space-5) var(--space-5); border-radius: var(--r-xl); background: var(--surface); box-shadow: 0 -8px 24px color-mix(in srgb, var(--navy-900) 8%, transparent); }
@@ -674,6 +580,10 @@
     .fest.is-locked .fest__alat { display: none; }
     .fest:has(.fest__stage.is-monster) .fest__alat { margin-top: 0; }
     .fest__cari { display: grid; grid-template-columns: 1fr auto; gap: var(--space-2); }
+    .fest__cari .input-wrap, .fest__cari .input { min-width: 0; }
+    .fest__aksi .btn { min-width: 0; padding-inline: var(--space-3); }
+    .fest-grid, .fest, .fest__alat { min-width: 0; }
+    @media (max-width: 23.5rem) { .fest__alat { padding-inline: var(--space-4); } .fest__cari .btn { padding-inline: var(--space-3); } }
     .fest__cari .input { min-height: var(--btn-md); }
     .fest__chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding: 2px; }
     .fest__aksi { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); }
@@ -771,17 +681,12 @@
       .fest.is-locked .fest__stage { aspect-ratio: auto; height: 52rem; min-height: 0; }
       .fest__kunci { display: none !important; }
       .fest:not(.is-locked) { box-shadow: var(--e2); }
-      .fest:not(.is-locked) .fest__stage { border-radius: var(--r-xl); }
       .fest__online { display: none; }
-      .fest:not(.is-locked) .fest__alat { position: static; display: block; padding: 0; border: 0; background: none; box-shadow: none; }
-      .fest:not(.is-locked) .fest__cari { position: absolute; z-index: 6; right: 0; top: calc(-1 * (var(--btn-md) + var(--space-4))); width: min(26rem, 60%); }
-      .fest:not(.is-locked) .fest__chips { position: absolute; z-index: 6; left: var(--space-4); bottom: var(--space-4); max-width: 45%; }
-      .fest:not(.is-locked) .fest__aksi { position: absolute; z-index: 6; right: var(--space-4); bottom: var(--space-4); }
-      .fest__chips .chip:not([aria-pressed="true"]) { box-shadow: var(--e1); }
-      .fest:not(.is-locked) .fest__aksi .btn--soft { --btn-bg: var(--white); --btn-fg: var(--navy-900); box-shadow: var(--e1); }
-      .fest:not(.is-locked) .fest__info { position: absolute; z-index: 6; left: var(--space-4); bottom: calc(var(--space-4) + var(--tap) + var(--space-3)); max-width: 60%; padding: 8px 12px; border-radius: var(--r-md); background: var(--glass); box-shadow: var(--e1); }
       .fest-samping { display: grid; gap: var(--space-4); }
-      .fest-head { padding-right: calc(min(26rem, 60%) + var(--space-5)); }
+      .fest-head { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--gutter-d); }
+      .fest-head__cari { flex: 0 1 26rem; }
+      .fest-head__cari .fest__cari { width: 100%; }
+      #satu-kata:has(.fest.is-locked) .fest-head__cari { visibility: hidden; }
       .fest-samping__kartu { padding: var(--space-5); border-radius: var(--r-lg); }
       .fest-samping__judul { display: flex; justify-content: space-between; align-items: center; gap: var(--space-2); font-size: var(--fs-h3); line-height: var(--lh-h3); font-weight: 700; letter-spacing: var(--ls-h3); color: var(--heading); }
       .fest-samping__judul .badge svg { width: .75rem; height: .75rem; }
@@ -795,6 +700,24 @@
       .fest-samping__monster .t-h3, .fest-samping__monster .t-sm { color: var(--white); }
       .fest-samping__monster .t-sm { opacity: .9; }
     }
+    @media (min-width: 80rem) {
+      .fest:not(.is-locked) .fest__stage { border-radius: var(--r-xl); }
+      .fest:not(.is-locked) .fest__alat { position: static; display: block; padding: 0; border: 0; background: none; box-shadow: none; }
+      .fest:not(.is-locked) .fest__chips { position: absolute; z-index: 6; left: var(--space-4); bottom: var(--space-4); max-width: 45%; }
+      .fest:not(.is-locked) .fest__aksi { position: absolute; z-index: 6; right: var(--space-4); bottom: var(--space-4); }
+      .fest__chips .chip:not([aria-pressed="true"]) { box-shadow: var(--e1); }
+      .fest:not(.is-locked) .fest__aksi .btn--soft { --btn-bg: var(--white); --btn-fg: var(--navy-900); box-shadow: var(--e1); }
+      .fest:not(.is-locked) .fest__info { position: absolute; z-index: 6; left: var(--space-4); bottom: calc(var(--space-4) + var(--tap) + var(--space-3)); max-width: 60%; padding: 8px 12px; border-radius: var(--r-md); background: var(--glass); box-shadow: var(--e1); }
+    }
+    @media (min-width: 64rem) and (max-width: 79.99rem) {
+      .fest:not(.is-locked) .fest__alat { display: flex; flex-wrap: wrap; justify-content: space-between; }
+      .fest:not(.is-locked) .fest__info { flex-basis: 100%; }
+    }
+    .bos-banner { position: fixed; z-index: 55; left: 50%; translate: -50% 0; bottom: calc(var(--tabbar-h) + 24px + env(safe-area-inset-bottom)); display: flex; align-items: center; gap: var(--space-2); max-width: calc(100% - 2rem); padding: 10px 16px; border-radius: var(--r-pill); background: var(--navy-900); color: var(--white); font-size: var(--fs-sm); text-decoration: none; box-shadow: var(--e3); white-space: nowrap; }
+    .bos-banner strong { color: var(--sun-400); }
+    .bos-banner svg { width: 1rem; height: 1rem; }
+    .bos-banner__dot { width: .625rem; height: .625rem; flex: none; border-radius: 50%; background: var(--coral-500); animation: k-pulse 1.4s infinite; }
+    @media (min-width: 64rem) { .bos-banner { bottom: var(--space-5); } }
     /* ---- Sukses gabung + kartu share (m04) ---- */
     dialog.sukses { width: 100%; max-width: 30rem; max-height: 100dvh; margin: auto; padding: var(--space-6) var(--margin-m) var(--space-5); border: 0; border-radius: var(--r-xl); overflow: auto; background: linear-gradient(180deg, var(--blue-500) 0%, var(--blue-600) 45%, var(--navy-900) 100%); color: var(--white); text-align: center; }
     dialog.sukses::backdrop { background: var(--scrim); }
@@ -1271,6 +1194,7 @@
     }
   </style>
   <link rel="stylesheet" href="assets/css/komponen.css">
+  <script src="assets/js/gladi.js"></script>
 </head>
 
 <body>
@@ -1356,7 +1280,7 @@
       </nav>
 
       <div class="header-tools">
-        <a class="btn btn--dark header-game" href="#satu-kata" data-ke-festival><svg aria-hidden="true"><use href="#i-game"/></svg>Game</a>
+        <a class="btn btn--dark header-game" href="game/"><svg aria-hidden="true"><use href="#i-game"/></svg>Game</a>
         <button class="icon-btn theme-toggle" type="button" aria-label="Mode gelap" aria-pressed="false" hidden>
           <svg class="icon-moon" aria-hidden="true"><use href="#i-moon"/></svg>
           <svg class="icon-sun" aria-hidden="true"><use href="#i-sun"/></svg>
@@ -1426,18 +1350,18 @@
         </ul>
 
         <div class="hero__row">
-          <a class="game-card" href="#satu-kata" aria-label="Game interaktif Festival 1 Kata: main sekarang">
+          <a class="game-card" href="game/" aria-label="Game Lawan Raja Batu: main sekarang, peluang dapat HP">
             <span class="game-card__art" aria-hidden="true"><svg class="game-card__pad" viewBox="0 0 120 80" aria-hidden="true"><defs><linearGradient id="hero-padg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--white)"/><stop offset="1" style="stop-color:var(--blue-100)"/></linearGradient></defs>
 <path d="M30 14h60c14 0 22 10 25 26 3 15 3 30-8 32-8 1.5-13-6-19-13H32c-6 7-11 14.5-19 13C2 70 2 55 5 40 8 24 16 14 30 14Z" fill="url(#hero-padg)" style="stroke:var(--line-2)" stroke-width="1.5"/>
 <path d="M34 30v18M25 39h18" style="stroke:var(--navy-900)" stroke-width="6" stroke-linecap="round"/>
 <circle cx="84" cy="31" r="4.6" style="fill:var(--navy-900)"/><circle cx="95" cy="40" r="4.6" style="fill:var(--navy-900)"/><circle cx="73" cy="40" r="4.6" style="fill:var(--navy-900)"/><circle cx="84" cy="49" r="4.6" style="fill:var(--navy-900)"/></svg></span>
             <span class="game-card__txt">
-              <span class="badge badge--sun">Game Interaktif</span>
-              <strong>Festival 1 Kata</strong>
-              <small>Rangkai kata terbaikmu, dan jadilah yang terhebat!</small>
+              <span class="badge badge--sun">Game · peluang dapat HP</span>
+              <strong>Lawan Raja Batu</strong>
+              <small>Kalahkan bos bareng, dapat kode undian, diundi saat live!</small>
               <span class="btn btn--dark btn--sm game-card__btn" aria-hidden="true"><svg><use href="#i-play"/></svg>Main Sekarang<svg><use href="#i-arrow"/></svg></span>
             </span>
-            <span class="game-card__kata" aria-hidden="true"><i>Maju</i><i>Satu Kata</i><i>Bersama</i><i>Indonesia</i><i>Untuk</i></span>
+            <span class="game-card__kata" aria-hidden="true"><i>Tap!</i><i>Combo x3</i><i>HINDAR</i><i>Kode #0001</i><i>Menang HP</i></span>
             <span class="game-card__go" aria-hidden="true"><svg><use href="#i-chevron-right"/></svg></span>
           </a>
 
@@ -1495,6 +1419,7 @@
             <h2 class="t-h1" id="sk-title">Festival Satu Kata</h2>
             <p class="sec-sub">Satu orang, satu kata. Kirim satu kata harapanmu dan hiduplah sebagai warga festival bersama ribuan pelajar se-Indonesia.</p>
           </div>
+          <div class="fest-head__cari" id="fest-cari-slot"></div>
         </div>
 
         <div class="fest-grid">
@@ -1609,8 +1534,8 @@
           <div class="fest-samping__monster">
             <span class="badge badge--game">Pra-live</span>
             <p class="t-h3">Lawan Monster, dapat tiket spin</p>
-            <p class="t-sm">Monster muncul sebelum live. Tap bareng, hindari jurusnya, kumpulkan tiket undian.</p>
-            <a class="btn btn--light btn--sm" href="#live"><svg aria-hidden="true"><use href="#i-calendar"/></svg>Lihat jadwal live</a>
+            <p class="t-sm">Kalahkan Raja Batu bareng sebelum live, dapat kode undian, diundi di live. Ada mode latihan kapan saja.</p>
+            <a class="btn btn--light btn--sm" href="game/"><svg aria-hidden="true"><use href="#i-game"/></svg>Main sekarang</a>
           </div>
         </aside>
         </div>
@@ -1625,7 +1550,7 @@
           <div class="juara__kosong" id="juara-kosong">
             <strong>Belum ada pemenang. Kamu bisa jadi yang pertama.</strong>
             <ol class="juara__langkah"><li><b>1</b>Masuk festival</li><li><b>2</b>Lawan monster, dapat tiket</li><li><b>3</b>Menang di spin live</li></ol>
-            <a class="btn btn--cta btn--sm" href="#fest-form">Ikut sekarang</a>
+            <a class="btn btn--cta btn--sm" href="game/">Main sekarang</a>
           </div>
         </div>
       </div>
@@ -2115,6 +2040,8 @@
   </footer>
 
   <!-- ========== ACTION BAR ========== -->
+  <a class="bos-banner" id="bos-banner" href="game/" hidden><span class="bos-banner__dot" aria-hidden="true"></span><span id="bos-banner-teks"></span><svg aria-hidden="true"><use href="#i-chevron-right"/></svg></a>
+
   <!-- ========== BOTTOM NAV seluler (5 item, design system) ========== -->
   <nav class="tabbar-wrap" aria-label="Navigasi bawah">
     <ul class="tabbar" id="tabbar">
@@ -2163,6 +2090,7 @@
     <ul class="menu-list">
       <li><button type="button" class="lainnya__kode" data-kode-open><span class="ico ico--wildcard"><svg aria-hidden="true"><use href="#i-key"/></svg></span><span class="menu-list__txt"><strong>Punya kode?</strong><small>Kode wildcard dari email atau kode Dana Kaget</small></span><svg class="menu-list__go" aria-hidden="true"><use href="#i-chevron-right"/></svg></button></li>
       <li><a href="#dana"><span class="ico ico--dana"><svg aria-hidden="true"><use href="#i-gift"/></svg></span><span class="menu-list__txt"><strong>Dana Kaget</strong><small id="lain-dana-sub">Klaim pakai kode akses</small></span><span class="badge badge--open" id="lain-dana-badge" hidden>Buka</span><svg class="menu-list__go" aria-hidden="true"><use href="#i-chevron-right"/></svg></a></li>
+      <li><a href="game/"><span class="ico ico--game"><svg aria-hidden="true"><use href="#i-game"/></svg></span><span class="menu-list__txt"><strong>Game: Lawan Raja Batu</strong><small>Kalahkan bos, dapat kode undian HP</small></span><svg class="menu-list__go" aria-hidden="true"><use href="#i-chevron-right"/></svg></a></li>
       <li><a href="klaim/"><span class="ico ico--wildcard"><svg aria-hidden="true"><use href="#i-ticket"/></svg></span><span class="menu-list__txt"><strong>Tiket Wildcard</strong><small id="lain-wild-sub">Untuk yang belum lolos</small></span><svg class="menu-list__go" aria-hidden="true"><use href="#i-chevron-right"/></svg></a></li>
       <li><a href="#road-to-bali"><span class="ico ico--road"><svg aria-hidden="true"><use href="#i-bus"/></svg></span><span class="menu-list__txt"><strong>Road to Bali</strong><small id="lain-road-sub">Dukungan menuju Bali</small></span><svg class="menu-list__go" aria-hidden="true"><use href="#i-chevron-right"/></svg></a></li>
       <li><a href="#leaderboard"><span class="ico ico--road"><svg aria-hidden="true"><use href="#i-trophy"/></svg></span><span class="menu-list__txt"><strong>Leaderboard</strong><small>Provinsi dan sekolah teraktif</small></span><svg class="menu-list__go" aria-hidden="true"><use href="#i-chevron-right"/></svg></a></li>
@@ -2239,7 +2167,6 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="assets/js/festival.js"></script>
-  <script src="assets/js/monster.js" defer></script>
   <script>
   (() => {
     'use strict';
@@ -2374,6 +2301,11 @@
       track.parentElement.addEventListener('pointerleave', () => { jeda = false; });
       mulai();
     })();
+
+    /* ---------- Header desktop: latar muncul setelah menggulir ---------- */
+    const hdr = $('.site-header');
+    const syncHdr = () => hdr.classList.toggle('is-scrolled', scrollY > 12);
+    addEventListener('scroll', syncHdr, { passive: true }); syncHdr();
 
     /* ---------- Scrollspy: nav pil desktop + bottom nav ---------- */
     const navLinks = $$('.nav__link');
@@ -3284,20 +3216,19 @@
     }
     muatJuara();
     setInterval(() => { if (!document.hidden) muatJuara(); }, 60000);
-    /* ---------- Lawan Monster: event kolaboratif sebelum live (assets/js/monster.js + /api/monster) ---------- */
-    // Dipasang setelah halaman siap; bila skrip/endpoint gagal, festival tetap berjalan seperti biasa.
-    window.addEventListener('DOMContentLoaded', () => {
-      if (!window.YCSMonster) return;
+    /* ---------- Raja Batu muncul → ajak ke /game/ (game dipisah dari beranda) ---------- */
+    async function cekBos() {
       try {
-        window.YCSMonster.pasang({
-          stage: $('.fest__stage'), festApi, now, endpoint: '/api/monster',
-          identitas: () => { try { return JSON.parse(localStorage.getItem('ycs_identitas') || 'null'); } catch (e) { return null; } },
-          saya: () => saya, // karakter milik pengunjung di festival ({n, k}) → ditandai "KAMU" saat melawan monster
-          bolehTap: () => !fest.classList.contains('is-locked'),
-          saatTerkunci: () => { toast('Isi data & satu kata dulu untuk ikut melawan monster.'); $('#fest-form').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' }); },
-        });
-      } catch (e) { /* fitur tambahan, jangan ganggu fitur lama */ }
-    });
+        const st = await (await fetch('/api/monster')).json();
+        const b = $('#bos-banner');
+        const tanding = st.fase === 'tanding', tunggu = st.fase === 'tunggu' && st.mulai;
+        b.hidden = !(tanding || tunggu);
+        if (tanding) $('#bos-banner-teks').innerHTML = '<strong>Raja Batu muncul!</strong> Lawan sekarang, dapat kode undian';
+        else if (tunggu) $('#bos-banner-teks').innerHTML = '<strong>Raja Batu</strong> muncul ' + new Date(st.mulai).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }) + ' WIB';
+      } catch (e) { /* abaikan */ }
+    }
+    cekBos();
+    setInterval(() => { if (!document.hidden) cekBos(); }, 20000);
 
     let waKlik = false;
     try { waKlik = sessionStorage.getItem('ycs_wa') === '1'; } catch (e) {}
@@ -3500,6 +3431,12 @@
       festApi.sorot(w, 8000, w === festApi.saya ? 'Ini kamu!' : '');
     }));
 
+    // Desktop (d02): kolom cari di kepala festival; HP (m02): di bottom sheet.
+    (() => {
+      const mq = matchMedia('(min-width: 64rem)'), cari = $('#fest-cari'), slot = $('#fest-cari-slot'), alat = $('#fest-alat');
+      const pindah = () => { if (mq.matches) slot.append(cari); else alat.insertBefore(cari, $('.fest__chips', alat)); };
+      pindah(); mq.addEventListener('change', pindah);
+    })();
     let hasilCari = [], posCari = 0, qTerakhir = '';
     $('#fest-cari').addEventListener('submit', (e) => {
       e.preventDefault();

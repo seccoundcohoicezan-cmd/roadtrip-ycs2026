@@ -382,11 +382,14 @@ function buatMonster(app, opsi = {}) {
   function finalisasi(id, out) {
     const e = st.events[id];
     e.final = true;
-    if (id[0] === 'u') { (e.ujiRows || []).forEach((r) => { const pid = Object.keys(e.tiket).find((q) => e.tiket[q] === r[2]); if (pid) r[8] = e.u[pid].p; }); ubah(); return; }
+    // Skema hadiah: kode undian hanya sah (ikut spin) bila Raja Batu tumbang. Monster menang / kabur → kode hangus.
+    const HANGUS = 'hangus · bos tidak tumbang';
+    const sah = !!out.kalah;
+    if (id[0] === 'u') { (e.ujiRows || []).forEach((r) => { const pid = Object.keys(e.tiket).find((q) => e.tiket[q] === r[2]); if (pid) r[8] = e.u[pid].p; if (!sah && r[9] === 'aktif') r[9] = HANGUS; }); ubah(); return; }
     const sh = app.sheets['Tiket Monster'];
     if (sh) {
       const nomorPid = new Map(Object.entries(e.tiket).map(([pid, no]) => [no, pid]));
-      sh.rows.forEach((r, i) => { if (i && r[1] === id && nomorPid.has(String(r[2]))) r[8] = e.u[nomorPid.get(String(r[2]))].p; });
+      sh.rows.forEach((r, i) => { if (i && r[1] === id && nomorPid.has(String(r[2]))) { r[8] = e.u[nomorPid.get(String(r[2]))].p; if (!sah && r[9] === 'aktif') r[9] = HANGUS; } });
     }
     const me = app.sheets['Monster Event'] || app.ctx.tab_(app.ss, 'monster');
     me.appendRow([id, out.mulai, out.selesai, out.kalah ? out.kalah : out.monsterMenang ? 'MONSTER MENANG ' + out.monsterMenang : 'kabur', e.total, Object.keys(e.u).length, e.n, '']);
@@ -457,6 +460,9 @@ function buatMonster(app, opsi = {}) {
   // latihan = hasil tidak dicatat dan stok tidak berkurang.
   function spin(id, latihan) {
     if (!id) return {ok: false, error: 'tidak_ada_tiket'};
+    const ev0 = st.events[id];
+    // Skema hadiah: hanya event yang bosnya tumbang yang boleh diundi (spin latihan tetap boleh untuk gladi).
+    if (!latihan && ev0 && !ev0.kalah) return {ok: false, error: 'bos_tidak_tumbang'};
     const semua = barisTiket(id);
     const calon = semua.filter((x) => x.r[9] === 'aktif');
     if (!calon.length) return {ok: false, error: 'tidak_ada_tiket'};

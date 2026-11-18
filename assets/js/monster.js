@@ -696,7 +696,7 @@
       if (tiketSaya) { kt.querySelector('strong').textContent = String(tiketSaya).startsWith('#') ? tiketSaya : '#' + tiketSaya; kt.querySelector('span').textContent = `${nf.format(sayaPoin)} tenaga`; }
       if (tanding && bolehTap() && !token && !blokir && navigator.onLine) pastikanToken().catch(() => {});
       if (st.fase === 'tunggu') tampilAjak(`${st.nama} muncul dalam ${jam(Date.parse(st.mulai) - now())}. Siapkan jarimu!`);
-      else if (tanding && !bolehTap()) tampilAjak('Buka festival dulu (isi data & satu kata di bawah) untuk ikut melawan.');
+      else if (tanding && !bolehTap()) tampilAjak('Buka festival dulu: gabung Festival Satu Kata di beranda untuk ikut melawan.');
       else if (tanding && karakterMati) tampilAjak('Karaktermu tumbang. Kamu tidak bisa menyerang lagi di event ini, tapi tetap bisa menonton & ajak teman!');
       else if (tanding && blokir) tampilAjak((PESAN_BLOKIR[blokir.error] || (() => 'Tidak bisa ikut dari perangkat ini.'))(blokir));
       else if (tanding && !navigator.onLine) tampilAjak(`Koneksi terputus. ${nf.format(pending())} tap disimpan dan dikirim saat tersambung.`);
@@ -716,7 +716,7 @@
       const jenis = akhir ? akhir.jenis : st.fase === 'menang' ? 'menang' : st.fase === 'monster_menang' ? 'monster' : 'kabur';
       pesan.hidden = false;
       pesan.dataset.jenis = jenis;
-      const tiketku = tiketSaya ? ` Tiket undianmu ${tiketSaya}, pantau spin saat live!` : '';
+      const tiketku = tiketSaya ? (jenis === 'menang' ? ` Kode undianmu ${tiketSaya} SAH, diundi saat live!` : ` Kode ${tiketSaya} hangus karena bos tidak tumbang.`) : '';
       const sumbang = sayaPoin ? ` Kamu menyumbang ${nf.format(sayaPoin)} tenaga.` : '';
       pesan.querySelector('h3').textContent = { menang: 'Monster Terkalahkan!', monster: st.nama + ' Menang!', kabur: st.nama + ' Kabur!' }[jenis];
       pesan.querySelector('p').textContent = {
@@ -841,7 +841,7 @@
           throw new Error(d.error || 'masuk');
         }
         token = d.token; simpan(KUNCI_TOKEN, token);
-        if (d.tiket) tiketSaya = d.tiket;
+        if (d.tiket) { tiketSaya = d.tiket; opsi.saatTiket && opsi.saatTiket(d.tiket, st); }
         if (d.saya) sayaPoin = d.saya;
         if (d.mati) setMati(false);
         if (st) tampilkan(true);
@@ -875,7 +875,7 @@
         simpan(KUNCI_ANTRE, antre);
         if (d.saya) sayaPoin = d.saya;
         if (d.mati && !karakterMati) setMati(true);
-        if (d.tiket && d.tiket !== tiketSaya) { tiketSaya = d.tiket; tampilAjak(`Selamat! Kamu dapat tiket undian ${tiketSaya}. Pantau spin saat live YCS!`, 5000); }
+        if (d.tiket && d.tiket !== tiketSaya) { tiketSaya = d.tiket; opsi.saatTiket && opsi.saatTiket(d.tiket, st); tampilAjak(`Kode undian ${tiketSaya} dicadangkan! Sah kalau Raja Batu tumbang. Pantau spin saat live YCS!`, 5000); }
         gagalBeruntun = 0;
         terapkan(d.status);
       } catch (e) {
