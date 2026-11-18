@@ -408,6 +408,7 @@
               <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-bolt"/></svg></span><div><h2 id="g-mon-jurus">Jurus &amp; nyawa warga</h2><p>Monster menembakkan jurus berkala yang menumbangkan warga. Nyawa warga habis = monster menang. Tenaga yang terkumpul antar jurus menjadi perisai.</p></div></header>
               <div class="set-grid">
                 <label class="switch" for="m-monster_jurus_aktif"><span>Jurus monster aktif<small>Mati = monster hanya bisa kalah atau kabur.</small></span><input type="checkbox" id="m-monster_jurus_aktif" data-key="monster_jurus_aktif" data-type="bool"></label>
+                <div class="field"><label for="m-monster_hp_warga">Nyawa tiap warga (kali kena)</label><input class="input" type="number" min="1" max="20" step="1" id="m-monster_hp_warga" data-key="monster_hp_warga"><p class="field__hint">Karakter tumbang setelah kena jurus sebanyak ini (bawaan 5).</p></div>
                 <div class="field"><label for="m-monster_jurus_anim">Durasi animasi jurus (detik)</label><input class="input" inputmode="decimal" id="m-monster_jurus_anim" data-key="monster_jurus_anim" placeholder="1.6"><p class="field__hint">0,6–4 detik: mengumpulkan api → ledakan → gelombang api.</p></div>
                 <div class="field"><label for="m-monster_jurus_detik">Jeda antar jurus (detik)</label><input class="input" type="number" min="4" max="60" step="1" id="m-monster_jurus_detik" data-key="monster_jurus_detik"></div>
                 <div class="field"><label for="m-monster_jurus_damage">Damage per jurus di level 1 (%)</label><input class="input" type="number" min="0" max="100" step="1" id="m-monster_jurus_damage" data-key="monster_jurus_damage"><p class="field__hint">Ikut naik sesuai ukuran level. Tanpa perlawanan, 4% = warga habis setelah 25 jurus.</p></div>
@@ -749,7 +750,7 @@
       $('#mon-pratinjau').innerHTML = a.target.map((t, i) => `<tr><td>${i + 1}</td><td>${nf.format(a.poin[i])}</td><td>${nf.format(t)}</td><td>${String(a.skala[i]).replace('.', ',')}×</td><td>±${nf.format(Math.ceil(t / a.poin[i] / 1000))} tap/orang</td></tr>`).join('');
       $$('#f-monster [data-pemicu]').forEach((el) => { el.hidden = !el.dataset.pemicu.split(' ').includes(v.monster_pemicu); });
       const jd = Number(v.monster_jurus_detik) || 8, dm = Number(v.monster_jurus_damage) || 0;
-      $('#jurus-ringkas').textContent = v.monster_jurus_aktif !== 'YA' ? 'Jurus mati.' : dm ? `Tanpa perlawanan, warga habis dalam ±${Math.ceil(100 / dm) * jd} detik di level 1. Perisai level 1 = ${nf.format(Math.round(a.target[0] * (Number(v.monster_perisai) || 0) / 100))} tenaga per ${jd} detik.` : 'Damage 0: jurus hanya efek visual.';
+      $('#jurus-ringkas').textContent = v.monster_jurus_aktif !== 'YA' ? 'Jurus mati.' : dm ? `Tiap jurus memukul ±${dm}% warga (−1 nyawa); tanpa perlawanan & tanpa HINDAR, warga habis dalam ±${Math.ceil(100 / dm) * (Number(v.monster_hp_warga) || 5) * jd} detik di level 1. Perisai level 1 = ${nf.format(Math.round(a.target[0] * (Number(v.monster_perisai) || 0) / 100))} tenaga per ${jd} detik.` : 'Damage 0: jurus hanya efek visual.';
       // Daftar kemunculan dari jadwal live (pemicu sebelum_live) atau waktu tertentu.
       const sekarang = data ? Date.parse(data.sekarang) : Date.now();
       let item = [];

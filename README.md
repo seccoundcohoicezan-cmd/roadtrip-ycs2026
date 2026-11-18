@@ -191,7 +191,7 @@ Tombol darurat: **Mulai sekarang** (event baru dari nol), **Stop darurat**, **Ke
 
 ### Karakter (MRKT-56 r7)
 
-Setiap pendaftar festival = 1 karakter (identitas **email atau No. WhatsApp**). Untuk menyerang, karaktermu harus masih berdiri. Jurus menumbangkan karakter secara acak di server (dikurangi perisai tim). Tekan **HINDAR** saat peringatan agar aman. Karakter tumbang tidak bisa menyerang lagi di event itu. Semua karakter tumbang = monster menang. Detail: `docs/ALUR.md`.
+Setiap pendaftar festival = 1 karakter (identitas **email atau No. WhatsApp**) dengan **5 nyawa** (`monster_hp_warga`). Untuk menyerang, karaktermu harus masih berdiri. Server mengumumkan **sasaran** jurus berikutnya (tanda bidik), monster mendekati & mengejar mereka, lalu tiap pukulan −1 nyawa (jumlah pukulan dikurangi perisai tim). Tekan **HINDAR** saat peringatan agar aman. Karakter tumbang tidak bisa menyerang lagi di event itu. Semua karakter tumbang = monster menang. Detail: `docs/ALUR.md`.
 
 ### Mode uji monster
 

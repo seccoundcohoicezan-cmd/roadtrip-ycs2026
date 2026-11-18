@@ -140,39 +140,73 @@ function buatMonster(app, opsi = {}) {
   // Jurus monster: tiap J detik sejak event mulai, nyawa warga berkurang damage × skala level.
   // Perisai: tenaga yang terkumpul sejak jurus sebelumnya (≥ perisai% target level) menahan hingga 80% damage.
   // Diproses malas (saat status/tap diminta) dengan jam server, jadi semua HP melihat nyawa yang sama.
-  // Jurus monster: tiap J detik sejak event mulai, sejumlah KARAKTER warga tumbang.
-  //   jumlah tumbang = populasi awal × damage% × skala level × (1 − perisai), minimal 1 bila masih ada sasaran.
-  //   Perisai: tenaga terkumpul sejak jurus sebelumnya (≥ perisai% target level) menahan hingga 80%.
-  //   Karakter yang menekan HINDAR saat peringatan aman dari jurus itu. Karakter tumbang tidak bisa menyerang.
-  //   Semua karakter tumbang → monster menang. Diproses malas dengan jam server.
+  // Jurus monster (karakter ber-nyawa):
+  //   - Setiap karakter punya hpMaks nyawa (monster_hp_warga, bawaan 5); tiap kena jurus −1, tumbang di 0.
+  //   - SASARAN jurus berikutnya dipilih lebih dulu (e.target) agar monster terlihat mendekati & mengejar mereka.
+  //   - Jumlah pukulan = populasi awal × damage% × skala level × (1 − perisai), minimal 1.
+  //   - Sasaran yang menekan HINDAR saat peringatan selamat (pukulan meleset). Karakter tumbang tidak bisa menyerang.
+  //   - Semua karakter tumbang → monster menang. Diproses malas dengan jam server.
+  const hpMaksDari = (m) => Math.round(angka(m.hpWarga, 5, 1, 20));
+  const tampilKarakter = (k) => { if (String(k).startsWith('uji:')) { const o = st.ujiPemain[String(k).slice(4)] || {}; return [namaTampil(o.nama || 'Penguji'), o.kata || '']; } const o = peserta(k) || {}; return [namaTampil(o.nama), o.kata || '']; };
+  function pukulanMaks(m, a, e, pop, li) {
+    const dmg = angka(m.jurusDamage, 4, 0, 100);
+    if (!dmg) return 0;
+    return Math.max(1, Math.round(Math.max(pop.length, e.populasiAwal || 0) * dmg / 100 * a.skala[li]));
+  }
+  // Pilih sasaran (boleh berulang bila pukulan > karakter hidup) untuk jurus ke-k.
+  function pilihTarget(m, a, e, pop, k) {
+    const li = Math.min(e.lvl, a.target.length) - 1;
+    const hidup = pop.filter((x) => !e.mati[x]);
+    const n = Math.min(pukulanMaks(m, a, e, pop, li), hidup.length * hpMaksDari(m));
+    const daftar = [];
+    for (let i = 0; i < n && hidup.length; i++) {
+      if (i % hidup.length === 0) for (let x = hidup.length - 1; x > 0; x--) { const r = crypto.randomInt(x + 1); [hidup[x], hidup[r]] = [hidup[r], hidup[x]]; }
+      daftar.push(hidup[i % hidup.length]);
+    }
+    e.target = {ke: k, daftar};
+  }
   function prosesJurus(c, j, e, t) {
     const m = mUntuk(c, j);
     if (!m.jurus || e.kalah || e.monsterMenang || !j.mulai) return;
     if (!e.mati) Object.assign(e, {mati: {}, hindar: {}, jurusKe: e.jurusKe || 0, totalJurus: e.totalJurus || 0, monsterMenang: 0, jurusInfo: null});
-    const J = angka(m.jurusDetik, 8, 4, 60) * 1000;
-    const kMaks = Math.floor((Math.min(t, j.selesai) - j.mulai) / J);
-    if (kMaks <= e.jurusKe) return;
+    if (!e.hp) e.hp = {};
+    const J = angka(m.jurusDetik, 8, 4, 60) * 1000, hpMaks = hpMaksDari(m);
     const a = aturan(m), pop = populasi(j);
     if (!e.populasiAwal) e.populasiAwal = pop.length;
+    const kMaks = Math.floor((Math.min(t, j.selesai) - j.mulai) / J);
+    let ubahan = false;
     for (let k = e.jurusKe + 1; k <= kMaks; k++) {
+      if (!e.target || e.target.ke !== k) pilihTarget(m, a, e, pop, k);
       const li = Math.min(e.lvl, a.target.length) - 1;
       const perisaiTarget = a.target[li] * angka(m.perisai, 2, 0, 100) / 100;
       const dapat = Math.max(0, e.total - e.totalJurus);
       const tahan = perisaiTarget > 0 ? Math.min(0.8, 0.8 * dapat / perisaiTarget) : 0;
       const aman = new Set(e.hindar[k] || []);
-      const sasaran = pop.filter((x) => !e.mati[x] && !aman.has(x));
-      const target = Math.round(Math.max(pop.length, e.populasiAwal) * angka(m.jurusDamage, 4, 0, 100) / 100 * a.skala[li] * (1 - tahan));
-      const n = Math.min(sasaran.length, sasaran.length ? Math.max(angka(m.jurusDamage, 4, 0, 100) > 0 ? 1 : 0, target) : 0);
-      for (let i = 0; i < n; i++) { const r = i + crypto.randomInt(sasaran.length - i); [sasaran[i], sasaran[r]] = [sasaran[r], sasaran[i]]; e.mati[sasaran[i]] = k; }
+      const daftar = e.target.daftar.slice(0, Math.max(e.target.daftar.length ? 1 : 0, Math.round(e.target.daftar.length * (1 - tahan))));
+      const kena = [], meleset = new Set();
+      let tumbang = 0;
+      for (const x of daftar) {
+        if (e.mati[x]) continue;
+        if (aman.has(x)) { meleset.add(x); continue; }
+        e.hp[x] = (e.hp[x] ?? hpMaks) - 1;
+        if (e.hp[x] <= 0) { e.mati[x] = k; tumbang++; }
+        kena.push(x);
+      }
       e.totalJurus = e.total; e.jurusKe = k;
       delete e.hindar[k];
       const hidup = pop.filter((x) => !e.mati[x]).length;
-      e.jurusInfo = {ke: k, tumbang: n, menghindar: aman.size, tahan: Math.round(tahan * 100)};
+      // untuk tampilan: siapa saja yang kena (maks 30) dengan sisa nyawanya
+      const unik = [...new Set(kena)].slice(0, 30).map((x) => [...tampilKarakter(x), Math.max(0, e.hp[x]), e.mati[x] ? 1 : 0]);
+      e.jurusInfo = {ke: k, pukulan: kena.length, tumbang, menghindar: meleset.size, tahan: Math.round(tahan * 100), kena: unik};
       e.hidup = hidup;
+      ubahan = true;
       if (pop.length && hidup === 0) { e.monsterMenang = j.mulai + k * J; break; }
+      pilihTarget(m, a, e, pop, k + 1);
     }
-    ubah();
+    if (!e.monsterMenang && t < j.selesai && (!e.target || e.target.ke !== e.jurusKe + 1)) { pilihTarget(m, a, e, pop, e.jurusKe + 1); ubahan = true; }
+    if (ubahan) ubah();
   }
+
 
 
   function status(c, j, t) {
@@ -193,7 +227,8 @@ function buatMonster(app, opsi = {}) {
     const J = angka(m.jurusDetik, 8, 4, 60) * 1000;
     const pop = t >= j.mulai ? populasi(j).length : 0;
     const hidupN = e.mati ? pop - Object.keys(e.mati).filter((k) => e.mati[k]).length : pop;
-    Object.assign(out, {hidup: Math.max(0, hidupN), totalWarga: pop, nyawa: pop ? Math.round(Math.max(0, hidupN) / pop * 1000) / 10 : 100, jurus: !!m.jurus, jurusMs: J, jurusAnimMs: Math.round(angka(m.jurusAnim, 1.6, 0.6, 4) * 1000), jurusDmgMaks: Math.round(angka(m.jurusDamage, 4, 0, 100) * a.skala[Math.min(e.lvl || 1, a.target.length) - 1] * 10) / 10, hindarMs: 2500, jurusKe: e.jurusKe || 0, jurusBerikut: m.jurus && out.fase === 'tanding' ? j.mulai + ((e.jurusKe || 0) + 1) * J : null,
+    Object.assign(out, {hidup: Math.max(0, hidupN), totalWarga: pop, nyawa: pop ? Math.round(Math.max(0, hidupN) / pop * 1000) / 10 : 100, jurus: !!m.jurus, jurusMs: J, jurusAnimMs: Math.round(angka(m.jurusAnim, 1.6, 0.6, 4) * 1000), jurusDmgMaks: Math.round(angka(m.jurusDamage, 4, 0, 100) * a.skala[Math.min(e.lvl || 1, a.target.length) - 1] * 10) / 10, hindarMs: 2500, hpMaks: hpMaksDari(m),
+      jurusTarget: e.target && e.target.ke === (e.jurusKe || 0) + 1 ? [...new Set(e.target.daftar)].slice(0, 30).map((x) => [...tampilKarakter(x), Math.max(0, (e.hp || {})[x] ?? hpMaksDari(m))]) : [], jurusKe: e.jurusKe || 0, jurusBerikut: m.jurus && out.fase === 'tanding' ? j.mulai + ((e.jurusKe || 0) + 1) * J : null,
       jurusInfo: e.jurusInfo || null, monsterMenang: e.monsterMenang ? new Date(e.monsterMenang).toISOString() : null});
     Object.assign(out, {level: Math.min(e.lvl, a.target.length), tenaga: e.tenaga, total: e.total, kalah: e.kalah ? new Date(e.kalah).toISOString() : null, naik: e.naik || null,
       pemain, tiket: e.n, interval: intervalUntuk(a.interval, pemain)});
@@ -215,7 +250,7 @@ function buatMonster(app, opsi = {}) {
       if (!ujiSah(p.uji)) return {ok: false, error: 'uji_berakhir'};
       const pid = '~' + pidDari(perangkat).slice(1); // '~' bukan karakter base64url → tidak bentrok dengan pid asli
       const orang = peserta(email) || {nama: 'Penguji ' + perangkat.slice(-4), sekolah: '-', provinsi: '-'};
-      st.ujiPemain[pid] = {email, nama: orang.nama, sekolah: orang.sekolah, provinsi: orang.provinsi};
+      st.ujiPemain[pid] = {email, nama: orang.nama, sekolah: orang.sekolah, provinsi: orang.provinsi, kata: orang.kata || ''};
       pidKe.set(pid, perangkat);
       const j = jadwalUntuk(cfg(), now(), p.uji), e = j.id && st.events[j.id];
       return {ok: true, uji: true, token: pid + '.' + tanda(pid), nama: namaTampil(orang.nama), tiket: e && e.tiket[pid] ? e.tiket[pid] : null, saya: e && e.u[pid] ? e.u[pid].p : 0, mati: !!(e && e.mati && e.mati['uji:' + pid])};
@@ -272,7 +307,9 @@ function buatMonster(app, opsi = {}) {
     const e = j.id && st.events[j.id];
     if (e && j.fase === 'aktif') prosesJurus(c, j, e, t);
     const kunci = kunciPemain(pid);
-    return {ok: true, mati: !!(e && e.mati && e.mati[kunci]), matiKe: e && e.mati ? e.mati[kunci] || null : null, tiket: e && e.tiket[pid] ? e.tiket[pid] : null, saya: e && e.u[pid] ? e.u[pid].p : 0};
+    const hpMaks = hpMaksDari(mUntuk(c, j));
+    return {ok: true, mati: !!(e && e.mati && e.mati[kunci]), matiKe: e && e.mati ? e.mati[kunci] || null : null, hp: e && e.hp && e.hp[kunci] != null ? Math.max(0, e.hp[kunci]) : hpMaks, hpMaks,
+      sasaran: !!(e && e.target && e.target.ke === (e.jurusKe || 0) + 1 && e.target.daftar.includes(kunci)), tiket: e && e.tiket[pid] ? e.tiket[pid] : null, saya: e && e.u[pid] ? e.u[pid].p : 0};
   }
 
   function terbitkanTiket(id, e, pid, a) {

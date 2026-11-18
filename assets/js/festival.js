@@ -344,6 +344,7 @@
         const getar = dekat ? Math.sin(t / 26 + px) * Math.max(1, h * 0.03) : 0;
         ctx.drawImage(sp, px - sw / 2 + getar, py - (SPR_H + SPR_ATAS) * k - naik, sw, sh);
         w.layar = { x: px, y: py - h - naik, kaki: py, h };
+        if (w.sasaran || w.kenaT || w.hp != null) gambarStatusTempur(w, px, py, h, t);
         if (w === wargaSaya) { gambarKamu(px, py - h - naik, h, t, w); continue; }
         if (panik && (dekat ? hash((w.n || '') + w.k) % 3 === 0 : hash((w.n || '') + w.k) % 11 === 0)) gambarPanik(px + getar, py - h - naik, h, t, w);
       }
@@ -360,6 +361,50 @@
       if (opsi.onFrame) opsi.onFrame();
     }
 
+    // Status tempur Lawan Monster: tanda bidik (sasaran jurus berikutnya), kilatan merah saat kena, hati nyawa.
+    function gambarStatusTempur(w, px, py, h, t) {
+      const kini = performance.now();
+      ctx.save();
+      if (w.sasaran) {
+        const r = h * 0.42, a = t / 400;
+        ctx.strokeStyle = 'rgba(255,60,60,.95)'; ctx.lineWidth = Math.max(2, h * 0.045);
+        ctx.beginPath(); ctx.ellipse(px, py - h * 0.45, r, r * 1.15, 0, 0, Math.PI * 2); ctx.stroke();
+        for (let i = 0; i < 4; i++) {
+          const s2 = a + i * Math.PI / 2, x1 = px + Math.cos(s2) * r * 0.75, y1 = py - h * 0.45 + Math.sin(s2) * r * 0.86;
+          const x2 = px + Math.cos(s2) * r * 1.3, y2 = py - h * 0.45 + Math.sin(s2) * r * 1.5;
+          ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+        }
+      }
+      const sejakKena = w.kenaT ? kini - w.kenaT : Infinity;
+      if (sejakKena < 260) { // kilatan merah
+        ctx.globalAlpha = 0.55 * (1 - sejakKena / 260); ctx.fillStyle = '#FF2E2E';
+        ctx.beginPath(); ctx.ellipse(px, py - h * 0.5, h * 0.32, h * 0.55, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+      if (sejakKena < 900) { // angka -1 melayang
+        const u = sejakKena / 900, uk = Math.max(10, Math.round(h * 0.3));
+        ctx.globalAlpha = 1 - u; ctx.font = '900 ' + uk + 'px system-ui, sans-serif'; ctx.textAlign = 'center';
+        ctx.lineWidth = 3; ctx.strokeStyle = '#5B0A16'; ctx.fillStyle = '#FF5D5D';
+        ctx.strokeText('-1', px + h * 0.25, py - h * 1.15 - u * h * 0.5); ctx.fillText('-1', px + h * 0.25, py - h * 1.15 - u * h * 0.5);
+        ctx.globalAlpha = 1;
+      }
+      // hati nyawa: tampil 2,5 dtk setelah kena, selalu untuk karaktermu
+      if (w.hp != null && w.hpMaks && (sejakKena < 2500 || w === wargaSaya)) {
+        const uk = Math.max(5, h * 0.11), lebar = w.hpMaks * uk * 1.25, x0 = px - lebar / 2 + uk * 0.6, y0 = py - h * (w === wargaSaya ? 1.62 : 1.18);
+        for (let i = 0; i < w.hpMaks; i++) hati(x0 + i * uk * 1.25, y0, uk, i < w.hp);
+      }
+      ctx.restore();
+    }
+    function hati(x, y, r, penuh) {
+      ctx.beginPath();
+      ctx.moveTo(x, y + r * 0.35);
+      ctx.bezierCurveTo(x, y - r * 0.2, x - r * 0.9, y - r * 0.2, x - r * 0.9, y + r * 0.25);
+      ctx.bezierCurveTo(x - r * 0.9, y + r * 0.7, x, y + r * 0.95, x, y + r * 1.2);
+      ctx.bezierCurveTo(x, y + r * 0.95, x + r * 0.9, y + r * 0.7, x + r * 0.9, y + r * 0.25);
+      ctx.bezierCurveTo(x + r * 0.9, y - r * 0.2, x, y - r * 0.2, x, y + r * 0.35);
+      ctx.fillStyle = penuh ? '#FF3D5A' : 'rgba(60,40,40,.45)'; ctx.fill();
+      ctx.lineWidth = Math.max(1, r * 0.18); ctx.strokeStyle = '#FFFFFF'; ctx.stroke();
+    }
     // Karakter milik pengunjung: cincin kuning di kaki + label "KAMU" memantul; saat menghindar muncul jejak gerak.
     function gambarKamu(x, y, h, t, w) {
       const lompat = Math.abs(Math.sin(t / 220)) * h * 0.08;
@@ -775,6 +820,13 @@
         return wargaSaya;
       },
       get saya() { return wargaSaya; },
+      // Cari warga dari nama tampil + kata (kunci tampilan publik yang sama dengan server).
+      cariNK(n, k) { return warga.find((w) => w.n === n && w.k === k) || null; },
+      // Lawan Monster: tandai sasaran jurus berikutnya (array warga) / catat pukulan & sisa nyawa.
+      setSasaran(daftar) { warga.forEach((w) => { w.sasaran = false; }); (daftar || []).forEach((w) => { if (w) w.sasaran = true; }); mulai(); },
+      kena(w, hp, hpMaks) { if (!w) return; w.kenaT = performance.now(); w.hp = hp; w.hpMaks = hpMaks; mulai(); },
+      setNyawa(w, hp, hpMaks) { if (w) { w.hp = hp; w.hpMaks = hpMaks; } },
+      bersihTempur() { warga.forEach((w) => { w.sasaran = false; w.kenaT = 0; w.hp = null; }); mulai(); },
       // Menghindar: karakter melompat & melesat menjauh dari monster (efek lokal; keamanan diputuskan server).
       menghindar(w) {
         if (!w || w.mati) return;

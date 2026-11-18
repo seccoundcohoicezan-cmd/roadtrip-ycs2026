@@ -52,7 +52,7 @@ Field di luar daftar dibuang server. Aturan validasi (panjang, format email, kat
 ## Lawan Monster
 
 `GET /api/monster` →
-`{fase, nama, wujud, id, mulai, selesai, live, level, levelMaks, target[], poin[], skala[], tenaga, total, pemain, tiket, interval, hidup, totalWarga, nyawa (% hidup), jurus, hindarMs, jurusMs, jurusAnimMs, jurusDmgMaks, jurusKe, jurusBerikut, jurusInfo, kalah, monsterMenang, uji?}`
+`{fase, nama, wujud, id, mulai, selesai, live, level, levelMaks, target[], poin[], skala[], tenaga, total, pemain, tiket, interval, hidup, totalWarga, nyawa (% hidup), hpMaks, jurusTarget[[nama, kata, nyawa]], jurus, hindarMs, jurusMs, jurusAnimMs, jurusDmgMaks, jurusKe, jurusBerikut, jurusInfo, kalah, monsterMenang, uji?}`
 
 `fase`:
 
@@ -74,7 +74,7 @@ Field di luar daftar dibuang server. Aturan validasi (panjang, format email, kat
   - `uji_berakhir`
 - `{aksi: "tap", token, n (≤200), seq, e (id event), uji?}` → `{terima, dup, buang, saya, tiket, mati, status}`. Karakter tumbang → `mati: true`, `terima: 0`.
 - `{aksi: "hindar", token, e, uji?}` → `{aman, ke}` hanya ≤ 2,5 dtk sebelum jurus (`bukan_waktunya` di luar itu).
-- `{aksi: "saya", token, uji?}` → `{mati, matiKe, tiket, saya}` status karakter sendiri (dipanggil setelah tiap jurus).
+- `{aksi: "saya", token, uji?}` → `{mati, matiKe, hp, hpMaks, sasaran, tiket, saya}` status karakter sendiri (dipanggil setelah tiap jurus).
   - Server membatasi 10 tap/dtk/pemain.
   - `seq` lama = duplikat (aman dikirim ulang).
 
