@@ -3,7 +3,7 @@
   "file": "m01-beranda.html",
   "title": "M01 Beranda (mobile)",
   "w": 390,
-  "h": 2060
+  "h": 844
  },
  {
   "file": "m02-festival.html",
@@ -63,7 +63,7 @@
   "file": "d01-beranda.html",
   "title": "D01 Beranda (desktop)",
   "w": 1440,
-  "h": 1666
+  "h": 900
  },
  {
   "file": "d02-festival.html",

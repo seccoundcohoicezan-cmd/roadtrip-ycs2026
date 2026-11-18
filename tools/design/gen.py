@@ -103,73 +103,119 @@ def av(k):  # avatar karakter
 def cd(d='35', h='14', m='27', s='08'):
     return f'<div class="cd"><div><b>{d}</b><span>Hari</span></div><div><b>{h}</b><span>Jam</span></div><div><b>{m}</b><span>Menit</span></div><div><b>{s}</b><span>Detik</span></div></div>'
 
-# =====================================================================
-# M01 BERANDA
-# =====================================================================
-hero = f'''
-<section style="position:relative;height:500px;margin:0 12px;border-radius:28px;overflow:hidden;background:#0A2463">
-  <img src="{A}/bali/bg-uludanu2-m.webp" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:62% 50%">
-  <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,24,64,.05) 0%,rgba(6,24,64,.15) 40%,rgba(6,24,64,.88) 78%,#061840 100%)"></div>
-  <span class="t-script" style="position:absolute;right:18px;top:18px;color:#fff;font-size:34px;line-height:30px;text-align:right;transform:rotate(-8deg);text-shadow:0 2px 12px rgba(0,0,0,.35)">Indonesia<br>Juara</span>
-  <div style="position:absolute;left:20px;right:20px;bottom:22px">
-    <span class="badge b-sun">{ic("trophy","s16")} Pengumuman resmi</span>
-    <h1 class="t-display" style="color:#fff;margin-top:12px">Selamat,<br><span style="color:var(--sun-400)">para finalis!</span></h1>
-    <p class="t-body" style="color:rgba(255,255,255,.86);margin-top:8px">100 pelajar terpilih berangkat ke Bali, 23 Des 2026 – 2 Jan 2027. Cari namamu, lalu rayakan bareng.</p>
-    <div class="row gap8 mt16"><span class="btn btn-sun grow">{ic("msg","s16")}Masuk Festival</span><span class="btn btn-white">{ic("search","s16")}Cari finalis</span></div>
-  </div>
-</section>'''
 
-quick = ''.join(f'''<div class="card card-pad stack" style="gap:10px;padding:14px 12px">
-  <span class="ico {c}">{ic(i)}</span><div><b class="t-h3" style="font-size:15px;line-height:20px;display:block">{t}</b><span class="t-xs" style="font-weight:500">{s}</span></div></div>'''
-  for i,c,t,s in [('msg','sun','Festival 1 Kata','Kirim kata, jadi warga'),('radio','coral','Live','Malam ini 19.00'),('gift','green','Dana Kaget','Butuh kode akses'),('ticket','violet','Wildcard','Belum lolos? Klaim')])
+# Panggung festival: latar SELALU utuh selebar bingkai (tidak dipotong, sama dengan situs live),
+# langit diperpanjang ke atas dan plaza ke bawah dengan warna yang diambil dari tepi gambar -> tanpa garis sambungan.
+LANGIT, PLAZA = '#13ACFD', '#EACDA2'   # sampel baris teratas / terbawah latar-900.webp
+def panggung(top, w, h=None, img='latar-900.webp', filt='', extra=''):
+    ih = round(w * 320 / 900, 1)
+    return (f'<div style="position:absolute;left:0;top:0;width:{w}px;{"height:%dpx;" % h if h else "bottom:0;"}overflow:hidden;{"filter:%s;" % filt if filt else ""}">'
+            f'<div style="position:absolute;left:0;right:0;top:0;height:{top+2}px;background:linear-gradient(180deg,#7CCBFF 0%,{LANGIT} 100%)"></div>'
+            f'<img src="{A}/festival/{img}" alt="" style="position:absolute;left:0;top:{top}px;width:{w}px;height:{ih}px;max-width:none">'
+            f'<div style="position:absolute;left:0;right:0;top:{top+ih-1}px;bottom:0;background:linear-gradient(180deg,{PLAZA} 0%,#E3C291 45%,#D6B07A 100%)"></div>{extra}</div>')
+
+# =====================================================================
+# M01 BERANDA — v2.1 (MRKT-60): disamakan dengan mockup "YCS 2026 Event App Homepage"
+# =====================================================================
+# Ikon berwarna (isi penuh) seperti mockup. Warna = token.
+ICF = {
+ 'trophy': '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M13 9h22v4c3.5-.6 6.6.4 6.6 4.2 0 5-4.6 8-9.4 8.4A12 12 0 0 1 26.5 31v4h5.5a2 2 0 0 1 2 2v3H14v-3a2 2 0 0 1 2-2h5.5v-4a12 12 0 0 1-5.7-5.4C11 25.2 6.4 22.2 6.4 17.2c0-3.8 3.1-4.8 6.6-4.2Zm-.2 7.5c-2-.3-3 .2-3 1.2 0 2.4 1.9 4.3 4.6 5a20 20 0 0 1-1.6-6.2Zm22.4 0a20 20 0 0 1-1.6 6.2c2.7-.7 4.6-2.6 4.6-5 0-1-1-1.5-3-1.2Z" fill="#FFC93C"/><path d="M14 37h20v3H14z" fill="#F5B400"/><path d="M19 13.5c0 6 1.6 10 4 12" fill="none" stroke="#FFE59A" stroke-width="2.4" stroke-linecap="round"/></svg>',
+ 'radio': '<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="6" fill="#D92D20"/><g fill="none" stroke="#D92D20" stroke-width="4.2" stroke-linecap="round"><path d="M15.5 32.5a12 12 0 0 1 0-17M32.5 15.5a12 12 0 0 1 0 17M9.5 38.5a20.5 20.5 0 0 1 0-29M38.5 9.5a20.5 20.5 0 0 1 0 29"/></g></svg>',
+ 'gift': '<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="9" y="22" width="30" height="20" rx="2.5" fill="#1F5FD6"/><rect x="6.5" y="15" width="35" height="9" rx="2.5" fill="#1A4FC0"/><rect x="21" y="15" width="6" height="27" fill="#FFC93C"/><path d="M24 15c-3.5-7-11-8-11.5-3.6C12.2 14.6 17 15 24 15Zm0 0c3.5-7 11-8 11.5-3.6.3 3.2-4.5 3.6-11.5 3.6Z" fill="none" stroke="#FFC93C" stroke-width="3.2" stroke-linejoin="round"/></svg>',
+ 'users': '<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="13" cy="15.5" r="5.5" fill="#1F5FD6"/><circle cx="35" cy="15.5" r="5.5" fill="#1F5FD6"/><path d="M2.5 34c.6-6.8 4.6-10.5 10.5-10.5 3 0 5.4 1 7.2 2.8A14 14 0 0 0 15 36H4.5a2 2 0 0 1-2-2Zm43 0c-.6-6.8-4.6-10.5-10.5-10.5-3 0-5.4 1-7.2 2.8A14 14 0 0 1 33 36h10.5a2 2 0 0 0 2-2Z" fill="#1F5FD6"/><circle cx="24" cy="14" r="7.5" fill="#1A4FC0"/><path d="M10.5 38c.8-8.6 6-13.5 13.5-13.5S36.7 29.4 37.5 38a2 2 0 0 1-2 2.2h-23a2 2 0 0 1-2-2.2Z" fill="#1A4FC0"/></svg>',
+}
+PAD = '''<svg viewBox="0 0 120 80" aria-hidden="true"><defs><linearGradient id="padg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#DCE6F7"/></linearGradient></defs>
+<path d="M30 14h60c14 0 22 10 25 26 3 15 3 30-8 32-8 1.5-13-6-19-13H32c-6 7-11 14.5-19 13C2 70 2 55 5 40 8 24 16 14 30 14Z" fill="url(#padg)" stroke="#C9D6EE" stroke-width="1.5"/>
+<path d="M34 30v18M25 39h18" stroke="#0A2463" stroke-width="6" stroke-linecap="round"/>
+<circle cx="84" cy="31" r="4.6" fill="#0A2463"/><circle cx="95" cy="40" r="4.6" fill="#0A2463"/><circle cx="73" cy="40" r="4.6" fill="#0A2463"/><circle cx="84" cy="49" r="4.6" fill="#0A2463"/></svg>'''
+MENU = '<svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width:26px;height:26px;stroke-width:2.6"><path d="M4 6.5h16M4 12h16M4 17.5h16"/></svg>'
+CALF = '<svg viewBox="0 0 24 24" aria-hidden="true" style="width:19px;height:19px"><rect x="2.5" y="4" width="19" height="17.5" rx="3.5" fill="#1F5FD6"/><rect x="2.5" y="4" width="19" height="5" rx="2.5" fill="#1A4FC0"/><path d="M7.5 2.5v4M16.5 2.5v4" stroke="#1A4FC0" stroke-width="2.4" stroke-linecap="round"/><g fill="#fff"><rect x="6" y="11.5" width="2.6" height="2.4" rx=".6"/><rect x="10.7" y="11.5" width="2.6" height="2.4" rx=".6"/><rect x="15.4" y="11.5" width="2.6" height="2.4" rx=".6"/><rect x="6" y="15.8" width="2.6" height="2.4" rx=".6"/><rect x="10.7" y="15.8" width="2.6" height="2.4" rx=".6"/><rect x="15.4" y="15.8" width="2.6" height="2.4" rx=".6"/></g></svg>'
+PINF = '<svg viewBox="0 0 24 24" aria-hidden="true" style="width:16px;height:16px"><path d="M12 22.5s-7.5-6.6-7.5-12.6a7.5 7.5 0 0 1 15 0c0 6-7.5 12.6-7.5 12.6Z" fill="#D92D20"/><circle cx="12" cy="9.8" r="2.9" fill="#fff"/></svg>'
+
+def brand3(size=50, fs=15, lh=16, light=False):
+    c1 = '#fff' if light else 'var(--navy-900)'; c2 = 'var(--sun-400)' if light else 'var(--blue-600)'
+    return (f'<div class="row" style="gap:10px"><span style="width:{size}px;height:{size}px;display:block;flex:none">{LOGO.replace("<svg ","<svg style=\"width:100%;height:100%\" ",1)}</span>'
+            f'<div style="font:800 {fs}px/{lh}px var(--font);letter-spacing:-.3px;color:{c1}">Youth Character<br>Summit<br><span style="color:{c2}">YCS 2026</span></div></div>')
+
+# gelombang ornamen (SVG vektor, warna token)
+HERO_WAVES = '''<svg viewBox="0 0 366 207" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none" aria-hidden="true">
+  <path d="M326 0H366V40C356 22 344 9 326 0Z" fill="#0A2463"/>
+  <path d="M302 0H328C346 9 358 22 366 38V52C354 28 332 10 302 0Z" fill="#FFC93C"/>
+  <path d="M0 168C20 176 38 190 50 207H0Z" fill="#0A2463"/>
+  <path d="M0 160C24 168 46 184 60 207H52C40 190 22 176 0 170Z" fill="#1F5FD6"/>
+  <path d="M296 207C324 198 348 184 366 166V207Z" fill="#0A2463"/>
+  <path d="M286 207C318 196 346 180 366 156V168C348 184 324 198 296 207Z" fill="#FFC93C"/>
+</svg>'''
+
+hero = f'''
+<section style="position:relative;height:207px;margin:0 12px;border-radius:24px;overflow:hidden;background:linear-gradient(180deg,#EAF2FF 0%,#F7FAFF 60%,#FFFFFF 100%);box-shadow:var(--e2)">
+  <div style="position:absolute;inset:0;-webkit-mask-image:linear-gradient(90deg,transparent 0%,transparent 24%,rgba(0,0,0,.6) 42%,#000 56%);mask-image:linear-gradient(90deg,transparent 0%,transparent 24%,rgba(0,0,0,.6) 42%,#000 56%)">
+    <img src="{A}/bali/bg-uludanu2-1440.webp" alt="Pura Ulun Danu Beratan, Bali" style="position:absolute;left:-30px;top:-30px;width:470px;height:294px;max-width:none;object-fit:cover">
+  </div>
+  {HERO_WAVES}
+  <div style="position:absolute;right:12px;top:22px;transform:rotate(-9deg)">
+    <span class="t-script" style="display:block;color:var(--navy-900);font-size:25px;line-height:21px;text-shadow:0 0 10px rgba(255,255,255,.9),0 0 3px rgba(255,255,255,.9)">Indonesia<br>&nbsp;&nbsp;&nbsp;Juara</span>
+    <svg viewBox="0 0 92 12" style="display:block;width:64px;height:9px;margin:1px 0 0 18px" aria-hidden="true"><path d="M3 9C20 2 34 2 46 6S74 10 89 3" fill="none" stroke="#FFC93C" stroke-width="5" stroke-linecap="round"/></svg>
+  </div>
+  <div style="position:absolute;left:22px;top:30px;width:230px">
+    <div style="font:800 20.5px/24px var(--font);letter-spacing:-.5px;color:var(--navy-900)">Selamat Datang di</div>
+    <div style="font:800 39px/42px var(--font);letter-spacing:-1.4px;color:var(--navy-950)">YCS 2026!</div>
+    <p style="font:600 10px/13.5px var(--font);color:var(--navy-900);margin-top:6px;width:202px;text-shadow:0 0 6px rgba(255,255,255,.9)">Bersama, kita wujudkan generasi muda berkarakter, berprestasi, dan berdampak.</p>
+    <span class="btn btn-sun" style="margin-top:12px;height:36px;padding:0 14px 0 18px;gap:6px;font-size:13px;font-weight:800;box-shadow:0 4px 10px rgba(245,180,0,.35)">Mulai Jelajahi {ic("chev","s16")}</span>
+  </div>
+</section>
+<div class="row" style="justify-content:center;gap:7px;margin-top:6px"><span style="width:9px;height:9px;border-radius:50%;background:var(--navy-900)"></span><span style="width:9px;height:9px;border-radius:50%;background:#C9D3E6"></span><span style="width:9px;height:9px;border-radius:50%;background:#C9D3E6"></span></div>'''
+
+quick = ''.join(f'''<div class="card" style="height:123px;padding:9px 2px 6px;text-align:center;border-radius:16px;box-shadow:var(--e2)">
+  <span style="display:block;width:40px;height:40px;margin:0 auto">{ICF[i]}</span>
+  <b style="font:800 12.5px/14px var(--font);letter-spacing:-.2px;color:var(--navy-900);margin-top:3px;height:28px;display:grid;place-items:center">{t}</b>
+  <span style="display:block;font:500 9px/11px var(--font);letter-spacing:-.1px;color:var(--ink-3);margin-top:2px">{s}</span></div>'''
+  for i,t,s in [('trophy','Festival<br>Satu Kata','Rangkai kata, tunjukkan semangatmu!'),('radio','Live','Saksikan langsung keseruan YCS 2026'),('gift','Dana Kaget','Dapatkan kejutan spesial dari YCS!'),('users','Finalis','Kenali para finalis terbaik YCS 2026')])
+
+game = f'''
+<div style="position:relative;margin:20px 14px 0;height:96px;border-radius:22px;overflow:hidden;background:linear-gradient(100deg,#0A2463 0%,#11307E 55%,#1A4FC0 100%);box-shadow:var(--e2)">
+  <svg viewBox="0 0 362 96" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%" aria-hidden="true"><path d="M268 0C252 40 262 74 362 96V0Z" fill="#1F5FD6" opacity=".55"/><path d="M200 96C250 70 280 40 290 0H268C258 40 240 72 180 96Z" fill="#2F7BFF" opacity=".18"/></svg>
+  <svg viewBox="0 0 30 30" style="position:absolute;left:10px;top:14px;width:22px;height:22px" aria-hidden="true"><path d="M5 12 11 8M8 3l3 7" stroke="#FFC93C" stroke-width="3" stroke-linecap="round"/></svg>
+  <span style="position:absolute;left:26px;top:24px;width:72px;height:50px;filter:drop-shadow(0 6px 10px rgba(0,0,0,.35))">{PAD.replace("<svg ","<svg style=\"width:100%;height:100%\" ",1)}</span>
+  <span style="position:absolute;left:112px;top:18px;bottom:18px;width:1.5px;background:rgba(255,255,255,.35)"></span>
+  <div style="position:absolute;left:124px;top:11px;right:48px;transform:rotate(-1.5deg);transform-origin:left center">
+    <span style="display:inline-block;background:var(--sun-400);color:var(--navy-900);font:800 10px/20px var(--font);padding:0 9px;border-radius:999px">Game Interaktif</span>
+    <b style="display:block;font:800 19px/23px var(--font);letter-spacing:-.2px;color:#fff;margin-top:4px">Festival 1 Kata</b>
+    <span style="display:block;font:600 9.5px/12px var(--font);color:#fff;max-width:178px">Rangkai kata terbaikmu, dan jadilah yang terhebat!</span>
+  </div>
+  <span style="position:absolute;right:12px;top:50%;margin-top:-16px;width:32px;height:32px;border-radius:50%;background:#fff;color:var(--navy-900);display:grid;place-items:center">{ic("chev","s16")}</span>
+</div>'''
+
+info = f'''
+<div class="card" style="margin:14px 13px 0;height:139px;padding:12px 10px 12px 16px;border-radius:22px;box-shadow:var(--e2);display:grid;grid-template-columns:1fr 1.5px 186px;gap:10px;align-items:center">
+  <div>
+    <div class="row" style="gap:6px">{CALF}<b style="font:800 12.5px/16px var(--font);color:var(--blue-600)">Informasi Acara</b></div>
+    <b style="display:block;font:800 21px/23px var(--font);letter-spacing:-.5px;color:var(--navy-900);margin-top:6px">23 Des –<br>2 Jan 2027</b>
+    <div class="row" style="gap:4px;margin-top:8px">{PINF}<span style="font:600 12px/15px var(--font);color:var(--navy-900)">Bali, Indonesia</span></div>
+  </div>
+  <span style="align-self:stretch;background:var(--line)"></span>
+  <div>
+    <b style="display:block;text-align:center;font:700 12px/15px var(--font);color:var(--navy-900)">Menuju YCS 2026</b>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:9px">{''.join(f'<div style="background:var(--blue-50);border-radius:10px;text-align:center;padding:9px 0 7px"><b style="display:block;font:800 18px/21px var(--font);color:var(--navy-900);font-variant-numeric:tabular-nums">{n}</b><span style="font:500 9.5px/12px var(--font);color:var(--ink-2)">{l}</span></div>' for n,l in [('35','Hari'),('14','Jam'),('27','Menit'),('18','Detik')])}</div>
+  </div>
+</div>'''
+
+HOMEF = '<svg viewBox="0 0 24 24" aria-hidden="true" style="width:24px;height:24px"><path d="M2.6 11.2 12 3l9.4 8.2-1.4 1.6-1.3-1.1V21h-5.2v-6h-3v6H5.3v-9.3L4 12.8Z" fill="currentColor"/></svg>'
+TABS2 = [(HOMEF,'Beranda'),(ic("trophy","s24"),'Festival'),(ic("cal","s24"),'Jadwal'),('<svg viewBox="0 0 24 24" aria-hidden="true" style="width:24px;height:24px"><circle cx="5" cy="12" r="2.2" fill="currentColor"/><circle cx="12" cy="12" r="2.2" fill="currentColor"/><circle cx="19" cy="12" r="2.2" fill="currentColor"/></svg>','Lainnya')]
+tab2 = ''.join(f'<div style="display:grid;justify-items:center;gap:4px;font:{"800" if l=="Beranda" else "600"} 11.5px/1 var(--font);color:{"var(--blue-600)" if l=="Beranda" else "var(--navy-900)"};position:relative;height:100%;align-content:center;{"" if i==0 else "box-shadow:inset 1px 0 0 var(--line);"}">{g}{l}{"<span style=\"position:absolute;bottom:3px;left:14%;right:14%;height:3px;border-radius:2px;background:var(--blue-600)\"></span>" if l=="Beranda" else ""}</div>' for i,(g,l) in enumerate(TABS2))
+tabbar2 = f'''<svg viewBox="0 0 390 130" preserveAspectRatio="none" style="position:absolute;left:0;right:0;bottom:0;width:100%;height:130px;z-index:19" aria-hidden="true"><path d="M0 46C70 30 130 26 200 24 280 22 340 14 390 4V130H0Z" fill="#1F5FD6"/><path d="M230 26C300 22 350 14 390 0V12C350 22 300 28 230 26Z" fill="#FFC93C"/><path d="M0 60C80 42 160 38 240 36 310 34 360 28 390 22V130H0Z" fill="#0A2463"/></svg>
+<nav style="position:absolute;left:9px;right:9px;bottom:16px;height:73px;background:#fff;border-radius:28px;box-shadow:var(--e3);display:grid;grid-template-columns:repeat(4,1fr);padding:10px 4px;z-index:20">{tab2}</nav><div class="home-ind" style="background:#fff;bottom:4px"></div>'''
 
 beranda = f'''
 {status()}
-{appbar()}
+<div style="display:flex;align-items:center;justify-content:space-between;height:67px;padding:0 15px 0 20px">{brand3()}<span style="width:46px;height:46px;border-radius:16px;background:#fff;box-shadow:var(--e1),var(--e2);display:grid;place-items:center;color:var(--navy-900)">{MENU}</span></div>
 {hero}
-<div class="sec mt16">
-  <div class="card card-pad">
-    <div class="row between"><div class="row gap8">{ic("bus")}<b class="t-sm" style="color:var(--navy-900);font-weight:700">Menuju Bali</b></div><span class="t-xs">Rab, 23 Des · 08.00 WIB</span></div>
-    <div class="mt12">{cd()}</div>
-    <div class="row gap8 mt12"><span class="btn btn-sm btn-ghost grow">{ic("bell","s16")}Ingatkan saya</span><span class="btn btn-sm btn-outline grow">{ic("share","s16")}Bagikan</span></div>
-  </div>
-</div>
-<div class="sec mt24"><div class="row between"><h2 class="t-h3">Mau ngapain hari ini?</h2></div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">{quick}</div></div>
-
-<div class="sec mt24">
- <div style="position:relative;border-radius:24px;overflow:hidden;background:linear-gradient(135deg,#1F5FD6,#0A2463);padding:18px 18px 0;color:#fff">
-  <div class="row between"><span class="badge b-sun">Kampanye utama</span><span class="t-xs" style="color:#B9D3FF">2.418 warga</span></div>
-  <h3 class="t-h2" style="color:#fff;margin-top:10px">Festival Satu Kata</h3>
-  <p class="t-sm" style="color:#DCEBFF;margin-top:4px">Satu orang, satu kata harapan. Kamu hidup sebagai warga di plaza festival Bali.</p>
-  <div class="row mt12" style="gap:0">{''.join(f'<span class="av" style="margin-right:-10px;background-image:url({K}/k{k:02d}.png);box-shadow:0 0 0 2px #1F5FD6"></span>' for k in [1,4,6,8,10,2])}<span class="t-xs" style="color:#fff;margin-left:18px">+2.412 lainnya</span></div>
-  <span class="btn btn-sun btn-block mt16">Gabung sekarang {ic("arrow","s16")}</span>
-  <img src="{A}/festival/latar-900.webp" style="margin:16px -18px 0;max-width:none;width:calc(100% + 36px);height:110px;object-fit:cover;object-position:50% 70%;border-radius:0">
- </div>
-</div>
-
-<div class="sec mt24">
-  <div class="row between"><h2 class="t-h3">Jadwal live</h2><span class="t-sm" style="color:var(--blue-600);font-weight:700">Semua {ic("chev","s16")}</span></div>
-  <div class="card card-pad mt12 row gap12" style="box-shadow:inset 0 0 0 2px var(--coral-500),var(--e1)">
-    <div style="width:52px;text-align:center;flex:none"><b class="t-h2" style="display:block">18</b><span class="t-xs">NOV</span></div>
-    <div class="grow"><span class="badge b-live">Live</span><b class="t-sm" style="display:block;color:var(--navy-900);font-weight:700;margin-top:6px">Lawan Monster + Spin HP</b><span class="t-xs">19.00 – 20.00 · YouTube</span></div>
-    <span class="btn btn-sm btn-danger">{ic("play","s16")}Tonton</span>
-  </div>
-</div>
-
-<div class="sec mt24">
-  <div class="card card-pad">
-    <div class="row between"><h2 class="t-h3">Road to Bali</h2><span class="badge b-blue">Target 100.000</span></div>
-    <div style="position:relative;height:96px;border-radius:14px;overflow:hidden;margin-top:12px"><img src="{A}/road/jalan-bali-800.webp" style="width:100%;height:100%;object-fit:cover;object-position:60% 60%"></div>
-    <div class="row between mt12"><b class="t-h2 t-num">12.840</b><span class="t-xs">dukungan terkumpul</span></div>
-    <div style="height:10px;border-radius:5px;background:var(--blue-50);margin-top:8px;overflow:hidden"><div style="width:12.8%;height:100%;background:linear-gradient(90deg,var(--blue-500),var(--sun-400));border-radius:5px"></div></div>
-    <div class="row between mt12"><span class="t-xs">Provinsi teratas</span><span class="t-xs" style="color:var(--navy-900)">1. Jawa Tengah · 2. Bali · 3. Jawa Timur</span></div>
-  </div>
-</div>
-<div style="height:110px"></div>
-{tabbar('Beranda')}
+<div style="margin-top:9px;padding:0 13px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px">{quick}</div>
+{game}
+{info}
+{tabbar2}
 '''
-page('m01-beranda', 'M01 Beranda (mobile)', 390, 2060, beranda)
+page('m01-beranda', 'M01 Beranda (mobile)', 390, 844, beranda)
 
 # =====================================================================
 # M02 FESTIVAL (stage)
@@ -183,10 +229,8 @@ for x,y,k,n,w,p in bubbles:
 me = f'''<div style="position:absolute;left:168px;top:455px;display:grid;justify-items:center">
       <span class="badge b-sun" style="margin-bottom:4px">Kamu</span><img src="{K}/k03.png" style="width:52px;filter:drop-shadow(0 0 6px rgba(255,201,60,.9))"></div>'''
 festival = f'''
-<div style="position:absolute;inset:0 0 auto 0;height:700px;background:#bfe0ff">
-  <img src="{A}/festival/latar-900.webp" style="position:absolute;top:60px;left:50%;height:330px;width:auto;max-width:none;transform:translateX(-50%)">
-  <div style="position:absolute;top:385px;left:0;right:0;bottom:0;background:linear-gradient(#e9cfa2,#dcb982)"></div>
-  <div style="position:absolute;top:370px;left:0;right:0;height:30px;background:linear-gradient(rgba(233,207,162,0),#e9cfa2)"></div>
+<div style="position:absolute;inset:0 0 auto 0;height:700px">
+  {panggung(104, 390, 700)}
   {stage_people}{me}
 </div>
 <div style="position:relative;z-index:2">{status()}
@@ -244,7 +288,7 @@ sukses = f'''
   <h1 class="t-h1 mt12" style="color:#fff">Selamat datang di<br>Festival Satu Kata</h1>
 </div>
 <div style="margin:22px auto 0;width:300px;border-radius:24px;background:#fff;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,.35);transform:rotate(-2deg)">
-  <div style="height:150px;position:relative;background:#bfe0ff"><img src="{A}/festival/latar-900.webp" style="width:100%;height:100%;object-fit:cover;object-position:50% 10%"></div>
+  <div style="height:150px;position:relative">{panggung(0, 300, 150)}</div>
   <div style="padding:0 18px 18px;position:relative">
     <img src="{K}/k03.png" style="width:82px;margin:-70px auto 0;position:relative">
     <span class="t-over" style="display:block;text-align:center">Aku bagian dari Festival 1 Kata</span>
@@ -265,13 +309,12 @@ page('m04-kartu', 'M04 Sukses gabung + kartu share', 390, 844, sukses)
 # M05 LAWAN MONSTER
 # =====================================================================
 monster = f'''
-<div style="position:absolute;inset:0;background:#160B33"></div>
-<img src="{A}/festival/latar-900.webp" style="position:absolute;top:0;left:50%;height:470px;max-width:none;transform:translateX(-50%);filter:saturate(.6) brightness(.55) hue-rotate(-20deg)">
-<div style="position:absolute;top:450px;left:0;right:0;bottom:0;background:linear-gradient(#5b4632,#2b1f2e)"></div>
+{panggung(150, 390, 844, filt='saturate(.6) brightness(.55) hue-rotate(-20deg)')}
+<div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(22,11,51,.55) 0%,rgba(22,11,51,0) 22%,rgba(22,11,51,0) 55%,rgba(43,31,46,.65) 100%)"></div>
 <div style="position:absolute;inset:0;background:radial-gradient(70% 45% at 50% 42%,rgba(255,80,40,.25),transparent 70%)"></div>
-<img src="{A}/monster/raja-potret.webp" style="position:absolute;left:50%;top:280px;width:200px;transform:translateX(-50%);filter:drop-shadow(0 20px 30px rgba(0,0,0,.6))">
-{''.join(f'<img src="{K}/k{k:02d}.png" style="position:absolute;left:{x}px;top:{y}px;width:40px">' for k,x,y in [(1,30,560),(4,90,600),(6,300,570),(8,250,620)])}
-<div style="position:absolute;left:170px;top:600px;display:grid;justify-items:center"><span class="badge b-sun" style="margin-bottom:4px">Kamu</span><img src="{K}/k03.png" style="width:48px"></div>
+<img src="{A}/monster/raja-potret.webp" style="position:absolute;left:50%;top:352px;width:196px;transform:translateX(-50%);filter:drop-shadow(0 20px 30px rgba(0,0,0,.6))">
+{''.join(f'<img src="{K}/k{k:02d}.png" style="position:absolute;left:{x}px;top:{y}px;width:40px">' for k,x,y in [(1,30,600),(4,92,640),(6,304,606),(8,252,650)])}
+<div style="position:absolute;left:170px;top:622px;display:grid;justify-items:center"><span class="badge b-sun" style="margin-bottom:4px">Kamu</span><img src="{K}/k03.png" style="width:48px"></div>
 <div style="position:relative;z-index:3">{status(True)}
 <div class="sec">
   <div style="background:rgba(10,6,30,.72);border-radius:18px;padding:12px 14px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);backdrop-filter:blur(6px)">
@@ -280,12 +323,12 @@ monster = f'''
     <div class="row between mt8"><span class="t-xs" style="color:#E6DDFF">Nyawa monster 58%</span><span class="t-xs" style="color:#E6DDFF">Warga hidup <b style="color:#fff">1.904/2.418</b></span></div>
   </div>
 </div></div>
-<div style="position:absolute;left:50%;top:205px;transform:translateX(-50%);z-index:4" class="toast"><span style="color:#FFC93C">{ic("alert")}</span>Jurus datang dalam 2 detik!</div>
+<div style="position:absolute;left:50%;top:296px;transform:translateX(-50%);z-index:4;white-space:nowrap" class="toast"><span style="color:#FFC93C">{ic("alert")}</span>Jurus datang dalam 2 detik!</div>
 <div style="position:absolute;left:16px;right:16px;bottom:34px;z-index:5;display:grid;grid-template-columns:1fr 1.25fr;gap:10px">
   <div style="background:rgba(10,6,30,.72);border-radius:18px;padding:12px;color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)"><span class="t-xs" style="color:#C9BCFF">Tiket kamu</span><b style="display:block;font:800 26px/30px var(--font)" class="t-num">#0418</b><span class="t-xs" style="color:#C9BCFF">327 tap</span></div>
   <span class="btn" style="height:auto;border-radius:18px;background:linear-gradient(180deg,#FFD866,#F5B400);color:#2A1A00;font-size:18px;flex-direction:column;gap:2px;box-shadow:0 0 0 4px rgba(255,201,60,.35),0 10px 24px rgba(245,180,0,.45)">{ic("run","s28")}HINDAR</span>
 </div>
-<div class="note" style="right:10px;top:340px">Area tap = monster + warga hidup. Meleset → label "Meleset!"</div>
+<div class="note" style="right:10px;top:440px">Area tap = monster + warga hidup. Meleset → label "Meleset!"</div>
 <div class="home-ind" style="background:#fff"></div>
 '''
 page('m05-monster', 'M05 Lawan Monster · saat jurus', 390, 844, monster)
@@ -403,62 +446,103 @@ lain = f'''
 page('m10-lainnya', 'M10 Lainnya (menu)', 390, 844, lain)
 
 # =====================================================================
-# D01 DESKTOP BERANDA
+# D01 DESKTOP BERANDA — v2.1 (MRKT-60): disamakan dengan mockup "Youth Character Summit 2026 Landing Page"
+# Koordinat = mockup 1672×941 diskalakan ke 1440×900.
 # =====================================================================
 dlinks = ''.join(f'<a class="{"on" if i==0 else ""}">{ic(n,"s16")}{l}</a>' for i,(n,l) in enumerate([('home','Beranda'),('msg','Festival Satu Kata'),('radio','Live'),('gift','Dana Kaget'),('users','Finalis')]))
-dquick = ''.join(f'''<div class="card row gap12" style="padding:18px"><span class="ico {c}" style="width:52px;height:52px">{ic(i,"s24")}</span><div class="grow"><b class="t-h3" style="display:block">{t}</b><span class="t-sm">{s}</span></div><span class="btn btn-icon btn-ghost" style="width:36px;height:36px">{ic("chev","s16")}</span></div>''' for i,c,t,s in [('msg','sun','Festival Satu Kata','Kirim 1 kata, jadi warga'),('radio','coral','Live','Malam ini 19.00 WIB'),('gift','green','Dana Kaget','Sisa 37 kuota'),('users','blue','Finalis','100 pelajar, 34 provinsi')])
+PADB = '''<svg viewBox="0 0 170 120" aria-hidden="true" style="width:100%;height:100%"><defs><linearGradient id="padb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2F7BFF"/><stop offset=".55" stop-color="#1F5FD6"/><stop offset="1" stop-color="#11307E"/></linearGradient></defs>
+<path d="M42 20h86c20 0 31 14 35 37 4 21 4 43-11 46-12 2-19-9-27-19H45c-8 10-15 21-27 19C3 100 3 78 7 57c4-23 15-37 35-37Z" fill="url(#padb)"/>
+<path d="M44 24h82c16 0 25 9 29 22-30-8-110-8-140 0 4-13 13-22 29-22Z" fill="#fff" opacity=".22"/>
+<path d="M48 45v24M36 57h24" stroke="#FFC93C" stroke-width="9" stroke-linecap="round"/>
+<circle cx="120" cy="45" r="6.5" fill="#FFC93C"/><circle cx="134" cy="57" r="6.5" fill="#fff"/><circle cx="106" cy="57" r="6.5" fill="#fff"/><circle cx="120" cy="69" r="6.5" fill="#FFC93C"/>
+<circle cx="70" cy="80" r="8" fill="#0A2463"/><circle cx="100" cy="80" r="8" fill="#0A2463"/></svg>'''
+TROPHY_BIG = '''<svg viewBox="0 0 120 130" aria-hidden="true" style="width:100%;height:100%"><defs><linearGradient id="trg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFE59A"/><stop offset=".45" stop-color="#FFC93C"/><stop offset="1" stop-color="#F5B400"/></linearGradient></defs>
+<path d="M28 8h64v14c10-2 20 1 20 12 0 15-13 24-27 25a32 32 0 0 1-17 15v12h12a5 5 0 0 1 5 5v6H35v-6a5 5 0 0 1 5-5h12V74a32 32 0 0 1-17-15C21 58 8 49 8 34c0-11 10-14 20-12Zm-1 22c-6-1-9 .5-9 3.5 0 7 6 12 13 14a58 58 0 0 1-4-17.5Zm66 0a58 58 0 0 1-4 17.5c7-2 13-7 13-14 0-3-3-4.5-9-3.5Z" fill="url(#trg)"/>
+<path d="m60 22 5 10 11 1.6-8 7.8 2 11L60 47l-10 5.4 2-11-8-7.8 11-1.6Z" fill="#FFF3CC"/>
+<rect x="30" y="102" width="60" height="22" rx="4" fill="#0A2463"/><rect x="40" y="108" width="40" height="8" rx="2" fill="#FFC93C"/></svg>'''
+SKYLINE = '''<svg viewBox="0 0 300 90" preserveAspectRatio="xMaxYMax meet" aria-hidden="true" style="width:100%;height:100%"><g fill="#1F5FD6" opacity=".85">
+<path d="M150 90V52h4l-2-6h-3l5-8h-6l6-9h-7l7-10h-7l8-11 8 11h-7l7 10h-7l6 9h-6l5 8h-3l-2 6h4v38Z"/>
+<path d="M205 90V60h3l-2-5h-3l4-7h-5l5-8h-5l6-9 6 9h-5l5 8h-5l4 7h-3l-2 5h3v30Z"/>
+<path d="M95 90V66h3l-2-4h-2l3-6h-4l4-7 4 7h-4l3 6h-2l-2 4h3v24Z"/>
+<path d="M250 90c1-16 2-30 6-44-6-2-14 0-19 5 4-7 12-10 19-9-5-5-13-6-19-3 6-6 15-5 21 0 1-7 6-12 13-13-5 4-8 9-8 14 6-4 14-3 18 2-6-2-12-1-16 3 6 0 12 4 13 10-5-5-11-6-16-4-4 13-5 26-5 39Z"/>
+<path d="M50 90c1-12 2-22 5-32-5-1-11 0-15 4 3-6 9-8 15-7-4-4-10-5-15-2 5-5 12-4 16 0 1-6 5-9 10-10-4 3-6 7-6 11 5-3 11-2 14 2-5-2-9-1-12 2 5 0 9 3 10 8-4-4-8-5-12-3-3 10-4 19-4 27Z"/>
+</g><path d="M0 90c40-10 90-14 150-12s110 4 150-4v16Z" fill="#1F5FD6"/></svg>'''
+
+dl2 = ''.join(f'<a style="display:inline-flex;align-items:center;gap:9px;height:46px;padding:0 {"20px 0 18px" if i==0 else "18px"};border-radius:999px;font:{"800" if i==0 else "700"} 15px/1 var(--font);color:{"#fff" if i==0 else "var(--navy-900)"};background:{"var(--blue-600)" if i==0 else "transparent"}">{g}{l}</a>' for i,(g,l) in enumerate([(HOMEF.replace('width:24px;height:24px','width:20px;height:20px'),'Beranda'),(ic('trophy'),'Festival Satu Kata'),(ic('play').replace('fill="currentColor"','fill="none"'),'Live'),(ic('gift'),'Dana Kaget'),(ic('users'),'Finalis')]))
+dq2 = ''.join(f'''<div style="background:#fff;border-radius:22px;box-shadow:var(--e2);height:108px;display:flex;align-items:center;gap:14px;padding:0 16px 0 18px">
+  <span style="width:68px;height:68px;border-radius:50%;background:{bg};display:grid;place-items:center;flex:none"><span style="width:42px;height:42px;display:block">{ICF[i]}</span></span>
+  <div style="flex:1"><b style="display:block;font:800 16px/21px var(--font);letter-spacing:-.3px;color:var(--navy-900);white-space:nowrap">{t}</b><span style="display:block;font:500 12.5px/17px var(--font);color:var(--ink-2);margin-top:4px">{s}</span></div>
+  <span style="width:36px;height:36px;border-radius:50%;background:#fff;box-shadow:var(--e1),0 0 0 1px var(--line);display:grid;place-items:center;color:var(--navy-900);flex:none">{ic("chev","s16")}</span></div>'''
+  for i,bg,t,s in [('trophy','var(--sun-100)','Festival Satu Kata','Rangkai kata, tunjukkan<br>semangatmu!'),('radio','var(--coral-100)','Live','Saksikan langsung<br>keseruan YCS 2026'),('gift','var(--sun-100)','Dana Kaget','Dapatkan kejutan<br>spesial dari YCS!'),('users','var(--blue-100)','Finalis','Kenali para finalis<br>terbaik YCS 2026')])
+chips = ''.join(f'<span style="position:absolute;left:{x}px;top:{y}px;transform:rotate({r}deg);background:{bg};color:{fg};font:800 {fs}px/1 var(--font);padding:8px 14px;border-radius:12px;box-shadow:0 6px 14px rgba(10,36,99,.18)">{w}</span>' for x,y,r,bg,fg,fs,w in [(566,24,-8,'#fff','var(--navy-900)',16,'Maju'),(640,40,-10,'var(--violet-600)','#fff',11,'Satu Kata'),(584,66,-6,'var(--sun-500)','#fff',17,'Bersama'),(606,104,-6,'var(--coral-500)','#fff',17,'Indonesia'),(560,132,4,'var(--green-100)','var(--green-600)',16,'Untuk')])
 d01 = f'''
-<div style="position:absolute;inset:0 0 auto 0;height:760px;overflow:hidden;background:#0A2463">
-  <img src="{A}/bali/bg-uludanu2-1440.webp" style="width:100%;height:100%;object-fit:cover;object-position:50% 45%">
-  <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(6,24,64,.92) 0%,rgba(6,24,64,.65) 38%,rgba(6,24,64,.05) 70%),linear-gradient(0deg,var(--bg) 0%,rgba(245,248,255,0) 22%)"></div>
+<div style="position:absolute;inset:0;background:radial-gradient(60% 40% at 18% 8%,#FFFFFF 0%,rgba(255,255,255,0) 70%),radial-gradient(40% 30% at 30% 70%,#FFFFFF 0%,rgba(255,255,255,0) 70%),linear-gradient(180deg,#E3EEFF 0%,#EEF4FF 45%,#F5F8FF 70%,#EAF2FF 100%)"></div>
+<div style="position:absolute;left:0;right:0;top:0;height:520px;-webkit-mask-image:linear-gradient(90deg,transparent 22%,rgba(0,0,0,.5) 36%,#000 48%),linear-gradient(180deg,#000 72%,transparent 100%);-webkit-mask-composite:source-in;mask-image:linear-gradient(90deg,transparent 22%,rgba(0,0,0,.5) 36%,#000 48%),linear-gradient(180deg,#000 72%,transparent 100%);mask-composite:intersect;overflow:hidden">
+  <img src="{A}/bali/bg-uludanu2-1440.webp" alt="Pura Ulun Danu Beratan, Bali" style="position:absolute;left:330px;top:-84px;width:1240px;height:775px;max-width:none;object-fit:cover">
 </div>
-<div style="position:relative">
-<div class="dnav">{brand(True)}<div class="links">{dlinks}</div><div class="row gap8"><span class="btn btn-sun">{ic("key","s16")}Punya kode?</span><span class="btn btn-icon" style="background:rgba(255,255,255,.15);color:#fff">{ic("moon")}</span></div></div>
-<div style="padding:90px 56px 0;display:grid;grid-template-columns:640px 1fr;gap:40px">
+<svg viewBox="0 0 1440 900" preserveAspectRatio="none" style="position:absolute;inset:0;width:1440px;height:900px" aria-hidden="true">
+  <path d="M0 330C60 360 120 420 150 500L0 520Z" fill="#1F5FD6" opacity=".9"/>
+  <path d="M0 392C40 410 80 446 104 500H0Z" fill="#0A2463"/>
+  <path d="M0 318C70 350 138 412 164 496H150C124 420 64 362 0 334Z" fill="#FFC93C"/>
+  <path d="M1290 470C1350 440 1400 410 1440 380V470Z" fill="#1F5FD6"/>
+  <path d="M1270 476C1340 446 1396 412 1440 366V382C1398 414 1346 448 1290 470Z" fill="#FFC93C"/>
+  <path d="M0 850C200 820 420 846 720 858 1000 868 1240 846 1440 820V900H0Z" fill="#DCEBFF"/>
+  <path d="M0 872C260 846 520 870 800 878 1060 884 1260 868 1440 852V900H0Z" fill="#B9D3FF" opacity=".7"/>
+</svg>
+<div style="position:absolute;left:39px;top:28px">{brand3(size=54, fs=18, lh=20)}</div>
+<nav style="position:absolute;left:293px;top:21px;width:749px;height:60px;background:rgba(255,255,255,.95);border-radius:999px;box-shadow:var(--e2);display:flex;align-items:center;justify-content:space-between;padding:0 24px 0 7px">{dl2}</nav>
+<span style="position:absolute;left:1149px;top:21px;width:170px;height:56px;border-radius:999px;background:var(--navy-900);color:#fff;display:flex;align-items:center;justify-content:center;gap:12px;font:800 17px/1 var(--font);box-shadow:0 8px 20px rgba(10,36,99,.3)"><svg viewBox="0 0 24 24" style="width:26px;height:26px" aria-hidden="true"><path d="M7 7h10c3 0 4.5 2 5 5.5.4 3.2.2 6-1.6 6.3-1.4.2-2.4-1-3.4-2.3H7c-1 1.3-2 2.5-3.4 2.3C1.8 18.5 1.6 15.7 2 12.5 2.5 9 4 7 7 7Z" fill="#fff"/><path d="M7.5 10.5v4M5.5 12.5h4" stroke="#0A2463" stroke-width="1.8" stroke-linecap="round"/><circle cx="16.5" cy="11.2" r="1.1" fill="#0A2463"/><circle cx="18.3" cy="13.4" r="1.1" fill="#0A2463"/></svg>Game {ic("arrow","s16")}</span>
+<span style="position:absolute;left:1353px;top:28px;width:46px;height:46px;border-radius:50%;background:#fff;box-shadow:var(--e2);display:grid;place-items:center;color:var(--navy-900)"><svg viewBox="0 0 24 24" style="width:22px;height:22px" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="currentColor"/></svg></span>
+
+<span style="position:absolute;left:67px;top:127px;height:40px;padding:0 18px 0 16px;border-radius:999px;background:var(--sun-400);color:var(--navy-900);display:inline-flex;align-items:center;gap:9px;font:800 16.5px/1 var(--font)">{ic("trophy")}Youth Character Summit 2026</span>
+<h1 style="position:absolute;left:64px;top:172px;font:800 56px/62px var(--font);letter-spacing:-1.6px;color:var(--navy-900);white-space:nowrap">Selamat Datang di</h1>
+<div style="position:absolute;left:66px;top:226px;font:italic 800 84px/90px var(--font);letter-spacing:-2.6px;color:var(--blue-600);white-space:nowrap">YCS 2026!</div>
+<svg viewBox="0 0 420 40" style="position:absolute;left:64px;top:296px;width:400px;height:36px" aria-hidden="true"><path d="M6 30C90 14 200 8 300 12c40 2 80 6 110 10" fill="none" stroke="#FFC93C" stroke-width="9" stroke-linecap="round"/></svg>
+<svg viewBox="0 0 40 40" style="position:absolute;left:458px;top:224px;width:40px;height:40px" aria-hidden="true"><path d="M8 26 20 14M14 34l20-8M20 6l2 10" stroke="#FFC93C" stroke-width="4" stroke-linecap="round"/></svg>
+<p style="position:absolute;left:72px;top:330px;width:400px;font:500 17px/23px var(--font);color:var(--navy-900)">Bersama, kita wujudkan generasi muda berkarakter, berprestasi, dan berdampak.</p>
+<span style="position:absolute;left:76px;top:397px;height:46px;padding:0 20px 0 7px;border-radius:999px;background:var(--sun-400);color:var(--navy-900);display:inline-flex;align-items:center;gap:10px;font:800 15px/1 var(--font);box-shadow:0 8px 18px rgba(245,180,0,.35)"><span style="width:32px;height:32px;border-radius:50%;background:var(--navy-900);color:var(--sun-400);display:grid;place-items:center"><svg viewBox="0 0 24 24" style="width:14px;height:14px" aria-hidden="true"><path d="M7 4.8v14.4a.8.8 0 0 0 1.2.7l11.4-7.2a.8.8 0 0 0 0-1.4L8.2 4.1a.8.8 0 0 0-1.2.7Z" fill="currentColor"/></svg></span>Mulai Jelajahi {ic("arrow","s16")}</span>
+<div style="position:absolute;left:1180px;top:196px;transform:rotate(-12deg)">
+  <span class="t-script" style="display:block;color:#fff;font-size:74px;line-height:62px;text-shadow:0 2px 0 rgba(10,36,99,.35),0 6px 22px rgba(10,36,99,.55)">Indonesia<br>&nbsp;&nbsp;&nbsp;Juara</span>
+  <svg viewBox="0 0 180 24" style="display:block;width:170px;height:22px;margin:-2px 0 0 60px" aria-hidden="true"><path d="M6 18C50 6 110 4 174 8" fill="none" stroke="#FFC93C" stroke-width="7" stroke-linecap="round"/></svg>
+</div>
+
+<div style="position:absolute;left:67px;top:466px;width:1305px;display:grid;grid-template-columns:repeat(4,1fr);gap:14px">{dq2}</div>
+
+<div style="position:absolute;left:50px;top:600px;width:820px;height:186px;border-radius:26px;overflow:hidden;background:linear-gradient(110deg,#F5F9FF 0%,#DCEBFF 45%,#B9D3FF 100%);box-shadow:var(--e2)">
+  <div style="position:absolute;inset:0;background:radial-gradient(30% 50% at 85% 30%,rgba(255,255,255,.9),rgba(255,255,255,0) 70%),radial-gradient(35% 45% at 20% 100%,rgba(255,255,255,.8),rgba(255,255,255,0) 70%)"></div>
+  <svg viewBox="0 0 820 186" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%" aria-hidden="true"><path d="M520 186C600 150 700 140 820 150V186Z" fill="#2F7BFF" opacity=".55"/><path d="M560 186C650 162 740 160 820 168V186Z" fill="#1F5FD6"/><path d="M0 160C60 150 120 160 180 186H0Z" fill="#FFC93C" opacity=".85"/>
+  <g fill="#FFC93C"><path d="m30 40 4 8 9 1-7 6 2 9-8-5-8 5 2-9-7-6 9-1Z"/></g><g fill="#2F7BFF"><path d="m250 30 3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1Z"/></g><circle cx="60" cy="120" r="4" fill="#6A3DE8"/><rect x="240" y="80" width="10" height="4" rx="2" fill="#FFC93C" transform="rotate(30 245 82)"/></svg>
+  <span style="position:absolute;left:30px;top:44px;width:180px;height:128px;transform:rotate(-12deg);filter:drop-shadow(0 12px 16px rgba(10,36,99,.35))">{PADB}</span>
+  <div style="position:absolute;left:236px;top:18px;transform:rotate(-3deg);transform-origin:left center">
+    <span style="display:inline-block;background:var(--sun-400);color:var(--navy-900);font:800 14px/30px var(--font);padding:0 14px;border-radius:999px">Game Interaktif</span>
+    <b style="display:block;font:800 36px/42px var(--font);letter-spacing:-.6px;color:var(--navy-900);margin-top:4px">Festival 1 Kata</b>
+    <span style="display:block;font:600 13px/17px var(--font);color:var(--navy-900)">Rangkai kata terbaikmu, dan jadilah yang terhebat!</span>
+  </div>
+  <span style="position:absolute;left:252px;top:131px;height:39px;padding:0 18px 0 6px;border-radius:999px;background:var(--navy-900);color:#fff;display:inline-flex;align-items:center;gap:10px;font:800 14px/1 var(--font)"><span style="width:28px;height:28px;border-radius:50%;background:var(--sun-400);color:var(--navy-900);display:grid;place-items:center"><svg viewBox="0 0 24 24" style="width:12px;height:12px" aria-hidden="true"><path d="M7 4.8v14.4a.8.8 0 0 0 1.2.7l11.4-7.2a.8.8 0 0 0 0-1.4L8.2 4.1a.8.8 0 0 0-1.2.7Z" fill="currentColor"/></svg></span>Main Sekarang {ic("arrow","s16")}</span>
+  {chips}
+  <span style="position:absolute;left:706px;top:16px;width:104px;height:114px;filter:drop-shadow(0 10px 14px rgba(10,36,99,.3))">{TROPHY_BIG}</span>
+  <svg viewBox="0 0 60 30" style="position:absolute;left:770px;top:110px;width:46px;height:24px" aria-hidden="true"><path d="M4 20C18 4 30 26 56 8" fill="none" stroke="#D92D20" stroke-width="5" stroke-linecap="round"/></svg>
+</div>
+
+<div style="position:absolute;left:891px;top:600px;width:504px;height:193px;background:#fff;border-radius:26px;box-shadow:var(--e2);display:grid;grid-template-columns:1fr 1.5px 255px;gap:16px;padding:22px 18px 22px 24px;align-items:start">
   <div>
-    <span class="badge b-sun">{ic("trophy","s16")} Pengumuman resmi YCS 2026</span>
-    <h1 style="font:800 72px/76px var(--font);letter-spacing:-2.4px;color:#fff;margin-top:18px">Selamat,<br><span style="color:var(--sun-400)">para finalis!</span></h1>
-    <p style="font:500 19px/30px var(--font);color:rgba(255,255,255,.86);margin-top:16px;max-width:540px">100 pelajar terpilih berangkat ke Bali, 23 Desember 2026 – 2 Januari 2027. Cari namamu atau teman sekolahmu, lalu rayakan bareng.</p>
-    <div class="row gap12 mt32"><span class="btn btn-sun btn-lg">{ic("msg","s16")}Masuk Festival Satu Kata</span><span class="btn btn-white btn-lg">{ic("search","s16")}Cari finalis</span></div>
+    <div class="row" style="gap:10px">{CALF.replace('width:19px;height:19px','width:24px;height:24px')}<b style="font:800 17px/22px var(--font);color:var(--navy-900)">Informasi Acara</b></div>
+    <b style="display:block;font:800 29px/32px var(--font);letter-spacing:-.6px;color:var(--navy-900);margin-top:22px">23 Des –<br>2 Jan 2027</b>
+    <div class="row" style="gap:6px;margin-top:12px">{PINF.replace('width:16px;height:16px','width:20px;height:20px')}<span style="font:600 16px/20px var(--font);color:var(--navy-900)">Bali, Indonesia</span></div>
   </div>
-  <div style="align-self:end;justify-self:end;width:420px" class="card card-pad">
-    <div class="row between"><div class="row gap8">{ic("bus")}<b class="t-sm" style="color:var(--navy-900);font-weight:700">Menuju keberangkatan ke Bali</b></div></div>
-    <span class="t-xs">Rabu, 23 Desember 2026 · 08.00 WIB</span>
-    <div class="mt12">{cd()}</div>
-    <div class="row gap8 mt12"><span class="btn btn-sm btn-ghost grow">{ic("bell","s16")}Ingatkan saya</span><span class="btn btn-sm btn-outline grow">{ic("share","s16")}Bagikan</span></div>
-  </div>
-  <span class="t-script" style="position:absolute;right:70px;top:150px;color:#fff;font-size:64px;line-height:56px;text-align:right;transform:rotate(-8deg);text-shadow:0 2px 16px rgba(0,0,0,.35)">Indonesia<br>Juara</span>
-</div>
-<div style="padding:0 56px;margin-top:70px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px">{dquick}</div>
-<div style="padding:0 56px;margin-top:40px;display:grid;grid-template-columns:1.6fr 1fr;gap:24px">
-  <div style="border-radius:28px;overflow:hidden;position:relative;background:linear-gradient(135deg,#1F5FD6,#0A2463);height:400px">
-    <img src="{A}/festival/latar-1600.webp" style="position:absolute;right:0;top:0;height:100%;width:62%;object-fit:cover;object-position:50% 20%;-webkit-mask-image:linear-gradient(90deg,transparent,#000 30%)">
-    <div style="position:absolute;left:36px;top:36px;width:380px;color:#fff">
-      <span class="badge b-sun">Kampanye utama</span>
-      <h2 style="font:800 44px/48px var(--font);letter-spacing:-1.2px;color:#fff;margin-top:14px">Festival<br>Satu Kata</h2>
-      <p class="t-body" style="color:#DCEBFF;margin-top:10px">Satu orang, satu kata harapan. Hidup sebagai warga di plaza festival Bali bareng ribuan pelajar se-Indonesia.</p>
-      <div class="row mt16">{''.join(f'<span class="av" style="margin-right:-10px;background-image:url({K}/k{k:02d}.png);box-shadow:0 0 0 2px #1A4FC0"></span>' for k in [1,4,6,8,10,2])}<span class="t-sm" style="color:#fff;margin-left:20px;font-weight:700">2.418 warga</span></div>
-      <span class="btn btn-sun btn-lg mt24">Gabung sekarang {ic("arrow","s16")}</span>
-    </div>
-  </div>
-  <div class="card" style="padding:24px">
-    <div class="row between"><h3 class="t-h2">Jadwal live</h3><span class="t-sm" style="color:var(--blue-600);font-weight:700">Semua</span></div>
-    {''.join(f'<div class="row gap12" style="padding:14px 0;border-bottom:1px solid var(--line)"><div style="width:52px;text-align:center"><b class="t-h3" style="display:block">{d}</b><span class="t-xs">NOV</span></div><div class="grow">{b}<b class="t-sm" style="display:block;color:var(--navy-900);font-weight:700;margin-top:4px">{t}</b><span class="t-xs" style="font-weight:500">{m}</span></div></div>' for d,b,t,m in [('18','<span class="badge b-live">Live</span>','Lawan Monster + Spin HP','YouTube · 19.00 WIB'),('25','<span class="badge b-blue">Akan datang</span>','Kenalan sama 100 finalis','Instagram · 19.00 WIB'),('16','<span class="badge b-grey">Selesai</span>','Pengumuman 100 Finalis','YouTube · rekaman')])}
+  <span style="align-self:stretch;margin:44px 0 6px;background:var(--line)"></span>
+  <div>
+    <b style="display:block;text-align:center;font:800 16px/22px var(--font);color:var(--navy-900)">Menuju YCS 2026</b>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:22px">{''.join(f'<div style="background:var(--blue-50);border-radius:14px;text-align:center;height:84px;display:grid;align-content:center"><b style="display:block;font:800 27px/31px var(--font);color:var(--navy-900);font-variant-numeric:tabular-nums">{n}</b><span style="font:500 13px/16px var(--font);color:var(--ink-2)">{l}</span></div>' for n,l in [('35','Hari'),('14','Jam'),('27','Menit'),('18','Detik')])}</div>
   </div>
 </div>
-<div style="padding:0 56px;margin-top:24px;display:grid;grid-template-columns:1fr 1fr;gap:24px">
-  <div class="card" style="padding:24px"><div class="row between"><h3 class="t-h2">Road to Bali</h3><span class="badge b-blue">Target 100.000</span></div>
-    <div style="height:150px;border-radius:18px;overflow:hidden;margin-top:14px"><img src="{A}/road/jalan-bali-1600.webp" style="width:100%;height:100%;object-fit:cover;object-position:50% 60%"></div>
-    <div class="row between mt16"><b class="t-h1 t-num">12.840</b><span class="t-sm">dukungan terkumpul</span></div>
-    <div style="height:12px;border-radius:6px;background:var(--blue-50);margin-top:10px"><div style="width:12.8%;height:100%;background:linear-gradient(90deg,var(--blue-500),var(--sun-400));border-radius:6px"></div></div></div>
-  <div class="card" style="padding:24px"><h3 class="t-h2">Leaderboard provinsi</h3><p class="t-sm mt4">Provinsi dengan dukungan terbanyak. Diperbarui tiap 5 menit.</p>
-    {''.join(f'<div class="row gap12" style="padding:12px 0;border-bottom:1px solid var(--line)"><span style="width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font:800 13px/1 var(--font);background:{bg};color:var(--navy-900)">{i}</span><b class="t-sm grow" style="color:var(--navy-900);font-weight:700">{p}</b><div style="width:180px;height:8px;border-radius:4px;background:var(--blue-50)"><div style="width:{w}%;height:100%;border-radius:4px;background:var(--blue-500)"></div></div><b class="t-sm t-num" style="color:var(--navy-900);width:60px;text-align:right">{n}</b></div>' for i,p,n,w,bg in [(1,'Jawa Tengah','3.204',100,'var(--sun-400)'),(2,'Bali','2.118',66,'#E3E8F2'),(3,'Jawa Timur','1.876',58,'#F3D4B5'),(4,'Jawa Barat','1.402',44,'var(--blue-50)')])}
-  </div>
-</div>
-<footer style="margin-top:56px;background:var(--navy-950);padding:36px 56px;display:flex;align-items:center;justify-content:space-between">{brand(True)}<span style="font:800 13px/1 var(--font);letter-spacing:4px;color:#B9D3FF">BERKARAKTER · BERKOLABORASI · BERDAMPAK</span><div class="row gap8">{''.join(f'<span class="btn btn-icon" style="background:rgba(255,255,255,.1);color:#fff;width:40px;height:40px">{ic(n,"s16")}</span>' for n in ['wa','play','heart'])}</div></footer>
-</div>
+<span style="position:absolute;left:1384px;top:772px;width:42px;height:42px;border-radius:50%;background:var(--blue-600);color:#fff;display:grid;place-items:center;box-shadow:0 6px 14px rgba(31,95,214,.4)"><svg class="i" viewBox="0 0 24 24" style="width:20px;height:20px;stroke-width:2.6" aria-hidden="true"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/></svg></span>
+
+<div style="position:absolute;left:39px;top:818px" class="row"><span style="width:52px;height:52px;display:block">{LOGO.replace("<svg ","<svg style=\"width:100%;height:100%\" ",1)}</span><div style="margin-left:10px"><b style="display:block;font:800 18px/20px var(--font);color:var(--navy-900)">YCS 2026</b><span style="font:500 14px/18px var(--font);color:var(--navy-900)">Youth Character Summit</span></div></div>
+<span style="position:absolute;left:0;right:0;top:842px;text-align:center;font:800 14px/1 var(--font);letter-spacing:5px;color:var(--navy-900)">BERKARAKTER &nbsp;•&nbsp; BERKOLABORASI &nbsp;•&nbsp; BERDAMPAK</span>
+<span style="position:absolute;right:0;bottom:0;width:300px;height:90px">{SKYLINE}</span>
 '''
-page('d01-beranda', 'D01 Beranda (desktop)', 1440, 1666, d01)
+page('d01-beranda', 'D01 Beranda (desktop)', 1440, 900, d01)
 
 # =====================================================================
 # D02 DESKTOP FESTIVAL
@@ -470,8 +554,7 @@ d02 = f'''
   <div>
     <div class="row between"><div><span class="t-over">#SatuKataUntukIndonesia</span><h1 class="t-h1 mt4">Festival Satu Kata</h1></div><div class="row gap8"><div class="input" style="width:300px;height:44px">{ic("search")}<span class="ph">Cari namamu atau temanmu</span></div><span class="btn btn-primary" style="height:44px">Temukan</span></div></div>
     <div style="position:relative;height:620px;border-radius:28px;overflow:hidden;margin-top:16px;background:#bfe0ff;box-shadow:var(--e2)">
-      <img src="{A}/festival/latar-1600.webp" style="position:absolute;top:0;left:0;width:100%">
-      <div style="position:absolute;top:330px;left:0;right:0;bottom:0;background:linear-gradient(rgba(233,207,162,0),#e6c896 60px,#d9b47c)"></div>
+      {panggung(0, 924, 620, img='latar-1600.webp')}
       {dpeople}
       <div style="position:absolute;left:440px;top:500px;display:grid;justify-items:center"><span class="badge b-sun" style="margin-bottom:4px">Kamu</span><img src="{K}/k03.png" style="width:60px;filter:drop-shadow(0 0 8px rgba(255,201,60,.9))"></div>
       <div style="position:absolute;left:16px;bottom:16px" class="row gap8"><span class="chip on">Semua</span><span class="chip">Provinsiku</span><span class="chip">Teman sekolah</span></div>

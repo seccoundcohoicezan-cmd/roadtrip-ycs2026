@@ -25,8 +25,16 @@ Galeri: `/design/` (contoh: https://roadtrip-ycs2026.vercel.app/design/). Halama
 
 Catatan kuning (`.note`) di M05 adalah anotasi desainer. Hapus layer-nya jika tidak perlu.
 
+## Revisi v2.1 (MRKT-60)
+- **M01 & D01 Beranda** disusun ulang mengikuti dua mockup arahan ("YCS 2026 Event App Homepage" dan "Youth Character Summit 2026 Landing Page"): header logo 3 baris + tombol menu 48×48, kartu hero "Selamat Datang di YCS 2026!" dengan foto Pura Ulun Danu Beratan dan tulisan *Indonesia Juara* (Caveat), gelombang navy–kuning berupa SVG, dot carousel, 4 kartu menu berikon warna, banner *Game Interaktif · Festival 1 Kata*, kartu *Informasi Acara* + hitung mundur, tab bawah putih bergaris aktif. Semua warna dari token `ds.css`.
+- Mobile dipetakan dari mockup 1024×1536 ke layar 390×844 (sumbu tegak ×0,55), desktop dari 1672×941 ke 1440×900. M01 sekarang tepat satu layar, seperti mockup. *Jadwal live* dan *Road to Bali* tetap ada di M06 Live dan M10 Lainnya.
+- Tab bawah mobile mengikuti mockup (4 menu): Beranda · Festival · Jadwal · Lainnya. *Jadwal* = jadwal live. *Finalis* dibuka dari kartu menu Beranda dan dari *Lainnya*. "Punya kode?" pindah ke menu (☰ di mobile, *Lainnya*), dan tombol header desktop menjadi **Game** seperti di mockup.
+- Foto rombongan pelajar di mockup desktop **tidak** dipakai: kita tidak punya foto asli dengan izin, jadi hanya foto pura yang dipakai. Ganti dengan foto kegiatan asli bila panitia sudah punya.
+- **Latar festival tidak lagi terpotong** (M02, M04, M05, D02): gambar latar selalu tampil utuh selebar bingkai, sama seperti situs live. Langit diperpanjang ke atas dan plaza ke bawah memakai warna yang diambil dari tepi gambar (`#13ACFD` / `#EACDA2`, helper `panggung()` di `gen.py`), jadi tidak ada lagi garis sambungan.
+- Warna di banner game yang tidak ada di token (oranye, hijau pada kata-kata) memakai token terdekat: `--sun-500`, `--coral-500`, `--green-100/600`, `--violet-600`.
+
 ## Keputusan UX
-- **Mobile-first, tab bawah 5 menu**: Beranda · Festival · Live · Finalis · Lainnya. Fitur sekunder (Dana Kaget, Wildcard, Road to Bali, Survei, FAQ, Privasi) dikelompokkan di *Lainnya* supaya menu utama tidak penuh.
+- **Mobile-first, tab bawah** (v2.1: 4 menu di Beranda sesuai mockup, lihat di atas; layar lain masih 5 menu: Beranda · Festival · Live · Finalis · Lainnya). Fitur sekunder (Dana Kaget, Wildcard, Road to Bali, Survei, FAQ, Privasi) dikelompokkan di *Lainnya* supaya menu utama tidak penuh.
 - **"Punya kode?" selalu di header**: satu pintu untuk semua kode. Format `YCS-XXXXX` dikenali sebagai Dana Kaget, 8 karakter sebagai Wildcard, dan pengguna langsung diarahkan (M09).
 - **Satu tombol kuning per layar** = aksi kampanye utama (Masuk/Gabung Festival). Biru dipakai untuk aksi form, merah hanya untuk LIVE.
 - **Gabung festival 3 langkah** (data diri → kata & karakter → gabung) dengan progress bar. Karakter otomatis disarankan dari provinsi (sesuai `modelProvinsi`).
