@@ -40,7 +40,7 @@ Tanpa frame (token + komponen saja, tata letak lama): Road to Bali, Leaderboard,
 - Pil plaza berbunyi "warga festival" (total pendaftar), bukan "online" — tidak ada data online.
 - Carousel hero: slide 1 Selamat datang (Sun "Mulai Jelajahi"), slide 2 Finalis/pengumuman, slide 3 Live & Dana Kaget; foto dari repo.
 - Logo YCS masih dummy (akan diganti panitia).
-- Warna kanvas JS (roda spin admin, gambar kartu) mengambil token lewat `getComputedStyle` bila memungkinkan; roda admin masih memakai palet sendiri.
+- Warna kanvas JS (roda spin admin, kartu PNG, mode latihan) mengambil token lewat `getComputedStyle`.
 
 ## Pertentangan antar-PNG
 
