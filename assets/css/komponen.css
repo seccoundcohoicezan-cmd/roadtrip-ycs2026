@@ -2,6 +2,9 @@
    Dipakai beranda + halaman turunan. Nama kelas lama dipertahankan agar JS tidak berubah:
    .btn--cta = Sun/CTA (maks. 1 per layar), .btn--primary = aksi form, .btn--soft = Ghost, .btn--ghost = Outline. */
 
+/* Atribut hidden selalu menang atas display komponen */
+[hidden] { display: none !important; }
+
 /* ---------- Tipografi ---------- */
 .t-display { font-size: var(--fs-display); line-height: var(--lh-display); font-weight: 800; letter-spacing: var(--ls-display); color: var(--heading); }
 .t-h1 { font-size: var(--fs-h1); line-height: var(--lh-h1); font-weight: 800; letter-spacing: var(--ls-h1); color: var(--heading); }

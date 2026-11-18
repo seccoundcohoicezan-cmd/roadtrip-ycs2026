@@ -698,16 +698,15 @@
     .wizard__top { display: grid; grid-template-columns: var(--tap) 1fr var(--tap); align-items: center; gap: var(--space-2); }
     .wizard__top .t-h3 { text-align: center; font-size: var(--fs-h2); line-height: var(--lh-h2); font-weight: 800; }
     .wizard__kembali svg { transform: rotate(180deg); }
-    .wizard__kembali[hidden] { display: inline-grid; visibility: hidden; }
+    .wizard__kembali[hidden] { display: inline-grid !important; visibility: hidden; }
     .wizard__no { justify-self: end; font-size: var(--fs-sm); font-weight: 700; color: var(--text-3); }
     .wizard__bar { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: var(--space-4); }
-    .wizard__bar li { display: grid; gap: 8px; font-size: var(--fs-xs); font-weight: 600; color: var(--text-3); }
-    .wizard__bar li:nth-child(2) { text-align: center; }
-    .wizard__bar li:nth-child(3) { text-align: right; }
-    .wizard__bar li::before { content: ""; height: 5px; border-radius: 3px; background: var(--line); }
+    .wizard__bar li { display: flex; flex-wrap: wrap; align-content: start; gap: 8px 3px; font-size: var(--fs-xs); font-weight: 600; color: var(--text-3); }
+    .wizard__bar li:nth-child(2) { justify-content: center; }
+    .wizard__bar li:nth-child(3) { justify-content: flex-end; }
+    .wizard__bar li::before { content: ""; flex: 0 0 100%; height: 5px; border-radius: 3px; background: var(--line); }
     .wizard__bar li.is-done { color: var(--primary); }
     .wizard__bar li.is-done::after { content: " ✓"; }
-    .wizard__bar li.is-done, .wizard__bar li[aria-current] { }
     .wizard__bar li.is-done::before, .wizard__bar li[aria-current]::before { background: var(--blue-600); }
     .wizard__bar li[aria-current] { color: var(--heading); font-weight: 700; }
     .wizard__step { margin: var(--space-5) 0 0; padding: 0; border: 0; min-width: 0; }
@@ -782,6 +781,7 @@
       .fest:not(.is-locked) .fest__aksi .btn--soft { --btn-bg: var(--white); --btn-fg: var(--navy-900); box-shadow: var(--e1); }
       .fest:not(.is-locked) .fest__info { position: absolute; z-index: 6; left: var(--space-4); bottom: calc(var(--space-4) + var(--tap) + var(--space-3)); max-width: 60%; padding: 8px 12px; border-radius: var(--r-md); background: var(--glass); box-shadow: var(--e1); }
       .fest-samping { display: grid; gap: var(--space-4); }
+      .fest-head { padding-right: calc(min(26rem, 60%) + var(--space-5)); }
       .fest-samping__kartu { padding: var(--space-5); border-radius: var(--r-lg); }
       .fest-samping__judul { display: flex; justify-content: space-between; align-items: center; gap: var(--space-2); font-size: var(--fs-h3); line-height: var(--lh-h3); font-weight: 700; letter-spacing: var(--ls-h3); color: var(--heading); }
       .fest-samping__judul .badge svg { width: .75rem; height: .75rem; }
