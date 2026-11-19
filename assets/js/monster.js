@@ -78,9 +78,11 @@
       } catch (e) { return null; }
     }
     let gambarTerakhir = null; // {i, x, y, w, h, balik} sprite Raja Batu yang terakhir digambar
+    let poseApi = { dx: 0, dy: 0 };
     function kenaTubuh(px, py) {
       const g = gambarTerakhir, m = aset.topeng;
       if (!g || !m) return null; // belum siap → pakai kotak lama
+      if (g.pose && (g.pose.rot || g.pose.dx)) { const q = g.pose, ax = px - g.pivX - q.dx, ay = py - g.pivY - q.dy, c = Math.cos(-q.rot), sn = Math.sin(-q.rot); px = g.pivX + (ax * c - ay * sn) / q.sx; py = g.pivY + (ax * sn + ay * c) / q.sy; }
       const r = Math.max(6, g.w * 0.035); // toleransi jari kecil di tepi tubuh
       for (const [dx, dy] of [[0, 0], [r, 0], [-r, 0], [0, r], [0, -r]]) {
         let u = (px + dx - g.x) / g.w; const v = (py + dy - g.y) / g.h;
@@ -298,7 +300,7 @@
       if (!sumber || !sumber.complete || !sumber.naturalWidth) return gambarMonsterLucu(g, t, kedip, mati);
       const n = sumber === runtuh ? 9 : 10;
       const fw = sumber.naturalWidth / n, fh = sumber.naturalHeight;
-      const i = sumber === runtuh ? Math.min(n - 1, Math.floor((mati || 0) * n)) : ps != null ? (ps < LEPAS ? 2 : 6) : Math.floor(t / (jalan.bergerak ? 170 : 520)) % n;
+      const i = sumber === runtuh ? Math.min(n - 1, Math.floor((mati || 0) * n)) : ps != null ? (ps < LEPAS ? 0 : ps < LEPAS + 0.25 ? 4 : 5) : Math.floor(t / (jalan.bergerak ? 170 : 520)) % n;
       // saat jurus: monster terangkat & membesar sedikit (mengumpulkan tenaga), lalu menghentak saat ledakan
       const angkat = ps == null ? 0 : ps < LEPAS ? ps / LEPAS : Math.max(0, 1 - (ps - LEPAS) / 0.2);
       const h = g.tinggi * (1 + 0.07 * angkat), w = h * fw / fh;
@@ -308,10 +310,20 @@
       ctx.fillStyle = 'rgba(60,40,20,.2)';
       ctx.beginPath(); ctx.ellipse(g.x, g.kaki, w * 0.42, h * 0.06, 0, 0, Math.PI * 2); ctx.fill();
       if (siaga) gambarAura(g, t);
+      // Gerak tubuh selaras efek api: ancang-ancang (tegak, condong ke belakang, jongkok, gemetar) → terjang ke depan → pulih.
+      const pz = { rot: 0, sx: 1, sy: 1, dx: 0, dy: 0 };
+      if (ps != null && !gerakMinim) {
+        const keluar = (u) => 1 - Math.pow(1 - u, 3), arahP = jalan.arah < 0 ? -1 : 1;
+        if (ps < LEPAS) { const u = ps / LEPAS, e = keluar(u); pz.rot = -0.24 * e; pz.sy = 1 - 0.12 * e; pz.sx = 1 + 0.07 * e; pz.dx = -w * 0.12 * e + Math.sin(t / 22) * w * (0.006 + 0.022 * u); pz.dy = Math.cos(t / 27) * h * 0.01 * u; }
+        else { const u = (ps - LEPAS) / (1 - LEPAS), m = u < 0.18 ? keluar(u / 0.18) : Math.max(0, 1 - (u - 0.18) / 0.82) ** 2; pz.rot = 0.3 * m; pz.sx = 1 + 0.1 * m; pz.sy = 1 + 0.14 * m; pz.dx = w * 0.34 * m; pz.dy = h * 0.04 * m; }
+        pz.rot *= arahP; pz.dx *= arahP;
+        ctx.translate(g.x + pz.dx, g.kaki + pz.dy); ctx.rotate(pz.rot); ctx.scale(pz.sx, pz.sy); ctx.translate(-g.x, -g.kaki);
+      }
       ctx.translate(g.x, 0); ctx.scale(jalan.arah < 0 && mati == null ? -1 : 1, 1); ctx.translate(-g.x, 0);
       if (mati != null && mati > 0.85) ctx.globalAlpha = Math.max(0, 1 - (mati - 0.85) / 0.15);
       ctx.drawImage(sumber, i * fw, 0, fw, fh, g.x - w / 2 + goyang, g.kaki - h - g.tinggi * 0.04 * angkat, w, h);
-      gambarTerakhir = sumber === lari ? { i, x: g.x - w / 2 + goyang, y: g.kaki - h - g.tinggi * 0.04 * angkat, w, h, balik: jalan.arah < 0 } : null;
+      gambarTerakhir = sumber === lari ? { i, x: g.x - w / 2 + goyang, y: g.kaki - h - g.tinggi * 0.04 * angkat, w, h, balik: jalan.arah < 0, pivX: g.x, pivY: g.kaki, pose: pz } : null;
+      poseApi = pz;
       if (kedip > 0) { // kedip terang tipis di atas sprite
         ctx.globalCompositeOperation = 'lighter';
         ctx.globalAlpha = kedip * 0.35;
@@ -334,6 +346,7 @@
         ctx.save();
         ctx.globalCompositeOperation = 'lighter';
         ctx.globalAlpha = p > 0.92 ? Math.max(0, (1 - p) / 0.08) : 1;
+        ctx.translate(poseApi.dx * 1.4, poseApi.dy); // api ikut terlempar ke arah terjangan
         if (jalan.arah < 0) { ctx.translate(cx, 0); ctx.scale(-1, 1); ctx.translate(-cx, 0); }
         ctx.drawImage(A, Math.min(n - 1, k) * fw, 0, fw, fh, cx - lebar / 2, cy - tinggi * 0.56, lebar, tinggi);
         ctx.restore();

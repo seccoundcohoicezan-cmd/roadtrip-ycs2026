@@ -33,6 +33,10 @@
     function kenaTubuh(px, py, b) {
       if (!topeng || !st.gambar) return px > b.x && px < b.x + b.w && py > b.y && py < b.kaki;
       const g = st.gambar, r = Math.max(10, g.w * 0.07);
+      if (g.pose) { // balikkan transformasi pose (pivot kaki) agar topeng tetap pas saat monster menerjang
+        const q = g.pose, ax = px - g.pivX - q.dx, ay = py - g.pivY - q.dy, c = Math.cos(-q.rot), sn = Math.sin(-q.rot);
+        px = g.pivX + (ax * c - ay * sn) / q.sx; py = g.pivY + (ax * sn + ay * c) / q.sy;
+      }
       for (const [dx, dy] of [[0, 0], [r, 0], [-r, 0], [0, r], [0, -r], [r * 0.7, r * 0.7], [-r * 0.7, r * 0.7], [r * 0.7, -r * 0.7], [-r * 0.7, -r * 0.7]]) {
         let u = (px + dx - g.x) / g.w; const v = (py + dy - g.y) / g.h;
         if (g.balik) u = 1 - u;
@@ -40,6 +44,26 @@
         if (topeng.a[Math.floor(v * (topeng.h - 1)) * topeng.w + Math.floor(g.i * topeng.fw + u * (topeng.fw - 1))] > 90) return true;
       }
       return false;
+    }
+    // Gerak tubuh saat jurus (selaras dengan efek api): ancang-ancang → hentakan menerjang → kembali.
+    // Pivot di kaki. rot (rad, positif = condong ke depan/arah hadap), sx/sy skala, dx/dy geser px.
+    const mudahKeluar = (u) => 1 - Math.pow(1 - u, 3), pegas = (u) => Math.sin(u * Math.PI);
+    function pose(t, b) {
+      const p = { rot: 0, sx: 1, sy: 1, dx: 0, dy: 0, frame: null };
+      if (gerakMinim || !st) return p;
+      if (st.awasSampai) {                         // ancang-ancang 2,4 dtk: tegak, condong ke belakang, jongkok, gemetar makin kuat
+        const u = Math.min(1, 1 - (st.awasSampai - t) / 2400), e = mudahKeluar(u);
+        p.frame = 0;
+        p.rot = -0.24 * e; p.sy = 1 - 0.12 * e; p.sx = 1 + 0.07 * e; p.dx = -b.w * 0.12 * e;
+        const g = 0.006 + 0.022 * u; p.dx += Math.sin(t / 22) * b.w * g; p.dy = Math.cos(t / 27) * b.h * g * 0.5;
+      } else if (st.tSerang && t - st.tSerang < 1100) {  // hentakan: menerjang ke depan & membesar, lalu pulih
+        const u = (t - st.tSerang) / 1100;
+        const maju = u < 0.18 ? mudahKeluar(u / 0.18) : Math.max(0, 1 - (u - 0.18) / 0.82) ** 2;
+        p.frame = u < 0.6 ? 4 : null;
+        p.rot = 0.3 * maju; p.sx = 1 + 0.1 * maju; p.sy = 1 + 0.14 * maju;
+        p.dx = b.w * 0.34 * maju; p.dy = b.h * 0.04 * maju; p.maju = maju;
+      }
+      return p;
     }
     function teks(isi, px, py, warnaTeks, besar) { st.partikel.push({ t: performance.now(), isi, x: px, y: py, warna: warnaTeks, besar, vy: -1.2 - Math.random() }); if (st.partikel.length > 40) st.partikel.shift(); }
 
@@ -109,7 +133,7 @@
       } else if (st.fase === 'main') {
         st.sisa = Math.max(0, DURASI - (t - st.t0) / 1000);
         $('#lt-waktu').textContent = Math.ceil(st.sisa);
-        st.posX += st.arah * 0.002; if (st.posX > 0.72 || st.posX < 0.28) st.arah *= -1;
+        if (!st.awasSampai && !(st.tSerang && t - st.tSerang < 1100)) st.posX += st.arah * 0.002; if (st.posX > 0.72 || st.posX < 0.28) st.arah *= -1;
         if (!st.awasSampai && t > st.tJurus) { st.awasSampai = t + 2400; st.hindarOk = false; $('#lt-awas').hidden = false; $('#lt-hindar').hidden = false; S().awas(); }
         if (st.awasSampai && t > st.awasSampai) {
           if (!st.hindarOk) { st.hati--; st.merah = t; S().kena(); hati(); teks('-1 nyawa', W / 2, H * 0.6, W8.coral, 24); }
@@ -125,14 +149,20 @@
         const R = aset.runtuh, f = Math.min(8, Math.floor((t - st.tRuntuh) / 110)), fw = 259, fh = 240, h2 = b.h * 1.05, w2 = h2 * fw / fh;
         if (R.complete && R.naturalWidth) x.drawImage(R, f * fw, 0, fw, fh, b.cx - w2 / 2, b.kaki - h2, w2, h2);
       } else {
-        const A = aset.lari; st.frame = Math.floor(t / 90) % 10;
+        const A = aset.lari, ps = pose(t, b); st.frame = ps.frame != null ? ps.frame : Math.floor(t / 90) % 10;
         if (A.complete && A.naturalWidth) {
           x.save();
+          const arahP = st.arah < 0 ? -1 : 1, q = { ...ps, rot: ps.rot * arahP, dx: ps.dx * arahP };
+          x.translate(b.cx + q.dx, b.kaki + q.dy); x.rotate(q.rot); x.scale(q.sx, q.sy); x.translate(-b.cx, -b.kaki);
           if (st.arah < 0) { x.translate(b.cx, 0); x.scale(-1, 1); x.translate(-b.cx, 0); }
+          if (ps.maju > 0.15) { // bayangan gerak (afterimage) di belakang tubuh saat menerjang
+            for (const [mund, al] of [[0.24, 0.22], [0.12, 0.38]]) { x.save(); x.globalAlpha = al * ps.maju; x.filter = 'sepia(1) saturate(4) hue-rotate(-20deg) brightness(1.1)'; x.drawImage(A, st.frame * 166, 0, 166, 200, b.x - b.w * mund, b.y, b.w, b.h); x.restore(); }
+          }
           if (st.kilat && t - st.kilat < 90) x.filter = 'brightness(2.2)';
           x.drawImage(A, st.frame * 166, 0, 166, 200, b.x, b.y, b.w, b.h);
           x.restore();
-          st.gambar = { i: st.frame, x: b.x, y: b.y, w: b.w, h: b.h, balik: st.arah < 0 };
+          st.gambar = { i: st.frame, x: b.x, y: b.y, w: b.w, h: b.h, balik: st.arah < 0, pivX: b.cx, pivY: b.kaki, pose: { ...ps, rot: ps.rot * (st.arah < 0 ? -1 : 1), dx: ps.dx * (st.arah < 0 ? -1 : 1) } };
+          st.poseTerakhir = st.gambar.pose;
         }
         // Serangan api (adaptasi GIF panitia): frame 0–7 mengumpulkan api selama peringatan, 8–15 ledakan setelahnya.
         const F = aset.api; let k = -1;
@@ -142,6 +172,8 @@
           const fw = F.naturalWidth / 16, fh = F.naturalHeight, lw = b.h * 2.1, lh = lw * fh / fw;
           x.fillStyle = `rgba(6,24,64,${k < 8 ? 0.12 + k * 0.03 : 0.36 - (k - 8) * 0.04})`; x.fillRect(0, 0, W, H); // langit meredup agar api menyala
           x.save(); x.globalCompositeOperation = 'lighter';
+          const q2 = st.poseTerakhir || { dx: 0, dy: 0 };
+          x.translate(q2.dx * 1.4, q2.dy);   // api ikut terlempar ke arah terjangan
           if (st.arah < 0) { x.translate(b.cx, 0); x.scale(-1, 1); x.translate(-b.cx, 0); }
           x.drawImage(F, k * fw, 0, fw, fh, b.cx - lw / 2, b.y + b.h * 0.5 - lh * 0.56, lw, lh);
           x.restore();
