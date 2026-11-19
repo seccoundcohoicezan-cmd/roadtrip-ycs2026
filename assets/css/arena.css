@@ -97,3 +97,21 @@
 .fest-b small { color: var(--ink-3); }
 .fest-b__ava { background: var(--sun-100); }
 .fest-b__tag { background: var(--sun-400); color: var(--navy-900); }
+
+/* ===== Tata letak overlay v2: tidak saling menumpuk, panel semi-transparan (kaca) ===== */
+/* Atas: HUD → peringatan jurus tepat di bawahnya (kiri-kanan menyisakan ruang tombol layar penuh).
+   Bawah: tiket (kiri) · tombol HINDAR/PERISAI (kanan) · ajakan/toast di atas baris bawah. */
+.mon__hud { background: color-mix(in srgb, var(--navy-950) 58%, transparent); }
+.mon__awas { top: var(--mon-hud-b, 7.5rem); transform: translateX(-50%); max-width: calc(100% - 7.5rem); padding: 10px 14px; font-size: var(--fs-sm); line-height: 1.35; background: color-mix(in srgb, #5B0A16 62%, transparent); box-shadow: var(--e2), inset 0 0 0 1px color-mix(in srgb, #FF8A6B 45%, transparent); animation: mon-awas2 .6s ease-in-out infinite alternate; }
+@keyframes mon-awas2 { to { box-shadow: var(--e2), inset 0 0 0 2px color-mix(in srgb, #FFB08F 80%, transparent), 0 0 18px color-mix(in srgb, #FF5A3C 45%, transparent); } }
+.mon__awas::before { font-size: var(--fs-body); }
+.mon__tiket { min-width: 0; padding: 8px 14px; background: color-mix(in srgb, var(--navy-950) 55%, transparent); }
+.mon__tiket strong { font-size: var(--fs-h2); }
+.mon__tiket small, .mon__tiket span { font-size: var(--fs-xs); }
+.mon__ajak { max-width: min(22rem, calc(100% - 1.5rem)); background: color-mix(in srgb, var(--navy-950) 60%, transparent); transition: bottom .25s var(--ease), opacity .2s; }
+.mon:has(.mon__tiket:not([hidden])) .mon__ajak { bottom: calc(var(--space-3) + 5.6rem); }
+.mon__hindar { width: min(42%, 11rem); min-height: 4.75rem; font-size: var(--fs-h3); background: linear-gradient(180deg, color-mix(in srgb, var(--sun-400) 82%, transparent), color-mix(in srgb, var(--sun-500) 82%, transparent)); }
+.mon__hindar.is-perisai { background: linear-gradient(180deg, color-mix(in srgb, #FFE58A 80%, transparent), color-mix(in srgb, #E9A400 80%, transparent)); }
+.mon__hindar svg { width: 1.5rem; height: 1.5rem; }
+@media (prefers-reduced-motion: reduce) { .mon__awas { animation: none; } }
+.mon:has(.mon__hindar:not([hidden])) .mon__ajak { visibility: hidden; }

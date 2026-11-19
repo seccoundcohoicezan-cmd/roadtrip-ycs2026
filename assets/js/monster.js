@@ -153,6 +153,8 @@
       kanvas.width = Math.round(w * dpr); kanvas.height = Math.round(h * dpr);
     }
     new ResizeObserver(ukur).observe(stage);
+    // Batas bawah HUD → variabel CSS: peringatan jurus & tombol layar penuh ditata tepat di bawahnya (tidak menumpuk).
+    new ResizeObserver(() => { if (hud.offsetHeight) stage.style.setProperty('--mon-hud-b', (hud.offsetTop + hud.offsetHeight + 8) + 'px'); }).observe(hud);
 
     const levelIdx = () => Math.max(0, Math.min((st.levelMaks || 1) - 1, (st.level || 1) - 1));
     const target = () => (st && st.target ? st.target[levelIdx()] : 1);

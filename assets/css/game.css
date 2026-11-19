@@ -25,7 +25,7 @@ main { max-width: 40rem; margin: 0 auto; padding: 0 var(--margin-m) var(--space-
 
 /* Arena */
 /* Layar penuh arena saat event (Fullscreen API; iPhone: fallback fixed 100dvh) */
-.g-penuh { position: absolute; z-index: 9; top: 44%; right: var(--space-2); background: color-mix(in srgb, var(--navy-950) 70%, transparent); color: var(--white); }
+.g-penuh { position: absolute; z-index: 9; top: var(--mon-hud-b, var(--space-3)); right: var(--space-3); width: 2.75rem; height: 2.75rem; min-height: 0; background: color-mix(in srgb, var(--navy-950) 50%, transparent); color: var(--white); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--white) 18%, transparent); }
 .g-penuh .ikon-off, .g-penuh[aria-pressed="true"] .ikon-on { display: none; }
 .g-penuh[aria-pressed="true"] .ikon-off { display: block; }
 .g-penuh:focus-visible { outline: none; box-shadow: var(--ring); }
@@ -150,3 +150,18 @@ dialog.dapat h2 { font-size: var(--fs-h1); line-height: var(--lh-h1); font-weigh
 }
 @media (prefers-reduced-motion: reduce) { .g-tidur__bos, .g-pulse, .lt-awas, .lt-hindar { animation: none; } }
 .svg-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+/* ===== Latihan v2: masuk halus, panel kaca, peringatan di bawah HUD (tidak menutupi bos) ===== */
+dialog.latihan { opacity: 0; transform: scale(.965); transition: opacity .38s cubic-bezier(.2,.8,.2,1), transform .5s cubic-bezier(.2,.8,.2,1); }
+dialog.latihan.is-buka { opacity: 1; transform: none; }
+dialog.latihan::backdrop { opacity: 0; transition: opacity .38s; }
+dialog.latihan.is-buka::backdrop { opacity: 1; }
+.lt-kanvas { transition: filter .6s; }
+dialog.latihan:not(.is-main) .lt-kanvas { filter: brightness(.7) saturate(.85); }
+.lt-mulai.is-pop { animation: lt-pop .8s cubic-bezier(.2,1.2,.4,1) both; }
+@keyframes lt-pop { 0% { transform: scale(1.4); opacity: 0; } 20% { transform: scale(1); opacity: 1; } 80% { opacity: 1; } 100% { transform: scale(.94); opacity: 0; } }
+.lt-awas { top: calc(7.25rem + env(safe-area-inset-top)); max-width: calc(100% - 2rem); padding: 10px 14px; font-size: var(--fs-sm); line-height: 1.35; background: color-mix(in srgb, #5B0A16 62%, transparent); box-shadow: var(--e2), inset 0 0 0 1px color-mix(in srgb, #FF8A6B 45%, transparent); animation: none; }
+.lt-hindar { width: min(60%, 14rem); min-height: 4.75rem; font-size: var(--fs-h3); background: linear-gradient(180deg, color-mix(in srgb, var(--sun-400) 82%, transparent), color-mix(in srgb, var(--sun-500) 82%, transparent)); }
+.lt-hindar.is-perisai { background: linear-gradient(180deg, color-mix(in srgb, #FFE58A 80%, transparent), color-mix(in srgb, #E9A400 80%, transparent)); }
+.lt-waktu, .lt-tutup { }
+@media (prefers-reduced-motion: reduce) { dialog.latihan, dialog.latihan::backdrop { transition: none; } .lt-mulai.is-pop { animation: none; } }

@@ -209,9 +209,10 @@
       }
       // logika waktu
       if (st.fase === 'hitung') {
-        const s = 3 - Math.floor((t - st.mulai) / 800);
-        $('#lt-mulai').textContent = s > 0 ? String(s) : 'SERANG!';
-        if (t - st.mulai > 3000) { st.fase = 'main'; st.t0 = t; jadwalJurus(t, true); $('#lt-mulai').textContent = ''; }
+        const s = Math.min(3, 3 - Math.floor((t - st.mulai) / 800));
+        const lbl = s > 0 ? String(s) : 'SERANG!', m = $('#lt-mulai');
+        if (m.textContent !== lbl) { m.textContent = lbl; m.classList.remove('is-pop'); void m.offsetWidth; m.classList.add('is-pop'); }
+        if (t - st.mulai > 3000) { st.fase = 'main'; st.t0 = t; jadwalJurus(t, true); m.textContent = ''; m.classList.remove('is-pop'); dlg.classList.add('is-main'); }
       } else if (st.fase === 'main') {
         st.sisa = Math.max(0, DURASI - (t - st.t0) / 1000);
         $('#lt-waktu').textContent = Math.ceil(st.sisa);
@@ -317,7 +318,7 @@
     }
 
     function mulai() {
-      W8 = warna(); st = baru(); st.mulai = performance.now();
+      W8 = warna(); st = baru(); st.mulai = performance.now() + 250; dlg.classList.remove('is-main'); // jeda singkat: dialog selesai memudar dulu
       tombolJurus(false); $('#lt-hasil').hidden = true; $('#lt-waktu').textContent = DURASI; $('#lt-combo').textContent = ''; hati();
       cancelAnimationFrame(raf); ukur(); raf = requestAnimationFrame(gambar);
     }
@@ -341,7 +342,7 @@
     // dialog yang dibuka lebih dulu.
     function buka() {
       let sudah = false;
-      const jalan = () => { if (sudah) return; sudah = true; if (!dlg.open) dlg.showModal(); mulai(); };
+      const jalan = () => { if (sudah) return; sudah = true; dlg.classList.remove('is-buka'); if (!dlg.open) dlg.showModal(); mulai(); requestAnimationFrame(() => requestAnimationFrame(() => dlg.classList.add('is-buka'))); };
       const p = layarPenuh();
       if (p) { p.then(jalan, jalan); setTimeout(jalan, 700); } else jalan();
     }
@@ -349,7 +350,7 @@
     $('#lt-tutup').addEventListener('click', tutup);
     $('#lt-keluar').addEventListener('click', tutup);
     $('#lt-lagi').addEventListener('click', () => { S().klik(); mulai(); });
-    dlg.addEventListener('close', () => { cancelAnimationFrame(raf); st = null; keluarPenuh(); });
+    dlg.addEventListener('close', () => { cancelAnimationFrame(raf); st = null; dlg.classList.remove('is-buka', 'is-main'); keluarPenuh(); });
     return { buka, tutup };
   }
   window.YCSLatihan = { buat };

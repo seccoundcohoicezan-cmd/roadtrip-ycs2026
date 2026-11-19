@@ -101,6 +101,9 @@
   // Ketukan pertama di arena saat bos menyerang langsung membuka layar penuh (lebih mudah dikontrol di HP).
   // Browser tanpa Fullscreen API (iPhone) memakai fallback: arena fixed memenuhi layar.
   const arena = $('#arena'), tPenuh = $('#g-penuh');
+  stage.appendChild(tPenuh); // di dalam panggung agar ikut tata letak overlay (di bawah HUD, kanan)
+  // Masuk/keluar layar penuh tidak menyentak: panggung memudar masuk setelah ukuran berubah.
+  const pudar = () => { if (!matchMedia('(prefers-reduced-motion: reduce)').matches && stage.animate) stage.animate([{ opacity: 0.25, transform: 'scale(.985)' }, { opacity: 1, transform: 'none' }], { duration: 380, easing: 'cubic-bezier(.2,.8,.2,1)' }); };
   let autoPenuh = false;
   const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
   const sedangPenuh = () => fsEl() === arena || arena.classList.contains('is-penuh');
@@ -113,7 +116,7 @@
     const minta = arena.requestFullscreen || arena.webkitRequestFullscreen;
     if (minta) {
       try { const pr = minta.call(arena, { navigationUI: 'hide' }); if (pr && pr.catch) pr.catch(() => { arena.classList.add('is-penuh'); syncPenuh(); }); } catch (e) { arena.classList.add('is-penuh'); }
-    } else arena.classList.add('is-penuh');
+    } else { arena.classList.add('is-penuh'); pudar(); }
     syncPenuh();
   }
   function keluarPenuh() {
@@ -123,8 +126,8 @@
     syncPenuh();
   }
   tPenuh.addEventListener('click', (e) => { e.stopPropagation(); S.klik(); if (sedangPenuh()) keluarPenuh(); else masukPenuh(); });
-  document.addEventListener('fullscreenchange', syncPenuh);
-  document.addEventListener('webkitfullscreenchange', syncPenuh);
+  document.addEventListener('fullscreenchange', () => { syncPenuh(); pudar(); });
+  document.addEventListener('webkitfullscreenchange', () => { syncPenuh(); pudar(); });
   arena.addEventListener('pointerup', (e) => {
     if (autoPenuh || !document.body.classList.contains('is-tanding') || sedangPenuh() || e.target.closest('button, a')) return;
     autoPenuh = true; masukPenuh();
