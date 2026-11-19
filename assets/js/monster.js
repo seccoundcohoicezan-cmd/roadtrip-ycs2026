@@ -78,7 +78,7 @@
       } catch (e) { return null; }
     }
     let gambarTerakhir = null; // {i, x, y, w, h, balik} sprite Raja Batu yang terakhir digambar
-    let poseApi = { dx: 0, dy: 0 };
+    let poseApi = { dx: 0, dy: 0 }, tubuhUlang = null;
     function kenaTubuh(px, py) {
       const g = gambarTerakhir, m = aset.topeng;
       if (!g || !m) return null; // belum siap → pakai kotak lama
@@ -315,13 +315,14 @@
       if (ps != null && !gerakMinim) {
         const keluar = (u) => 1 - Math.pow(1 - u, 3), arahP = jalan.arah < 0 ? -1 : 1;
         if (ps < LEPAS) { const u = ps / LEPAS, e = keluar(u); pz.rot = -0.24 * e; pz.sy = 1 - 0.12 * e; pz.sx = 1 + 0.07 * e; pz.dx = -w * 0.12 * e + Math.sin(t / 22) * w * (0.006 + 0.022 * u); pz.dy = Math.cos(t / 27) * h * 0.01 * u; }
-        else { const u = (ps - LEPAS) / (1 - LEPAS), m = u < 0.18 ? keluar(u / 0.18) : Math.max(0, 1 - (u - 0.18) / 0.82) ** 2; pz.rot = 0.3 * m; pz.sx = 1 + 0.1 * m; pz.sy = 1 + 0.14 * m; pz.dx = w * 0.34 * m; pz.dy = h * 0.04 * m; }
+        else { const u = (ps - LEPAS) / (1 - LEPAS), m = u < 0.16 ? keluar(u / 0.16) : u < 0.3 ? 1 : Math.max(0, 1 - (u - 0.3) / 0.7) ** 2; pz.rot = 0.3 * m; pz.sx = 1 + 0.1 * m; pz.sy = 1 + 0.14 * m; pz.dx = w * 0.34 * m; pz.dy = h * 0.04 * m; }
         pz.rot *= arahP; pz.dx *= arahP;
         ctx.translate(g.x + pz.dx, g.kaki + pz.dy); ctx.rotate(pz.rot); ctx.scale(pz.sx, pz.sy); ctx.translate(-g.x, -g.kaki);
       }
       ctx.translate(g.x, 0); ctx.scale(jalan.arah < 0 && mati == null ? -1 : 1, 1); ctx.translate(-g.x, 0);
       if (mati != null && mati > 0.85) ctx.globalAlpha = Math.max(0, 1 - (mati - 0.85) / 0.15);
       ctx.drawImage(sumber, i * fw, 0, fw, fh, g.x - w / 2 + goyang, g.kaki - h - g.tinggi * 0.04 * angkat, w, h);
+      tubuhUlang = ps != null && sumber === lari ? { m: ctx.getTransform(), i, fw, fh, x: g.x - w / 2 + goyang, y: g.kaki - h - g.tinggi * 0.04 * angkat, w, h } : null;
       gambarTerakhir = sumber === lari ? { i, x: g.x - w / 2 + goyang, y: g.kaki - h - g.tinggi * 0.04 * angkat, w, h, balik: jalan.arah < 0, pivX: g.x, pivY: g.kaki, pose: pz } : null;
       poseApi = pz;
       if (kedip > 0) { // kedip terang tipis di atas sprite
@@ -348,8 +349,11 @@
         ctx.globalAlpha = p > 0.92 ? Math.max(0, (1 - p) / 0.08) : 1;
         ctx.translate(poseApi.dx * 1.4, poseApi.dy); // api ikut terlempar ke arah terjangan
         if (jalan.arah < 0) { ctx.translate(cx, 0); ctx.scale(-1, 1); ctx.translate(-cx, 0); }
+        if (k >= 8 && k <= 11) ctx.globalAlpha *= 0.7;
         ctx.drawImage(A, Math.min(n - 1, k) * fw, 0, fw, fh, cx - lebar / 2, cy - tinggi * 0.56, lebar, tinggi);
         ctx.restore();
+        // tubuh digambar ulang di atas api agar gerakan menyerang tetap terbaca
+        if (tubuhUlang && aset.lari && aset.lari.complete) { const q = tubuhUlang; ctx.save(); ctx.setTransform(q.m); ctx.globalAlpha = k >= 8 ? 0.85 : 0.6; ctx.drawImage(aset.lari, q.i * q.fw, 0, q.fw, q.fh, q.x, q.y, q.w, q.h); ctx.restore(); }
         return;
       }
       const dada = { x: g.x, y: g.kaki - g.tinggi * 0.55 };

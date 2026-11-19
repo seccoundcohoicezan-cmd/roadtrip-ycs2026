@@ -21,7 +21,7 @@
     new ResizeObserver(ukur).observe(kanvas);
 
     function baru() {
-      return { hp: HP, hati: HATI, sisa: DURASI, combo: 0, comboMaks: 0, tTap: 0, dmg: 0, aman: 0, kritis: 0, partikel: [], konfeti: [], getar: 0, kilat: 0, merah: 0,
+      return { hp: HP, hati: HATI, sisa: DURASI, combo: 0, comboMaks: 0, tTap: 0, dmg: 0, aman: 0, kritis: 0, partikel: [], konfeti: [], bara: [], debu: [], benturan: false, getar: 0, kilat: 0, merah: 0,
         mulai: 0, jalan: false, akhir: null, tJurus: 0, awasSampai: 0, hindarOk: false, fase: 'hitung', hitung: 3, posX: 0.5, arah: 1, frame: 0, tRuntuh: 0, tAkhir: 0 };
     }
     function bos() { // kotak bos di layar
@@ -58,12 +58,47 @@
         const g = 0.006 + 0.022 * u; p.dx += Math.sin(t / 22) * b.w * g; p.dy = Math.cos(t / 27) * b.h * g * 0.5;
       } else if (st.tSerang && t - st.tSerang < 1100) {  // hentakan: menerjang ke depan & membesar, lalu pulih
         const u = (t - st.tSerang) / 1100;
-        const maju = u < 0.18 ? mudahKeluar(u / 0.18) : Math.max(0, 1 - (u - 0.18) / 0.82) ** 2;
+        // terjang 0–0,16 · tahan saat benturan 0,16–0,30 (hit-stop) · pulih ke kuda-kuda 0,30–1
+        const maju = u < 0.16 ? mudahKeluar(u / 0.16) : u < 0.3 ? 1 : Math.max(0, 1 - (u - 0.3) / 0.7) ** 2;
         p.frame = u < 0.6 ? 4 : null;
         p.rot = 0.3 * maju; p.sx = 1 + 0.1 * maju; p.sy = 1 + 0.14 * maju;
         p.dx = b.w * 0.34 * maju; p.dy = b.h * 0.04 * maju; p.maju = maju;
       }
       return p;
+    }
+    // Efek benturan: jejak api oranye mengikuti sabetan senjata, ledakan bara & percikan, gelombang kejut + debu di kaki, getar.
+    function gambarBenturan(t, b) {
+      const u = (t - st.tSerang) / 1100, arahP = st.arah < 0 ? -1 : 1, q = st.poseTerakhir || { dx: 0 };
+      const depanX = b.cx + q.dx + arahP * b.w * 0.42, depanY = b.y + b.h * 0.42;
+      if (!st.benturan && u >= 0.16) { // detik benturan
+        st.benturan = true; st.getar = t; st.getarAmp = 1.6;
+        for (let i = 0; i < 46; i++) { const a = (Math.random() - 0.5) * Math.PI * 1.4 + (arahP > 0 ? 0 : Math.PI), v = 2 + Math.random() * 7; st.bara.push({ x: depanX, y: depanY, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 2, r: 1.5 + Math.random() * 2.5, t0: t, umur: 500 + Math.random() * 500 }); }
+        for (let i = 0; i < 14; i++) { const a = Math.random() * Math.PI, v = 1 + Math.random() * 2.5; st.debu.push({ x: b.cx + q.dx, y: b.kaki, vx: Math.cos(a) * v * (Math.random() < 0.5 ? -1 : 1) * 2, vy: -Math.sin(a) * v * 0.6, r: 8 + Math.random() * 14, t0: t, umur: 900 }); }
+      }
+      x.save(); x.globalCompositeOperation = 'lighter';
+      // jejak sabetan diagonal (0–0,3)
+      if (u < 0.32) {
+        const p = Math.min(1, u / 0.16), pud = u < 0.16 ? 1 : 1 - (u - 0.16) / 0.16;
+        const cx = b.cx + q.dx, cy = b.y + b.h * 0.45, R = b.h * 0.62, a0 = -2.3, a1 = a0 + 2.6 * p;
+        for (const [lebar, al] of [[18, 0.25], [9, 0.55], [3, 0.95]]) {
+          x.strokeStyle = `rgba(255,${150 + (3 - lebar / 6) * 30},40,${al * pud})`; x.lineWidth = lebar; x.lineCap = 'round';
+          x.beginPath(); x.ellipse(cx, cy, R, R * 0.55, arahP * -0.5, arahP > 0 ? a0 : Math.PI - a1, arahP > 0 ? a1 : Math.PI - a0); x.stroke();
+        }
+      }
+      // kilatan di titik benturan
+      if (u >= 0.16 && u < 0.36) { const k = 1 - (u - 0.16) / 0.2, rr = b.h * (0.12 + 0.35 * (1 - k)); const g = x.createRadialGradient(depanX, depanY, 0, depanX, depanY, rr); g.addColorStop(0, `rgba(255,250,220,${k})`); g.addColorStop(0.4, `rgba(255,170,40,${0.7 * k})`); g.addColorStop(1, 'rgba(255,80,20,0)'); x.fillStyle = g; x.beginPath(); x.arc(depanX, depanY, rr, 0, 6.28); x.fill(); }
+      // gelombang kejut di tanah
+      if (u >= 0.16 && u < 0.7) { const k = (u - 0.16) / 0.54; x.strokeStyle = `rgba(255,200,120,${0.6 * (1 - k)})`; x.lineWidth = 3 * (1 - k) + 1; x.beginPath(); x.ellipse(b.cx + q.dx, b.kaki, b.w * (0.3 + 1.1 * k), b.w * (0.07 + 0.22 * k), 0, 0, 6.28); x.stroke(); }
+      x.restore();
+    }
+    function gambarPartikelBenturan(t) {
+      x.save();
+      st.debu = st.debu.filter((d) => t - d.t0 < d.umur);
+      for (const d of st.debu) { const k = (t - d.t0) / d.umur; d.x += d.vx; d.y += d.vy; d.vy *= 0.96; x.globalAlpha = 0.35 * (1 - k); x.fillStyle = 'rgb(205,180,140)'; x.beginPath(); x.arc(d.x, d.y, d.r * (1 + k * 1.5), 0, 6.28); x.fill(); }
+      x.globalCompositeOperation = 'lighter';
+      st.bara = st.bara.filter((p) => t - p.t0 < p.umur);
+      for (const p of st.bara) { const k = (t - p.t0) / p.umur; p.x += p.vx; p.y += p.vy; p.vy += 0.25; p.vx *= 0.98; x.globalAlpha = 1 - k; x.fillStyle = k < 0.4 ? 'rgb(255,240,180)' : 'rgb(255,140,40)'; x.beginPath(); x.arc(p.x, p.y, p.r * (1 - k * 0.5), 0, 6.28); x.fill(); }
+      x.restore();
     }
     function teks(isi, px, py, warnaTeks, besar) { st.partikel.push({ t: performance.now(), isi, x: px, y: py, warna: warnaTeks, besar, vy: -1.2 - Math.random() }); if (st.partikel.length > 40) st.partikel.shift(); }
 
@@ -78,7 +113,7 @@
       const semangat = st.sisa <= 15;
       const kali = Math.min(3, 1 + Math.floor(st.combo / 8) * 0.5) * (semangat ? 2 : 1), krit = Math.random() < 0.12;
       const d = Math.round((krit ? 3 : 1) * kali);
-      st.hp = Math.max(0, st.hp - d); st.dmg += d; st.kilat = t; if (!gerakMinim) st.getar = t;
+      st.hp = Math.max(0, st.hp - d); st.dmg += d; st.kilat = t; if (!gerakMinim) { st.getar = t; st.getarAmp = 0.7; }
       if (krit) { st.kritis++; S().kritis(); teks('KRITIS -' + d, px, py, W8.sun, 26); } else { S().pukul(st.combo); teks('-' + d, px, py, W8.white, 20); }
       $('#lt-combo').textContent = semangat ? `SEMANGAT! Serangan x${String(kali).replace('.', ',')}` : st.combo >= 5 ? `${st.combo} combo · x${String(kali).replace('.', ',')}` : '';
       if (st.hp <= 0) selesai(true);
@@ -123,8 +158,15 @@
       if (L.complete && L.naturalWidth) { const s = Math.max(W / L.naturalWidth, (H * 0.5) / L.naturalHeight * 0.9); const lw = L.naturalWidth * s, lh = L.naturalHeight * s; x.drawImage(L, (W - lw) / 2, H * 0.52 - lh, lw, lh); }
       x.fillStyle = 'rgba(6,24,64,.35)'; x.fillRect(0, 0, W, H);
       let ox = 0, oy = 0;
-      if (st.getar && t - st.getar < 120) { ox = (Math.random() - 0.5) * 8; oy = (Math.random() - 0.5) * 6; }
+      if (st.getar && t - st.getar < 180) { const k = 1 - (t - st.getar) / 180; const a = st.getarAmp || 1; ox = (Math.random() - 0.5) * 9 * a * k; oy = (Math.random() - 0.5) * 7 * a * k; }
       x.save(); x.translate(ox, oy);
+      // Dorongan kamera (hanya lapisan karakter & efek; latar tetap diam): mendekat saat ancang-ancang, puncak saat benturan.
+      if (!gerakMinim && st.fase === 'main') {
+        const bb = bos(); let dorong = 0;
+        if (st.awasSampai) dorong = 0.04 * Math.min(1, 1 - (st.awasSampai - t) / 2400);
+        else if (st.tSerang && t - st.tSerang < 1100) { const u = (t - st.tSerang) / 1100; dorong = u < 0.3 ? 0.04 + 0.04 * Math.min(1, u / 0.16) : 0.08 * Math.max(0, 1 - (u - 0.3) / 0.7); }
+        if (dorong) { x.translate(bb.cx, bb.y + bb.h * 0.55); x.scale(1 + dorong, 1 + dorong); x.translate(-bb.cx, -(bb.y + bb.h * 0.55)); }
+      }
       // logika waktu
       if (st.fase === 'hitung') {
         const s = 3 - Math.floor((t - st.mulai) / 800);
@@ -137,7 +179,7 @@
         if (!st.awasSampai && t > st.tJurus) { st.awasSampai = t + 2400; st.hindarOk = false; $('#lt-awas').hidden = false; $('#lt-hindar').hidden = false; S().awas(); }
         if (st.awasSampai && t > st.awasSampai) {
           if (!st.hindarOk) { st.hati--; st.merah = t; S().kena(); hati(); teks('-1 nyawa', W / 2, H * 0.6, W8.coral, 24); }
-          st.awasSampai = 0; st.tSerang = t; if (!gerakMinim) st.getar = t; $('#lt-awas').hidden = true; $('#lt-hindar').hidden = true; jadwalJurus(t);
+          st.awasSampai = 0; st.tSerang = t; st.benturan = false; $('#lt-awas').hidden = true; $('#lt-hindar').hidden = true; jadwalJurus(t);
           if (st.hati <= 0) selesai(false);
         }
         if (st.sisa <= 0) selesai(false);
@@ -160,6 +202,7 @@
           }
           if (st.kilat && t - st.kilat < 90) x.filter = 'brightness(2.2)';
           x.drawImage(A, st.frame * 166, 0, 166, 200, b.x, b.y, b.w, b.h);
+          st.matriks = x.getTransform(); // dipakai untuk menggambar ulang tubuh di atas api
           x.restore();
           st.gambar = { i: st.frame, x: b.x, y: b.y, w: b.w, h: b.h, balik: st.arah < 0, pivX: b.cx, pivY: b.kaki, pose: { ...ps, rot: ps.rot * (st.arah < 0 ? -1 : 1), dx: ps.dx * (st.arah < 0 ? -1 : 1) } };
           st.poseTerakhir = st.gambar.pose;
@@ -175,10 +218,15 @@
           const q2 = st.poseTerakhir || { dx: 0, dy: 0 };
           x.translate(q2.dx * 1.4, q2.dy);   // api ikut terlempar ke arah terjangan
           if (st.arah < 0) { x.translate(b.cx, 0); x.scale(-1, 1); x.translate(-b.cx, 0); }
+          x.globalAlpha = k >= 8 && k <= 11 ? 0.7 : 1;
           x.drawImage(F, k * fw, 0, fw, fh, b.cx - lw / 2, b.y + b.h * 0.5 - lh * 0.56, lw, lh);
           x.restore();
+          // tubuh digambar ulang di atas api agar gerakan menyerang tetap terbaca (api tetap menyelimuti tepinya)
+          if (st.matriks && A.complete) { x.save(); x.setTransform(st.matriks); x.globalAlpha = k >= 8 ? 0.85 : 0.6; x.drawImage(A, st.frame * 166, 0, 166, 200, b.x, b.y, b.w, b.h); x.restore(); }
         }
+        if (!gerakMinim && st.tSerang && t - st.tSerang < 1100) gambarBenturan(t, b);
       }
+      gambarPartikelBenturan(t);
       x.restore();
       // angka & partikel
       st.partikel = st.partikel.filter((p) => t - p.t < 800);
