@@ -54,7 +54,7 @@ Tanpa frame (token + komponen saja, tata letak lama): Road to Bali, Leaderboard,
 - Lobi bergaya game harian: status bos + hitung mundur (dari jadwal monster/live), tombol **Main latihan**, **Kode undianku**, **Misi pejuang** (lencana), pemenang spin. Suara pendek (WebAudio) + getar, bisa dimatikan.
 - **Arena event asli** = panggung festival + overlay monster yang sama (`assets/js/monster.js`, jam & aturan server). Beranda tidak lagi memasang monster; saat bos muncul/menjelang, beranda menampilkan banner yang menaut ke `/game/`.
 - **Skema hadiah:** ikut menyerang → kode undian dicadangkan → **sah bila Raja Batu tumbang** → diundi saat live (admin Spin Undian). Bos menang/kabur → kode hangus (server + tampilan).
-- **Mode latihan** (`assets/js/latihan.js`): 40 detik, tap bos (combo, kritis), HINDAR saat jurus, 3 nyawa, skor & rekor, "Tantang teman". Lokal, tanpa kode undian. Maks ±12 tap/detik dihitung (anti auto-klik).
+- **Mode latihan** (`assets/js/latihan.js`): 45 detik, dibuat mudah dimenangkan (HP bos 160, 5 nyawa, jurus lebih jarang, jendela HINDAR 2,4 dtk, 15 detik terakhir serangan ×2), tap bos (combo, kritis), HINDAR saat jurus, skor & rekor, "Tantang teman". Lokal, tanpa kode undian. Maks ±12 tap/detik dihitung (anti auto-klik).
 - CSS bersama panggung + monster dipindah ke `assets/css/arena.css` (beranda & game).
 
 ### Mode Gladi seluruh web (`assets/js/gladi.js`)
@@ -67,3 +67,4 @@ Tanpa frame (token + komponen saja, tata letak lama): Road to Bali, Leaderboard,
 - HP sempit (≤360 px): kolom cari & tombol bottom sheet festival tidak lagi melebar keluar layar.
 - Desktop: kolom cari festival pindah ke kepala bagian (tidak menimpa teks); 1024–1280 px alat festival di bawah panggung; header desktop mendapat latar saat digulir.
 - Roda spin admin memakai warna token (teks navy di juring kuning).
+- Plaza di layar tegak (HP): latar gerbang diperbesar sampai ±42% tinggi panggung (sisi kiri-kanan terpotong) agar jarak gerbang–lapangan realistis.

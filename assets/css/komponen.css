@@ -139,7 +139,7 @@
 .alert--warn { background: var(--warning-bg); color: var(--warning); }
 .alert--info { background: var(--info-bg); color: var(--info); }
 .alert[hidden], .alert:empty { display: none; }
-.toast {
+.toast { pointer-events: none;
   position: fixed; left: 50%; bottom: calc(var(--tabbar-h) + 28px + env(safe-area-inset-bottom)); z-index: 90; width: max-content; max-width: min(92vw, 26rem);
   display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: var(--r-md);
   background: var(--navy-900); color: var(--white); box-shadow: var(--e3); font: 600 var(--fs-sm)/var(--lh-sm) var(--font-sans);

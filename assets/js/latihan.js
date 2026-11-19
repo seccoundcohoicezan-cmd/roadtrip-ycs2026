@@ -2,7 +2,8 @@
    Tap bos untuk menyerang (combo & kritis), tekan HINDAR saat jurus datang, 3 nyawa. Hasil: skor + tantang teman. */
 (() => {
   'use strict';
-  const DURASI = 40, HP = 300, HATI = 3, JEDA_COMBO = 450, JEDA_MIN = 80; // JEDA_MIN: maks ±12 tap/detik dihitung (anti auto-klik)
+  // Dibuat mudah dimenangkan (kampanye: orang harus merasa bisa). Penanda: ±4 tap/detik santai sudah cukup menang.
+  const DURASI = 45, HP = 160, HATI = 5, JEDA_COMBO = 600, JEDA_MIN = 80; // JEDA_MIN: maks ±12 tap/detik dihitung (anti auto-klik)
   const gerakMinim = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const S = () => window.YCSSuara || { pukul() {}, kritis() {}, awas() {}, aman() {}, kena() {}, menang() {}, kalah() {}, klik() {} };
   const muat = (src) => { const i = new Image(); i.src = src; return i; };
@@ -30,20 +31,22 @@
     function tap(ev) {
       if (!st || st.fase !== 'main') return;
       const r = kanvas.getBoundingClientRect(), px = ev.clientX - r.left, py = ev.clientY - r.top, b = bos();
-      if (px < b.x - 20 || px > b.x + b.w + 20 || py < b.y - 20 || py > b.kaki + 10) { teks('Meleset!', px, py, W8.white, 16); return; }
+      if (px < b.x - 50 || px > b.x + b.w + 50 || py < b.y - 50 || py > b.kaki + 40) { teks('Meleset!', px, py, W8.white, 16); return; }
       const t = performance.now();
       if (t - st.tTap < JEDA_MIN) return;
       st.combo = t - st.tTap < JEDA_COMBO ? st.combo + 1 : 1; st.tTap = t; st.comboMaks = Math.max(st.comboMaks, st.combo);
-      const kali = Math.min(3, 1 + Math.floor(st.combo / 10) * 0.5), krit = Math.random() < 0.08;
+      // Combo naik tiap 8 tap; 15 detik terakhir "Semangat!" serangan ×2 agar pemain yang mepet tetap bisa menang.
+      const semangat = st.sisa <= 15;
+      const kali = Math.min(3, 1 + Math.floor(st.combo / 8) * 0.5) * (semangat ? 2 : 1), krit = Math.random() < 0.12;
       const d = Math.round((krit ? 3 : 1) * kali);
       st.hp = Math.max(0, st.hp - d); st.dmg += d; st.kilat = t; if (!gerakMinim) st.getar = t;
       if (krit) { st.kritis++; S().kritis(); teks('KRITIS -' + d, px, py, W8.sun, 26); } else { S().pukul(st.combo); teks('-' + d, px, py, W8.white, 20); }
-      $('#lt-combo').textContent = st.combo >= 5 ? `${st.combo} combo · x${String(kali).replace('.', ',')}` : '';
+      $('#lt-combo').textContent = semangat ? `SEMANGAT! Serangan x${String(kali).replace('.', ',')}` : st.combo >= 5 ? `${st.combo} combo · x${String(kali).replace('.', ',')}` : '';
       if (st.hp <= 0) selesai(true);
     }
     kanvas.addEventListener('pointerdown', tap);
 
-    function jadwalJurus(t, awal) { st.tJurus = t + (awal ? 3500 : 4000) + Math.random() * 2000; }
+    function jadwalJurus(t, awal) { st.tJurus = t + (awal ? 5000 : 6500) + Math.random() * 2500; }
     function hindar() {
       if (!st || st.fase !== 'main' || performance.now() > st.awasSampai) return;
       st.hindarOk = true; st.aman++; S().aman(); teks('AMAN!', W / 2, H * 0.62, W8.green, 26);
@@ -92,7 +95,7 @@
         st.sisa = Math.max(0, DURASI - (t - st.t0) / 1000);
         $('#lt-waktu').textContent = Math.ceil(st.sisa);
         st.posX += st.arah * 0.0025; if (st.posX > 0.85 || st.posX < 0.15) st.arah *= -1;
-        if (!st.awasSampai && t > st.tJurus) { st.awasSampai = t + 1600; st.hindarOk = false; $('#lt-awas').hidden = false; $('#lt-hindar').hidden = false; S().awas(); }
+        if (!st.awasSampai && t > st.tJurus) { st.awasSampai = t + 2400; st.hindarOk = false; $('#lt-awas').hidden = false; $('#lt-hindar').hidden = false; S().awas(); }
         if (st.awasSampai && t > st.awasSampai) {
           if (!st.hindarOk) { st.hati--; st.merah = t; S().kena(); hati(); teks('-1 nyawa', W / 2, H * 0.6, W8.coral, 24); }
           st.awasSampai = 0; $('#lt-awas').hidden = true; $('#lt-hindar').hidden = true; jadwalJurus(t);

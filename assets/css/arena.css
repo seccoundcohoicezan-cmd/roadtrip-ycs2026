@@ -69,7 +69,7 @@
 .mon__hindar:disabled { background: var(--disabled-bg); color: var(--disabled-fg); box-shadow: none; animation: none; cursor: default; }
 .mon__hindar:focus-visible { outline: none; box-shadow: 0 0 0 5px color-mix(in srgb, var(--sun-400) 35%, transparent), var(--ring); }
 @keyframes mon-hindar { to { transform: scale(1.04); } }
-.mon__tiket { position: absolute; left: var(--space-3); bottom: var(--space-3); z-index: 2; display: grid; min-width: 8rem; padding: var(--space-3) var(--space-4); border-radius: var(--r-lg); background: color-mix(in srgb, var(--navy-950) 90%, transparent); color: var(--white); box-shadow: var(--e2), inset 0 0 0 1px color-mix(in srgb, var(--white) 12%, transparent); }
+.mon__tiket { pointer-events: none; position: absolute; left: var(--space-3); bottom: var(--space-3); z-index: 2; display: grid; min-width: 8rem; padding: var(--space-3) var(--space-4); border-radius: var(--r-lg); background: color-mix(in srgb, var(--navy-950) 90%, transparent); color: var(--white); box-shadow: var(--e2), inset 0 0 0 1px color-mix(in srgb, var(--white) 12%, transparent); }
 .mon__tiket[hidden] { display: none; }
 .mon__tiket small { font-size: var(--fs-sm); color: var(--violet-100); }
 .mon__tiket strong { font-size: var(--fs-h1); line-height: 1.1; font-weight: 800; font-variant-numeric: tabular-nums; }

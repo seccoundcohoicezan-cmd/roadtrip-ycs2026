@@ -796,7 +796,7 @@
       // Tap harus tepat mengenai monster atau warga (yang masih berdiri). Di luar itu = meleset, tidak dihitung.
       const g = geometri();
       const kenaMonster = Math.abs(x - g.x) < g.lebar * 0.45 && y > g.atas + g.tinggi * 0.04 && y < g.kaki;
-      const w = !kenaMonster && fest && fest.wargaDi ? fest.wargaDi(x, y, 3) : null;
+      const w = !kenaMonster && fest && fest.wargaDi ? fest.wargaDi(x, y, 9) : null; // toleransi jari di HP
       if (w && w === fest.saya && !$('.mon__hindar').hidden) { hindar(); return; } // ketuk karaktermu saat peringatan = menghindar
       if (!kenaMonster && !w) { teks.push({ s: 'Meleset!', x, y, t0: performance.now(), warna: '#E9E3DA' }); mulaiGambar(); return; }
       const pos = w && fest.posisi(w);

@@ -198,7 +198,7 @@
     const latar = new Image();
     let siapLatar = false, W = 0, H = 0, dpr = 1, warga = [], raf = 0, terlihat = true, tAkhir = 0, tLalu = 0;
     let balonAktif = opsi.balonAktif ?? true;
-    let area = { y0: 0, y1: 0, imgH: 0 };
+    let area = { y0: 0, y1: 0, imgH: 0, imgW: 0, imgX: 0 };
     const balon = []; // {w, el, sampai, pin}
     const efek = []; // cahaya dari judul ke warga: {w, t0}
     const kilau = Array.from({ length: 22 }, (_, i) => { const r = acak(i * 7919 + 13); return { x: r(), y: r(), f: r() * 6.28, k: 0.8 + r() * 1.6, s: 0.6 + r() * 0.9 }; });
@@ -223,8 +223,12 @@
       dpr = Math.min(2, window.devicePixelRatio || 1);
       W = w; H = h;
       canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
-      // Gambar latar selalu utuh selebar panggung (tidak dipotong); sisa tinggi diisi lanjutan plaza.
-      area.imgH = siapLatar ? W * latar.height / latar.width : W * 588 / 1654;
+      // Layar lebar: gambar latar utuh selebar panggung. Layar tegak (HP): latar diperbesar sampai ±42% tinggi panggung
+      // (sisi kiri-kanan terpotong) agar gerbang tidak tampak jauh dan plaza buatan di bawahnya tidak terlalu panjang.
+      const rasio = siapLatar ? latar.height / latar.width : 588 / 1654;
+      area.imgH = Math.max(W * rasio, H * 0.42);
+      area.imgW = area.imgH / rasio;
+      area.imgX = (W - area.imgW) / 2;
       area.y0 = Math.min(H * 0.8, area.imgH * 0.86);
       area.y1 = H * 0.975;
       gambar(performance.now());
@@ -288,7 +292,7 @@
       const vx = W / 2, vy = ih * 0.72;
       for (let i = -14; i <= 14; i++) { const xb = vx + i * W * 0.085; const t = (ih - vy) / (H - vy); ctx.beginPath(); ctx.moveTo(vx + (xb - vx) * t, ih); ctx.lineTo(xb, H); ctx.stroke(); }
       for (let k = 1; k < 10; k++) { const yy = ih + (H - ih) * Math.pow(k / 10, 1.5); ctx.beginPath(); ctx.moveTo(0, yy); ctx.lineTo(W, yy); ctx.stroke(); }
-      if (siapLatar) ctx.drawImage(latar, 0, 0, W, ih);
+      if (siapLatar) ctx.drawImage(latar, area.imgX, 0, area.imgW, ih);
       else { const s = ctx.createLinearGradient(0, 0, 0, ih); s.addColorStop(0, '#5BB8F0'); s.addColorStop(1, '#ECCEA4'); ctx.fillStyle = s; ctx.fillRect(0, 0, W, ih); }
       // sambungan halus antara gambar dan lanjutan plaza
       const f = ctx.createLinearGradient(0, ih - 24, 0, ih + 6);
@@ -495,7 +499,7 @@
     }
 
     // Titik pusat teks "Youth Character Summit 2026" pada gambar latar.
-    const kotakJudul = () => ({ x: W * JUDUL.x, y: area.imgH * JUDUL.y, w: W * JUDUL.w, h: area.imgH * JUDUL.h });
+    const kotakJudul = () => ({ x: area.imgX + area.imgW * JUDUL.x, y: area.imgH * JUDUL.y, w: area.imgW * JUDUL.w, h: area.imgH * JUDUL.h });
     const judul = () => { const k = kotakJudul(); return { x: k.x + k.w / 2, y: k.y + k.h * 0.5, r: area.imgH * 0.24, bawah: k.y + k.h * 0.86 }; };
     // Kekuatan pemicu saat ini (0..1): naik cepat lalu meredup halus.
     const pemicu = (t) => { const e = efek[0]; if (!e) return 0; const u = (t - e.t0) / 1800; return u < 0 || u > 1 ? 0 : (u < 0.15 ? u / 0.15 : Math.pow(1 - (u - 0.15) / 0.85, 2)); };
@@ -620,7 +624,7 @@
       const u = (t - g.pop) / 700;
       const pantul = u >= 0 && u < 1 ? Math.sin(u * Math.PI) * 0.22 * (1 - u) + Math.sin(u * Math.PI * 3) * 0.05 * (1 - u) : 0;
       const k = 1 + pantul + g.hover * 0.06 + (gerakMinim ? 0 : Math.sin(d * 1.3 + g.fase) * 0.015);
-      return { x: g.x * W + geser, y: g.y * ih + bob, r: g.r * W * k };
+      return { x: area.imgX + g.x * area.imgW + geser, y: g.y * ih + bob, r: g.r * area.imgW * k };
     };
     function gambarGelembung(t) {
       if (!siapGel) return;
