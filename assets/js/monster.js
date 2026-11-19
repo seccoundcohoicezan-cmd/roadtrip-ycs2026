@@ -78,7 +78,7 @@
       } catch (e) { return null; }
     }
     let gambarTerakhir = null; // {i, x, y, w, h, balik} sprite Raja Batu yang terakhir digambar
-    let poseApi = { dx: 0, dy: 0 }, tubuhUlang = null, jurusAktif = null;
+    let poseApi = { dx: 0, dy: 0 }, tubuhUlang = null, jurusAktif = null, ujungRig = null;
     function kenaTubuh(px, py) {
       const g = gambarTerakhir, m = aset.topeng;
       if (!g || !m) return null; // belum siap → pakai kotak lama
@@ -111,6 +111,7 @@
     let akhir = null;         // animasi kemenangan {t0}
     let levelLama = 0, idLama = '', ditutup = '';
     let token = baca(KUNCI_TOKEN);
+    let perisaiKe = 0; // nomor jurus meteor yang kamu tahan dengan PERISAI
     let tiketSaya = null, blokir = null, karakterMati = false, hindarKe = 0, hpSaya = null, aku_sasaran = false; // karakter milik pemain: tumbang = tidak bisa menyerang // blokir: {error, nama} bila aturan 1 perangkat = 1 peserta menolak
 
     // Identitas perangkat: acak sekali, disimpan di localStorage + cookie (dipakai bersama halaman lain).
@@ -169,16 +170,39 @@
     // p 0..LEPAS = mengumpulkan api, LEPAS = ledakan tepat di waktu jurus (pancaran keluar), sesudahnya gelombang api.
     const LEPAS = 0.55;
     const serangMs = () => (st && st.jurusAnimMs) || 1600;
+    // Jenis jurus berikutnya dari server (pola sama di semua HP); meteor = jurus area dengan durasi lebih panjang.
+    const jenisBerikut = () => (st && st.jurusJenis) || (window.YCSRajaRig ? window.YCSRajaRig.DAFTAR[((st && st.jurusKe) || 0) % 3] : 'tusuk');
+    const durasiJurus = (jenis) => (jenis === 'meteor' ? Math.max(3000, serangMs() * 1.8) : serangMs());
+    // Jurus yang sedang tampil dikunci (waktu, jenis, durasi) sampai animasinya selesai, sehingga status baru dari server
+    // (jurusBerikut sudah maju) tidak memotong gerakan di tengah jalan.
+    let aktif = null; // {T, jenis, D, ke}
     function progresSerang() {
-      const D = serangMs();
-      if (akhir && akhir.jenis === 'monster') { const u = (performance.now() - akhir.t0) / D; return u >= 0 && u < 1 ? u : null; }
+      if (akhir && akhir.jenis === 'monster') { const D = serangMs(), u = (performance.now() - akhir.t0) / D; return u >= 0 && u < 1 ? u : null; }
+      const t = now();
+      if (aktif) { const p = (aktif.D * LEPAS - (aktif.T - t)) / aktif.D; if (p >= 0 && p < 1) return p; aktif = null; }
       const s = sisaJurus();
-      return s <= D * LEPAS && s > -D * (1 - LEPAS) ? (D * LEPAS - s) / D : null;
+      if (s === Infinity) return null;
+      const jenis = jenisBerikut(), D = durasiJurus(jenis);
+      if (s <= D * LEPAS && s > -D * (1 - LEPAS)) { aktif = { T: st.jurusBerikut, jenis, D, ke: (st.jurusKe || 0) + 1 }; mulaiHujan(); return (D * LEPAS - s) / D; }
+      return null;
+    }
+    // Meteor deterministik per jurus (benih = waktu jurus) + beberapa meteor diarahkan ke warga yang terlihat & karaktermu.
+    let hujan = null;
+    function mulaiHujan() {
+      hujan = null;
+      if (!aktif || aktif.jenis !== 'meteor' || !window.YCSRajaRig || gerakMinim) return;
+      const l = fest && fest.lantai ? fest.lantai() : { y0: H * 0.4, y1: H * 0.97 };
+      const khusus = [];
+      if (fest && fest.saya && fest.saya.layar && !fest.saya.mati) khusus.push([fest.saya.layar.x, fest.saya.layar.kaki]);
+      ((fest && fest.tampil) || []).filter((w) => w.layar && !w.mati && w !== fest.saya).slice(0, 6).forEach((w) => khusus.push([w.layar.x, w.layar.kaki]));
+      hujan = { daftar: window.YCSRajaRig.hujan(aktif.T, W < 520 ? 26 : 36, { x0: W * 0.03, x1: W * 0.97, y0: l.y0 + (l.y1 - l.y0) * 0.15, y1: l.y1 }, khusus), getar: 0 };
     }
     // Getaran layar sesaat setelah ledakan.
     function getarLayar() {
       const p = progresSerang();
-      if (p == null || gerakMinim || p < LEPAS || p > LEPAS + 0.18) return 0;
+      if (p == null || gerakMinim || p < LEPAS) return 0;
+      if (aktif && aktif.jenis === 'meteor') return hujan ? hujan.getar * 5 : 0;
+      if (p > LEPAS + 0.18) return 0;
       return (1 - (p - LEPAS) / 0.18) * 7;
     }
     const sisaJurus = () => (st && st.fase === 'tanding' && st.jurus && st.jurusBerikut ? st.jurusBerikut - now() : Infinity);
@@ -187,6 +211,7 @@
       if (!st || gerakMinim || !dt) return;
       if (akhir && akhir.jenis === 'kabur') { jalan.arah = jalan.x < 0.5 ? -1 : 1; jalan.x += jalan.arah * dt * 0.5; jalan.bergerak = true; return; }
       if (akhir || st.fase !== 'tanding' || progresSerang() != null) return;
+      if (jenisBerikut() === 'meteor' && sisaJurus() < 2600) return; // diam bersiap menancapkan trisula
       // Kejar sasaran jurus berikutnya: berdiri di samping warga sasaran terdekat yang masih berdiri.
       const kejar = sasaranTerdekat();
       if (kejar) {
@@ -324,12 +349,12 @@
       if (ps != null && !gerakMinim && RIG && lari.complete) {
         // Jurus memakai rig (badan melengkung + lengan berputar). Jenis jurus berganti tiap jurus (sama untuk semua pemain).
         if (!aset.rig) aset.rig = RIG.bangun(lari);
-        if (!jurusAktif) jurusAktif = RIG.DAFTAR[((st && st.jurusKe) || 0) % RIG.DAFTAR.length];
+        jurusAktif = aktif ? aktif.jenis : jurusAktif || jenisBerikut();
         if (aset.rig) {
           ctx.restore(); ctx.save();
           const awal = ps < LEPAS, P = RIG.pose(jurusAktif, awal ? 'awal' : 'serang', awal ? ps / LEPAS : (ps - LEPAS) / (1 - LEPAS), t);
           const o = { x: g.x - w / 2, y: g.kaki - h, w, h, balik: jalan.arah < 0 };
-          RIG.gambar(ctx, aset.rig, o, P, t);
+          ujungRig = RIG.gambar(ctx, aset.rig, o, P, t);
           tubuhUlang = { rig: true, o, P, t };
           gambarTerakhir = { i: 0, x: o.x, y: o.y, w, h, balik: o.balik, pivX: g.x, pivY: g.kaki, pose: { rot: 0, sx: P.skala, sy: P.skala, dx: 0, dy: -P.angkat * h } };
           poseApi = { dx: 0, dy: 0 };
@@ -359,16 +384,22 @@
       const A = aset.api;
       if (st && st.wujud !== 'lucu' && A && A.complete && A.naturalWidth) {
         const n = 16, fw = A.naturalWidth / n, fh = A.naturalHeight;
-        const k = p < LEPAS ? Math.floor(p / LEPAS * 8) : 8 + Math.floor((p - LEPAS) / (1 - LEPAS) * 8);
-        const lebar = g.tinggi * 2.1, tinggi = lebar * fh / fw;
-        const cx = g.x, cy = g.kaki - g.tinggi * 0.5;
+        const met = aktif && aktif.jenis === 'meteor';
+        const pq = p < LEPAS ? p / LEPAS : met ? Math.min(1, (p - LEPAS) / (1 - LEPAS) / 0.35) : (p - LEPAS) / (1 - LEPAS);
+        const kf = p < LEPAS ? Math.min(7.99, pq * 8) : 8 + Math.min(7.99, pq * 8), k = Math.floor(kf), kfr = kf - k;
+        const lebar = g.tinggi * (met ? 1.8 : 2.1), tinggi = lebar * fh / fw;
+        const cx = g.x, cy = met ? g.kaki - g.tinggi * 0.2 : g.kaki - g.tinggi * 0.5;
+        if (met && p >= LEPAS && ujungRig) gambarRune(ujungRig, g, (p - LEPAS) / (1 - LEPAS));
         ctx.save();
         ctx.globalCompositeOperation = 'lighter';
         ctx.globalAlpha = p > 0.92 ? Math.max(0, (1 - p) / 0.08) : 1;
         ctx.translate(poseApi.dx * 1.4, poseApi.dy); // api ikut terlempar ke arah terjangan
         if (jalan.arah < 0) { ctx.translate(cx, 0); ctx.scale(-1, 1); ctx.translate(-cx, 0); }
         if (k >= 8 && k <= 11) ctx.globalAlpha *= tubuhUlang && tubuhUlang.rig ? 0.5 : 0.7;
-        ctx.drawImage(A, Math.min(n - 1, k) * fw, 0, fw, fh, cx - lebar / 2, cy - tinggi * 0.56, lebar, tinggi);
+        if (met) ctx.globalAlpha *= p < LEPAS ? 0.4 : 0.7;
+        const a0 = ctx.globalAlpha; // dua frame berurutan di-crossfade → api mengalir halus
+        ctx.globalAlpha = a0 * (1 - kfr); ctx.drawImage(A, Math.min(n - 1, k) * fw, 0, fw, fh, cx - lebar / 2, cy - tinggi * 0.56, lebar, tinggi);
+        if (k < n - 1) { ctx.globalAlpha = a0 * kfr; ctx.drawImage(A, (k + 1) * fw, 0, fw, fh, cx - lebar / 2, cy - tinggi * 0.56, lebar, tinggi); }
         ctx.restore();
         // tubuh digambar ulang di atas api agar gerakan menyerang tetap terbaca
         if (tubuhUlang && tubuhUlang.rig) { /* rig: api cukup diredupkan, tidak digambar ulang (hemat CPU di HP) */ } else if (tubuhUlang && aset.lari && aset.lari.complete) { const q = tubuhUlang; ctx.save(); ctx.setTransform(q.m); ctx.globalAlpha = k >= 8 ? 0.85 : 0.6; ctx.drawImage(aset.lari, q.i * q.fw, 0, q.fw, q.fh, q.x, q.y, q.w, q.h); ctx.restore(); }
@@ -437,6 +468,29 @@
       }
       ctx.restore();
     }
+    // Lingkaran rune api di titik trisula tertancap (Hujan Meteor).
+    function gambarRune([px, py], g, u) {
+      const k = u < 0.07 ? u / 0.07 : u < 0.86 ? 1 : Math.max(0, 1 - (u - 0.86) / 0.14), r = g.tinggi * (0.3 + 0.2 * Math.min(1, u / 0.2));
+      ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.translate(px, py); ctx.scale(1, 0.28);
+      ctx.globalAlpha = 0.85 * k; ctx.strokeStyle = 'rgb(255,120,40)'; ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.arc(0, 0, r, 0, 6.283); ctx.stroke();
+      ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 0, r * 0.72, 0, 6.283); ctx.stroke();
+      const tt = performance.now();
+      for (let i = 0; i < 6; i++) { const a = i / 6 * 6.283 + tt / 900; ctx.beginPath(); ctx.moveTo(Math.cos(a) * r * 0.72, Math.sin(a) * r * 0.72); ctx.lineTo(Math.cos(a + 2.1) * r * 0.72, Math.sin(a + 2.1) * r * 0.72); ctx.stroke(); }
+      ctx.restore();
+    }
+    // Hujan meteor + kubah perisai di atas karaktermu (bila kamu menekan PERISAI untuk jurus ini).
+    function gambarHujanMeteor(p, t) {
+      if (!hujan || !aktif || aktif.jenis !== 'meteor') return;
+      const RIG = window.YCSRajaRig, u = p < LEPAS ? -1 : (p - LEPAS) / (1 - LEPAS);
+      // Meteor mulai turun sedikit sebelum detik jurus (u dipetakan agar hantaman pertama ≈ detik jurus)
+      const uu = (p - LEPAS * 0.75) / (1 - LEPAS * 0.75);
+      if (p >= LEPAS * 0.5) { const lg = Math.min(1, (p - LEPAS * 0.5) / (LEPAS * 0.5)) * (p > 0.92 ? (1 - p) / 0.08 : 1); ctx.fillStyle = `rgba(60,8,12,${0.32 * lg})`; ctx.fillRect(0, 0, W, H); }
+      hujan.getar = uu > 0 ? RIG.gambarHujan(ctx, hujan.daftar, uu, Math.min(W, H) * 0.045, H, {}) : 0;
+      const w = fest && fest.saya;
+      if (perisaiKe === aktif.ke && w && w.layar && !w.mati) RIG.gambarPerisai(ctx, w.layar.x, w.layar.kaki, w.layar.h * 0.85, t, p > 0.95 ? (1 - p) / 0.05 : 1, hujan.getar);
+      void u;
+    }
     // Aura jurus: lingkaran api berdenyut di belakang monster saat bersiap menyerang / menang.
     function gambarAura(g, t) {
       const r = g.tinggi * (0.55 + 0.08 * Math.sin(t / 70));
@@ -484,18 +538,32 @@
       mulaiGambar();
     }
     // Saat waktu jurus tiba (jam server): tembakkan jurus sesuai perkiraan damage; server mengoreksi saat status masuk.
+    // Pola jurus sama dengan server (server/monster.cjs jenisJurus).
+    const polaJurus = (k) => (k > 0 && k % 3 === 0 ? 'meteor' : ['tusuk', 'tebas', 'hentak'][(k - Math.floor(k / 3) - 1) % 3]);
     function cekJurus() {
       if (!st || st.fase !== 'tanding' || !st.jurus || !st.jurusBerikut) return;
-      const awas = $('.mon__awas'), sisa = sisaJurus();
-      awas.hidden = !(sisa < AWAL_JURUS && sisa > -300);
+      // Status server belum datang setelah jurus lewat (jaringan lambat / server ramai): majukan jadwal secara lokal
+      // supaya peringatan & tombol HINDAR/PERISAI jurus berikutnya tetap muncul tepat waktu. Server tetap penentu hasil.
+      if (st.jurusMs && now() - st.jurusBerikut > 1500 && (!st.selesai || st.jurusBerikut + st.jurusMs < Date.parse(st.selesai))) {
+        st.jurusKe = (st.jurusKe || 0) + 1; st.jurusBerikut += st.jurusMs; st.jurusJenis = polaJurus(st.jurusKe + 1); st.jurusTarget = []; terapkanSasaran();
+      }
+      const awas = $('.mon__awas'), sisa = sisaJurus(), jenis = jenisBerikut(), met = jenis === 'meteor';
+      const jendela = Math.min(st.hindarMs || 2500, 2500);
+      awas.hidden = !(sisa < (met ? jendela : AWAL_JURUS) && sisa > -300);
       const tombol = $('.mon__hindar'), ke = (st.jurusKe || 0) + 1;
-      const bisaHindar = !karakterMati && !!token && sisa < Math.min(st.hindarMs || 2500, 2500) && sisa > -200;
+      const bisaHindar = !karakterMati && !!token && sisa < jendela && sisa > -200;
       tombol.hidden = !bisaHindar;
-      if (bisaHindar) { tombol.disabled = hindarKe === ke; tombol.textContent = hindarKe === ke ? 'AMAN ✓' : 'HINDAR!'; }
-      if (!awas.hidden) awas.textContent = aku_sasaran && !karakterMati ? 'KAMU jadi sasaran! Tekan HINDAR!' : (window.YCSRajaRig ? window.YCSRajaRig.JURUS[window.YCSRajaRig.DAFTAR[((st.jurusKe || 0)) % 3]].awas : 'Awas! ' + st.nama + ' bersiap mengeluarkan jurus!');
+      tombol.classList.toggle('is-perisai', met);
+      if (bisaHindar) {
+        const sudah = hindarKe === ke, isi = sudah ? (met ? 'PERISAI ✓' : 'AMAN ✓') : met ? 'PERISAI!' : 'HINDAR!';
+        tombol.disabled = sudah;
+        if (tombol.dataset.isi !== isi) { tombol.dataset.isi = isi; tombol.innerHTML = (sudah ? '' : `<svg aria-hidden="true"><use href="#${met ? 'i-shield' : 'i-run'}"/></svg>`) + isi; }
+      }
+      if (!awas.hidden) awas.textContent = met ? (karakterMati ? 'Raja Batu menancapkan trisula — HUJAN METEOR!' : hindarKe === ke ? 'Perisai terpasang! Bertahan dari hujan meteor…' : 'HUJAN METEOR! Semua warga terancam — tekan PERISAI (1×)!')
+        : aku_sasaran && !karakterMati ? 'KAMU jadi sasaran! Tekan HINDAR!' : (window.YCSRajaRig ? window.YCSRajaRig.JURUS[jenis].awas : 'Awas! ' + st.nama + ' bersiap mengeluarkan jurus!');
       if (sisa <= 0 && jurusDitembak < ke) {
         jurusDitembak = ke;
-        tembakSasaran(); // pancaran ke warga sasaran; kena/meleset & sisa nyawa dikonfirmasi server
+        if (!met) tembakSasaran(); // pancaran ke warga sasaran; kena/meleset & sisa nyawa dikonfirmasi server
         if (navigator.vibrate && !gerakMinim) try { navigator.vibrate([30, 40, 30]); } catch (e) {}
         poll(600); setTimeout(() => poll(0), 1600);
       }
@@ -517,7 +585,7 @@
         const w = fest.cariNK(n, k);
         if (!w) return;
         fest.kena(w, hp, hpMaks);
-        if (w === fest.saya) { hpSaya = hp; if (mati) setMati(true); else tampilAjak(`Karaktermu kena! Nyawa tinggal ${hp} dari ${hpMaks}. Tekan HINDAR saat jadi sasaran.`, 2600); }
+        if (w === fest.saya) { hpSaya = hp; if (mati) setMati(true); else tampilAjak(info.jenis === 'meteor' ? `Karaktermu kena meteor! Nyawa tinggal ${hp} dari ${hpMaks}. Pasang PERISAI saat hujan meteor.` : `Karaktermu kena! Nyawa tinggal ${hp} dari ${hpMaks}. Tekan HINDAR saat jadi sasaran.`, 2600); }
         else if (mati && !w.mati) fest.tumbang(w, w.layar && w.layar.x < g.x ? -1 : 1);
       });
     }
@@ -587,7 +655,8 @@
         const ps = mati == null ? progresSerang() : null;
         if (ps != null && ps < LEPAS && st.wujud === 'lucu') gambarAura(g, t);
         (st.wujud === 'lucu' ? gambarMonsterLucu : gambarRajaBatu)(g, t, kedip, mati);
-        if (ps != null && !gerakMinim) gambarJurusEfek(g, ps);
+        if (ps != null && !gerakMinim) { gambarJurusEfek(g, ps); gambarHujanMeteor(ps, t); }
+        else if (perisaiKe && perisaiKe === (st.jurusKe || 0) + 1 && fest && fest.saya && fest.saya.layar && !fest.saya.mati && window.YCSRajaRig) window.YCSRajaRig.gambarPerisai(ctx, fest.saya.layar.x, fest.saya.layar.kaki, fest.saya.layar.h * 0.85, t, 1, 0);
         aturZona(akhir && akhir.selesai && akhir.jenis !== 'monster' ? null : g);
       } else aturZona(null);
       gambarPancaran(t);
@@ -699,7 +768,7 @@
       if (st.id && st.id !== idLama) {
         // event baru: reset tampilan & buang antrean milik event lain
         idLama = st.id; levelLama = st.level || 1; akhir = null; tampilTenaga = st.tenaga || 0; tumbuh = { dari: 1, ke: 1, t0: 0 };
-        selesaiTampil(); jurusDitembak = 0; jurusSinkron = 0; karakterMati = false; hindarKe = 0; hpSaya = null; Object.assign(jalan, { x: 0.5, y: 0.72, tx: 0.5, ty: 0.72, jeda: 0.8 }); pesan.hidden = true;
+        selesaiTampil(); jurusDitembak = 0; jurusSinkron = 0; karakterMati = false; hindarKe = 0; perisaiKe = 0; aktif = null; hujan = null; hpSaya = null; Object.assign(jalan, { x: 0.5, y: 0.72, tx: 0.5, ty: 0.72, jeda: 0.8 }); pesan.hidden = true;
         if (antre.e !== st.id) { antre = { e: st.id, n: 0, kirim: null, seq: 0 }; simpan(KUNCI_ANTRE, antre); }
         muatAset(st.wujud);
       }
@@ -736,7 +805,9 @@
         cekKarakter();
         const ji = st.jurusInfo;
         if (!pertama && ji && !karakterMati && !(ji.kena || []).some(([n, k]) => fest && fest.saya && fest.saya.n === n && fest.saya.k === k))
-          tampilAjak(`${nf.format(ji.pukulan || 0)} pukulan, ${nf.format(ji.tumbang || 0)} warga tumbang${ji.menghindar ? ', ' + nf.format(ji.menghindar) + ' menghindar' : ''}${ji.tahan ? ' · perisai ' + ji.tahan + '%' : ''}.`, 2400);
+          tampilAjak(ji.jenis === 'meteor'
+            ? `Hujan meteor! ${nf.format(ji.pukulan || 0)} warga kena, ${nf.format(ji.tumbang || 0)} tumbang${ji.menghindar ? ', ' + nf.format(ji.menghindar) + ' selamat berkat perisai' : ''}.${perisaiKe === ji.ke ? ' Perisaimu menahan meteor!' : ''}`
+            : `${nf.format(ji.pukulan || 0)} pukulan, ${nf.format(ji.tumbang || 0)} warga tumbang${ji.menghindar ? ', ' + nf.format(ji.menghindar) + ' menghindar' : ''}${ji.tahan ? ' · perisai ' + ji.tahan + '%' : ''}.`, 2600);
       }
       terapkanSasaran();
       tampilkan(adaEvent);
@@ -812,11 +883,12 @@
       const ke = (st && st.jurusKe || 0) + 1;
       if (!token || karakterMati || hindarKe === ke) return;
       hindarKe = ke;
-      if (fest && fest.menghindar) fest.menghindar(fest.saya);
+      const met = jenisBerikut() === 'meteor';
+      if (met) perisaiKe = ke; else if (fest && fest.menghindar) fest.menghindar(fest.saya);
       if (navigator.vibrate && !gerakMinim) try { navigator.vibrate(15); } catch (e) {}
       try {
         const d = await minta({ aksi: 'hindar', token, e: st.id, uji });
-        if (!d.ok) { hindarKe = 0; if (d.error === 'bukan_waktunya') tampilAjak('Terlambat! Tekan HINDAR saat peringatan muncul.', 1600); }
+        if (!d.ok) { hindarKe = 0; perisaiKe = 0; if (d.error === 'bukan_waktunya') tampilAjak(met ? 'Terlambat! Pasang PERISAI saat peringatan meteor muncul.' : 'Terlambat! Tekan HINDAR saat peringatan muncul.', 1600); }
         else if (d.mati) setMati(true);
       } catch (e) { hindarKe = 0; }
     }
@@ -826,7 +898,13 @@
       if (!token || karakterMati) return;
       try {
         const d = await minta({ aksi: 'saya', token, uji });
-        if (d.ok) { hpSaya = d.hp; if (fest && fest.saya) fest.setNyawa(fest.saya, d.hp, d.hpMaks); if (d.mati) setMati(true); else tampilkan(true); }
+        if (d.ok) {
+          const turun = hpSaya != null && d.hp < hpSaya;
+          hpSaya = d.hp; if (fest && fest.saya) fest.setNyawa(fest.saya, d.hp, d.hpMaks);
+          if (d.mati) setMati(true);
+          else if (turun && st && st.jurusInfo && st.jurusInfo.jenis === 'meteor') tampilAjak(`Karaktermu kena meteor! Nyawa tinggal ${d.hp} dari ${d.hpMaks}. Pasang PERISAI saat hujan meteor berikutnya.`, 2800);
+          else tampilkan(true);
+        }
       } catch (e) { /* coba lagi di jurus berikutnya */ }
     }
     function setMati(animasi) {

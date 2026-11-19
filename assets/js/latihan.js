@@ -1,9 +1,10 @@
-/* Mode latihan Lawan Raja Batu — game lokal 40 detik (tanpa server, tanpa kode undian).
-   Tap bos untuk menyerang (combo & kritis), tekan HINDAR saat jurus datang, 3 nyawa. Hasil: skor + tantang teman. */
+/* Mode latihan Lawan Raja Batu — game lokal 45 detik (tanpa server, tanpa kode undian).
+   Tap bos untuk menyerang (combo & kritis), tekan HINDAR saat jurus datang, PERISAI saat Hujan Meteor (jurus area,
+   muncul tepat setelah tiap 2 jurus). Layar penuh otomatis saat mulai. Hasil: skor + tantang teman. */
 (() => {
   'use strict';
   // Dibuat mudah dimenangkan (kampanye: orang harus merasa bisa). Penanda: ±4 tap/detik santai sudah cukup menang.
-  const DURASI = 45, HP = 160, HATI = 5, JEDA_COMBO = 600, JEDA_MIN = 80; // JEDA_MIN: maks ±12 tap/detik dihitung (anti auto-klik)
+  const DURASI = 45, HP = 160, HATI = 5, JEDA_COMBO = 600, JEDA_MIN = 80, AWAS = 2400, SERANG = 1100, SERANG_METEOR = 2600; // JEDA_MIN: maks ±12 tap/detik dihitung (anti auto-klik)
   const gerakMinim = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const S = () => window.YCSSuara || { pukul() {}, kritis() {}, awas() {}, aman() {}, kena() {}, menang() {}, kalah() {}, klik() {} };
   const muat = (src) => { const i = new Image(); i.src = src; return i; };
@@ -21,9 +22,11 @@
     new ResizeObserver(ukur).observe(kanvas);
 
     function baru() {
-      return { hp: HP, hati: HATI, sisa: DURASI, combo: 0, comboMaks: 0, tTap: 0, dmg: 0, aman: 0, kritis: 0, partikel: [], konfeti: [], bara: [], debu: [], benturan: false, jejak: [], jurus: 'tusuk', urutJurus: 0, retak: null, getar: 0, kilat: 0, merah: 0,
+      return { nJurus: 0, meteor: null, perisai: 0, tKena: 0, tLalu: 0, hp: HP, hati: HATI, sisa: DURASI, combo: 0, comboMaks: 0, tTap: 0, dmg: 0, aman: 0, kritis: 0, partikel: [], konfeti: [], bara: [], debu: [], benturan: false, jejak: [], jurus: 'tusuk', urutJurus: 0, retak: null, getar: 0, kilat: 0, merah: 0,
         mulai: 0, jalan: false, akhir: null, tJurus: 0, awasSampai: 0, hindarOk: false, fase: 'hitung', hitung: 3, posX: 0.5, arah: 1, frame: 0, tRuntuh: 0, tAkhir: 0 };
     }
+    const lamaSerang = () => (st.jurus === 'meteor' ? SERANG_METEOR : SERANG);
+    const sedangSerang = (t) => !!(st.tSerang && t - st.tSerang < lamaSerang());
     function bos() { // kotak bos di layar
       const h = Math.min(H * 0.46, W * 0.8 * 1.2), w = h * (166 / 200);
       const cx = W * (0.5 + (st.posX - 0.5) * 0.5), kaki = H * 0.78;
@@ -52,12 +55,12 @@
       const p = { rot: 0, sx: 1, sy: 1, dx: 0, dy: 0, frame: null };
       if (gerakMinim || !st) return p;
       if (st.awasSampai) {                         // ancang-ancang 2,4 dtk: tegak, condong ke belakang, jongkok, gemetar makin kuat
-        const u = Math.min(1, 1 - (st.awasSampai - t) / 2400), e = mudahKeluar(u);
+        const u = Math.min(1, 1 - (st.awasSampai - t) / AWAS), e = mudahKeluar(u);
         p.frame = 0;
         p.rot = -0.24 * e; p.sy = 1 - 0.12 * e; p.sx = 1 + 0.07 * e; p.dx = -b.w * 0.12 * e;
         const g = 0.006 + 0.022 * u; p.dx += Math.sin(t / 22) * b.w * g; p.dy = Math.cos(t / 27) * b.h * g * 0.5;
-      } else if (st.tSerang && t - st.tSerang < 1100) {  // hentakan: menerjang ke depan & membesar, lalu pulih
-        const u = (t - st.tSerang) / 1100;
+      } else if (sedangSerang(t)) {  // hentakan: menerjang ke depan & membesar, lalu pulih
+        const u = (t - st.tSerang) / lamaSerang();
         // terjang 0–0,16 · tahan saat benturan 0,16–0,30 (hit-stop) · pulih ke kuda-kuda 0,30–1
         const maju = u < 0.16 ? mudahKeluar(u / 0.16) : u < 0.3 ? 1 : Math.max(0, 1 - (u - 0.3) / 0.7) ** 2;
         p.frame = u < 0.6 ? 4 : null;
@@ -105,13 +108,24 @@
         x.restore();
       }
     }
-    function gambarPartikelBenturan(t) {
+    function gambarPartikelBenturan(t, f) { // f = dt × 60: gerak partikel sama cepat di layar 60/90/120 Hz
       x.save();
       st.debu = st.debu.filter((d) => t - d.t0 < d.umur);
-      for (const d of st.debu) { const k = (t - d.t0) / d.umur; d.x += d.vx; d.y += d.vy; d.vy *= 0.96; x.globalAlpha = 0.35 * (1 - k); x.fillStyle = 'rgb(205,180,140)'; x.beginPath(); x.arc(d.x, d.y, d.r * (1 + k * 1.5), 0, 6.28); x.fill(); }
+      for (const d of st.debu) { const k = (t - d.t0) / d.umur; d.x += d.vx * f; d.y += d.vy * f; d.vy *= Math.pow(0.96, f); x.globalAlpha = 0.35 * (1 - k); x.fillStyle = 'rgb(205,180,140)'; x.beginPath(); x.arc(d.x, d.y, d.r * (1 + k * 1.5), 0, 6.28); x.fill(); }
       x.globalCompositeOperation = 'lighter';
       st.bara = st.bara.filter((p) => t - p.t0 < p.umur);
-      for (const p of st.bara) { const k = (t - p.t0) / p.umur; p.x += p.vx; p.y += p.vy; p.vy += 0.25; p.vx *= 0.98; x.globalAlpha = 1 - k; x.fillStyle = k < 0.4 ? 'rgb(255,240,180)' : 'rgb(255,140,40)'; x.beginPath(); x.arc(p.x, p.y, p.r * (1 - k * 0.5), 0, 6.28); x.fill(); }
+      for (const p of st.bara) { const k = (t - p.t0) / p.umur; p.x += p.vx * f; p.y += p.vy * f; p.vy += 0.25 * f; p.vx *= Math.pow(0.98, f); x.globalAlpha = 1 - k; x.fillStyle = k < 0.4 ? 'rgb(255,240,180)' : 'rgb(255,140,40)'; x.beginPath(); x.arc(p.x, p.y, p.r * (1 - k * 0.5), 0, 6.28); x.fill(); }
+      x.restore();
+    }
+    // Lingkaran rune api di titik trisula tertancap: berdenyut selama hujan meteor.
+    function gambarRune(t, [px, py], b, u) {
+      const k = u < 0.07 ? u / 0.07 : u < 0.86 ? 1 : 1 - (u - 0.86) / 0.14, r = b.w * (0.35 + 0.25 * Math.min(1, u / 0.2));
+      x.save(); x.globalCompositeOperation = 'lighter'; x.translate(px, py); x.scale(1, 0.28);
+      x.globalAlpha = 0.85 * k; x.strokeStyle = 'rgb(255,120,40)'; x.lineWidth = 4;
+      x.beginPath(); x.arc(0, 0, r, 0, 6.283); x.stroke();
+      x.lineWidth = 2; x.beginPath(); x.arc(0, 0, r * 0.72, 0, 6.283); x.stroke();
+      for (let i = 0; i < 6; i++) { const a = i / 6 * 6.283 + t / 900; x.beginPath(); x.moveTo(Math.cos(a) * r * 0.72, Math.sin(a) * r * 0.72); x.lineTo(Math.cos(a + 2.1) * r * 0.72, Math.sin(a + 2.1) * r * 0.72); x.stroke(); }
+      const g = x.createRadialGradient(0, 0, 0, 0, 0, r); g.addColorStop(0, `rgba(255,190,80,${0.5 * k})`); g.addColorStop(1, 'rgba(255,60,20,0)'); x.fillStyle = g; x.beginPath(); x.arc(0, 0, r, 0, 6.283); x.fill();
       x.restore();
     }
     function teks(isi, px, py, warnaTeks, besar) { st.partikel.push({ t: performance.now(), isi, x: px, y: py, warna: warnaTeks, besar, vy: -1.2 - Math.random() }); if (st.partikel.length > 40) st.partikel.shift(); }
@@ -134,10 +148,19 @@
     }
     kanvas.addEventListener('pointerdown', tap);
 
-    function jadwalJurus(t, awal) { st.tJurus = t + (awal ? 5000 : 6500) + Math.random() * 2500; }
+    // Pola: 2 jurus sasaran → Hujan Meteor menyusul tepat setelah jurus kedua selesai (bos diam menancapkan trisula).
+    function jadwalJurus(t, awal) {
+      if (!awal && st.jurus !== 'meteor' && st.nJurus % 2 === 0) { st.tJurus = t + SERANG + 350; st.berikutMeteor = true; return; }
+      st.berikutMeteor = false; st.tJurus = t + (awal ? 5000 : st.jurus === 'meteor' ? 5200 : 6500) + Math.random() * 2500;
+    }
+    function tombolJurus(meteor) {
+      $('#lt-hindar').innerHTML = meteor ? '<svg aria-hidden="true"><use href="#i-shield"/></svg>PERISAI' : '<svg aria-hidden="true"><use href="#i-run"/></svg>HINDAR';
+      $('#lt-hindar').classList.toggle('is-perisai', meteor);
+    }
     function hindar() {
       if (!st || st.fase !== 'main' || performance.now() > st.awasSampai) return;
-      st.hindarOk = true; st.aman++; S().aman(); teks('AMAN!', W / 2, H * 0.62, W8.green, 26);
+      st.hindarOk = true; st.aman++; S().aman();
+      if (st.jurus === 'meteor') { st.perisai = performance.now(); teks('PERISAI AKTIF!', W / 2, H * 0.62, W8.sun, 26); } else teks('AMAN!', W / 2, H * 0.62, W8.green, 26);
       $('#lt-hindar').hidden = true; $('#lt-awas').hidden = true;
     }
     $('#lt-hindar').addEventListener('click', hindar);
@@ -164,6 +187,7 @@
     function gambar(t) {
       raf = requestAnimationFrame(gambar);
       if (!W) return;
+      const f = st.tLalu ? Math.min(3, (t - st.tLalu) / 16.67) : 1; st.tLalu = t;
       x.clearRect(0, 0, W, H);
       // latar plaza
       const L = aset.latar;
@@ -177,8 +201,10 @@
       // Dorongan kamera (hanya lapisan karakter & efek; latar tetap diam): mendekat saat ancang-ancang, puncak saat benturan.
       if (!gerakMinim && st.fase === 'main') {
         const bb = bos(); let dorong = 0;
-        if (st.awasSampai) dorong = 0.04 * Math.min(1, 1 - (st.awasSampai - t) / 2400);
-        else if (st.tSerang && t - st.tSerang < 1100) { const u = (t - st.tSerang) / 1100; dorong = u < 0.3 ? 0.04 + 0.04 * Math.min(1, u / 0.16) : 0.08 * Math.max(0, 1 - (u - 0.3) / 0.7); }
+        const halus = (u) => u * u * (3 - 2 * u);
+        if (st.awasSampai) dorong = (st.jurus === 'meteor' ? -0.03 : 0.04) * halus(Math.min(1, 1 - (st.awasSampai - t) / AWAS));
+        else if (sedangSerang(t) && st.jurus === 'meteor') { const u = (t - st.tSerang) / SERANG_METEOR; dorong = -0.03 * (u < 0.86 ? 1 : 1 - halus((u - 0.86) / 0.14)); }
+        else if (sedangSerang(t)) { const u = (t - st.tSerang) / SERANG; dorong = u < 0.3 ? 0.04 + 0.04 * halus(Math.min(1, u / 0.16)) : 0.08 * (1 - halus(Math.min(1, (u - 0.3) / 0.7))); }
         if (dorong) { x.translate(bb.cx, bb.y + bb.h * 0.55); x.scale(1 + dorong, 1 + dorong); x.translate(-bb.cx, -(bb.y + bb.h * 0.55)); }
       }
       // logika waktu
@@ -189,11 +215,27 @@
       } else if (st.fase === 'main') {
         st.sisa = Math.max(0, DURASI - (t - st.t0) / 1000);
         $('#lt-waktu').textContent = Math.ceil(st.sisa);
-        if (!st.awasSampai && !(st.tSerang && t - st.tSerang < 1100)) st.posX += st.arah * 0.002; if (st.posX > 0.72 || st.posX < 0.28) st.arah *= -1;
-        if (!st.awasSampai && t > st.tJurus) { st.awasSampai = t + 2400; st.hindarOk = false; const R = window.YCSRajaRig; if (R) { const d = R.DAFTAR; if (!st.kantong || !st.kantong.length) { st.kantong = d.slice().sort(() => Math.random() - 0.5); if (st.kantong[0] === st.jurus) st.kantong.push(st.kantong.shift()); } st.jurus = st.kantong.shift(); $('#lt-awas').textContent = R.JURUS[st.jurus].awas + ' Tekan HINDAR!'; } $('#lt-awas').hidden = false; $('#lt-hindar').hidden = false; S().awas(); }
+        if (!st.awasSampai && !sedangSerang(t)) { st.posX += st.arah * 0.12 * f / 60 * 1; if (st.posX > 0.72 || st.posX < 0.28) st.arah = st.posX > 0.72 ? -1 : 1; }
+        if (!st.awasSampai && t > st.tJurus) {
+          st.awasSampai = t + AWAS; st.hindarOk = false; st.perisai = 0;
+          const R = window.YCSRajaRig;
+          if (R) {
+            if (st.berikutMeteor) st.jurus = 'meteor';
+            else { const d = R.DAFTAR; if (!st.kantong || !st.kantong.length) { st.kantong = d.slice().sort(() => Math.random() - 0.5); if (st.kantong[0] === st.jurus) st.kantong.push(st.kantong.shift()); } st.jurus = st.kantong.shift(); st.nJurus++; }
+            $('#lt-awas').textContent = st.jurus === 'meteor' ? R.JURUS.meteor.awas : R.JURUS[st.jurus].awas + ' Tekan HINDAR!';
+          }
+          tombolJurus(st.jurus === 'meteor');
+          if (st.jurus === 'meteor') { const kb = bos(); st.meteor = R ? R.hujan(t, gerakMinim ? 8 : 30, { x0: W * 0.03, x1: W * 0.97, y0: kb.kaki - H * 0.12, y1: H * 0.98 }, [[W * 0.5, H * 0.93], [W * 0.3, H * 0.9], [W * 0.72, H * 0.95]]) : []; }
+          $('#lt-awas').hidden = false; $('#lt-hindar').hidden = false; S().awas();
+        }
         if (st.awasSampai && t > st.awasSampai) {
-          if (!st.hindarOk) { st.hati--; st.merah = t; S().kena(); hati(); teks('-1 nyawa', W / 2, H * 0.6, W8.coral, 24); }
+          // jurus sasaran: kena saat benturan; meteor: kena saat meteor pertama menghantam (≈25% hujan)
+          if (!st.hindarOk) st.tKena = t + (st.jurus === 'meteor' ? SERANG_METEOR * 0.24 : 0);
           st.awasSampai = 0; st.tSerang = t; st.benturan = false; $('#lt-awas').hidden = true; $('#lt-hindar').hidden = true; jadwalJurus(t);
+        }
+        if (st.tKena && t >= st.tKena) {
+          st.tKena = 0; st.hati--; st.merah = t; S().kena(); hati(); teks(st.jurus === 'meteor' ? '-1 nyawa · kena meteor' : '-1 nyawa', W / 2, H * 0.6, W8.coral, 24);
+          if (navigator.vibrate && !gerakMinim) try { navigator.vibrate([40, 30, 40]); } catch (e) {}
           if (st.hati <= 0) selesai(false);
         }
         if (st.sisa <= 0) selesai(false);
@@ -207,27 +249,31 @@
       } else {
         const A = aset.lari, RIG = window.YCSRajaRig;
         if (!st.rig && RIG && A.complete && A.naturalWidth) st.rig = rigCache || (rigCache = RIG.bangun(A));
-        const menyerang = !gerakMinim && st.rig && (st.awasSampai || (st.tSerang && t - st.tSerang < 1100));
+        const menyerang = !gerakMinim && st.rig && (st.awasSampai || sedangSerang(t));
         const faseBaru = menyerang ? (st.awasSampai ? 'awal' : 'serang') : ''; if (dlg.dataset.fase !== faseBaru) dlg.dataset.fase = faseBaru;
         if (menyerang) {
           // ===== Jurus (rig: badan melengkung + lengan berputar di bahu) =====
-          const awal = !!st.awasSampai, pp = awal ? Math.min(1, 1 - (st.awasSampai - t) / 2400) : (t - st.tSerang) / 1100;
+          const awal = !!st.awasSampai, pp = awal ? Math.min(1, 1 - (st.awasSampai - t) / AWAS) : (t - st.tSerang) / lamaSerang(), met = st.jurus === 'meteor';
           const P = RIG.pose(st.jurus, awal ? 'awal' : 'serang', pp, t);
           const o = { x: b.x, y: b.y, w: b.w, h: b.h, balik: st.arah < 0 };
           // api di BELAKANG tubuh (mengumpul → meledak), posisinya mengikuti jenis jurus
-          const F = aset.api, k = awal ? Math.min(7, Math.floor(pp * 8)) : 8 + Math.min(7, Math.floor(pp * 8));
-          x.fillStyle = `rgba(6,24,64,${k < 8 ? 0.1 + k * 0.03 : 0.34 - (k - 8) * 0.04})`; x.fillRect(0, 0, W, H);
+          // frame api mengambang + crossfade dua frame berurutan → api mengalir halus (bukan patah 16 frame)
+          const F = aset.api, pa = met && !awal ? Math.min(1, pp / 0.35) : pp, kf = awal ? Math.min(7.99, pa * 8) : 8 + Math.min(7.99, pa * 8), k = Math.floor(kf), kfr = kf - k;
+          const gelap = met ? (awal ? 0.12 + 0.25 * pp : pp < 0.86 ? 0.37 : 0.37 * (1 - (pp - 0.86) / 0.14)) : kf < 8 ? 0.1 + kf * 0.03 : 0.34 - (kf - 8) * 0.04;
+          x.fillStyle = met ? `rgba(40,6,10,${gelap})` : `rgba(6,24,64,${gelap})`; x.fillRect(0, 0, W, H);
           const apiDi = (alpha, skala) => {
             if (!F.complete || !F.naturalWidth) return;
             const fw = F.naturalWidth / 16, fh = F.naturalHeight, lw = b.h * 2.1 * skala, lh = lw * fh / fw;
-            const cy = st.jurus === 'hentak' ? b.kaki - lh * 0.3 : b.y + b.h * 0.5 - lh * 0.06;
-            x.save(); x.globalCompositeOperation = 'lighter'; x.globalAlpha = alpha;
+            const cy = st.jurus === 'hentak' || met ? b.kaki - lh * 0.3 : b.y + b.h * 0.5 - lh * 0.06;
+            x.save(); x.globalCompositeOperation = 'lighter';
             if (st.arah < 0) { x.translate(b.cx, 0); x.scale(-1, 1); x.translate(-b.cx, 0); }
-            x.drawImage(F, k * fw, 0, fw, fh, b.cx - lw / 2, cy - lh * 0.5, lw, lh); x.restore();
+            x.globalAlpha = alpha * (1 - kfr); x.drawImage(F, k * fw, 0, fw, fh, b.cx - lw / 2, cy - lh * 0.5, lw, lh);
+            if (k < 15) { x.globalAlpha = alpha * kfr; x.drawImage(F, (k + 1) * fw, 0, fw, fh, b.cx - lw / 2, cy - lh * 0.5, lw, lh); }
+            x.restore();
           };
-          apiDi(1, st.jurus === 'hentak' ? 1.3 : 1);
+          apiDi(met ? (awal ? 0.4 : 0.7) : 1, st.jurus === 'hentak' ? 1.3 : met ? 0.9 : 1);
           // bayangan gerak saat hentakan
-          if (!awal && pp < 0.4) for (const [mund, al] of [[0.1, 0.18], [0.05, 0.3]]) {
+          if (!awal && !met && pp < 0.4) for (const [mund, al] of [[0.1, 0.18], [0.05, 0.3]]) {
             const Pg = RIG.pose(st.jurus, 'serang', Math.max(0, pp - mund), t);
             x.save(); x.globalAlpha = al; x.filter = 'sepia(1) saturate(5) hue-rotate(-25deg) brightness(1.15)'; RIG.gambar(x, st.rig, o, Pg, t); x.restore();
           }
@@ -238,7 +284,8 @@
           if (st.ujung) { st.jejak.push([st.ujung[0], st.ujung[1], t]); if (st.jejak.length > 14) st.jejak.shift(); }
           if (!awal && P.benturan && !st.benturan) mulaiBenturan(t, b);
           st.gambar = { i: 0, x: b.x, y: b.y, w: b.w, h: b.h, balik: st.arah < 0, pivX: b.cx, pivY: b.kaki, pose: { rot: 0, sx: P.skala, sy: P.skala, dx: 0, dy: -P.angkat * b.h } };
-          if (!awal) gambarBenturan(t, b, pp);
+          if (!awal && !met) gambarBenturan(t, b, pp);
+          if (met && !awal && st.ujung) gambarRune(t, st.ujung, b, pp);
         } else if (A.complete && A.naturalWidth) {
           st.frame = Math.floor(t / 90) % 10; st.jejak.length = 0;
           x.save();
@@ -249,7 +296,13 @@
           st.gambar = { i: st.frame, x: b.x, y: b.y, w: b.w, h: b.h, balik: st.arah < 0, pivX: b.cx, pivY: b.kaki, pose: null };
         }
       }
-      gambarPartikelBenturan(t);
+      gambarPartikelBenturan(t, f);
+      if (st.jurus === 'meteor' && st.meteor && st.tSerang && sedangSerang(t) && window.YCSRajaRig) {
+        const u = (t - st.tSerang) / SERANG_METEOR;
+        const g = window.YCSRajaRig.gambarHujan(x, st.meteor, u, Math.min(W, H) * 0.05, H, { hemat: gerakMinim });
+        if (g > 0.3 && !gerakMinim) { st.getar = t; st.getarAmp = 1.1 * g; }
+        if (st.perisai) window.YCSRajaRig.gambarPerisai(x, W / 2, H * 1.02, Math.min(W * 0.46, H * 0.3), t, Math.min(1, (t - st.perisai) / 200) * (u > 0.92 ? (1 - u) / 0.08 : 1), g);
+      } else if (st.perisai && st.awasSampai && window.YCSRajaRig) window.YCSRajaRig.gambarPerisai(x, W / 2, H * 1.02, Math.min(W * 0.46, H * 0.3), t, Math.min(1, (t - st.perisai) / 200), 0);
       x.restore();
       // angka & partikel
       st.partikel = st.partikel.filter((p) => t - p.t < 800);
@@ -265,15 +318,38 @@
 
     function mulai() {
       W8 = warna(); st = baru(); st.mulai = performance.now();
-      $('#lt-hasil').hidden = true; $('#lt-waktu').textContent = DURASI; $('#lt-combo').textContent = ''; hati();
+      tombolJurus(false); $('#lt-hasil').hidden = true; $('#lt-waktu').textContent = DURASI; $('#lt-combo').textContent = ''; hati();
       cancelAnimationFrame(raf); ukur(); raf = requestAnimationFrame(gambar);
     }
-    function buka() { if (!dlg.open) dlg.showModal(); mulai(); }
-    function tutup() { cancelAnimationFrame(raf); st = null; if (dlg.open) dlg.close(); }
+    // Layar penuh saat mulai (gestur klik pemain). iPhone tanpa Fullscreen API: dialog sudah 100dvh.
+    let kitaPenuh = false;
+    function layarPenuh() {
+      const d = document.documentElement, minta = d.requestFullscreen || d.webkitRequestFullscreen;
+      if (!minta || document.fullscreenElement || document.webkitFullscreenElement) return null;
+      try {
+        const p = minta.call(d, { navigationUI: 'hide' }); kitaPenuh = true;
+        if (!p || !p.then) return null;
+        return p.then(() => { try { screen.orientation && screen.orientation.lock && screen.orientation.lock('portrait').catch(() => {}); } catch (e) {} }, () => { kitaPenuh = false; });
+      } catch (e) { kitaPenuh = false; return null; }
+    }
+    function keluarPenuh() {
+      if (!kitaPenuh) return; kitaPenuh = false;
+      const k = document.exitFullscreen || document.webkitExitFullscreen;
+      if (k && (document.fullscreenElement || document.webkitFullscreenElement)) try { const p = k.call(document); if (p && p.catch) p.catch(() => {}); } catch (e) {}
+    }
+    // Dialog dibuka SETELAH layar penuh aktif: elemen layar penuh masuk top layer belakangan dan akan menutupi
+    // dialog yang dibuka lebih dulu.
+    function buka() {
+      let sudah = false;
+      const jalan = () => { if (sudah) return; sudah = true; if (!dlg.open) dlg.showModal(); mulai(); };
+      const p = layarPenuh();
+      if (p) { p.then(jalan, jalan); setTimeout(jalan, 700); } else jalan();
+    }
+    function tutup() { cancelAnimationFrame(raf); st = null; if (dlg.open) dlg.close(); keluarPenuh(); }
     $('#lt-tutup').addEventListener('click', tutup);
     $('#lt-keluar').addEventListener('click', tutup);
     $('#lt-lagi').addEventListener('click', () => { S().klik(); mulai(); });
-    dlg.addEventListener('close', () => { cancelAnimationFrame(raf); st = null; });
+    dlg.addEventListener('close', () => { cancelAnimationFrame(raf); st = null; keluarPenuh(); });
     return { buka, tutup };
   }
   window.YCSLatihan = { buat };

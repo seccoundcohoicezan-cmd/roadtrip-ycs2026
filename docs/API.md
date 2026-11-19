@@ -53,7 +53,7 @@ Field di luar daftar dibuang server. Aturan validasi (panjang, format email, kat
 ## Lawan Monster
 
 `GET /api/monster` →
-`{fase, nama, wujud, id, mulai, selesai, live, level, levelMaks, target[], poin[], skala[], tenaga, total, pemain, tiket, interval, hidup, totalWarga, nyawa (% hidup), hpMaks, jurusTarget[[nama, kata, nyawa]], jurus, hindarMs, jurusMs, jurusAnimMs, jurusDmgMaks, jurusKe, jurusBerikut, jurusInfo, kalah, monsterMenang, uji?}`
+`{fase, nama, wujud, id, mulai, selesai, live, level, levelMaks, target[], poin[], skala[], tenaga, total, pemain, tiket, interval, hidup, totalWarga, nyawa (% hidup), hpMaks, jurusTarget[[nama, kata, nyawa]], jurus, hindarMs, jurusMs, jurusAnimMs, jurusDmgMaks, jurusKe, jurusJenis (tusuk|tebas|hentak|meteor — tiap jurus ke-3 = Hujan Meteor, serangan area; aksi `hindar` saat meteor = PERISAI), jurusBerikut, jurusInfo{jenis,…}, kalah, monsterMenang, uji?}`
 
 `fase`:
 

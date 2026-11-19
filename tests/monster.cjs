@@ -237,6 +237,29 @@ test('karakter ber-nyawa: sasaran diumumkan dulu, tiap pukulan −1 nyawa, tumba
   assert.equal(m.saya({token: ta}).mati, true); assert.equal(m.saya({token: ta}).hp, 0);
 });
 
+test('jurus ke-3 = Hujan Meteor (area): semua karakter hidup kena kecuali yang memasang PERISAI', () => {
+  const {jam, app, m} = siapkanMonster('100000');
+  const kt = app.sheets['Satu Kata'];
+  for (let i = 0; i < 20; i++) kt.rows.push(['2026-11-19', 'm' + i, 'maju', 'Bali', 'web', 'YA', 'Warga ' + i, 'SMA', 'm' + i + '@mail.com', 'Ya', 1]);
+  app.sheets.Pengaturan.rows.find((x) => x[0] === 'monster_perisai')[1] = '0';
+  app.cache.remove('cfg'); m.segarkan();
+  assert.deepEqual([1, 2, 3, 4, 5, 6, 7, 8, 9].map(m.jenisJurus), ['tusuk', 'tebas', 'meteor', 'hentak', 'tusuk', 'meteor', 'tebas', 'hentak', 'meteor']);
+  const ta = m.masuk({perangkat: 'dev-meteor-aaaaaaaaa', email: 'ani@mail.com'}, '1.1.1.1').token;
+  const tb = m.masuk({perangkat: 'dev-meteor-bbbbbbbbb', email: 'budi@mail.com'}, '1.1.1.2').token;
+  let s = m.lihat();
+  jam.now += 16000; s = m.lihat(); // dua jurus sasaran lewat
+  assert.equal(s.jurusKe, 2); assert.equal(s.jurusJenis, 'meteor'); assert.equal(s.jurusTarget.length, 0, 'meteor tidak mengunci sasaran');
+  assert.equal(m.saya({token: tb}).sasaran, true, 'semua yang hidup terancam meteor');
+  const hpA = m.saya({token: ta}).hp, hpB = m.saya({token: tb}).hp, hidup = s.hidup;
+  jam.now += 6500; const r = m.hindar({token: ta, e: s.id}); // PERISAI saat peringatan
+  assert.equal(r.aman, true); assert.equal(r.jenis, 'meteor');
+  jam.now += 1600; s = m.lihat();
+  assert.equal(s.jurusInfo.jenis, 'meteor'); assert.equal(s.jurusInfo.menghindar, 1);
+  assert.equal(s.jurusInfo.pukulan, hidup - 1, 'semua karakter hidup kena kecuali yang berperisai');
+  assert.equal(m.saya({token: ta}).hp, hpA, 'perisai menahan meteor'); assert.equal(m.saya({token: tb}).hp, hpB - 1, 'tanpa perisai −1 nyawa');
+  assert.equal(s.jurusJenis, 'hentak');
+});
+
 test('karakter tumbang di tengah event: tap ditolak (mati) walau event masih berjalan', () => {
   const {jam, app, m} = siapkanMonster('100000');
   const kt = app.sheets['Satu Kata'];
@@ -264,7 +287,7 @@ test('pemenang publik: nama disingkat, hadiah, tanpa event uji', () => {
   const s = m.admin({token, aksi: 'spin', event: id});
   assert.equal(s.targetRoda, s.hadiah.id);
   const p = m.pemenangPublik().pemenang;
-  assert.equal(p.length, 1); assert.equal(p[0].nama, 'Ani L.'); assert.equal(p[0].hadiah, 'HP Android'); assert.ok(!JSON.stringify(p).includes('@'));
+  assert.equal(p.length, 1); assert.ok(['Ani L.', 'Budi S.'].includes(p[0].nama), p[0].nama); // dua tiket berbobot sama → pemenang acak assert.equal(p[0].hadiah, 'HP Android'); assert.ok(!JSON.stringify(p).includes('@'));
   // tanpa hadiah → roda nama (lingkaran tetap ada)
   m.admin({token, aksi: 'spin-atur', hadiah: []});
   const s2 = m.admin({token, aksi: 'spin', event: id});

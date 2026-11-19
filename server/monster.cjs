@@ -153,8 +153,13 @@ function buatMonster(app, opsi = {}) {
     if (!dmg) return 0;
     return Math.max(1, Math.round(Math.max(pop.length, e.populasiAwal || 0) * dmg / 100 * a.skala[li]));
   }
+  // Pola jurus (sama di semua HP): tusuk, tebas, METEOR, hentak, tusuk, METEOR, … — tiap jurus ke-3 = Hujan Meteor Api,
+  // serangan AREA yang mengenai semua karakter hidup (cocok untuk ribuan pemain). Selamat hanya dengan PERISAI (1× per hujan).
+  const POLA_JURUS = ['tusuk', 'tebas', 'hentak'];
+  const jenisJurus = (k) => (k > 0 && k % 3 === 0 ? 'meteor' : POLA_JURUS[(k - Math.floor(k / 3) - 1) % 3]);
   // Pilih sasaran (boleh berulang bila pukulan > karakter hidup) untuk jurus ke-k.
   function pilihTarget(m, a, e, pop, k) {
+    if (jenisJurus(k) === 'meteor') { e.target = {ke: k, daftar: [], area: true}; return; }
     const li = Math.min(e.lvl, a.target.length) - 1;
     const hidup = pop.filter((x) => !e.mati[x]);
     const n = Math.min(pukulanMaks(m, a, e, pop, li), hidup.length * hpMaksDari(m));
@@ -182,7 +187,13 @@ function buatMonster(app, opsi = {}) {
       const dapat = Math.max(0, e.total - e.totalJurus);
       const tahan = perisaiTarget > 0 ? Math.min(0.8, 0.8 * dapat / perisaiTarget) : 0;
       const aman = new Set(e.hindar[k] || []);
-      const daftar = e.target.daftar.slice(0, Math.max(e.target.daftar.length ? 1 : 0, Math.round(e.target.daftar.length * (1 - tahan))));
+      let daftar;
+      if (e.target.area) { // meteor: semua karakter hidup kena, kecuali yang memasang perisai; tenaga warga meredam sebagian
+        const hidupK = pop.filter((x) => !e.mati[x]);
+        for (let x = hidupK.length - 1; x > 0; x--) { const r = crypto.randomInt(x + 1); [hidupK[x], hidupK[r]] = [hidupK[r], hidupK[x]]; }
+        const terbuka = hidupK.filter((x) => !aman.has(x)), terlindung = hidupK.filter((x) => aman.has(x));
+        daftar = [...terbuka.slice(0, Math.max(terbuka.length ? 1 : 0, Math.round(terbuka.length * (1 - tahan)))), ...terlindung];
+      } else daftar = e.target.daftar.slice(0, Math.max(e.target.daftar.length ? 1 : 0, Math.round(e.target.daftar.length * (1 - tahan))));
       const kena = [], meleset = new Set();
       let tumbang = 0;
       for (const x of daftar) {
@@ -197,7 +208,7 @@ function buatMonster(app, opsi = {}) {
       const hidup = pop.filter((x) => !e.mati[x]).length;
       // untuk tampilan: siapa saja yang kena (maks 30) dengan sisa nyawanya
       const unik = [...new Set(kena)].slice(0, 30).map((x) => [...tampilKarakter(x), Math.max(0, e.hp[x]), e.mati[x] ? 1 : 0]);
-      e.jurusInfo = {ke: k, pukulan: kena.length, tumbang, menghindar: meleset.size, tahan: Math.round(tahan * 100), kena: unik};
+      e.jurusInfo = {ke: k, jenis: jenisJurus(k), pukulan: kena.length, tumbang, menghindar: meleset.size, tahan: Math.round(tahan * 100), kena: unik};
       e.hidup = hidup;
       ubahan = true;
       if (pop.length && hidup === 0) { e.monsterMenang = j.mulai + k * J; break; }
@@ -228,7 +239,7 @@ function buatMonster(app, opsi = {}) {
     const pop = t >= j.mulai ? populasi(j).length : 0;
     const hidupN = e.mati ? pop - Object.keys(e.mati).filter((k) => e.mati[k]).length : pop;
     Object.assign(out, {hidup: Math.max(0, hidupN), totalWarga: pop, nyawa: pop ? Math.round(Math.max(0, hidupN) / pop * 1000) / 10 : 100, jurus: !!m.jurus, jurusMs: J, jurusAnimMs: Math.round(angka(m.jurusAnim, 1.6, 0.6, 4) * 1000), jurusDmgMaks: Math.round(angka(m.jurusDamage, 4, 0, 100) * a.skala[Math.min(e.lvl || 1, a.target.length) - 1] * 10) / 10, hindarMs: 2500, hpMaks: hpMaksDari(m),
-      jurusTarget: e.target && e.target.ke === (e.jurusKe || 0) + 1 ? [...new Set(e.target.daftar)].slice(0, 30).map((x) => [...tampilKarakter(x), Math.max(0, (e.hp || {})[x] ?? hpMaksDari(m))]) : [], jurusKe: e.jurusKe || 0, jurusBerikut: m.jurus && out.fase === 'tanding' ? j.mulai + ((e.jurusKe || 0) + 1) * J : null,
+      jurusTarget: e.target && e.target.ke === (e.jurusKe || 0) + 1 ? [...new Set(e.target.daftar)].slice(0, 30).map((x) => [...tampilKarakter(x), Math.max(0, (e.hp || {})[x] ?? hpMaksDari(m))]) : [], jurusKe: e.jurusKe || 0, jurusJenis: jenisJurus((e.jurusKe || 0) + 1), jurusBerikut: m.jurus && out.fase === 'tanding' ? j.mulai + ((e.jurusKe || 0) + 1) * J : null,
       jurusInfo: e.jurusInfo || null, monsterMenang: e.monsterMenang ? new Date(e.monsterMenang).toISOString() : null});
     Object.assign(out, {level: Math.min(e.lvl, a.target.length), tenaga: e.tenaga, total: e.total, kalah: e.kalah ? new Date(e.kalah).toISOString() : null, naik: e.naik || null,
       pemain, tiket: e.n, interval: intervalUntuk(a.interval, pemain)});
@@ -297,7 +308,7 @@ function buatMonster(app, opsi = {}) {
     if (!m.jurus || t < T - HINDAR_MS || t > T + 300 || e.kalah || e.monsterMenang) return {ok: false, error: 'bukan_waktunya'};
     const daftar = (e.hindar[ke] = e.hindar[ke] || []);
     if (!daftar.includes(kunci)) { daftar.push(kunci); ubah(); }
-    return {ok: true, aman: true, ke};
+    return {ok: true, aman: true, ke, jenis: jenisJurus(ke)};
   }
   // Status karakter milik pemain (dipanggil setelah tiap jurus): masih hidup atau sudah tumbang.
   function saya(p) {
@@ -309,7 +320,7 @@ function buatMonster(app, opsi = {}) {
     const kunci = kunciPemain(pid);
     const hpMaks = hpMaksDari(mUntuk(c, j));
     return {ok: true, mati: !!(e && e.mati && e.mati[kunci]), matiKe: e && e.mati ? e.mati[kunci] || null : null, hp: e && e.hp && e.hp[kunci] != null ? Math.max(0, e.hp[kunci]) : hpMaks, hpMaks,
-      sasaran: !!(e && e.target && e.target.ke === (e.jurusKe || 0) + 1 && e.target.daftar.includes(kunci)), tiket: e && e.tiket[pid] ? e.tiket[pid] : null, saya: e && e.u[pid] ? e.u[pid].p : 0};
+      sasaran: !!(e && e.target && e.target.ke === (e.jurusKe || 0) + 1 && (e.target.area ? !(e.mati && e.mati[kunci]) : e.target.daftar.includes(kunci))), tiket: e && e.tiket[pid] ? e.tiket[pid] : null, saya: e && e.u[pid] ? e.u[pid].p : 0};
   }
 
   function terbitkanTiket(id, e, pid, a) {
@@ -537,7 +548,7 @@ function buatMonster(app, opsi = {}) {
     return {ok: true, pemenang: out};
   }
 
-  return {lihat, masuk, tap, hindar, saya, admin, pemenangPublik, state: st, jadwal, segarkan: () => { memo.t = 0; }};
+  return {lihat, masuk, tap, hindar, saya, admin, pemenangPublik, state: st, jadwal, jenisJurus, segarkan: () => { memo.t = 0; }};
 }
 
 module.exports = {buatMonster, jadwal, PASCA, MENIT};

@@ -57,6 +57,9 @@
 .mon__awas { position: absolute; left: 50%; top: 34%; display: flex; align-items: center; gap: 10px; margin: 0; padding: 12px 18px; transform: translate(-50%, -50%); border-radius: var(--r-md); background: var(--navy-900); color: var(--white); font-weight: 700; font-size: var(--fs-body); text-align: center; white-space: nowrap; box-shadow: var(--e3); animation: mon-awas .5s infinite alternate; }
 .mon__awas::before { content: "⚠"; color: var(--sun-400); font-size: var(--fs-h3); line-height: 1; }
 .mon__awas[hidden] { display: none; }
+.mon__awas { white-space: normal; width: max-content; max-width: 92%; }
+.mon__hindar.is-perisai { background: linear-gradient(180deg, #FFE58A, var(--sun-400) 55%, #E9A400); box-shadow: 0 0 0 5px color-mix(in srgb, #FFE58A 45%, transparent), 0 0 26px 6px color-mix(in srgb, var(--sun-400) 55%, transparent), var(--e3); }
+.mon__hindar.is-perisai:disabled { background: linear-gradient(180deg, #FFF3C4, #FFE58A); color: var(--navy-900); box-shadow: 0 0 0 5px color-mix(in srgb, #FFE58A 35%, transparent); }
 @keyframes mon-awas { to { transform: translate(-50%, -50%) scale(1.04); } }
 .mon__pesan[data-jenis="monster"] { background: var(--navy-950); color: var(--white); }
 .mon__pesan[data-jenis="monster"] h3 { color: var(--coral-100); }

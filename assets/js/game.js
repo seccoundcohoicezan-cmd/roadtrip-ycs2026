@@ -97,6 +97,39 @@
     } catch (e) { /* lobi tetap jalan */ }
   }
 
+  /* ---------- layar penuh arena (event) ---------- */
+  // Ketukan pertama di arena saat bos menyerang langsung membuka layar penuh (lebih mudah dikontrol di HP).
+  // Browser tanpa Fullscreen API (iPhone) memakai fallback: arena fixed memenuhi layar.
+  const arena = $('#arena'), tPenuh = $('#g-penuh');
+  let autoPenuh = false;
+  const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
+  const sedangPenuh = () => fsEl() === arena || arena.classList.contains('is-penuh');
+  function syncPenuh() {
+    const p = sedangPenuh();
+    tPenuh.setAttribute('aria-pressed', String(p)); tPenuh.setAttribute('aria-label', p ? 'Keluar layar penuh' : 'Layar penuh');
+    document.body.classList.toggle('is-penuh', p);
+  }
+  function masukPenuh() {
+    const minta = arena.requestFullscreen || arena.webkitRequestFullscreen;
+    if (minta) {
+      try { const pr = minta.call(arena, { navigationUI: 'hide' }); if (pr && pr.catch) pr.catch(() => { arena.classList.add('is-penuh'); syncPenuh(); }); } catch (e) { arena.classList.add('is-penuh'); }
+    } else arena.classList.add('is-penuh');
+    syncPenuh();
+  }
+  function keluarPenuh() {
+    arena.classList.remove('is-penuh');
+    const k = document.exitFullscreen || document.webkitExitFullscreen;
+    if (fsEl() && k) try { const pr = k.call(document); if (pr && pr.catch) pr.catch(() => {}); } catch (e) {}
+    syncPenuh();
+  }
+  tPenuh.addEventListener('click', (e) => { e.stopPropagation(); S.klik(); if (sedangPenuh()) keluarPenuh(); else masukPenuh(); });
+  document.addEventListener('fullscreenchange', syncPenuh);
+  document.addEventListener('webkitfullscreenchange', syncPenuh);
+  arena.addEventListener('pointerup', (e) => {
+    if (autoPenuh || !document.body.classList.contains('is-tanding') || sedangPenuh() || e.target.closest('button, a')) return;
+    autoPenuh = true; masukPenuh();
+  });
+
   /* ---------- status bos & hitung mundur ---------- */
   let cfg = null, stMon = null, target = 0;
   async function muatStatus() {
@@ -125,6 +158,8 @@
     const selesai = ['menang', 'monster_menang', 'habis', 'kabur'].includes(f);
     $('#g-tidur').hidden = tanding || selesai;
     document.body.classList.toggle('is-tanding', tanding);
+    tPenuh.hidden = !tanding && !sedangPenuh();
+    if (!tanding && !selesai && sedangPenuh()) keluarPenuh();
     target = bosBerikut();
     const badge = $('#g-status-badge'), judul = $('#g-status-judul'), sub = $('#g-status-sub');
     $('#g-ingat').hidden = !target;
