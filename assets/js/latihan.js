@@ -7,7 +7,10 @@
   const gerakMinim = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const S = () => window.YCSSuara || { pukul() {}, kritis() {}, awas() {}, aman() {}, kena() {}, menang() {}, kalah() {}, klik() {} };
   const muat = (src) => { const i = new Image(); i.src = src; return i; };
-  const aset = { latar: muat('/assets/img/festival/latar-900.webp'), lari: muat('/assets/img/monster/raja-lari.webp'), runtuh: muat('/assets/img/monster/raja-runtuh.webp') };
+  const aset = { latar: muat('/assets/img/festival/latar-900.webp'), lari: muat('/assets/img/monster/raja-lari.webp'), runtuh: muat('/assets/img/monster/raja-runtuh.webp'), api: muat('/assets/img/monster/raja-api.webp') };
+  // Topeng alfa sprite: hanya tubuh Raja Batu yang bisa dipukul (bukan kotak di sekitarnya).
+  let topeng = null;
+  aset.lari.addEventListener('load', () => { try { const c = document.createElement('canvas'); c.width = aset.lari.naturalWidth; c.height = aset.lari.naturalHeight; const g = c.getContext('2d', { willReadFrequently: true }); g.drawImage(aset.lari, 0, 0); const d = g.getImageData(0, 0, c.width, c.height).data; const a = new Uint8Array(c.width * c.height); for (let i = 0; i < a.length; i++) a[i] = d[i * 4 + 3]; topeng = { a, w: c.width, h: c.height, fw: c.width / 10 }; } catch (e) { topeng = null; } });
   const warna = () => { const c = getComputedStyle(document.documentElement); const t = (n) => c.getPropertyValue('--' + n).trim(); return { sun: t('sun-400'), coral: t('coral-500'), white: t('white'), navy: t('navy-900'), blue: t('blue-500'), green: t('green-600'), violet: t('violet-600'), langit: t('ilus-langit-festival'), plaza: t('ilus-plaza') }; };
 
   function buat(dlg, opsi = {}) {
@@ -26,12 +29,24 @@
       const cx = W * (0.5 + (st.posX - 0.5) * 0.5), kaki = H * 0.78;
       return { x: cx - w / 2, y: kaki - h, w, h, cx, kaki };
     }
+    // Kena bila jari mengenai piksel tubuh (toleransi jari ±7% lebar bos agar tetap mudah).
+    function kenaTubuh(px, py, b) {
+      if (!topeng || !st.gambar) return px > b.x && px < b.x + b.w && py > b.y && py < b.kaki;
+      const g = st.gambar, r = Math.max(10, g.w * 0.07);
+      for (const [dx, dy] of [[0, 0], [r, 0], [-r, 0], [0, r], [0, -r], [r * 0.7, r * 0.7], [-r * 0.7, r * 0.7], [r * 0.7, -r * 0.7], [-r * 0.7, -r * 0.7]]) {
+        let u = (px + dx - g.x) / g.w; const v = (py + dy - g.y) / g.h;
+        if (g.balik) u = 1 - u;
+        if (u < 0 || u > 1 || v < 0 || v > 1) continue;
+        if (topeng.a[Math.floor(v * (topeng.h - 1)) * topeng.w + Math.floor(g.i * topeng.fw + u * (topeng.fw - 1))] > 90) return true;
+      }
+      return false;
+    }
     function teks(isi, px, py, warnaTeks, besar) { st.partikel.push({ t: performance.now(), isi, x: px, y: py, warna: warnaTeks, besar, vy: -1.2 - Math.random() }); if (st.partikel.length > 40) st.partikel.shift(); }
 
     function tap(ev) {
       if (!st || st.fase !== 'main') return;
       const r = kanvas.getBoundingClientRect(), px = ev.clientX - r.left, py = ev.clientY - r.top, b = bos();
-      if (px < b.x - 50 || px > b.x + b.w + 50 || py < b.y - 50 || py > b.kaki + 40) { teks('Meleset!', px, py, W8.white, 16); return; }
+      if (!kenaTubuh(px, py, b)) { teks('Meleset!', px, py, W8.white, 16); return; }
       const t = performance.now();
       if (t - st.tTap < JEDA_MIN) return;
       st.combo = t - st.tTap < JEDA_COMBO ? st.combo + 1 : 1; st.tTap = t; st.comboMaks = Math.max(st.comboMaks, st.combo);
@@ -94,11 +109,11 @@
       } else if (st.fase === 'main') {
         st.sisa = Math.max(0, DURASI - (t - st.t0) / 1000);
         $('#lt-waktu').textContent = Math.ceil(st.sisa);
-        st.posX += st.arah * 0.0025; if (st.posX > 0.85 || st.posX < 0.15) st.arah *= -1;
+        st.posX += st.arah * 0.002; if (st.posX > 0.72 || st.posX < 0.28) st.arah *= -1;
         if (!st.awasSampai && t > st.tJurus) { st.awasSampai = t + 2400; st.hindarOk = false; $('#lt-awas').hidden = false; $('#lt-hindar').hidden = false; S().awas(); }
         if (st.awasSampai && t > st.awasSampai) {
           if (!st.hindarOk) { st.hati--; st.merah = t; S().kena(); hati(); teks('-1 nyawa', W / 2, H * 0.6, W8.coral, 24); }
-          st.awasSampai = 0; $('#lt-awas').hidden = true; $('#lt-hindar').hidden = true; jadwalJurus(t);
+          st.awasSampai = 0; st.tSerang = t; if (!gerakMinim) st.getar = t; $('#lt-awas').hidden = true; $('#lt-hindar').hidden = true; jadwalJurus(t);
           if (st.hati <= 0) selesai(false);
         }
         if (st.sisa <= 0) selesai(false);
@@ -117,8 +132,20 @@
           if (st.kilat && t - st.kilat < 90) x.filter = 'brightness(2.2)';
           x.drawImage(A, st.frame * 166, 0, 166, 200, b.x, b.y, b.w, b.h);
           x.restore();
+          st.gambar = { i: st.frame, x: b.x, y: b.y, w: b.w, h: b.h, balik: st.arah < 0 };
         }
-        if (st.awasSampai) { x.strokeStyle = W8.coral; x.lineWidth = 4; x.globalAlpha = 0.5 + 0.5 * Math.sin(t / 60); x.beginPath(); x.arc(b.cx, b.y + b.h * 0.45, b.w * 0.75, 0, 6.28); x.stroke(); x.globalAlpha = 1; }
+        // Serangan api (adaptasi GIF panitia): frame 0–7 mengumpulkan api selama peringatan, 8–15 ledakan setelahnya.
+        const F = aset.api; let k = -1;
+        if (st.awasSampai) k = Math.min(7, Math.floor((1 - (st.awasSampai - t) / 2400) * 8));
+        else if (st.tSerang && t - st.tSerang < 1100) k = 8 + Math.min(7, Math.floor((t - st.tSerang) / 1100 * 8));
+        if (k >= 0 && F.complete && F.naturalWidth && !gerakMinim) {
+          const fw = F.naturalWidth / 16, fh = F.naturalHeight, lw = b.h * 2.1, lh = lw * fh / fw;
+          x.fillStyle = `rgba(6,24,64,${k < 8 ? 0.12 + k * 0.03 : 0.36 - (k - 8) * 0.04})`; x.fillRect(0, 0, W, H); // langit meredup agar api menyala
+          x.save(); x.globalCompositeOperation = 'lighter';
+          if (st.arah < 0) { x.translate(b.cx, 0); x.scale(-1, 1); x.translate(-b.cx, 0); }
+          x.drawImage(F, k * fw, 0, fw, fh, b.cx - lw / 2, b.y + b.h * 0.5 - lh * 0.56, lw, lh);
+          x.restore();
+        }
       }
       x.restore();
       // angka & partikel

@@ -64,6 +64,32 @@
       const img = (src) => { const i = new Image(); i.decoding = 'async'; i.src = src; return i; };
       aset.lari = img('/assets/img/monster/raja-lari.webp');     // 10 frame horizontal
       aset.runtuh = img('/assets/img/monster/raja-runtuh.webp'); // 9 frame horizontal
+      aset.api = img('/assets/img/monster/raja-api.webp');       // 16 frame efek api dari GIF serangan panitia (tanpa latar)
+      aset.lari.addEventListener('load', () => { aset.topeng = topeng(aset.lari, 10); });
+    }
+    // Topeng alfa sprite (per piksel) agar hanya TUBUH monster yang bisa dipukul, bukan kotak di sekitarnya.
+    function topeng(gbr, n) {
+      try {
+        const c = document.createElement('canvas'); c.width = gbr.naturalWidth; c.height = gbr.naturalHeight;
+        const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(gbr, 0, 0);
+        const d = x.getImageData(0, 0, c.width, c.height).data, a = new Uint8Array(c.width * c.height);
+        for (let i = 0; i < a.length; i++) a[i] = d[i * 4 + 3];
+        return { a, w: c.width, h: c.height, fw: c.width / n };
+      } catch (e) { return null; }
+    }
+    let gambarTerakhir = null; // {i, x, y, w, h, balik} sprite Raja Batu yang terakhir digambar
+    function kenaTubuh(px, py) {
+      const g = gambarTerakhir, m = aset.topeng;
+      if (!g || !m) return null; // belum siap → pakai kotak lama
+      const r = Math.max(6, g.w * 0.035); // toleransi jari kecil di tepi tubuh
+      for (const [dx, dy] of [[0, 0], [r, 0], [-r, 0], [0, r], [0, -r]]) {
+        let u = (px + dx - g.x) / g.w; const v = (py + dy - g.y) / g.h;
+        if (g.balik) u = 1 - u;
+        if (u < 0 || u > 1 || v < 0 || v > 1) continue;
+        const sx = Math.floor(g.i * m.fw + u * (m.fw - 1)), sy = Math.floor(v * (m.h - 1));
+        if (m.a[sy * m.w + sx] > 90) return true;
+      }
+      return false;
     }
     // Bola cahaya dirender sekali lalu dipakai ulang (lebih murah daripada gradient per frame).
     const bola = document.createElement('canvas');
@@ -285,6 +311,7 @@
       ctx.translate(g.x, 0); ctx.scale(jalan.arah < 0 && mati == null ? -1 : 1, 1); ctx.translate(-g.x, 0);
       if (mati != null && mati > 0.85) ctx.globalAlpha = Math.max(0, 1 - (mati - 0.85) / 0.15);
       ctx.drawImage(sumber, i * fw, 0, fw, fh, g.x - w / 2 + goyang, g.kaki - h - g.tinggi * 0.04 * angkat, w, h);
+      gambarTerakhir = sumber === lari ? { i, x: g.x - w / 2 + goyang, y: g.kaki - h - g.tinggi * 0.04 * angkat, w, h, balik: jalan.arah < 0 } : null;
       if (kedip > 0) { // kedip terang tipis di atas sprite
         ctx.globalCompositeOperation = 'lighter';
         ctx.globalAlpha = kedip * 0.35;
@@ -297,6 +324,21 @@
     // → gelombang kejut di tanah + dua sabetan api melengkung ke kiri & kanan + percikan bara.
     function acakJurus(ke) { let x = (ke * 9301 + 49297) % 233280; return () => (x = (x * 9301 + 49297) % 233280) / 233280; }
     function gambarJurusEfek(g, p) {
+      // Efek api hasil adaptasi GIF serangan panitia: tubuh monster tetap utuh, api mengelilinginya (tanpa kotak).
+      const A = aset.api;
+      if (st && st.wujud !== 'lucu' && A && A.complete && A.naturalWidth) {
+        const n = 16, fw = A.naturalWidth / n, fh = A.naturalHeight;
+        const k = p < LEPAS ? Math.floor(p / LEPAS * 8) : 8 + Math.floor((p - LEPAS) / (1 - LEPAS) * 8);
+        const lebar = g.tinggi * 2.1, tinggi = lebar * fh / fw;
+        const cx = g.x, cy = g.kaki - g.tinggi * 0.5;
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.globalAlpha = p > 0.92 ? Math.max(0, (1 - p) / 0.08) : 1;
+        if (jalan.arah < 0) { ctx.translate(cx, 0); ctx.scale(-1, 1); ctx.translate(-cx, 0); }
+        ctx.drawImage(A, Math.min(n - 1, k) * fw, 0, fw, fh, cx - lebar / 2, cy - tinggi * 0.56, lebar, tinggi);
+        ctx.restore();
+        return;
+      }
       const dada = { x: g.x, y: g.kaki - g.tinggi * 0.55 };
       const r = acakJurus((st && st.jurusKe) || 1);
       ctx.save();
@@ -795,7 +837,9 @@
       const x = (ev.clientX ?? r.left + r.width / 2) - r.left, y = (ev.clientY ?? r.top + r.height * 0.7) - r.top;
       // Tap harus tepat mengenai monster atau warga (yang masih berdiri). Di luar itu = meleset, tidak dihitung.
       const g = geometri();
-      const kenaMonster = Math.abs(x - g.x) < g.lebar * 0.45 && y > g.atas + g.tinggi * 0.04 && y < g.kaki;
+      const kotak = Math.abs(x - g.x) < g.lebar * 0.45 && y > g.atas + g.tinggi * 0.04 && y < g.kaki;
+      const tubuh = st && st.wujud !== 'lucu' ? kenaTubuh(x, y) : null;
+      const kenaMonster = tubuh == null ? kotak : tubuh;
       const w = !kenaMonster && fest && fest.wargaDi ? fest.wargaDi(x, y, 9) : null; // toleransi jari di HP
       if (w && w === fest.saya && !$('.mon__hindar').hidden) { hindar(); return; } // ketuk karaktermu saat peringatan = menghindar
       if (!kenaMonster && !w) { teks.push({ s: 'Meleset!', x, y, t0: performance.now(), warna: '#E9E3DA' }); mulaiGambar(); return; }
