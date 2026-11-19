@@ -78,7 +78,7 @@
       } catch (e) { return null; }
     }
     let gambarTerakhir = null; // {i, x, y, w, h, balik} sprite Raja Batu yang terakhir digambar
-    let poseApi = { dx: 0, dy: 0 }, tubuhUlang = null;
+    let poseApi = { dx: 0, dy: 0 }, tubuhUlang = null, jurusAktif = null;
     function kenaTubuh(px, py) {
       const g = gambarTerakhir, m = aset.topeng;
       if (!g || !m) return null; // belum siap → pakai kotak lama
@@ -319,6 +319,24 @@
         pz.rot *= arahP; pz.dx *= arahP;
         ctx.translate(g.x + pz.dx, g.kaki + pz.dy); ctx.rotate(pz.rot); ctx.scale(pz.sx, pz.sy); ctx.translate(-g.x, -g.kaki);
       }
+      const RIG = window.YCSRajaRig;
+      if (ps == null) jurusAktif = null;
+      if (ps != null && !gerakMinim && RIG && lari.complete) {
+        // Jurus memakai rig (badan melengkung + lengan berputar). Jenis jurus berganti tiap jurus (sama untuk semua pemain).
+        if (!aset.rig) aset.rig = RIG.bangun(lari);
+        if (!jurusAktif) jurusAktif = RIG.DAFTAR[((st && st.jurusKe) || 0) % RIG.DAFTAR.length];
+        if (aset.rig) {
+          ctx.restore(); ctx.save();
+          const awal = ps < LEPAS, P = RIG.pose(jurusAktif, awal ? 'awal' : 'serang', awal ? ps / LEPAS : (ps - LEPAS) / (1 - LEPAS), t);
+          const o = { x: g.x - w / 2, y: g.kaki - h, w, h, balik: jalan.arah < 0 };
+          RIG.gambar(ctx, aset.rig, o, P, t);
+          tubuhUlang = { rig: true, o, P, t };
+          gambarTerakhir = { i: 0, x: o.x, y: o.y, w, h, balik: o.balik, pivX: g.x, pivY: g.kaki, pose: { rot: 0, sx: P.skala, sy: P.skala, dx: 0, dy: -P.angkat * h } };
+          poseApi = { dx: 0, dy: 0 };
+          ctx.restore();
+          return;
+        }
+      }
       ctx.translate(g.x, 0); ctx.scale(jalan.arah < 0 && mati == null ? -1 : 1, 1); ctx.translate(-g.x, 0);
       if (mati != null && mati > 0.85) ctx.globalAlpha = Math.max(0, 1 - (mati - 0.85) / 0.15);
       ctx.drawImage(sumber, i * fw, 0, fw, fh, g.x - w / 2 + goyang, g.kaki - h - g.tinggi * 0.04 * angkat, w, h);
@@ -349,11 +367,11 @@
         ctx.globalAlpha = p > 0.92 ? Math.max(0, (1 - p) / 0.08) : 1;
         ctx.translate(poseApi.dx * 1.4, poseApi.dy); // api ikut terlempar ke arah terjangan
         if (jalan.arah < 0) { ctx.translate(cx, 0); ctx.scale(-1, 1); ctx.translate(-cx, 0); }
-        if (k >= 8 && k <= 11) ctx.globalAlpha *= 0.7;
+        if (k >= 8 && k <= 11) ctx.globalAlpha *= tubuhUlang && tubuhUlang.rig ? 0.5 : 0.7;
         ctx.drawImage(A, Math.min(n - 1, k) * fw, 0, fw, fh, cx - lebar / 2, cy - tinggi * 0.56, lebar, tinggi);
         ctx.restore();
         // tubuh digambar ulang di atas api agar gerakan menyerang tetap terbaca
-        if (tubuhUlang && aset.lari && aset.lari.complete) { const q = tubuhUlang; ctx.save(); ctx.setTransform(q.m); ctx.globalAlpha = k >= 8 ? 0.85 : 0.6; ctx.drawImage(aset.lari, q.i * q.fw, 0, q.fw, q.fh, q.x, q.y, q.w, q.h); ctx.restore(); }
+        if (tubuhUlang && tubuhUlang.rig) { /* rig: api cukup diredupkan, tidak digambar ulang (hemat CPU di HP) */ } else if (tubuhUlang && aset.lari && aset.lari.complete) { const q = tubuhUlang; ctx.save(); ctx.setTransform(q.m); ctx.globalAlpha = k >= 8 ? 0.85 : 0.6; ctx.drawImage(aset.lari, q.i * q.fw, 0, q.fw, q.fh, q.x, q.y, q.w, q.h); ctx.restore(); }
         return;
       }
       const dada = { x: g.x, y: g.kaki - g.tinggi * 0.55 };
@@ -474,7 +492,7 @@
       const bisaHindar = !karakterMati && !!token && sisa < Math.min(st.hindarMs || 2500, 2500) && sisa > -200;
       tombol.hidden = !bisaHindar;
       if (bisaHindar) { tombol.disabled = hindarKe === ke; tombol.textContent = hindarKe === ke ? 'AMAN ✓' : 'HINDAR!'; }
-      if (!awas.hidden) awas.textContent = aku_sasaran && !karakterMati ? 'KAMU jadi sasaran! Tekan HINDAR!' : 'Awas! ' + st.nama + ' bersiap mengeluarkan jurus!';
+      if (!awas.hidden) awas.textContent = aku_sasaran && !karakterMati ? 'KAMU jadi sasaran! Tekan HINDAR!' : (window.YCSRajaRig ? window.YCSRajaRig.JURUS[window.YCSRajaRig.DAFTAR[((st.jurusKe || 0)) % 3]].awas : 'Awas! ' + st.nama + ' bersiap mengeluarkan jurus!');
       if (sisa <= 0 && jurusDitembak < ke) {
         jurusDitembak = ke;
         tembakSasaran(); // pancaran ke warga sasaran; kena/meleset & sisa nyawa dikonfirmasi server

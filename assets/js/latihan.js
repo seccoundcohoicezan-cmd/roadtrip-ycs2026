@@ -9,7 +9,7 @@
   const muat = (src) => { const i = new Image(); i.src = src; return i; };
   const aset = { latar: muat('/assets/img/festival/latar-900.webp'), lari: muat('/assets/img/monster/raja-lari.webp'), runtuh: muat('/assets/img/monster/raja-runtuh.webp'), api: muat('/assets/img/monster/raja-api.webp') };
   // Topeng alfa sprite: hanya tubuh Raja Batu yang bisa dipukul (bukan kotak di sekitarnya).
-  let topeng = null;
+  let topeng = null, rigCache = null;
   aset.lari.addEventListener('load', () => { try { const c = document.createElement('canvas'); c.width = aset.lari.naturalWidth; c.height = aset.lari.naturalHeight; const g = c.getContext('2d', { willReadFrequently: true }); g.drawImage(aset.lari, 0, 0); const d = g.getImageData(0, 0, c.width, c.height).data; const a = new Uint8Array(c.width * c.height); for (let i = 0; i < a.length; i++) a[i] = d[i * 4 + 3]; topeng = { a, w: c.width, h: c.height, fw: c.width / 10 }; } catch (e) { topeng = null; } });
   const warna = () => { const c = getComputedStyle(document.documentElement); const t = (n) => c.getPropertyValue('--' + n).trim(); return { sun: t('sun-400'), coral: t('coral-500'), white: t('white'), navy: t('navy-900'), blue: t('blue-500'), green: t('green-600'), violet: t('violet-600'), langit: t('ilus-langit-festival'), plaza: t('ilus-plaza') }; };
 
@@ -21,7 +21,7 @@
     new ResizeObserver(ukur).observe(kanvas);
 
     function baru() {
-      return { hp: HP, hati: HATI, sisa: DURASI, combo: 0, comboMaks: 0, tTap: 0, dmg: 0, aman: 0, kritis: 0, partikel: [], konfeti: [], bara: [], debu: [], benturan: false, getar: 0, kilat: 0, merah: 0,
+      return { hp: HP, hati: HATI, sisa: DURASI, combo: 0, comboMaks: 0, tTap: 0, dmg: 0, aman: 0, kritis: 0, partikel: [], konfeti: [], bara: [], debu: [], benturan: false, jejak: [], jurus: 'tusuk', urutJurus: 0, retak: null, getar: 0, kilat: 0, merah: 0,
         mulai: 0, jalan: false, akhir: null, tJurus: 0, awasSampai: 0, hindarOk: false, fase: 'hitung', hitung: 3, posX: 0.5, arah: 1, frame: 0, tRuntuh: 0, tAkhir: 0 };
     }
     function bos() { // kotak bos di layar
@@ -67,29 +67,43 @@
       return p;
     }
     // Efek benturan: jejak api oranye mengikuti sabetan senjata, ledakan bara & percikan, gelombang kejut + debu di kaki, getar.
-    function gambarBenturan(t, b) {
-      const u = (t - st.tSerang) / 1100, arahP = st.arah < 0 ? -1 : 1, q = st.poseTerakhir || { dx: 0 };
-      const depanX = b.cx + q.dx + arahP * b.w * 0.42, depanY = b.y + b.h * 0.42;
-      if (!st.benturan && u >= 0.16) { // detik benturan
-        st.benturan = true; st.getar = t; st.getarAmp = 1.6;
-        for (let i = 0; i < 46; i++) { const a = (Math.random() - 0.5) * Math.PI * 1.4 + (arahP > 0 ? 0 : Math.PI), v = 2 + Math.random() * 7; st.bara.push({ x: depanX, y: depanY, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 2, r: 1.5 + Math.random() * 2.5, t0: t, umur: 500 + Math.random() * 500 }); }
-        for (let i = 0; i < 14; i++) { const a = Math.random() * Math.PI, v = 1 + Math.random() * 2.5; st.debu.push({ x: b.cx + q.dx, y: b.kaki, vx: Math.cos(a) * v * (Math.random() < 0.5 ? -1 : 1) * 2, vy: -Math.sin(a) * v * 0.6, r: 8 + Math.random() * 14, t0: t, umur: 900 }); }
-      }
+    function mulaiBenturan(t, b) {
+      st.benturan = true; st.getar = t; st.getarAmp = st.jurus === 'hentak' ? 2.4 : 1.6;
+      const [px, py] = st.ujung || [b.cx, b.y + b.h * 0.45], n = st.jurus === 'hentak' ? 30 : 46;
+      for (let i = 0; i < n; i++) { const a = st.jurus === 'hentak' ? -Math.PI * Math.random() : Math.random() * Math.PI * 2, v = 2 + Math.random() * 7; st.bara.push({ x: px, y: py, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 2, r: 1.5 + Math.random() * 2.5, t0: t, umur: 500 + Math.random() * 500 }); }
+      const nd = st.jurus === 'hentak' ? 30 : 12;
+      for (let i = 0; i < nd; i++) { const a = Math.random() * Math.PI, v = 1 + Math.random() * (st.jurus === 'hentak' ? 4 : 2.5); st.debu.push({ x: b.cx + (Math.random() - 0.5) * b.w * 0.4, y: b.kaki, vx: Math.cos(a) * v * (Math.random() < 0.5 ? -1 : 1) * 2, vy: -Math.sin(a) * v * 0.6, r: 8 + Math.random() * 16, t0: t, umur: 1000 }); }
+      if (st.jurus === 'hentak') st.retak = Array.from({ length: 7 }, (_, i) => { const a = Math.PI * (0.05 + 0.9 * i / 6) + (Math.random() - 0.5) * 0.2; const tt = []; let r = 0; while (r < 1) { r += 0.15 + Math.random() * 0.15; tt.push([Math.cos(a + (Math.random() - 0.5) * 0.4) * r, Math.sin(a) * r * 0.25]); } return tt; });
+    }
+    // Efek per jurus: tusuk = garis kecepatan + kilatan di tinju; tebas = jejak api mengikuti ujung trisula; hentak = retakan + gelombang besar.
+    function gambarBenturan(t, b, u) {
+      const [px, py] = st.ujung || [b.cx, b.y + b.h * 0.45];
       x.save(); x.globalCompositeOperation = 'lighter';
-      // jejak sabetan diagonal (0–0,3)
-      if (u < 0.32) {
-        const p = Math.min(1, u / 0.16), pud = u < 0.16 ? 1 : 1 - (u - 0.16) / 0.16;
-        const cx = b.cx + q.dx, cy = b.y + b.h * 0.45, R = b.h * 0.62, a0 = -2.3, a1 = a0 + 2.6 * p;
-        for (const [lebar, al] of [[18, 0.25], [9, 0.55], [3, 0.95]]) {
-          x.strokeStyle = `rgba(255,${150 + (3 - lebar / 6) * 30},40,${al * pud})`; x.lineWidth = lebar; x.lineCap = 'round';
-          x.beginPath(); x.ellipse(cx, cy, R, R * 0.55, arahP * -0.5, arahP > 0 ? a0 : Math.PI - a1, arahP > 0 ? a1 : Math.PI - a0); x.stroke();
+      if (st.jurus === 'tebas' && st.jejak.length > 2 && u < 0.4) { // pita api mengikuti ujung trisula
+        for (let i = 1; i < st.jejak.length; i++) {
+          const [x0, y0] = st.jejak[i - 1], [x1, y1] = st.jejak[i], f = i / st.jejak.length, pud = u < 0.3 ? 1 : 1 - (u - 0.3) / 0.1;
+          x.strokeStyle = `rgba(255,${120 + 110 * f},40,${0.9 * f * pud})`; x.lineWidth = 3 + 22 * f; x.lineCap = 'round';
+          x.beginPath(); x.moveTo(x0, y0); x.lineTo(x1, y1); x.stroke();
         }
       }
-      // kilatan di titik benturan
-      if (u >= 0.16 && u < 0.36) { const k = 1 - (u - 0.16) / 0.2, rr = b.h * (0.12 + 0.35 * (1 - k)); const g = x.createRadialGradient(depanX, depanY, 0, depanX, depanY, rr); g.addColorStop(0, `rgba(255,250,220,${k})`); g.addColorStop(0.4, `rgba(255,170,40,${0.7 * k})`); g.addColorStop(1, 'rgba(255,80,20,0)'); x.fillStyle = g; x.beginPath(); x.arc(depanX, depanY, rr, 0, 6.28); x.fill(); }
-      // gelombang kejut di tanah
-      if (u >= 0.16 && u < 0.7) { const k = (u - 0.16) / 0.54; x.strokeStyle = `rgba(255,200,120,${0.6 * (1 - k)})`; x.lineWidth = 3 * (1 - k) + 1; x.beginPath(); x.ellipse(b.cx + q.dx, b.kaki, b.w * (0.3 + 1.1 * k), b.w * (0.07 + 0.22 * k), 0, 0, 6.28); x.stroke(); }
+      if (st.jurus === 'tusuk' && u < 0.35) { // garis kecepatan memancar dari tinju
+        const k = 1 - u / 0.35;
+        for (let i = 0; i < 14; i++) { const a = i / 14 * Math.PI * 2 + 0.3, r0 = b.h * 0.08, r1 = b.h * (0.25 + 0.35 * (1 - k)); x.strokeStyle = `rgba(255,220,150,${0.55 * k})`; x.lineWidth = 2; x.beginPath(); x.moveTo(px + Math.cos(a) * r0, py + Math.sin(a) * r0); x.lineTo(px + Math.cos(a) * r1, py + Math.sin(a) * r1); x.stroke(); }
+      }
+      if (st.benturan) {
+        const e = Math.max(0, Math.min(1, (u - 0.14) / 0.22)), k = 1 - e;
+        if (k > 0) { const rr = b.h * (0.12 + 0.4 * e); const g = x.createRadialGradient(px, py, 0, px, py, rr); g.addColorStop(0, `rgba(255,250,220,${k})`); g.addColorStop(0.4, `rgba(255,170,40,${0.7 * k})`); g.addColorStop(1, 'rgba(255,80,20,0)'); x.fillStyle = g; x.beginPath(); x.arc(px, py, rr, 0, 6.28); x.fill(); }
+        const w2 = (u - 0.14) / 0.6;
+        if (w2 > 0 && w2 < 1) { const besar = st.jurus === 'hentak' ? 1.9 : 1.1; x.strokeStyle = `rgba(255,200,120,${0.65 * (1 - w2)})`; x.lineWidth = 4 * (1 - w2) + 1; x.beginPath(); x.ellipse(b.cx, b.kaki, b.w * (0.3 + besar * w2), b.w * (0.07 + 0.25 * besar * w2), 0, 0, 6.28); x.stroke(); }
+      }
       x.restore();
+      if (st.jurus === 'hentak' && st.retak && u < 0.95) { // retakan tanah
+        x.save(); x.strokeStyle = `rgba(60,30,10,${0.8 * (1 - Math.max(0, u - 0.6) / 0.35)})`; x.lineWidth = 3;
+        for (const r of st.retak) { x.beginPath(); x.moveTo(b.cx, b.kaki); for (const [a, c] of r) x.lineTo(b.cx + a * b.w * 1.1, b.kaki + c * b.w * 1.1); x.stroke(); }
+        x.globalCompositeOperation = 'lighter'; x.strokeStyle = `rgba(255,120,30,${0.6 * (1 - u)})`; x.lineWidth = 1.5;
+        for (const r of st.retak) { x.beginPath(); x.moveTo(b.cx, b.kaki); for (const [a, c] of r) x.lineTo(b.cx + a * b.w * 1.1, b.kaki + c * b.w * 1.1); x.stroke(); }
+        x.restore();
+      }
     }
     function gambarPartikelBenturan(t) {
       x.save();
@@ -176,7 +190,7 @@
         st.sisa = Math.max(0, DURASI - (t - st.t0) / 1000);
         $('#lt-waktu').textContent = Math.ceil(st.sisa);
         if (!st.awasSampai && !(st.tSerang && t - st.tSerang < 1100)) st.posX += st.arah * 0.002; if (st.posX > 0.72 || st.posX < 0.28) st.arah *= -1;
-        if (!st.awasSampai && t > st.tJurus) { st.awasSampai = t + 2400; st.hindarOk = false; $('#lt-awas').hidden = false; $('#lt-hindar').hidden = false; S().awas(); }
+        if (!st.awasSampai && t > st.tJurus) { st.awasSampai = t + 2400; st.hindarOk = false; const R = window.YCSRajaRig; if (R) { const d = R.DAFTAR; if (!st.kantong || !st.kantong.length) { st.kantong = d.slice().sort(() => Math.random() - 0.5); if (st.kantong[0] === st.jurus) st.kantong.push(st.kantong.shift()); } st.jurus = st.kantong.shift(); $('#lt-awas').textContent = R.JURUS[st.jurus].awas + ' Tekan HINDAR!'; } $('#lt-awas').hidden = false; $('#lt-hindar').hidden = false; S().awas(); }
         if (st.awasSampai && t > st.awasSampai) {
           if (!st.hindarOk) { st.hati--; st.merah = t; S().kena(); hati(); teks('-1 nyawa', W / 2, H * 0.6, W8.coral, 24); }
           st.awasSampai = 0; st.tSerang = t; st.benturan = false; $('#lt-awas').hidden = true; $('#lt-hindar').hidden = true; jadwalJurus(t);
@@ -191,40 +205,49 @@
         const R = aset.runtuh, f = Math.min(8, Math.floor((t - st.tRuntuh) / 110)), fw = 259, fh = 240, h2 = b.h * 1.05, w2 = h2 * fw / fh;
         if (R.complete && R.naturalWidth) x.drawImage(R, f * fw, 0, fw, fh, b.cx - w2 / 2, b.kaki - h2, w2, h2);
       } else {
-        const A = aset.lari, ps = pose(t, b); st.frame = ps.frame != null ? ps.frame : Math.floor(t / 90) % 10;
-        if (A.complete && A.naturalWidth) {
-          x.save();
-          const arahP = st.arah < 0 ? -1 : 1, q = { ...ps, rot: ps.rot * arahP, dx: ps.dx * arahP };
-          x.translate(b.cx + q.dx, b.kaki + q.dy); x.rotate(q.rot); x.scale(q.sx, q.sy); x.translate(-b.cx, -b.kaki);
-          if (st.arah < 0) { x.translate(b.cx, 0); x.scale(-1, 1); x.translate(-b.cx, 0); }
-          if (ps.maju > 0.15) { // bayangan gerak (afterimage) di belakang tubuh saat menerjang
-            for (const [mund, al] of [[0.24, 0.22], [0.12, 0.38]]) { x.save(); x.globalAlpha = al * ps.maju; x.filter = 'sepia(1) saturate(4) hue-rotate(-20deg) brightness(1.1)'; x.drawImage(A, st.frame * 166, 0, 166, 200, b.x - b.w * mund, b.y, b.w, b.h); x.restore(); }
+        const A = aset.lari, RIG = window.YCSRajaRig;
+        if (!st.rig && RIG && A.complete && A.naturalWidth) st.rig = rigCache || (rigCache = RIG.bangun(A));
+        const menyerang = !gerakMinim && st.rig && (st.awasSampai || (st.tSerang && t - st.tSerang < 1100));
+        const faseBaru = menyerang ? (st.awasSampai ? 'awal' : 'serang') : ''; if (dlg.dataset.fase !== faseBaru) dlg.dataset.fase = faseBaru;
+        if (menyerang) {
+          // ===== Jurus (rig: badan melengkung + lengan berputar di bahu) =====
+          const awal = !!st.awasSampai, pp = awal ? Math.min(1, 1 - (st.awasSampai - t) / 2400) : (t - st.tSerang) / 1100;
+          const P = RIG.pose(st.jurus, awal ? 'awal' : 'serang', pp, t);
+          const o = { x: b.x, y: b.y, w: b.w, h: b.h, balik: st.arah < 0 };
+          // api di BELAKANG tubuh (mengumpul → meledak), posisinya mengikuti jenis jurus
+          const F = aset.api, k = awal ? Math.min(7, Math.floor(pp * 8)) : 8 + Math.min(7, Math.floor(pp * 8));
+          x.fillStyle = `rgba(6,24,64,${k < 8 ? 0.1 + k * 0.03 : 0.34 - (k - 8) * 0.04})`; x.fillRect(0, 0, W, H);
+          const apiDi = (alpha, skala) => {
+            if (!F.complete || !F.naturalWidth) return;
+            const fw = F.naturalWidth / 16, fh = F.naturalHeight, lw = b.h * 2.1 * skala, lh = lw * fh / fw;
+            const cy = st.jurus === 'hentak' ? b.kaki - lh * 0.3 : b.y + b.h * 0.5 - lh * 0.06;
+            x.save(); x.globalCompositeOperation = 'lighter'; x.globalAlpha = alpha;
+            if (st.arah < 0) { x.translate(b.cx, 0); x.scale(-1, 1); x.translate(-b.cx, 0); }
+            x.drawImage(F, k * fw, 0, fw, fh, b.cx - lw / 2, cy - lh * 0.5, lw, lh); x.restore();
+          };
+          apiDi(1, st.jurus === 'hentak' ? 1.3 : 1);
+          // bayangan gerak saat hentakan
+          if (!awal && pp < 0.4) for (const [mund, al] of [[0.1, 0.18], [0.05, 0.3]]) {
+            const Pg = RIG.pose(st.jurus, 'serang', Math.max(0, pp - mund), t);
+            x.save(); x.globalAlpha = al; x.filter = 'sepia(1) saturate(5) hue-rotate(-25deg) brightness(1.15)'; RIG.gambar(x, st.rig, o, Pg, t); x.restore();
           }
           if (st.kilat && t - st.kilat < 90) x.filter = 'brightness(2.2)';
-          x.drawImage(A, st.frame * 166, 0, 166, 200, b.x, b.y, b.w, b.h);
-          st.matriks = x.getTransform(); // dipakai untuk menggambar ulang tubuh di atas api
-          x.restore();
-          st.gambar = { i: st.frame, x: b.x, y: b.y, w: b.w, h: b.h, balik: st.arah < 0, pivX: b.cx, pivY: b.kaki, pose: { ...ps, rot: ps.rot * (st.arah < 0 ? -1 : 1), dx: ps.dx * (st.arah < 0 ? -1 : 1) } };
-          st.poseTerakhir = st.gambar.pose;
-        }
-        // Serangan api (adaptasi GIF panitia): frame 0–7 mengumpulkan api selama peringatan, 8–15 ledakan setelahnya.
-        const F = aset.api; let k = -1;
-        if (st.awasSampai) k = Math.min(7, Math.floor((1 - (st.awasSampai - t) / 2400) * 8));
-        else if (st.tSerang && t - st.tSerang < 1100) k = 8 + Math.min(7, Math.floor((t - st.tSerang) / 1100 * 8));
-        if (k >= 0 && F.complete && F.naturalWidth && !gerakMinim) {
-          const fw = F.naturalWidth / 16, fh = F.naturalHeight, lw = b.h * 2.1, lh = lw * fh / fw;
-          x.fillStyle = `rgba(6,24,64,${k < 8 ? 0.12 + k * 0.03 : 0.36 - (k - 8) * 0.04})`; x.fillRect(0, 0, W, H); // langit meredup agar api menyala
-          x.save(); x.globalCompositeOperation = 'lighter';
-          const q2 = st.poseTerakhir || { dx: 0, dy: 0 };
-          x.translate(q2.dx * 1.4, q2.dy);   // api ikut terlempar ke arah terjangan
+          st.ujung = RIG.gambar(x, st.rig, o, P, t);
+          x.filter = 'none';
+          apiDi(0.3, 1); // lapisan api tipis di depan agar menyatu
+          if (st.ujung) { st.jejak.push([st.ujung[0], st.ujung[1], t]); if (st.jejak.length > 14) st.jejak.shift(); }
+          if (!awal && P.benturan && !st.benturan) mulaiBenturan(t, b);
+          st.gambar = { i: 0, x: b.x, y: b.y, w: b.w, h: b.h, balik: st.arah < 0, pivX: b.cx, pivY: b.kaki, pose: { rot: 0, sx: P.skala, sy: P.skala, dx: 0, dy: -P.angkat * b.h } };
+          if (!awal) gambarBenturan(t, b, pp);
+        } else if (A.complete && A.naturalWidth) {
+          st.frame = Math.floor(t / 90) % 10; st.jejak.length = 0;
+          x.save();
           if (st.arah < 0) { x.translate(b.cx, 0); x.scale(-1, 1); x.translate(-b.cx, 0); }
-          x.globalAlpha = k >= 8 && k <= 11 ? 0.7 : 1;
-          x.drawImage(F, k * fw, 0, fw, fh, b.cx - lw / 2, b.y + b.h * 0.5 - lh * 0.56, lw, lh);
+          if (st.kilat && t - st.kilat < 90) x.filter = 'brightness(2.2)';
+          x.drawImage(A, st.frame * 166, 0, 166, 200, b.x, b.y, b.w, b.h);
           x.restore();
-          // tubuh digambar ulang di atas api agar gerakan menyerang tetap terbaca (api tetap menyelimuti tepinya)
-          if (st.matriks && A.complete) { x.save(); x.setTransform(st.matriks); x.globalAlpha = k >= 8 ? 0.85 : 0.6; x.drawImage(A, st.frame * 166, 0, 166, 200, b.x, b.y, b.w, b.h); x.restore(); }
+          st.gambar = { i: st.frame, x: b.x, y: b.y, w: b.w, h: b.h, balik: st.arah < 0, pivX: b.cx, pivY: b.kaki, pose: null };
         }
-        if (!gerakMinim && st.tSerang && t - st.tSerang < 1100) gambarBenturan(t, b);
       }
       gambarPartikelBenturan(t);
       x.restore();
