@@ -187,5 +187,20 @@
     for (let i = 0; i < 5; i++) { const a = Math.PI * (0.15 + i * 0.175) + (t / 2400) % 0.35; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + Math.cos(Math.PI + a) * r, y + Math.sin(Math.PI + a) * r); ctx.stroke(); }
     ctx.restore();
   }
-  window.YCSRajaRig = { bangun, pose, gambar, JURUS, DAFTAR, hujan, gambarHujan, gambarPerisai };
+  // Animasi nyawa berkurang di tengah layar: hati besar muncul → retak dicoret → terbelah dua & jatuh, lalu sisa nyawa.
+  // wadah = elemen posisi relatif (dialog latihan / panggung arena). sisa & maks = nyawa setelah berkurang.
+  const HATI_D = 'M12 20.5s-8-4.6-8-10.4A4.4 4.4 0 0 1 12 7.6a4.4 4.4 0 0 1 8 2.5c0 5.8-8 10.4-8 10.4Z';
+  function hatiPecah(wadah, sisa, maks, label) {
+    if (!wadah) return;
+    const lama = wadah.querySelector(':scope > .hati-pecah'); if (lama) lama.remove();
+    const el = document.createElement('div');
+    el.className = 'hati-pecah'; el.setAttribute('aria-hidden', 'true');
+    const svg = (cls) => `<svg class="${cls}" viewBox="2 5 20 18"><path d="${HATI_D}"/></svg>`;
+    const deret = Array.from({ length: maks }, (_, i) => `<i class="${i < sisa ? '' : i === sisa ? 'is-baru' : 'is-habis'}"></i>`).join('');
+    el.innerHTML = `<div class="hati-pecah__hati">${svg('hp-kiri')}${svg('hp-kanan')}<svg class="hp-retak" viewBox="2 5 20 18"><path d="M12.6 7.4 10.8 11l2.3 2-2 3.2 1.1 3.8"/></svg></div>
+      <p class="hati-pecah__teks"><b>−1</b> ${label || 'nyawa'}</p><p class="hati-pecah__deret">${deret}</p>`;
+    wadah.appendChild(el);
+    setTimeout(() => el.remove(), 2000);
+  }
+  window.YCSRajaRig = { hatiPecah, bangun, pose, gambar, JURUS, DAFTAR, hujan, gambarHujan, gambarPerisai };
 })();

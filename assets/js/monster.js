@@ -111,6 +111,13 @@
     let akhir = null;         // animasi kemenangan {t0}
     let levelLama = 0, idLama = '', ditutup = '';
     let token = baca(KUNCI_TOKEN);
+    // Animasi hati pecah di tengah panggung tiap nyawa karaktermu berkurang (sekali per penurunan, dari sumber mana pun).
+    let hpAnim = null;
+    function hatiBerkurang(hp, maks, meteor) {
+      if (hp == null) return;
+      if (hpAnim != null && hp < hpAnim && window.YCSRajaRig) window.YCSRajaRig.hatiPecah(stage, Math.max(0, hp), maks || (st && st.hpMaks) || 5, meteor ? 'nyawa · kena meteor' : 'nyawa');
+      hpAnim = hp;
+    }
     let perisaiKe = 0; // nomor jurus meteor yang kamu tahan dengan PERISAI
     let tiketSaya = null, blokir = null, karakterMati = false, hindarKe = 0, hpSaya = null, aku_sasaran = false; // karakter milik pemain: tumbang = tidak bisa menyerang // blokir: {error, nama} bila aturan 1 perangkat = 1 peserta menolak
 
@@ -587,7 +594,7 @@
         const w = fest.cariNK(n, k);
         if (!w) return;
         fest.kena(w, hp, hpMaks);
-        if (w === fest.saya) { hpSaya = hp; if (mati) setMati(true); else tampilAjak(info.jenis === 'meteor' ? `Karaktermu kena meteor! Nyawa tinggal ${hp} dari ${hpMaks}. Pasang PERISAI saat hujan meteor.` : `Karaktermu kena! Nyawa tinggal ${hp} dari ${hpMaks}. Tekan HINDAR saat jadi sasaran.`, 2600); }
+        if (w === fest.saya) { hatiBerkurang(hp, hpMaks, info.jenis === 'meteor'); hpSaya = hp; if (mati) setMati(true); else tampilAjak(info.jenis === 'meteor' ? `Karaktermu kena meteor! Nyawa tinggal ${hp} dari ${hpMaks}. Pasang PERISAI saat hujan meteor.` : `Karaktermu kena! Nyawa tinggal ${hp} dari ${hpMaks}. Tekan HINDAR saat jadi sasaran.`, 2600); }
         else if (mati && !w.mati) fest.tumbang(w, w.layar && w.layar.x < g.x ? -1 : 1);
       });
     }
@@ -770,7 +777,7 @@
       if (st.id && st.id !== idLama) {
         // event baru: reset tampilan & buang antrean milik event lain
         idLama = st.id; levelLama = st.level || 1; akhir = null; tampilTenaga = st.tenaga || 0; tumbuh = { dari: 1, ke: 1, t0: 0 };
-        selesaiTampil(); jurusDitembak = 0; jurusSinkron = 0; karakterMati = false; hindarKe = 0; perisaiKe = 0; aktif = null; hujan = null; hpSaya = null; Object.assign(jalan, { x: 0.5, y: 0.72, tx: 0.5, ty: 0.72, jeda: 0.8 }); pesan.hidden = true;
+        selesaiTampil(); jurusDitembak = 0; jurusSinkron = 0; karakterMati = false; hindarKe = 0; perisaiKe = 0; aktif = null; hujan = null; hpSaya = null; hpAnim = null; Object.assign(jalan, { x: 0.5, y: 0.72, tx: 0.5, ty: 0.72, jeda: 0.8 }); pesan.hidden = true;
         if (antre.e !== st.id) { antre = { e: st.id, n: 0, kirim: null, seq: 0 }; simpan(KUNCI_ANTRE, antre); }
         muatAset(st.wujud);
       }
@@ -902,6 +909,7 @@
         const d = await minta({ aksi: 'saya', token, uji });
         if (d.ok) {
           const turun = hpSaya != null && d.hp < hpSaya;
+          hatiBerkurang(d.hp, d.hpMaks, st && st.jurusInfo && st.jurusInfo.jenis === 'meteor');
           hpSaya = d.hp; if (fest && fest.saya) fest.setNyawa(fest.saya, d.hp, d.hpMaks);
           if (d.mati) setMati(true);
           else if (turun && st && st.jurusInfo && st.jurusInfo.jenis === 'meteor') tampilAjak(`Karaktermu kena meteor! Nyawa tinggal ${d.hp} dari ${d.hpMaks}. Pasang PERISAI saat hujan meteor berikutnya.`, 2800);

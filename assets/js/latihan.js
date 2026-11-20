@@ -235,7 +235,7 @@
           st.awasSampai = 0; st.tSerang = t; st.benturan = false; $('#lt-awas').hidden = true; $('#lt-hindar').hidden = true; jadwalJurus(t);
         }
         if (st.tKena && t >= st.tKena) {
-          st.tKena = 0; st.hati--; st.merah = t; S().kena(); hati(); teks(st.jurus === 'meteor' ? '-1 nyawa · kena meteor' : '-1 nyawa', W / 2, H * 0.6, W8.coral, 24);
+          st.tKena = 0; st.hati--; st.merah = t; S().kena(); hati(); if (window.YCSRajaRig) window.YCSRajaRig.hatiPecah(dlg, Math.max(0, st.hati), HATI, st.jurus === 'meteor' ? 'nyawa · kena meteor' : 'nyawa');
           if (navigator.vibrate && !gerakMinim) try { navigator.vibrate([40, 30, 40]); } catch (e) {}
           if (st.hati <= 0) selesai(false);
         }
