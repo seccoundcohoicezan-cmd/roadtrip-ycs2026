@@ -170,7 +170,7 @@
 
     // Posisi monster: tengah plaza, kaki di sekitar 80% lantai. Tinggi mengikuti skala level.
     // Monster berkeliling plaza: posisi ternormalisasi (x 0..1 lebar, y 0..1 kedalaman lantai).
-    const jalan = { x: 0.5, y: 0.72, tx: 0.5, ty: 0.72, arah: 1, jeda: 0.8, bergerak: false };
+    const jalan = { x: 0.5, y: 0.6, tx: 0.5, ty: 0.6, arah: 1, jeda: 0.8, bergerak: false };
     const sinarJurus = [];   // pancaran jurus: {t0, x0, y0, x1, y1}
     const konfeti = [];
     let jurusDitembak = 0, jurusSinkron = 0, prediksi = null; // prediksi: {ke, nyawa} sampai server mengonfirmasi jurus
@@ -660,50 +660,63 @@
       return cabang;
     }
     // k 0..1 = seberapa jauh retakan menjalar (0 = baru mulai, 1 = sesaat sebelum muncul). Koordinat retakan: satuan relatif → px lantai.
-    function gambarRetak(t, k, kuat = 1) {
+    function gambarRetak(t, k, kuat = 1, c = ctx) {
       if (!st || k <= 0) return;
       if (!retakCache || retakCache.id !== st.id) retakCache = {id: st.id, cabang: polaRetak(st.id || 'ycs')};
       const l = fest && fest.lantai ? fest.lantai() : {y0: H * 0.4, y1: H * 0.97};
-      const cx = W * 0.5, cy = l.y0 + (l.y1 - l.y0) * 0.68, R = Math.min(W * 0.62, (l.y1 - l.y0) * 1.35);
+      const cx = W * 0.5, cy = l.y0 + (l.y1 - l.y0) * 0.6, R = Math.min(W * 0.62, (l.y1 - l.y0) * 1.35);
       const denyut = 0.65 + 0.35 * Math.sin(t / (380 - 220 * k));
-      ctx.save();
-      ctx.translate(cx, cy); ctx.scale(1, 0.42);
+      c.save();
+      c.translate(cx, cy); c.scale(1, 0.42);
       // tanah menghitam di pusat
-      const gd = ctx.createRadialGradient(0, 0, 0, 0, 0, R * (0.25 + 0.5 * k));
+      const gd = c.createRadialGradient(0, 0, 0, 0, 0, R * (0.25 + 0.5 * k));
       gd.addColorStop(0, `rgba(25,10,6,${0.55 * k * kuat})`); gd.addColorStop(1, 'rgba(25,10,6,0)');
-      ctx.fillStyle = gd; ctx.beginPath(); ctx.arc(0, 0, R * (0.25 + 0.5 * k), 0, 6.283); ctx.fill();
-      const jalur = (c, u) => {
-        const n = c.titik.length - 1, m = Math.max(0, Math.min(1, u)) * n, j = Math.floor(m);
-        ctx.beginPath(); ctx.moveTo(c.titik[0][0] * R, c.titik[0][1] * R);
-        for (let i = 1; i <= j; i++) ctx.lineTo(c.titik[i][0] * R, c.titik[i][1] * R);
-        if (j < n) { const f = m - j, a = c.titik[j], b = c.titik[j + 1]; ctx.lineTo((a[0] + (b[0] - a[0]) * f) * R, (a[1] + (b[1] - a[1]) * f) * R); }
+      c.fillStyle = gd; c.beginPath(); c.arc(0, 0, R * (0.25 + 0.5 * k), 0, 6.283); c.fill();
+      const jalur = (cb, u) => {
+        const n = cb.titik.length - 1, m = Math.max(0, Math.min(1, u)) * n, j = Math.floor(m);
+        c.beginPath(); c.moveTo(cb.titik[0][0] * R, cb.titik[0][1] * R);
+        for (let i = 1; i <= j; i++) c.lineTo(cb.titik[i][0] * R, cb.titik[i][1] * R);
+        if (j < n) { const f = m - j, a = cb.titik[j], b = cb.titik[j + 1]; c.lineTo((a[0] + (b[0] - a[0]) * f) * R, (a[1] + (b[1] - a[1]) * f) * R); }
       };
-      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-      for (const c of retakCache.cabang) {
-        const u = (k - c.mulai) / (1 - c.mulai); if (u <= 0) continue;
-        jalur(c, u); ctx.strokeStyle = `rgba(20,8,4,${0.9 * kuat})`; ctx.lineWidth = (3 + 10 * c.tebal) * (0.55 + 0.45 * k); ctx.stroke();
+      c.lineCap = 'round'; c.lineJoin = 'round';
+      for (const cb of retakCache.cabang) {
+        const u = (k - cb.mulai) / (1 - cb.mulai); if (u <= 0) continue;
+        jalur(cb, u); c.strokeStyle = `rgba(20,8,4,${0.9 * kuat})`; c.lineWidth = (3 + 10 * cb.tebal) * (0.55 + 0.45 * k); c.stroke();
       }
-      ctx.globalCompositeOperation = 'lighter';
-      for (const c of retakCache.cabang) {
-        const u = (k - c.mulai) / (1 - c.mulai); if (u <= 0) continue;
-        jalur(c, u);
-        ctx.strokeStyle = `rgba(255,${90 + 70 * denyut},30,${(0.25 + 0.65 * k) * denyut * kuat})`; ctx.lineWidth = (1.5 + 4.5 * c.tebal) * (0.55 + 0.45 * k); ctx.stroke();
+      c.globalCompositeOperation = 'lighter';
+      for (const cb of retakCache.cabang) {
+        const u = (k - cb.mulai) / (1 - cb.mulai); if (u <= 0) continue;
+        jalur(cb, u);
+        c.strokeStyle = `rgba(255,${90 + 70 * denyut},30,${(0.25 + 0.65 * k) * denyut * kuat})`; c.lineWidth = (1.5 + 4.5 * cb.tebal) * (0.55 + 0.45 * k); c.stroke();
       }
       // pusat bercahaya magma
-      const gm = ctx.createRadialGradient(0, 0, 0, 0, 0, R * 0.22 * (0.4 + k));
+      const gm = c.createRadialGradient(0, 0, 0, 0, 0, R * 0.22 * (0.4 + k));
       gm.addColorStop(0, `rgba(255,170,60,${0.7 * k * denyut * kuat})`); gm.addColorStop(1, 'rgba(255,60,20,0)');
-      ctx.fillStyle = gm; ctx.beginPath(); ctx.arc(0, 0, R * 0.22 * (0.4 + k), 0, 6.283); ctx.fill();
-      ctx.restore();
+      c.fillStyle = gm; c.beginPath(); c.arc(0, 0, R * 0.22 * (0.4 + k), 0, 6.283); c.fill();
+      c.restore();
       // asap & bara naik dari retakan saat sudah dekat
       if (k > 0.55 && !gerakMinim) {
-        ctx.save(); ctx.globalCompositeOperation = 'lighter';
+        c.save(); c.globalCompositeOperation = 'lighter';
         for (let i = 0; i < 10; i++) {
           const f = ((t / (1800 + i * 90)) + i * 0.37) % 1, x = cx + Math.sin(i * 7.3) * R * 0.5 * (0.3 + 0.7 * ((i * 0.13) % 1)), y = cy - f * H * 0.25;
-          ctx.globalAlpha = (1 - f) * (k - 0.55) * 1.6 * kuat; ctx.fillStyle = 'rgb(255,140,50)'; ctx.beginPath(); ctx.arc(x, y, 1.5 + 2 * (1 - f), 0, 6.283); ctx.fill();
+          c.globalAlpha = (1 - f) * (k - 0.55) * 1.6 * kuat; c.fillStyle = 'rgb(255,140,50)'; c.beginPath(); c.arc(x, y, 1.5 + 2 * (1 - f), 0, 6.283); c.fill();
         }
-        ctx.restore();
+        c.restore();
       }
     }
+    // Retakan digambar di lapisan LANTAI kanvas festival (di bawah warga, tidak menimpa orang); warga ikut khawatir.
+    function retakSekarang(t) {
+      if (!st) return null;
+      if (st.fase === 'tunggu' && st.mulai) { const sisa = Date.parse(st.mulai) - now(); if (sisa < 3600000) return {k: Math.max(0, Math.min(1, 1 - sisa / 3600000)), kuat: 1}; }
+      if (masuk) return {k: 1, kuat: 1};
+      if (mendarat && performance.now() - mendarat < 3200) return {k: 1, kuat: Math.max(0, 1 - (performance.now() - mendarat) / 3200)};
+      return null;
+    }
+    if (fest && fest.setLantaiHook) fest.setLantaiHook((c, t) => {
+      const r = retakSekarang(t);
+      if (fest.setCemas) fest.setCemas(r && st && st.fase === 'tunggu' ? 0.25 + 0.75 * r.k : 0);
+      if (r && !el.hidden) gambarRetak(t, r.k, r.kuat, c);
+    });
     // Raja Batu jatuh dari langit: 0–0,9 dtk melayang turun (makin cepat), mendarat → hentakan, getar, debu, kilat.
     const MASUK_MS = 1000;
     function offsetMasuk(t) {
@@ -738,12 +751,7 @@
       let getar = getarLayar();
       if (mendarat && t - mendarat < 500 && !gerakMinim) getar = Math.max(getar, 14 * (1 - (t - mendarat) / 500));
       if (getar) ctx.translate((Math.random() - 0.5) * getar, (Math.random() - 0.5) * getar);
-      // pertanda: retakan menjalar selama 1 jam terakhir sebelum muncul; tetap terlihat lalu memudar setelah Raja Batu mendarat
-      if (st.fase === 'tunggu' && st.mulai) {
-        const sisa = Date.parse(st.mulai) - now(), k = Math.max(0, Math.min(1, 1 - sisa / 3600000));
-        gambarRetak(t, k);
-        if (k > 0.97 && !gerakMinim && Math.sin(t / 900) > 0.96) ctx.translate((Math.random() - 0.5) * 4, (Math.random() - 0.5) * 3);
-      } else if (masuk || (mendarat && t - mendarat < 3200)) gambarRetak(t, 1, mendarat ? Math.max(0, 1 - (t - mendarat) / 3200) : 1);
+
       gerakMonster(dt);
       cekJurus();
       const g = geometri();
@@ -808,10 +816,7 @@
       tulisNyawa();
       const hidup = partikel.length || teks.length || sinarJurus.length || konfeti.length || (akhir && !akhir.selesai) || (st.fase === 'tanding' && !gerakMinim) || (tumbuh.t0 && t - tumbuh.t0 < 900) || masuk;
       if (hidup && panggungTerlihat && !document.hidden) raf = requestAnimationFrame(gambar);
-      else if (st.fase === 'tunggu' && st.mulai && Date.parse(st.mulai) - now() < 3600000 && panggungTerlihat && !document.hidden) {
-        // retakan cukup 15 fps (hemat baterai selama satu jam menunggu)
-        raf = -1; setTimeout(() => { if (raf === -1) { raf = 0; tLalu = 0; mulaiGambar(); } }, 66);
-      } else tLalu = 0;
+      else tLalu = 0;
     }
     function tebarKonfeti() {
       if (gerakMinim) return;
@@ -876,7 +881,7 @@
       if (st.id && st.id !== idLama) {
         // event baru: reset tampilan & buang antrean milik event lain
         idLama = st.id; levelLama = st.level || 1; akhir = null; tampilTenaga = st.tenaga || 0; tumbuh = { dari: 1, ke: 1, t0: 0 };
-        selesaiTampil(); jurusDitembak = 0; jurusSinkron = 0; karakterMati = false; hindarKe = 0; perisaiKe = 0; aktif = null; hujan = null; hpSaya = null; hpAnim = null; Object.assign(jalan, { x: 0.5, y: 0.72, tx: 0.5, ty: 0.72, jeda: 0.8 }); pesan.hidden = true;
+        selesaiTampil(); jurusDitembak = 0; jurusSinkron = 0; karakterMati = false; hindarKe = 0; perisaiKe = 0; aktif = null; hujan = null; hpSaya = null; hpAnim = null; Object.assign(jalan, { x: 0.5, y: 0.6, tx: 0.5, ty: 0.6, jeda: 0.8 }); pesan.hidden = true;
         if (antre.e !== st.id) { antre = { e: st.id, n: 0, kirim: null, seq: 0 }; simpan(KUNCI_ANTRE, antre); }
         muatAset(st.wujud);
       }

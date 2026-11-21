@@ -253,6 +253,7 @@
     }
     // Zona monster (Lawan Monster): {x, atas, kaki, lebar} dalam px layar. Warga tidak boleh menimpa monster:
     // yang berada di dalam zona menyingkir ke sisi terdekat, dan tidak ada yang berjalan menembusnya.
+    let lantaiHook = null, cemas = 0; // lantaiHook: gambar di lantai SEBELUM warga (mis. retakan tanah); cemas 0..1: warga khawatir
     let zona = null, panik = false, wargaSaya = null; // wargaSaya: karakter milik pengunjung (ditandai "KAMU" saat event)
     function diZona(x, y) {
       if (!zona || !W) return false;
@@ -333,6 +334,7 @@
       gambarSuasana(t);
       gambarGelembung(t);
       gambarJudul(t);
+      if (lantaiHook) { ctx.save(); try { lantaiHook(ctx, t); } catch (e) { lantaiHook = null; } ctx.restore(); }
       const b = tinggiDasar();
       const urut = warga.slice().sort((p, q) => p.y - q.y);
       for (const w of urut) {
@@ -345,12 +347,14 @@
         const k = h / SPR_H, sw = SPR_W * k, sh = (SPR_H + SPR_ATAS + SPR_BAWAH) * k;
         if (w.mati) { gambarTumbang(w, sp, px, py, h, sw, sh, k, t); continue; }
         const dekat = panik && zona && Math.abs(px - zona.x) < zona.lebar * 1.4;
-        const getar = dekat ? Math.sin(t / 26 + px) * Math.max(1, h * 0.03) : 0;
+        const getar = dekat ? Math.sin(t / 26 + px) * Math.max(1, h * 0.03) : cemas > 0.6 && !gerakMinim ? Math.sin(t / 40 + px) * h * 0.012 * (cemas - 0.6) / 0.4 : 0;
         ctx.drawImage(sp, px - sw / 2 + getar, py - (SPR_H + SPR_ATAS) * k - naik, sw, sh);
         w.layar = { x: px, y: py - h - naik, kaki: py, h };
+        if (cemas > 0 && !panik && h > 12) gambarKhawatir(px + getar, py - h * 0.83 - naik, h * 0.13, t, w);
         if (w.sasaran || w.kenaT || w.hp != null) gambarStatusTempur(w, px, py, h, t);
         if (w === wargaSaya) { gambarKamu(px, py - h - naik, h, t, w); continue; }
         if (panik && (dekat ? hash((w.n || '') + w.k) % 3 === 0 : hash((w.n || '') + w.k) % 11 === 0)) gambarPanik(px + getar, py - h - naik, h, t, w);
+        else if (!panik && cemas > 0.35 && hash((w.n || '') + w.k) % 100 < cemas * 22) gambarPanik(px + getar, py - h - naik, h, t, w);
       }
       for (const bl of balon) {
         if (!bl.pin) continue;
@@ -426,6 +430,16 @@
         ctx.globalAlpha = a; ctx.fillStyle = '#7CFFB2'; ctx.font = '900 ' + uk + 'px system-ui, sans-serif';
         ctx.fillText('MENGHINDAR!', x, ly - uk * 1.5 - (1 - a) * h * 0.4);
       }
+      ctx.restore();
+    }
+    // Wajah khawatir (pertanda retakan tanah): alis naik di tengah + mulut ternganga kecil. (x,y) = pusat kepala, R = jari-jari.
+    function gambarKhawatir(x, y, R, t, w) {
+      ctx.save();
+      ctx.strokeStyle = '#1F1A17'; ctx.lineWidth = Math.max(0.8, R * 0.09); ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(x - R * 0.6, y - R * 0.18); ctx.lineTo(x - R * 0.18, y - R * 0.42);
+      ctx.moveTo(x + R * 0.6, y - R * 0.18); ctx.lineTo(x + R * 0.18, y - R * 0.42); ctx.stroke();
+      const buka = 0.13 + 0.05 * Math.sin(t / 180 + x);
+      ctx.fillStyle = '#5A1E14'; ctx.beginPath(); ctx.ellipse(x, y + R * 0.62, R * 0.2, R * buka * (0.9 + cemas), 0, 0, Math.PI * 2); ctx.fill();
       ctx.restore();
     }
     // Warga panik: tanda seru berkedip + tetes keringat di atas kepala.
@@ -815,6 +829,9 @@
       get zona() { return zona; },
       // Lawan Monster: warga panik selama monster di plaza; tumbangkan/bangkitkan warga (w.mati = waktu tumbang).
       setPanik(on) { panik = !!on; mulai(); },
+      // Lapisan lantai di bawah warga (fn(ctx, t)) & tingkat khawatir warga 0..1 (retakan tanah sebelum monster muncul).
+      setLantaiHook(fn) { lantaiHook = typeof fn === 'function' ? fn : null; mulai(); },
+      setCemas(v) { cemas = Math.max(0, Math.min(1, Number(v) || 0)); },
       tumbang(w, arah) { if (w && !w.mati) { w.mati = performance.now(); w.matiArah = arah || 0; w.diam = false; mulai(); } },
       bangkitSemua() { warga.forEach((w) => { w.mati = 0; }); mulai(); },
       // Karakter milik pengunjung (dari data festival {n, k}); null = sembunyikan penanda.
