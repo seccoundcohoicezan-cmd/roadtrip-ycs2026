@@ -9,8 +9,14 @@ const kodeDuta = (nama, sekolah) => 'duta-' + BigInt('0x' + crypto.createHash('s
 const namaTampil = (n) => { const b = String(n || '').trim().split(/\s+/); return b.length > 1 ? b[0] + ' ' + b[b.length - 1][0] + '.' : b[0] || ''; };
 const tidakTampil = (v) => /^(tidak|no|false|0)$/i.test(String(v ?? '').trim());
 
+const KATA_RE = /^[a-z\u00c0-\u024f-]{2,20}$/;
+// Karakter plaza duta: stabil dari nama+sekolah (1..24 = karakter adat di festival.js).
+const karakterDari = (nama, sekolah) => { let h = 0; const s = String(nama) + '|' + String(sekolah); for (let j = 0; j < s.length; j++) h = (h * 31 + s.charCodeAt(j)) >>> 0; return 1 + (h % 24); };
+
 function buatDuta(appFn, opsi = {}) {
   const now = opsi.now || Date.now;
+  const simpanan = () => { const st = opsi.state ? opsi.state() : (opsi._st = opsi._st || {}); st.dutaKata = st.dutaKata || {}; return st.dutaKata; }; // kode → {kata, t, hari, n}
+  const ipHit = new Map();
   let memo = {t: 0, v: null};
   function hitung() {
     if (memo.v && now() - memo.t < (opsi.memoMs ?? 15000)) return memo.v;
@@ -21,7 +27,7 @@ function buatDuta(appFn, opsi = {}) {
     fin.forEach((r) => {
       if (!String(r[0] || '').trim() || tidakTampil(r[6])) return;
       const kode = kodeDuta(r[0], r[1]);
-      if (!duta.has(kode)) duta.set(kode, {kode, nama: String(r[0]).trim(), sekolah: String(r[1] || ''), kota: String(r[2] || ''), provinsi: String(r[3] || ''), foto: '', warga: 0, terbaru: []});
+      if (!duta.has(kode)) duta.set(kode, {kode, nama: String(r[0]).trim(), sekolah: String(r[1] || ''), kota: String(r[2] || ''), provinsi: String(r[3] || ''), kata: (simpanan()[kode] || {}).kata || '', karakter: karakterDari(r[0], r[1]), warga: 0, terbaru: []});
     });
     let totalWarga = 0;
     kata.forEach((r) => {
@@ -47,9 +53,33 @@ function buatDuta(appFn, opsi = {}) {
       if (!d) return {ok: false, error: 'tidak_ditemukan'};
       return {ok: true, duta: d, totalDuta: h.daftar.length};
     }
-    return {ok: true, totalDuta: h.daftar.length, totalWarga: h.totalWarga, duta: h.urut.map(({kode, nama, sekolah, kota, provinsi, warga, peringkat}) => ({kode, nama, sekolah, kota, provinsi, warga, peringkat})), diperbarui: new Date(now()).toISOString()};
+    return {ok: true, totalDuta: h.daftar.length, totalWarga: h.totalWarga, duta: h.urut.map(({kode, nama, sekolah, kota, provinsi, warga, peringkat, kata}) => ({kode, nama, sekolah, kota, provinsi, warga, peringkat, kata})), diperbarui: new Date(now()).toISOString()};
   }
-  return {lihat, segarkan: () => { memo.t = 0; }, kodeDuta};
+  // Duta menulis kata sendiri (tampil di atas karakternya di plaza). Divalidasi seperti Satu Kata + daftar kata terlarang.
+  function tulisKata(p, ip) {
+    const kode = String(p.kode || '').toLowerCase();
+    const kata = String(p.kata || '').trim().toLowerCase();
+    const h = ipHit.get(ip) || {n: 0, sampai: now() + 600000};
+    if (h.sampai < now()) { h.n = 0; h.sampai = now() + 600000; }
+    if (++h.n > 40) { ipHit.set(ip, h); return {ok: false, error: 'terlalu_banyak'}; }
+    ipHit.set(ip, h);
+    if (!KATA_RE.test(kata)) return {ok: false, error: 'validation'};
+    const app = appFn();
+    try { if (app.ctx.kataDiblokir_(kata, app.ctx.bacaPengaturan_())) return {ok: false, error: 'kata_ditolak'}; } catch (e) { /* tanpa filter tambahan */ }
+    memo.t = 0;
+    const d = hitung().daftar.find((x) => x.kode === kode);
+    if (!d) return {ok: false, error: 'tidak_ditemukan'};
+    const s = simpanan(), hari = Math.floor((now() + 7 * 3600000) / 86400000), lama = s[kode] || {};
+    const n = lama.hari === hari ? (lama.n || 0) : 0;
+    if (n >= 10) return {ok: false, error: 'terlalu_banyak'};
+    s[kode] = {kata, t: now(), hari, n: n + 1};
+    if (opsi.ubah) opsi.ubah();
+    memo.t = 0;
+    return {ok: true, kata};
+  }
+  // Duta sebagai warga plaza: [nama tampil, kata (atau "duta" bila belum menulis), provinsi, karakter].
+  const orangPlaza = () => hitung().daftar.map((d) => [namaTampil(d.nama), d.kata || 'duta', d.provinsi, d.karakter]);
+  return {lihat, tulisKata, orangPlaza, segarkan: () => { memo.t = 0; }, kodeDuta};
 }
 
 module.exports = {buatDuta, kodeDuta};

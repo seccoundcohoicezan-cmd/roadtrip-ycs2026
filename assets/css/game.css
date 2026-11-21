@@ -165,3 +165,9 @@ dialog.latihan:not(.is-main) .lt-kanvas { filter: brightness(.7) saturate(.85); 
 .lt-hindar.is-perisai { background: linear-gradient(180deg, color-mix(in srgb, #FFE58A 80%, transparent), color-mix(in srgb, #E9A400 80%, transparent)); }
 .lt-waktu, .lt-tutup { }
 @media (prefers-reduced-motion: reduce) { dialog.latihan, dialog.latihan::backdrop { transition: none; } .lt-mulai.is-pop { animation: none; } }
+
+/* Pertanda 1 jam sebelum Raja Batu muncul: kartu tidur jadi ringkas di bawah, plaza beretak terlihat jelas */
+body.is-retak .g-tidur { align-content: end; gap: var(--space-1); padding: var(--space-4); background: linear-gradient(180deg, transparent 0%, transparent 70%, color-mix(in srgb, var(--navy-950) 85%, transparent) 90%); }
+body.is-retak .g-tidur__bos, body.is-retak .g-tidur__sub, body.is-retak .g-tidur__judul, body.is-retak .g-hitung { display: none !important; }
+body.is-retak .g-tidur .badge { background: var(--coral-500); color: var(--white); animation: g-denyut .8s ease-in-out infinite alternate; }
+@media (prefers-reduced-motion: reduce) { body.is-retak .g-tidur .badge { animation: none; } }

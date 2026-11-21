@@ -31,7 +31,7 @@ const opsional = (v, max, re) => v === undefined || v === '' || (typeof v === 's
 
 function buatApi(data) {
   const app = () => data.app;
-  const duta = buatDuta(app);
+  const duta = buatDuta(app, {state: () => data.monster.state, ubah: () => data.tandai()});
   const jawab = (body, cache = CACHE.tidak, kode, header) => ({kode: kode || (body.ok ? 200 : (STATUS[body.error] || 422)), body, cache, header});
   // GET Code.gs: bila skema ikut diperbarui (pastikanSkema_), tandai agar tersimpan & diteruskan.
   function baca(aksi) {
@@ -125,7 +125,12 @@ function buatApi(data) {
     'GET now': {fn: () => jawab({ok: true, now: Date.now()})},
     'GET stats': {fn: () => { const d = baca('stats'); return d.ok === true ? jawab(d, CACHE.stats) : jawab({ok: false, error: 'connection'}); }},
     'GET reveal': {fn: reveal},
-    'GET kata': {fn: () => { const d = baca('kata'); return d.ok === true ? jawab(d, CACHE.kata) : jawab({ok: false, error: 'connection'}); }},
+    'GET kata': {fn: () => {
+      const d = baca('kata');
+      if (d.ok !== true) return jawab({ok: false, error: 'connection'});
+      const dt = duta.orangPlaza(); // peserta lolos = warga plaza (kata tulisan mereka sendiri; tidak menambah hitungan kata)
+      return jawab({...d, orang: dt.slice(0, 500).concat(d.orang || []), duta: dt.length}, CACHE.kata);
+    }},
     'POST kata': {maks: FORMULIR.kata.maks, fn: (p, ip) => formulir('kata', p, ip)},
     'POST dana': {maks: FORMULIR.dana.maks, fn: (p, ip) => formulir('dana', p, ip)},
     'POST klaim': {maks: FORMULIR.klaim.maks, fn: (p, ip) => formulir('klaim', p, ip)},
@@ -136,6 +141,7 @@ function buatApi(data) {
     'POST monster': {maks: 4096, fn: (p, ip) => monsterPost(p, ip, false)},
     'POST monster/admin': {maks: 4096, fn: (p, ip) => monsterPost(p, ip, true)},
     'GET pemenang': {fn: () => jawab(data.monster.pemenangPublik(), CACHE.pemenang)},
+    'POST duta': {maks: 2048, fn: (p, ip) => { const d = p && p.aksi === 'kata' ? duta.tulisKata(p, ipHash(ip) || 'x') : {ok: false, error: 'validation'}; return jawab(d, CACHE.tidak, d.ok ? 200 : d.error === 'terlalu_banyak' ? 429 : d.error === 'tidak_ditemukan' ? 404 : 422); }},
     'GET duta': {fn: (p, ip, url) => { const d = duta.lihat(url.searchParams.get('kode') || ''); return jawab(d, 'public, max-age=0, s-maxage=20, stale-while-revalidate=60', d.ok ? 200 : 404); }},
   };
   return {rute, STATUS};

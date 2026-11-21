@@ -161,13 +161,15 @@
     const selesai = ['menang', 'monster_menang', 'habis', 'kabur'].includes(f);
     $('#g-tidur').hidden = tanding || selesai;
     document.body.classList.toggle('is-tanding', tanding);
+    // 1 jam terakhir sebelum muncul: kartu menyusut agar retakan tanah di plaza terlihat
+    document.body.classList.toggle('is-retak', f === 'tunggu' && !!stMon.mulai && Date.parse(stMon.mulai) - now() < 3600000);
     tPenuh.hidden = !tanding && !sedangPenuh();
     if (!tanding && !selesai && sedangPenuh()) keluarPenuh();
     target = bosBerikut();
     const badge = $('#g-status-badge'), judul = $('#g-status-judul'), sub = $('#g-status-sub');
     $('#g-ingat').hidden = !target;
     if (stMon && stMon.ujiSalah) { badge.textContent = 'Link uji berakhir'; judul.textContent = 'Mode uji sudah selesai'; sub.textContent = 'Minta link uji baru ke panitia, atau main latihan dulu.'; $('#g-hitung').hidden = true; return; }
-    if (target) { badge.textContent = f === 'tunggu' ? 'Segera muncul!' : 'Bos sedang tidur'; judul.textContent = 'Raja Batu muncul dalam'; sub.textContent = cfg && stMon && stMon.live ? `Sebelum live "${stMon.live.judul}". Siapkan jarimu!` : 'Bos muncul ±20 menit sebelum live. Sambil menunggu, latihan dulu!'; }
+    if (target) { badge.textContent = document.body.classList.contains('is-retak') ? 'Tanah plaza mulai retak…' : f === 'tunggu' ? 'Segera muncul!' : 'Bos sedang tidur'; judul.textContent = 'Raja Batu muncul dalam'; sub.textContent = cfg && stMon && stMon.live ? `Sebelum live "${stMon.live.judul}". Siapkan jarimu!` : 'Bos muncul ±20 menit sebelum live. Sambil menunggu, latihan dulu!'; }
     else { badge.textContent = 'Bos sedang tidur'; judul.textContent = 'Jadwal Raja Batu segera diumumkan'; sub.textContent = 'Pantau saluran WhatsApp YCS. Sambil menunggu, latihan dulu!'; }
     $('#g-hitung').hidden = !target;
     tik();

@@ -643,6 +643,91 @@
       ctx.restore();
     }
 
+    /* ---------- Pertanda: retakan tanah 1 jam sebelum Raja Batu muncul, lalu Raja Batu melompat jatuh dari atas ---------- */
+    let retakCache = null, masuk = 0, mendarat = 0;
+    function polaRetak(seed) {
+      let a = 0; for (const c of String(seed)) a = (a * 31 + c.charCodeAt(0)) >>> 0; a = a || 7;
+      const r = () => ((a = (a * 1103515245 + 12345) >>> 0) / 4294967296);
+      const cabang = [];
+      const tumbuh = (x, y, sud, pjg, tebal, lapis) => {
+        const titik = [[x, y]]; let s = sud;
+        const n = 6 + Math.floor(r() * 5);
+        for (let i = 0; i < n; i++) { s += (r() - 0.5) * 0.9; x += Math.cos(s) * pjg / n; y += Math.sin(s) * pjg / n; titik.push([x, y]); if (lapis < 2 && r() < 0.28) tumbuh(x, y, s + (r() < 0.5 ? -1 : 1) * (0.5 + r() * 0.6), pjg * (0.35 + r() * 0.3), tebal * 0.6, lapis + 1); }
+        cabang.push({titik, tebal, lapis, mulai: lapis * 0.18 + r() * 0.1});
+      };
+      const N = 9;
+      for (let i = 0; i < N; i++) tumbuh(0, 0, (i / N) * Math.PI * 2 + r() * 0.5, 0.75 + r() * 0.55, 1, 0);
+      return cabang;
+    }
+    // k 0..1 = seberapa jauh retakan menjalar (0 = baru mulai, 1 = sesaat sebelum muncul). Koordinat retakan: satuan relatif → px lantai.
+    function gambarRetak(t, k, kuat = 1) {
+      if (!st || k <= 0) return;
+      if (!retakCache || retakCache.id !== st.id) retakCache = {id: st.id, cabang: polaRetak(st.id || 'ycs')};
+      const l = fest && fest.lantai ? fest.lantai() : {y0: H * 0.4, y1: H * 0.97};
+      const cx = W * 0.5, cy = l.y0 + (l.y1 - l.y0) * 0.68, R = Math.min(W * 0.62, (l.y1 - l.y0) * 1.35);
+      const denyut = 0.65 + 0.35 * Math.sin(t / (380 - 220 * k));
+      ctx.save();
+      ctx.translate(cx, cy); ctx.scale(1, 0.42);
+      // tanah menghitam di pusat
+      const gd = ctx.createRadialGradient(0, 0, 0, 0, 0, R * (0.25 + 0.5 * k));
+      gd.addColorStop(0, `rgba(25,10,6,${0.55 * k * kuat})`); gd.addColorStop(1, 'rgba(25,10,6,0)');
+      ctx.fillStyle = gd; ctx.beginPath(); ctx.arc(0, 0, R * (0.25 + 0.5 * k), 0, 6.283); ctx.fill();
+      const jalur = (c, u) => {
+        const n = c.titik.length - 1, m = Math.max(0, Math.min(1, u)) * n, j = Math.floor(m);
+        ctx.beginPath(); ctx.moveTo(c.titik[0][0] * R, c.titik[0][1] * R);
+        for (let i = 1; i <= j; i++) ctx.lineTo(c.titik[i][0] * R, c.titik[i][1] * R);
+        if (j < n) { const f = m - j, a = c.titik[j], b = c.titik[j + 1]; ctx.lineTo((a[0] + (b[0] - a[0]) * f) * R, (a[1] + (b[1] - a[1]) * f) * R); }
+      };
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      for (const c of retakCache.cabang) {
+        const u = (k - c.mulai) / (1 - c.mulai); if (u <= 0) continue;
+        jalur(c, u); ctx.strokeStyle = `rgba(20,8,4,${0.9 * kuat})`; ctx.lineWidth = (3 + 10 * c.tebal) * (0.55 + 0.45 * k); ctx.stroke();
+      }
+      ctx.globalCompositeOperation = 'lighter';
+      for (const c of retakCache.cabang) {
+        const u = (k - c.mulai) / (1 - c.mulai); if (u <= 0) continue;
+        jalur(c, u);
+        ctx.strokeStyle = `rgba(255,${90 + 70 * denyut},30,${(0.25 + 0.65 * k) * denyut * kuat})`; ctx.lineWidth = (1.5 + 4.5 * c.tebal) * (0.55 + 0.45 * k); ctx.stroke();
+      }
+      // pusat bercahaya magma
+      const gm = ctx.createRadialGradient(0, 0, 0, 0, 0, R * 0.22 * (0.4 + k));
+      gm.addColorStop(0, `rgba(255,170,60,${0.7 * k * denyut * kuat})`); gm.addColorStop(1, 'rgba(255,60,20,0)');
+      ctx.fillStyle = gm; ctx.beginPath(); ctx.arc(0, 0, R * 0.22 * (0.4 + k), 0, 6.283); ctx.fill();
+      ctx.restore();
+      // asap & bara naik dari retakan saat sudah dekat
+      if (k > 0.55 && !gerakMinim) {
+        ctx.save(); ctx.globalCompositeOperation = 'lighter';
+        for (let i = 0; i < 10; i++) {
+          const f = ((t / (1800 + i * 90)) + i * 0.37) % 1, x = cx + Math.sin(i * 7.3) * R * 0.5 * (0.3 + 0.7 * ((i * 0.13) % 1)), y = cy - f * H * 0.25;
+          ctx.globalAlpha = (1 - f) * (k - 0.55) * 1.6 * kuat; ctx.fillStyle = 'rgb(255,140,50)'; ctx.beginPath(); ctx.arc(x, y, 1.5 + 2 * (1 - f), 0, 6.283); ctx.fill();
+        }
+        ctx.restore();
+      }
+    }
+    // Raja Batu jatuh dari langit: 0–0,9 dtk melayang turun (makin cepat), mendarat → hentakan, getar, debu, kilat.
+    const MASUK_MS = 1000;
+    function offsetMasuk(t) {
+      if (!masuk) return null;
+      const p = (t - masuk) / MASUK_MS;
+      if (p < 0) return {dy: -H * 1.3, sx: 1, sy: 1};
+      if (p < 1) return {dy: -(1 - p * p) * H * 1.15, sx: 1 - 0.08 * p, sy: 1 + 0.12 * p};
+      if (!mendarat) { mendarat = t; if (navigator.vibrate && !gerakMinim) try { navigator.vibrate([60, 30, 90]); } catch (e) {} }
+      const q = (t - mendarat) / 600;
+      if (q >= 1) { if (t - mendarat > 2600) masuk = 0; return null; }
+      const pegas = Math.sin(q * Math.PI * 2.5) * Math.exp(-q * 4);
+      return {dy: 0, sx: 1 + 0.18 * pegas, sy: 1 - 0.22 * pegas};
+    }
+    function gambarDebuMendarat(t, g) {
+      if (!mendarat) return;
+      const q = (t - mendarat) / 1100; if (q >= 1) return;
+      ctx.save();
+      ctx.globalAlpha = 0.6 * (1 - q); ctx.strokeStyle = 'rgb(255,200,140)'; ctx.lineWidth = 6 * (1 - q) + 1;
+      ctx.beginPath(); ctx.ellipse(g.x, g.kaki, g.tinggi * (0.4 + 2.2 * q), g.tinggi * (0.1 + 0.55 * q), 0, 0, 6.283); ctx.stroke();
+      for (let i = 0; i < 14; i++) { const a = Math.PI + (i / 13) * Math.PI, d = g.tinggi * (0.3 + 1.4 * q); ctx.globalAlpha = 0.35 * (1 - q); ctx.fillStyle = 'rgb(200,175,140)'; ctx.beginPath(); ctx.arc(g.x + Math.cos(a) * d, g.kaki + Math.sin(a) * d * 0.35 - g.tinggi * 0.15 * q, g.tinggi * 0.08 * (1 + q), 0, 6.283); ctx.fill(); }
+      if (q < 0.25) { ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = (1 - q / 0.25) * 0.5; ctx.fillStyle = 'rgb(255,230,190)'; ctx.fillRect(0, 0, W, H); }
+      ctx.restore();
+    }
+
     function gambar(t) {
       raf = 0;
       if (!st || el.hidden || !W) return;
@@ -650,8 +735,15 @@
       tLalu = t;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, W, H);
-      const getar = getarLayar();
+      let getar = getarLayar();
+      if (mendarat && t - mendarat < 500 && !gerakMinim) getar = Math.max(getar, 14 * (1 - (t - mendarat) / 500));
       if (getar) ctx.translate((Math.random() - 0.5) * getar, (Math.random() - 0.5) * getar);
+      // pertanda: retakan menjalar selama 1 jam terakhir sebelum muncul; tetap terlihat lalu memudar setelah Raja Batu mendarat
+      if (st.fase === 'tunggu' && st.mulai) {
+        const sisa = Date.parse(st.mulai) - now(), k = Math.max(0, Math.min(1, 1 - sisa / 3600000));
+        gambarRetak(t, k);
+        if (k > 0.97 && !gerakMinim && Math.sin(t / 900) > 0.96) ctx.translate((Math.random() - 0.5) * 4, (Math.random() - 0.5) * 3);
+      } else if (masuk || (mendarat && t - mendarat < 3200)) gambarRetak(t, 1, mendarat ? Math.max(0, 1 - (t - mendarat) / 3200) : 1);
       gerakMonster(dt);
       cekJurus();
       const g = geometri();
@@ -663,7 +755,11 @@
         if (akhir && akhir.jenis === 'monster') { ctx.fillStyle = `rgba(120,0,10,${0.35 * Math.min(1, (t - akhir.t0) / 800)})`; ctx.fillRect(0, 0, W, H); }
         const ps = mati == null ? progresSerang() : null;
         if (ps != null && ps < LEPAS && st.wujud === 'lucu') gambarAura(g, t);
+        const om = offsetMasuk(t);
+        if (om) { ctx.save(); ctx.translate(g.x, g.kaki + om.dy); ctx.scale(om.sx, om.sy); ctx.translate(-g.x, -g.kaki); }
         (st.wujud === 'lucu' ? gambarMonsterLucu : gambarRajaBatu)(g, t, kedip, mati);
+        if (om) ctx.restore();
+        gambarDebuMendarat(t, g);
         if (ps != null && !gerakMinim) { gambarJurusEfek(g, ps); gambarHujanMeteor(ps, t); }
         else if (perisaiKe && perisaiKe === (st.jurusKe || 0) + 1 && fest && fest.saya && fest.saya.layar && !fest.saya.mati && window.YCSRajaRig) window.YCSRajaRig.gambarPerisai(ctx, fest.saya.layar.x, fest.saya.layar.kaki, fest.saya.layar.h * 0.85, t, 1, 0);
         aturZona(akhir && akhir.selesai && akhir.jenis !== 'monster' ? null : g);
@@ -710,9 +806,12 @@
       tampilTenaga = gerakMinim ? tujuan : tampilTenaga + (tujuan - tampilTenaga) * Math.min(1, dt * 6);
       tulisBar();
       tulisNyawa();
-      const hidup = partikel.length || teks.length || sinarJurus.length || konfeti.length || (akhir && !akhir.selesai) || (st.fase === 'tanding' && !gerakMinim) || (tumbuh.t0 && t - tumbuh.t0 < 900);
+      const hidup = partikel.length || teks.length || sinarJurus.length || konfeti.length || (akhir && !akhir.selesai) || (st.fase === 'tanding' && !gerakMinim) || (tumbuh.t0 && t - tumbuh.t0 < 900) || masuk;
       if (hidup && panggungTerlihat && !document.hidden) raf = requestAnimationFrame(gambar);
-      else tLalu = 0;
+      else if (st.fase === 'tunggu' && st.mulai && Date.parse(st.mulai) - now() < 3600000 && panggungTerlihat && !document.hidden) {
+        // retakan cukup 15 fps (hemat baterai selama satu jam menunggu)
+        raf = -1; setTimeout(() => { if (raf === -1) { raf = 0; tLalu = 0; mulaiGambar(); } }, 66);
+      } else tLalu = 0;
     }
     function tebarKonfeti() {
       if (gerakMinim) return;
@@ -782,6 +881,8 @@
         muatAset(st.wujud);
       }
       if (['tanding', 'menang', 'monster_menang', 'habis'].includes(st.fase)) muatAset(st.wujud);
+      // Raja Batu baru muncul (dari fase tunggu, atau halaman dibuka ≤6 dtk setelah mulai) → animasi jatuh dari atas
+      if (st.fase === 'tanding' && !gerakMinim && st.mulai && ((lama && lama.id === st.id && lama.fase === 'tunggu') || (!lama && now() - Date.parse(st.mulai) < 6000))) { masuk = performance.now() + 250; mendarat = 0; }
       // naik level: monster membesar + kilatan kecil
       if (st.level && levelLama && st.level > levelLama) {
         const sk = st.skala || [];
@@ -852,7 +953,7 @@
       kt.hidden = !tiketSaya || !tanding;
       if (tiketSaya) { kt.querySelector('strong').textContent = String(tiketSaya).startsWith('#') ? tiketSaya : '#' + tiketSaya; kt.querySelector('span').textContent = `${nf.format(sayaPoin)} tenaga`; }
       if (tanding && bolehTap() && !token && !blokir && navigator.onLine) pastikanToken().catch(() => {});
-      if (st.fase === 'tunggu') tampilAjak(`${st.nama} muncul dalam ${jam(Date.parse(st.mulai) - now())}. Siapkan jarimu!`);
+      if (st.fase === 'tunggu') tampilAjak(`Tanah plaza mulai retak… ${st.nama} muncul dalam ${jam(Date.parse(st.mulai) - now())}. Siapkan jarimu!`);
       else if (tanding && !bolehTap()) tampilAjak('Buka festival dulu: gabung Festival Satu Kata di beranda untuk ikut melawan.');
       else if (tanding && karakterMati) tampilAjak('Karaktermu tumbang. Kamu tidak bisa menyerang lagi di event ini, tapi tetap bisa menonton & ajak teman!');
       else if (tanding && blokir) tampilAjak((PESAN_BLOKIR[blokir.error] || (() => 'Tidak bisa ikut dari perangkat ini.'))(blokir));

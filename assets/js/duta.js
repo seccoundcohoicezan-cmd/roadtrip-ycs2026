@@ -46,6 +46,8 @@
       $('#saya-peringkat').textContent = saya.peringkat ? '#' + saya.peringkat : '–';
       $('#saya-peringkat-sub').textContent = saya.peringkat ? `dari ${nf.format(d.totalDuta)} duta` : 'ajak 1 warga untuk masuk papan';
       $('#saya-link').value = linkDari(saya.kode);
+      if (document.activeElement !== $('#kata')) $('#kata').value = saya.kata || '';
+      if (!$('#kata-status').dataset.tetap) $('#kata-status').innerHTML = saya.kata ? `Kata-mu di plaza: <span class="kata-sekarang">${esc(saya.kata)}</span>` : 'Kamu belum menulis kata — karaktermu di plaza masih bertuliskan "duta".';
       $('#bagi-wa').href = 'https://wa.me/?text=' + encodeURIComponent(ajakan(saya));
       $('#bagi-native').hidden = !navigator.share;
       $('#saya-daftar').innerHTML = saya.terbaru.map((w) => `<li><span><strong>${esc(w.nama)}</strong> <small>${esc(w.provinsi)}</small></span><small>“${esc(w.kata)}”</small></li>`).join('')
@@ -57,6 +59,23 @@
     } catch (e) { toast('Gagal memuat data duta. Coba lagi.'); }
   }
 
+  const PESAN_KATA = {validation: 'Tulis satu kata saja (2–20 huruf, tanpa spasi/angka; tanda hubung boleh).', kata_ditolak: 'Kata itu tidak bisa dipakai. Coba kata lain yang positif.', terlalu_banyak: 'Terlalu sering diganti. Coba lagi besok.', tidak_ditemukan: 'Data duta tidak ditemukan.'};
+  $('#f-kata').addEventListener('submit', async (e) => {
+    e.preventDefault(); if (!saya) return;
+    const kata = $('#kata').value.trim().toLowerCase(), st = $('#kata-status');
+    if (!/^[a-z\u00c0-\u024f-]{2,20}$/.test(kata)) { st.textContent = PESAN_KATA.validation; return; }
+    const b = $('#kata-simpan'); b.disabled = true;
+    try {
+      const d = await (await fetch(API, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({aksi: 'kata', kode: saya.kode, kata})})).json();
+      if (!d.ok) { st.textContent = PESAN_KATA[d.error] || 'Gagal menyimpan. Coba lagi.'; return; }
+      saya.kata = d.kata; st.dataset.tetap = '1';
+      st.innerHTML = `Tersimpan! Kata-mu di plaza: <span class="kata-sekarang">${esc(d.kata)}</span> (tampil di festival dalam ±1 menit)`;
+      setTimeout(() => { delete st.dataset.tetap; }, 8000);
+      toast('Kata tersimpan!');
+    } catch (err) { st.textContent = 'Koneksi bermasalah. Coba lagi.'; }
+    finally { b.disabled = false; }
+  });
+  $('#kata').addEventListener('input', () => { $('#kata').value = $('#kata').value.toLowerCase().replace(/\s+/g, ''); });
   $('#cari').addEventListener('input', cari);
   $('#cari-hasil').addEventListener('click', (e) => { const b = e.target.closest('[data-kode]'); if (b) pilih(b.dataset.kode, true); });
   $('#salin').addEventListener('click', async () => {

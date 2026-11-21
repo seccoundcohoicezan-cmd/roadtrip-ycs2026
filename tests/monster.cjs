@@ -384,9 +384,16 @@ test('duta: link referral per peserta lolos, warga lewat link terhitung, finalis
   const d = duta.lihat(kd);
   assert.equal(d.duta.terbaru.length, 3); assert.equal(d.duta.terbaru[0].nama, 'Teman 2.'); assert.ok(!JSON.stringify(d).includes('@'), 'tanpa email');
   assert.equal(duta.lihat('duta-zzzzzz').error, 'tidak_ditemukan');
-  const kata = app.get('kata');
-  assert.equal(kata.duta, 2); assert.ok(kata.orang.some((o) => o[0] === 'Dewi S.' && o[1] === 'duta'), 'finalis tampil sebagai warga plaza');
-  assert.equal(kata.total, 6, 'duta tidak menambah hitungan kata (3 warga awal + 3 ajakan)');
+  // duta jadi warga plaza; kata awal "duta" lalu diganti tulisan sendiri (beragam)
+  assert.ok(duta.orangPlaza().some((o) => o[0] === 'Dewi S.' && o[1] === 'duta'));
+  assert.equal(duta.tulisKata({kode: kd, kata: 'Berani'}, 'ip1').kata, 'berani');
+  assert.equal(duta.tulisKata({kode: kd, kata: 'dua kata'}, 'ip1').error, 'validation');
+  assert.equal(duta.tulisKata({kode: 'duta-zzzzzz', kata: 'maju'}, 'ip1').error, 'tidak_ditemukan');
+  assert.ok(duta.orangPlaza().some((o) => o[0] === 'Dewi S.' && o[1] === 'berani'), 'kata duta tampil di plaza');
+  assert.equal(duta.lihat(kd).duta.kata, 'berani');
+  for (let i = 0; i < 9; i++) duta.tulisKata({kode: kd, kata: 'maju'}, 'ip' + i);
+  assert.equal(duta.tulisKata({kode: kd, kata: 'hebat'}, 'ipz').error, 'terlalu_banyak', 'maks 10 ganti kata per hari');
+  assert.equal(app.get('kata').total, 6, 'duta tidak menambah hitungan kata (3 warga awal + 3 ajakan)');
 });
 
 test('impor ulang finalis tidak menggandakan data; data tersimpan bisa dilihat & duplikat lama dirapikan', () => {

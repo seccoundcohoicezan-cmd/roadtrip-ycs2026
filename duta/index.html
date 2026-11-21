@@ -45,6 +45,9 @@
     .papan b { font-variant-numeric: tabular-nums; }
     .btn-bukan { background: transparent; color: var(--white); border: 1.5px solid color-mix(in srgb, var(--white) 55%, transparent); box-shadow: none; }
     .btn-bukan:hover { background: color-mix(in srgb, var(--white) 12%, transparent); }
+    .kata-baris { display: flex; gap: var(--space-2); margin-top: var(--space-3); }
+    .kata-baris .input { flex: 1; min-width: 0; text-transform: lowercase; font-weight: 700; }
+    .kata-sekarang { display: inline-block; padding: .1rem .6rem; border-radius: var(--r-pill); background: var(--sun-400); color: var(--navy-900); font-weight: 800; }
     .tugas { margin: var(--space-3) 0 0; padding-left: 1.25rem; display: grid; gap: var(--space-2); }
   </style>
 </head>
@@ -105,6 +108,12 @@
               <button class="btn btn--sm btn-bukan" type="button" id="ganti">Bukan saya</button>
             </div>
           </article>
+          <form class="card kata-duta" id="f-kata" style="margin-top:var(--space-4)" novalidate aria-labelledby="kata-judul">
+            <h3 id="kata-judul">Satu kata darimu</h3>
+            <p class="card__sub">Kata ini muncul di atas karaktermu di plaza Festival Satu Kata. Satu kata saja (2–20 huruf), misalnya <i>berani</i>, <i>gotong-royong</i>, <i>mimpi</i>.</p>
+            <div class="kata-baris"><label class="visually-hidden" for="kata">Kata kamu</label><input class="input" id="kata" maxlength="20" autocomplete="off" autocapitalize="none" placeholder="tulis satu kata"><button class="btn btn--cta btn--sm" type="submit" id="kata-simpan">Simpan</button></div>
+            <p class="small" id="kata-status" role="status" style="margin-top:var(--space-2)"></p>
+          </form>
           <section class="card" style="margin-top:var(--space-4)" aria-labelledby="warga-judul">
             <h3 id="warga-judul">Warga yang bergabung lewat linkmu</h3>
             <ul class="warga-list" id="saya-daftar"></ul>
@@ -116,7 +125,7 @@
         <section class="card" aria-labelledby="tugas-judul">
           <h2 id="tugas-judul">Cara jadi duta</h2>
           <ol class="tugas">
-            <li>Cari namamu, lalu <b>salin link ajakan</b> pribadimu.</li>
+            <li>Cari namamu, <b>tulis satu kata</b>-mu untuk plaza, lalu <b>salin link ajakan</b> pribadimu.</li>
             <li>Bagikan ke teman, grup kelas, dan story media sosial.</li>
             <li>Teman yang membuka linkmu lalu mengirim <b>satu kata</b> di festival otomatis tercatat sebagai warga ajakanmu.</li>
             <li>Pantau angkanya di halaman ini. Duta dengan warga terbanyak tampil di papan peringkat.</li>
