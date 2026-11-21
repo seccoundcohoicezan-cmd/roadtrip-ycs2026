@@ -508,8 +508,16 @@ function kataPublik_() {
     orang.push([e.n, e.k, e.p, e.m]);
   });
   const kata = Object.keys(hit).map(k => [k, hit[k]]).sort((a, b) => b[1] - a[1]).slice(0, 150);
-  // Warga festival: maksimal 2.000 terbaru (terbaru lebih dulu).
-  const out = {ok: true, total: total, kata: kata, orang: orang.reverse().slice(0, 2000), diperbarui: isoWib_(Date.now())};
+  // Peserta lolos (tab Finalis) otomatis jadi warga plaza sebagai "duta" (tidak menambah hitungan kata/undian).
+  const duta = [];
+  baris_(tab_(ss_(), 'finalis'), 7).forEach((r, i) => {
+    if (!String(r[0] || '').trim() || /^(tidak|no|false|0)$/i.test(String(r[6] || '').trim())) return;
+    let h = 0; const s = String(r[0]) + '|' + String(r[1]);
+    for (let j = 0; j < s.length; j++) h = (h * 31 + s.charCodeAt(j)) >>> 0;
+    duta.push([namaTampil_(r[0]), 'duta', String(r[3] || ''), 1 + (h % 24)]);
+  });
+  // Warga festival: duta + maksimal 2.000 terbaru (terbaru lebih dulu).
+  const out = {ok: true, total: total, kata: kata, orang: duta.slice(0, 500).concat(orang.reverse().slice(0, 2000)), duta: duta.length, diperbarui: isoWib_(Date.now())};
   try { c.put('kata', JSON.stringify(out), 60); } catch (e) { /* lebih dari batas cache: dilayani dari CDN */ }
   return out;
 }
@@ -753,7 +761,7 @@ function impor_(p) {
   return kunci_(LockService.getScriptLock(), () => {
     if (p.mode === 'ganti' && sheet.getLastRow() > 1) sheet.getRange(2, 1, sheet.getLastRow() - 1, lebar).clearContent();
     if (isi.length) sheet.getRange(sheet.getLastRow() + 1, 1, isi.length, lebar).setNumberFormat('@').setValues(isi);
-    cache_().remove('reveal');
+    cache_().remove('reveal'); cache_().remove('kata');
     logAdmin_('impor ' + jenis, (p.mode === 'ganti' ? 'ganti, ' : 'tambah, ') + isi.length + ' baris');
     return {ok: true, jumlah: isi.length, dilewati: baris.length - 1 - isi.length};
   });

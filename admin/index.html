@@ -494,14 +494,12 @@
         </section>
         <!-- Spin undian -->
         <section role="tabpanel" id="p-spin" aria-labelledby="t-spin" tabindex="0" hidden>
-          <div class="content__head"><div><h1>Spin Undian</h1><p class="muted small">Dua tahap saat live: putar <b>nama</b> pemenang dulu, lalu putar <b>hadiah</b>-nya. Peserta diambil dari data yang diimpor (peserta lolos / wild card) atau tiket Lawan Monster.</p></div></div>
+          <div class="content__head"><div><h1>Spin Undian</h1><p class="muted small">Dua tahap saat live: putar <b>nama</b> pemenang dulu, lalu putar <b>hadiah</b>-nya. Yang diundi: pemegang tiket Lawan Monster atau wild card. Peserta lolos (data Finalis) <b>tidak ikut undian</b> — mereka duta yang mengajak warga lewat link referral di <a href="/duta/" target="_blank" rel="noopener">/duta/</a>.</p></div></div>
           <section class="set-card spin-card" id="spin-card" aria-label="Spin undian">
             <div class="spin-alat">
               <div class="field"><label for="spin-sumber">Peserta yang diundi</label><select class="select" id="spin-sumber">
-                <option value="lolos">Peserta lolos (data Finalis)</option>
-                <option value="wildcard">Wild card</option>
-                <option value="semua">Peserta lolos + wild card</option>
                 <option value="tiket">Tiket Lawan Monster</option>
+                <option value="wildcard">Wild card</option>
               </select></div>
               <div class="field" id="spin-event-wrap" hidden><label for="spin-event">Event monster</label><select class="select" id="spin-event"></select></div>
               <label class="switch spin-latihan" for="spin-latihan"><span>Mode latihan<small>Hasil tidak dicatat, stok tidak berkurang.</small></span><input type="checkbox" id="spin-latihan"></label>
@@ -927,8 +925,8 @@
     const WARNA = WARNA_TOKEN.map(tok);
     const TEKS_JURING = WARNA_TOKEN.map((n) => tok(TERANG.includes(n) ? 'navy-900' : 'white'));
     const monAdmin = (data) => api('admin-primer', {perintah: 'monster', data});
-    const SUMBER_LABEL = {lolos: 'Peserta lolos', wildcard: 'Wild card', semua: 'Peserta lolos + wild card', tiket: 'Tiket Lawan Monster'};
-    const ERR_SPIN = {tidak_ada_peserta: 'Semua peserta di daftar ini sudah menang atau datanya kosong. Impor data di tab Impor & Ekspor.', tanpa_hadiah: 'Belum ada hadiah. Buka ⚙ Atur hadiah lalu tambahkan.', hadiah_habis: 'Semua stok hadiah habis. Tambah stok di ⚙ Atur hadiah.', putar_nama_dulu: 'Putar nama dulu.', bos_tidak_tumbang: 'Tiket event ini hangus (bos tidak tumbang). Pakai mode latihan untuk gladi.', tidak_ada_tiket: 'Belum ada tiket di event ini.'};
+    const SUMBER_LABEL = {wildcard: 'Wild card', tiket: 'Tiket Lawan Monster'};
+    const ERR_SPIN = {tidak_ada_peserta: 'Semua peserta di daftar ini sudah menang atau datanya kosong.', tanpa_hadiah: 'Belum ada hadiah. Buka ⚙ Atur hadiah lalu tambahkan.', hadiah_habis: 'Semua stok hadiah habis. Tambah stok di ⚙ Atur hadiah.', putar_nama_dulu: 'Putar nama dulu.', bos_tidak_tumbang: 'Tiket event ini hangus (bos tidak tumbang). Pakai mode latihan untuk gladi.', tidak_ada_tiket: 'Belum ada tiket di event ini.'};
     const pesanSpin = (d) => ERR_SPIN[d.error] || pesan(d);
     const singkat = (n) => { const b = String(n || '').trim().split(/\s+/); return b.length > 1 ? b[0] + ' ' + b[b.length - 1][0] + '.' : b[0] || ''; };
     // Gambar hadiah: data URL → Image (untuk roda & hasil).
@@ -1158,8 +1156,8 @@
       const t = pesertaData ? pesertaData.peserta : [];
       const q = $('#spin-cari').value.trim().toLowerCase(), saring = ($$('input[name="saring"]').find((r) => r.checked) || {}).value || 'semua';
       const sisa = t.filter((x) => !x.menang).length;
-      $('#spin-ringkas').textContent = `Daftar peserta · ${SUMBER_LABEL[pesertaData ? pesertaData.sumber : 'lolos']} (${nf.format(t.length)} orang, ${nf.format(sisa)} belum menang)`;
-      if (!berputar && tahap === 'nama' && $('#spin-hasil-hadiah').hidden) $('#spin-info').textContent = t.length ? `${nf.format(sisa)} peserta ikut undian.` : 'Data peserta kosong. Impor dulu di tab Impor & Ekspor.';
+      $('#spin-ringkas').textContent = `Daftar peserta · ${SUMBER_LABEL[pesertaData ? pesertaData.sumber : 'tiket']} (${nf.format(t.length)} orang, ${nf.format(sisa)} belum menang)`;
+      if (!berputar && tahap === 'nama' && $('#spin-hasil-hadiah').hidden) $('#spin-info').textContent = t.length ? `${nf.format(sisa)} peserta ikut undian.` : 'Belum ada peserta undian di sumber ini.';
       $('#spin-putar').disabled = berputar || (tahap === 'nama' && !sisa);
       const cocok = t.filter((x) => (saring === 'semua' || (saring === 'menang') === !!x.menang) && (!q || [x.nama, x.sekolah, x.kota, x.provinsi, x.jalur, x.kode].join(' ').toLowerCase().includes(q)));
       $('#spin-tabel').innerHTML = cocok.slice(0, batasTabel).map((x, i) => `<tr><td>${i + 1}</td><td>${esc(x.nama)}</td><td>${esc(x.sekolah)}</td><td>${esc(x.kota)}</td><td>${esc(x.provinsi)}</td><td>${esc(x.jalur)}</td><td class="${x.menang ? 'is-menang' : ''}">${x.menang ? 'Menang' + (x.menang.hadiah ? ' · ' + esc(x.menang.hadiah) : '') : 'Ikut undian'}</td></tr>`).join('')
@@ -1237,7 +1235,7 @@
     function renderDataTersimpan() {
       const d = dtData; if (!d) return;
       const kode = d.jenis === 'kode';
-      $('#dt-ringkas').textContent = `${nf.format(d.total)} baris tersimpan · ${nf.format(d.unik)} ${kode ? 'email' : 'orang'} unik. Data inilah yang dipakai di Spin Undian.`;
+      $('#dt-ringkas').textContent = `${nf.format(d.total)} baris tersimpan · ${nf.format(d.unik)} ${kode ? 'email' : 'orang'} unik. ${kode ? 'Pemegang wild card ikut Spin Undian.' : 'Peserta lolos = duta (tidak ikut undian), link referralnya di /duta/.'}`;
       $('#dt-dup').hidden = !d.duplikat;
       $('#dt-dup').textContent = d.duplikat ? `Ada ${nf.format(d.duplikat)} baris ganda (${kode ? 'email' : 'nama + sekolah'} sama), biasanya karena file yang sama diimpor dua kali dengan mode "Tambahkan". Spin Undian sudah menghitung tiap orang satu kali; klik "Hapus duplikat" untuk merapikan datanya.` : '';
       $('#dt-rapikan').disabled = !d.duplikat; $('#dt-kosongkan').disabled = !d.total;

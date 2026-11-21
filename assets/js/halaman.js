@@ -73,7 +73,8 @@
     const fromUrl = (new URLSearchParams(location.search).get('ref') || '').toLowerCase().replace(/[^\w-]/g, '').slice(0, 40);
     try {
       const saved = JSON.parse(localStorage.getItem('ycs_ref') || 'null');
-      if (saved && Date.now() - saved.t < 30 * 864e5) return saved.v;
+      const dutaBaru = fromUrl.startsWith('duta-') && !(saved && String(saved.v).startsWith('duta-') && Date.now() - saved.t < 30 * 864e5);
+      if (saved && Date.now() - saved.t < 30 * 864e5 && !dutaBaru) return saved.v;
       if (fromUrl) { localStorage.setItem('ycs_ref', JSON.stringify({v: fromUrl, t: Date.now()})); return fromUrl; }
     } catch (e) { return fromUrl; }
     return '';

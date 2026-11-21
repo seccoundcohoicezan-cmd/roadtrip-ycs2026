@@ -90,3 +90,8 @@ Field di luar daftar dibuang server. Aturan validasi (panjang, format email, kat
 - `spin-nama {sumber, event?, latihan}` → pemenang dipilih acak di server (crypto), pemenang lama tidak ikut; disimpan sebagai `tunda`.
 - `spin-hadiah` → hadiah dipilih sesuai bobot & stok untuk pemenang `tunda`; hasil asli dicatat di `st.spin.hasil` + tab **Hasil Undian** (+ status tiket bila sumber tiket).
 - `spin-batal`, `hadiah-gambar {id, gambar: data:image/webp|png;base64 ≤200 KB}` (foto diperkecil & latarnya dihapus di browser admin).
+
+### Duta (peserta lolos) — `GET /api/duta[?kode=duta-xxxxxx]`
+- Tiap baris tab **Finalis** = 1 duta dengan kode referral stabil `duta-` + 6 karakter (hash nama+sekolah). Link: `/?ref=duta-xxxxxx#satu-kata`.
+- Warga Satu Kata yang kolom **Sumber**-nya = kode itu dihitung sebagai ajakan duta. Daftar: `{totalDuta, totalWarga, duta[{kode,nama,sekolah,kota,provinsi,warga,peringkat}]}`; detail `?kode=`: + 10 warga terbaru (nama disingkat, provinsi, kata; tanpa email).
+- Halaman `/duta/` (noindex, tidak ditautkan dari beranda). Duta otomatis tampil sebagai warga plaza (`/api/kata` → `orang` dengan kata "duta") dan **tidak ikut undian** (spin hanya sumber tiket / wild card; tiket milik duta dikecualikan).

@@ -477,7 +477,8 @@ function buatMonster(app, opsi = {}) {
     // Skema hadiah: hanya event yang bosnya tumbang yang boleh diundi (spin latihan tetap boleh untuk gladi).
     if (!latihan && ev0 && !ev0.kalah) return {ok: false, error: 'bos_tidak_tumbang'};
     const semua = barisTiket(id);
-    const calon = semua.filter((x) => x.r[9] === 'aktif');
+    const duta = setDuta();
+    const calon = semua.filter((x) => x.r[9] === 'aktif' && !duta.has(kunciOrang(x.r[3], x.r[4])));
     if (!calon.length) return {ok: false, error: 'tidak_ada_tiket'};
     const roda = tersedia();
     if (st.spin.hadiah.length && !roda.length) return {ok: false, error: 'hadiah_habis'};
@@ -508,7 +509,10 @@ function buatMonster(app, opsi = {}) {
   /* ---------- Undian 2 tahap: spin NAMA (peserta lolos / wild card / tiket) → spin HADIAH ---------- */
   // Sumber peserta: 'lolos' = tab Finalis (hasil impor), 'wildcard' = tab Kode Wildcard, 'semua' = keduanya,
   // 'tiket' = tiket Lawan Monster event terpilih. Pemenang tidak ikut lagi di putaran berikutnya.
-  const SUMBER = ['lolos', 'wildcard', 'semua', 'tiket'];
+  // Peserta lolos (Finalis) = duta: TIDAK ikut undian; mereka bertugas mengajak warga (link referral di /duta/).
+  const SUMBER = ['wildcard', 'tiket'];
+  const kunciOrang = (nama, sekolah) => String(nama || '').trim().toLowerCase().replace(/\s+/g, ' ') + '|' + String(sekolah || '').trim().toLowerCase().replace(/\s+/g, ' ');
+  const setDuta = () => new Set(baris('Finalis').filter((r) => String(r[0] || '').trim()).map((r) => kunciOrang(r[0], r[1])));
   const idDari = (...x) => crypto.createHash('sha1').update(x.map((v) => String(v || '').trim().toLowerCase()).join('|')).digest('base64url').slice(0, 12);
   const baris = (nama) => { const sh = app.sheets[nama]; return sh ? sh.rows.slice(1) : []; };
   function pesertaDari(sumber, event) {
@@ -522,7 +526,8 @@ function buatMonster(app, opsi = {}) {
       const email = String(r[1] || '');
       out.push({id: 'w:' + String(r[0]).toUpperCase(), sumber: 'wildcard', nama: String(r[2] || '').trim() || email.replace(/^(.{2}).*(@.*)$/, '$1***$2'), sekolah: '', kota: '', provinsi: '', jalur: 'Wild card', kode: String(r[0]).toUpperCase(), status: String(r[3] || '')});
     });
-    if (sumber === 'tiket' && event) barisTiket(event).forEach(({r}) => out.push({id: 't:' + String(r[2]), sumber: 'tiket', nama: String(r[3] || ''), sekolah: String(r[4] || ''), kota: '', provinsi: String(r[5] || ''), jalur: 'Tiket ' + String(r[2]), kontribusi: Number(r[8]) || 0, statusTiket: String(r[9] || '')}));
+    const duta = sumber === 'tiket' ? setDuta() : null;
+    if (sumber === 'tiket' && event) barisTiket(event).filter(({r}) => !duta.has(kunciOrang(r[3], r[4]))).forEach(({r}) => out.push({id: 't:' + String(r[2]), sumber: 'tiket', nama: String(r[3] || ''), sekolah: String(r[4] || ''), kota: '', provinsi: String(r[5] || ''), jalur: 'Tiket ' + String(r[2]), kontribusi: Number(r[8]) || 0, statusTiket: String(r[9] || '')}));
     // satu orang = satu entri (data yang terimpor dua kali tidak menggandakan peluang)
     const unik = new Set();
     for (let i = out.length - 1; i >= 0; i--) { if (unik.has(out[i].id)) out.splice(i, 1); else unik.add(out[i].id); }
@@ -533,7 +538,7 @@ function buatMonster(app, opsi = {}) {
   const acakBobot = (arr, w) => { const total = arr.reduce((s, x) => s + w(x), 0); let r = crypto.randomInt(Math.max(1, Math.round(total * 1000))) / 1000; for (const x of arr) { r -= w(x); if (r < 0) return x; } return arr[arr.length - 1]; };
   const acak = (arr) => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = crypto.randomInt(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   function spinNama(p) {
-    const sumber = SUMBER.includes(p.sumber) ? p.sumber : 'lolos', latihan = !!p.latihan;
+    const sumber = SUMBER.includes(p.sumber) ? p.sumber : 'tiket', latihan = !!p.latihan;
     const event = sumber === 'tiket' ? p.event : '';
     if (sumber === 'tiket') {
       if (!event) return {ok: false, error: 'tidak_ada_tiket'};
@@ -595,7 +600,7 @@ function buatMonster(app, opsi = {}) {
       const sebelum = isi().length, lihat = new Set();
       const sisa = p.aksi === 'data-kosongkan' ? [] : isi().filter((r) => { const k = kunci(r); if (!k.replace('|', '') || lihat.has(k)) return false; lihat.add(k); return true; });
       sh.rows.splice(1, sh.rows.length - 1, ...sisa);
-      app.cache.remove('reveal');
+      app.cache.remove('reveal'); app.cache.remove('kata');
       app.ctx.logAdmin_(p.aksi === 'data-kosongkan' ? 'kosongkan ' + jenis : 'hapus duplikat ' + jenis, (sebelum - sisa.length) + ' baris dihapus');
       ubah();
       return {...dataImpor({jenis}), dihapus: sebelum - sisa.length};
@@ -618,7 +623,7 @@ function buatMonster(app, opsi = {}) {
     if (p.aksi === 'spin-info') return {ok: true, ...infoSpin()};
     if (p.aksi === 'spin-atur') return aturSpin(p);
     if (p.aksi === 'spin') return spin(id, !!p.latihan);
-    if (p.aksi === 'peserta') { const sumber = SUMBER.includes(p.sumber) ? p.sumber : 'lolos'; return {ok: true, sumber, event: id || null, events: daftar, peserta: pesertaDari(sumber, sumber === 'tiket' ? id : ''), hasil: st.spin.hasil.slice().reverse(), tunda: st.spin.tunda && now() - st.spin.tunda.t < 60 * MENIT ? st.spin.tunda : null}; }
+    if (p.aksi === 'peserta') { const sumber = SUMBER.includes(p.sumber) ? p.sumber : 'tiket'; return {ok: true, sumber, event: id || null, events: daftar, peserta: pesertaDari(sumber, sumber === 'tiket' ? id : ''), hasil: st.spin.hasil.slice().reverse(), tunda: st.spin.tunda && now() - st.spin.tunda.t < 60 * MENIT ? st.spin.tunda : null}; }
     if (p.aksi === 'spin-nama') return spinNama({...p, event: id});
     if (p.aksi === 'spin-hadiah') return spinHadiah(p);
     if (p.aksi === 'spin-batal') { st.spin.tunda = null; return {ok: true}; }

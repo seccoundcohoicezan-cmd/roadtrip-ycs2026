@@ -2,6 +2,7 @@
 // Kontrak (path, body, status, cache) sama dengan fungsi Vercel lama, jadi frontend tidak berubah.
 // Lihat docs/API.md untuk daftar lengkap.
 const crypto = require('node:crypto');
+const {buatDuta} = require('./duta.cjs');
 
 // Kode galat → status HTTP (galat lain → 422).
 const STATUS = {kata_ditolak: 422, nama_ditolak: 422, validation: 400, sesi_habis: 401, sandi_salah: 401, terlalu_banyak: 429, rate_limit: 429, busy: 503, server: 502, save_failed: 502, connection: 502};
@@ -30,6 +31,7 @@ const opsional = (v, max, re) => v === undefined || v === '' || (typeof v === 's
 
 function buatApi(data) {
   const app = () => data.app;
+  const duta = buatDuta(app);
   const jawab = (body, cache = CACHE.tidak, kode, header) => ({kode: kode || (body.ok ? 200 : (STATUS[body.error] || 422)), body, cache, header});
   // GET Code.gs: bila skema ikut diperbarui (pastikanSkema_), tandai agar tersimpan & diteruskan.
   function baca(aksi) {
@@ -134,6 +136,7 @@ function buatApi(data) {
     'POST monster': {maks: 4096, fn: (p, ip) => monsterPost(p, ip, false)},
     'POST monster/admin': {maks: 4096, fn: (p, ip) => monsterPost(p, ip, true)},
     'GET pemenang': {fn: () => jawab(data.monster.pemenangPublik(), CACHE.pemenang)},
+    'GET duta': {fn: (p, ip, url) => { const d = duta.lihat(url.searchParams.get('kode') || ''); return jawab(d, 'public, max-age=0, s-maxage=20, stale-while-revalidate=60', d.ok ? 200 : 404); }},
   };
   return {rute, STATUS};
 }

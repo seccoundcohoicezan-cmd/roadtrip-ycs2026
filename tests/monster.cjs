@@ -326,43 +326,67 @@ test('skema hadiah: kode dicadangkan saat ikut menyerang, hangus bila monster me
   assert.equal(m.admin({token, aksi: 'spin', event: id}).error, 'bos_tidak_tumbang');
 });
 
-test('undian 2 tahap: spin nama (lolos / wild card) → spin hadiah, pemenang tidak keluar lagi, gambar hadiah', () => {
+test('undian 2 tahap: spin nama (wild card) → spin hadiah; peserta lolos (duta) TIDAK ikut undian; gambar hadiah', () => {
   const {app, m} = siapkanMonster('100000');
   const token = app.post({aksi: 'admin-login', sandi: app.sheets.Admin.rows[1][1]}).token;
-  const imp = app.post({aksi: 'admin-impor', token, jenis: 'finalis', mode: 'ganti', baris: [['nama', 'sekolah', 'kota', 'provinsi', 'jalur'], ['Dewi Sartika', 'SMAN 1', 'Semarang', 'Jawa Tengah', 'Seleksi Umum'], ['Eko Prasetyo', 'SMAN 2', 'Solo', 'Jawa Tengah', 'Golden Buzzer']]});
-  assert.equal(imp.ok, true, JSON.stringify(imp));
-  app.post({aksi: 'admin-impor', token, jenis: 'kode', mode: 'ganti', baris: [['email', 'nama'], ['fajar@mail.com', 'Fajar Nugroho']]});
+  app.post({aksi: 'admin-impor', token, jenis: 'finalis', mode: 'ganti', baris: [['nama', 'sekolah', 'kota', 'provinsi', 'jalur'], ['Ani Lestari', 'SMA 0', 'Denpasar', 'Bali', 'Seleksi Umum']]});
+  app.post({aksi: 'admin-impor', token, jenis: 'kode', mode: 'ganti', baris: [['email', 'nama'], ['fajar@mail.com', 'Fajar Nugroho'], ['gita@mail.com', 'Gita Ayu'], ['hadi@mail.com', 'Hadi W']]});
   const adm = (d) => m.admin({token, ...d});
-  assert.equal(adm({aksi: 'peserta', sumber: 'lolos'}).peserta.length, 2);
-  assert.equal(adm({aksi: 'peserta', sumber: 'wildcard'}).peserta[0].nama, 'Fajar Nugroho');
-  assert.equal(adm({aksi: 'peserta', sumber: 'semua'}).peserta.length, 3);
+  assert.equal(adm({aksi: 'peserta', sumber: 'lolos'}).sumber, 'tiket', 'sumber "lolos" tidak tersedia untuk undian');
+  assert.equal(adm({aksi: 'peserta', sumber: 'wildcard'}).peserta.length, 3);
   assert.equal(adm({aksi: 'spin-hadiah'}).error, 'putar_nama_dulu');
   adm({aksi: 'spin-atur', hadiah: [{nama: 'HP Android', stok: 1, bobot: 1}, {nama: 'Tumbler', stok: '', bobot: 3}]});
   const hid = adm({aksi: 'spin-info'}).hadiah[0].id;
   const gb = 'data:image/webp;base64,' + Buffer.from('gambar').toString('base64');
   assert.equal(adm({aksi: 'hadiah-gambar', id: hid, gambar: gb}).hadiah[0].gambar, gb);
   assert.equal(adm({aksi: 'hadiah-gambar', id: hid, gambar: 'javascript:alert(1)'}).error, 'gambar_tidak_valid');
-  adm({aksi: 'spin-atur', hadiah: adm({aksi: 'spin-info'}).hadiah}); // simpan ulang tidak menghapus gambar
+  adm({aksi: 'spin-atur', hadiah: adm({aksi: 'spin-info'}).hadiah});
   assert.equal(adm({aksi: 'spin-info'}).hadiah[0].gambar, gb);
-  // latihan: tidak dicatat
-  const l1 = adm({aksi: 'spin-nama', sumber: 'semua', latihan: true}); assert.equal(l1.ok, true);
+  const l1 = adm({aksi: 'spin-nama', sumber: 'wildcard', latihan: true}); assert.equal(l1.ok, true);
   assert.ok(l1.rodaPutar.some((x) => x.id === l1.targetRoda));
   assert.equal(adm({aksi: 'spin-hadiah'}).latihan, true);
-  assert.equal(adm({aksi: 'peserta', sumber: 'semua'}).hasil.length, 0);
-  // asli: 3 putaran → 3 pemenang berbeda, lalu habis
+  assert.equal(adm({aksi: 'peserta', sumber: 'wildcard'}).hasil.length, 0);
   const menang = new Set();
   for (let i = 0; i < 3; i++) {
-    const n = adm({aksi: 'spin-nama', sumber: 'semua'}); assert.equal(n.ok, true);
+    assert.equal(adm({aksi: 'spin-nama', sumber: 'wildcard'}).ok, true);
     const h = adm({aksi: 'spin-hadiah'}); assert.equal(h.ok, true); assert.equal(h.ke, i + 1);
     menang.add(h.pemenang.id);
   }
   assert.equal(menang.size, 3);
-  assert.equal(adm({aksi: 'spin-nama', sumber: 'semua'}).error, 'tidak_ada_peserta');
-  const info = adm({aksi: 'spin-info'});
-  assert.equal(info.hadiah.find((x) => x.nama === 'HP Android').terpakai <= 1, true, 'stok HP 1 tidak terlampaui');
-  assert.equal(app.sheets['Hasil Undian'].rows.length, 4, 'header + 3 hasil tercatat di Sheet');
-  assert.ok(adm({aksi: 'peserta', sumber: 'lolos'}).peserta.every((x) => x.menang));
+  assert.equal(adm({aksi: 'spin-nama', sumber: 'wildcard'}).error, 'tidak_ada_peserta');
+  assert.ok(adm({aksi: 'spin-info'}).hadiah.find((x) => x.nama === 'HP Android').terpakai <= 1);
+  assert.equal(app.sheets['Hasil Undian'].rows.length, 4);
   assert.ok(m.pemenangPublik().pemenang.length >= 3);
+  // tiket Lawan Monster milik peserta lolos (Ani Lestari, SMA 0) tidak masuk undian
+  const id = m.lihat().id;
+  const ta = m.masuk({perangkat: 'dev-duta-aaaaaaaaaaa', email: 'ani@mail.com'}, '1.1.1.1').token; m.tap({token: ta, n: 5, seq: 1, e: id});
+  const tb = m.masuk({perangkat: 'dev-duta-bbbbbbbbbbb', email: 'budi@mail.com'}, '1.1.1.2').token; m.tap({token: tb, n: 5, seq: 1, e: id});
+  const ps = adm({aksi: 'peserta', sumber: 'tiket', event: id}).peserta;
+  assert.ok(ps.length >= 1 && !ps.some((x) => x.nama === 'Ani Lestari'), 'duta dikecualikan dari tiket undian: ' + ps.map((x) => x.nama));
+});
+
+test('duta: link referral per peserta lolos, warga lewat link terhitung, finalis jadi warga plaza', () => {
+  const {app} = siapkanMonster('100000');
+  const token = app.post({aksi: 'admin-login', sandi: app.sheets.Admin.rows[1][1]}).token;
+  app.post({aksi: 'admin-impor', token, jenis: 'finalis', mode: 'ganti', baris: [['nama', 'sekolah', 'kota', 'provinsi', 'jalur'], ['Dewi Sartika', 'SMAN 1', 'Semarang', 'Jawa Tengah', 'Seleksi Umum'], ['Eko Prasetyo', 'SMAN 2', 'Solo', 'Jawa Tengah', 'Seleksi Umum']]});
+  const {buatDuta, kodeDuta} = require('../server/duta.cjs');
+  const duta = buatDuta(() => app, {memoMs: 0});
+  const kd = kodeDuta('Dewi Sartika', 'SMAN 1');
+  assert.match(kd, /^duta-[0-9a-z]{6}$/);
+  assert.equal(kodeDuta(' dewi  sartika ', 'sman 1'), kd, 'kode stabil (tidak peka spasi/huruf besar)');
+  for (let i = 0; i < 3; i++) {
+    const r = app.post({aksi: 'kata-kirim', kata: 'maju', karakter: 2, nama: 'Teman ' + i, sekolah: 'SMA X', email: 't' + i + '@mail.com', provinsi: 'Bali', channelClicked: true, consent: true, ref: kd, requestId: '0000000' + i + '-0000-4000-8000-000000000000'});
+    assert.equal(r.ok, true, JSON.stringify(r));
+  }
+  const l = duta.lihat();
+  assert.equal(l.totalDuta, 2); assert.equal(l.totalWarga, 3);
+  assert.equal(l.duta[0].kode, kd); assert.equal(l.duta[0].warga, 3); assert.equal(l.duta[0].peringkat, 1);
+  const d = duta.lihat(kd);
+  assert.equal(d.duta.terbaru.length, 3); assert.equal(d.duta.terbaru[0].nama, 'Teman 2.'); assert.ok(!JSON.stringify(d).includes('@'), 'tanpa email');
+  assert.equal(duta.lihat('duta-zzzzzz').error, 'tidak_ditemukan');
+  const kata = app.get('kata');
+  assert.equal(kata.duta, 2); assert.ok(kata.orang.some((o) => o[0] === 'Dewi S.' && o[1] === 'duta'), 'finalis tampil sebagai warga plaza');
+  assert.equal(kata.total, 6, 'duta tidak menambah hitungan kata (3 warga awal + 3 ajakan)');
 });
 
 test('impor ulang finalis tidak menggandakan data; data tersimpan bisa dilihat & duplikat lama dirapikan', () => {
@@ -377,7 +401,6 @@ test('impor ulang finalis tidak menggandakan data; data tersimpan bisa dilihat &
   app.sheets.Finalis.rows.push(...app.sheets.Finalis.rows.slice(1, 151).map((r) => r.slice()));
   let d = adm({aksi: 'data-lihat', jenis: 'finalis'});
   assert.equal(d.total, 300); assert.equal(d.unik, 150); assert.equal(d.duplikat, 150);
-  assert.equal(adm({aksi: 'peserta', sumber: 'lolos'}).peserta.length, 150, 'spin menghitung tiap orang sekali');
   d = adm({aksi: 'data-rapikan', jenis: 'finalis'});
   assert.equal(d.dihapus, 150); assert.equal(d.total, 150); assert.equal(d.duplikat, 0);
   assert.equal(adm({aksi: 'data-lihat', jenis: 'kode'}).total, 0);

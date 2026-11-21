@@ -189,7 +189,11 @@ dialog.sheet {
 dialog.sheet::backdrop { background: var(--scrim); }
 dialog.sheet[open] { animation: k-sheet 260ms var(--ease); }
 @keyframes k-sheet { from { transform: translateY(40px); opacity: 0; } }
-.sheet__grab { width: 40px; height: 5px; margin: 0 auto 14px; border-radius: 3px; background: var(--line-strong); }
+.sheet__grab { position: relative; width: 40px; height: 5px; margin: 0 auto 14px; border-radius: 3px; background: var(--line-strong); cursor: grab; touch-action: none; }
+.sheet__grab::before { content: ""; position: absolute; inset: -14px -60px; } /* area tarik lebih lebar dari garisnya */
+.sheet__head { touch-action: pan-x; }
+dialog.sheet.is-tarik { animation: none; transition: none; user-select: none; -webkit-user-select: none; }
+dialog.sheet.is-lepas { transition: transform 220ms var(--ease); }
 .sheet__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-4); }
 @media (min-width: 48rem) {
   dialog.sheet { inset: 0; margin: auto; height: fit-content; border-radius: var(--r-xl); padding-bottom: 24px; }
