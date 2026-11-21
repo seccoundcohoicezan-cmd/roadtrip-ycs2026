@@ -921,7 +921,7 @@
       if (!berputar && tahap === 'nama') gambarRoda(rodaNamaIdle());
     }
     const belumMenang = () => (pesertaData ? pesertaData.peserta.filter((x) => !x.menang) : []);
-    const rodaNamaIdle = () => belumMenang().slice(0, 400).sort(() => Math.random() - 0.5).slice(0, 16).map((x) => ({id: x.id, nama: singkat(x.nama), bobot: 1, persen: 0}));
+    const rodaNamaIdle = () => belumMenang().slice(0, 400).sort(() => Math.random() - 0.5).slice(0, 16).map((x) => ({id: x.id, nama: x.nama, bobot: 1, persen: 0}));
     async function muatHadiah() {
       const d = await monAdmin({aksi: 'spin-info'});
       if (!d.ok) return;

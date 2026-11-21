@@ -539,7 +539,7 @@ function buatMonster(app, opsi = {}) {
     const calon = pesertaDari(sumber, event).filter((x) => !x.menang);
     if (!calon.length) return {ok: false, error: 'tidak_ada_peserta'};
     const pilih = sumber === 'tiket' && st.spin.peluang === 'kontribusi' ? acakBobot(calon, (x) => Math.max(1, x.kontribusi || 1)) : calon[crypto.randomInt(calon.length)];
-    const roda = acak([pilih, ...acak(calon.filter((x) => x !== pilih)).slice(0, 15)]).map((x) => ({id: x.id, nama: namaTampil(x.nama), bobot: 1, persen: 0}));
+    const roda = acak([pilih, ...acak(calon.filter((x) => x !== pilih)).slice(0, 15)]).map((x) => ({id: x.id, nama: String(x.nama).slice(0, 40), bobot: 1, persen: 0}));
     st.spin.tunda = {pemenang: pilih, sumber, event, latihan, t: now()};
     return {ok: true, tahap: 'nama', latihan, sumber, pemenang: pilih, rodaPutar: roda, targetRoda: pilih.id, sisa: calon.length - (latihan ? 0 : 1)};
   }
