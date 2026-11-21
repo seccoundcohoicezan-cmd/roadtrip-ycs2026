@@ -190,6 +190,13 @@
       #spin-card:fullscreen .spin-reel { width: 100%; }
     }
 
+    .dt-kepala { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .75rem; }
+    .dt-alat { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin: .75rem 0; }
+    .dt-alat .input { flex: 1; min-width: 16rem; }
+    .dt-hanya { display: inline-flex; gap: .375rem; align-items: center; font-size: .875rem; font-weight: 600; }
+    .dt-tabel { max-height: 34rem; overflow: auto; }
+    .dt-tabel tr.is-dup td { background: color-mix(in srgb, var(--coral-500) 12%, transparent); }
+    .dt-tabel td .dup-tanda { display: inline-block; margin-left: .375rem; padding: 0 .4rem; border-radius: 999px; background: var(--coral-500); color: var(--white); font-size: .6875rem; font-weight: 800; }
     .uji-link { display: flex; gap: .5rem; flex-wrap: wrap; }
     .uji-link .input { flex: 1; min-width: 14rem; }
     #spin-card:fullscreen { overflow: auto; padding: 1.5rem; background: var(--navy-900); }
@@ -598,6 +605,25 @@
               <p class="alert alert--info" id="ekspor-status" role="status" style="margin-top:1rem"></p>
             </div>
           </div>
+          <section class="panel data-tersimpan" aria-labelledby="dt-judul" style="margin-top:1.25rem">
+            <div class="dt-kepala">
+              <div><h2 id="dt-judul">Data tersimpan</h2><p class="panel__sub" id="dt-ringkas">Memuat…</p></div>
+              <div class="seg" role="radiogroup" aria-label="Jenis data tersimpan">
+                <label><input type="radio" name="dt-jenis" value="finalis" checked><span>Finalis (peserta lolos)</span></label>
+                <label><input type="radio" name="dt-jenis" value="kode"><span>Kode wildcard</span></label>
+              </div>
+            </div>
+            <p class="alert alert--warn" id="dt-dup" hidden></p>
+            <div class="dt-alat">
+              <input class="input" id="dt-cari" type="search" placeholder="Cari nama, sekolah, kota, provinsi, email, atau kode">
+              <label class="dt-hanya"><input type="checkbox" id="dt-hanya-dup"> Hanya duplikat</label>
+              <button class="btn btn--soft btn--sm" type="button" id="dt-rapikan">Hapus duplikat</button>
+              <button class="btn btn--ghost btn--sm" type="button" id="dt-kosongkan">Kosongkan data ini</button>
+            </div>
+            <div class="table-wrap dt-tabel"><table class="mon-adm-tabel"><thead id="dt-head"></thead><tbody id="dt-body"></tbody></table></div>
+            <button class="btn btn--soft btn--sm" type="button" id="dt-lagi" hidden style="margin-top:.75rem">Tampilkan lebih banyak</button>
+            <p class="small muted" id="dt-status" role="status" style="margin-top:.5rem"></p>
+          </section>
         </section>
 
         <!-- Keamanan -->
@@ -700,6 +726,7 @@
       if (focus) tab.focus();
       if (tab.id === 't-monster' && typeof statusMon === 'function') { statusMon(); muatUji(); }
       if (tab.id === 't-spin') { muatPeserta(); muatHadiah(); }
+      if (tab.id === 't-data') muatDataTersimpan();
       if (tab.id === 't-keamanan') statusPrimer();
     }
     tabs.forEach((t, i) => {
@@ -1198,6 +1225,51 @@
       finally { berputar = false; $('#spin-batal').disabled = false; renderPeserta(); }
     });
 
+
+    /* ---------- Data tersimpan (tab Impor & Ekspor): lihat isi Finalis / Kode wildcard, cari, hapus duplikat ---------- */
+    let dtData = null, dtBatas = 200;
+    const dtJenis = () => ($$('input[name="dt-jenis"]').find((r) => r.checked) || {}).value || 'finalis';
+    async function muatDataTersimpan() {
+      const d = await monAdmin({aksi: 'data-lihat', jenis: dtJenis()});
+      if (!d.ok) { $('#dt-ringkas').textContent = pesan(d); return; }
+      dtData = d; renderDataTersimpan();
+    }
+    function renderDataTersimpan() {
+      const d = dtData; if (!d) return;
+      const kode = d.jenis === 'kode';
+      $('#dt-ringkas').textContent = `${nf.format(d.total)} baris tersimpan · ${nf.format(d.unik)} ${kode ? 'email' : 'orang'} unik. Data inilah yang dipakai di Spin Undian.`;
+      $('#dt-dup').hidden = !d.duplikat;
+      $('#dt-dup').textContent = d.duplikat ? `Ada ${nf.format(d.duplikat)} baris ganda (${kode ? 'email' : 'nama + sekolah'} sama), biasanya karena file yang sama diimpor dua kali dengan mode "Tambahkan". Spin Undian sudah menghitung tiap orang satu kali; klik "Hapus duplikat" untuk merapikan datanya.` : '';
+      $('#dt-rapikan').disabled = !d.duplikat; $('#dt-kosongkan').disabled = !d.total;
+      $('#dt-head').innerHTML = kode ? '<tr><th>#</th><th>Kode</th><th>Nama</th><th>Email</th><th>Status</th><th>Berlaku hingga</th></tr>' : '<tr><th>#</th><th>Nama</th><th>Sekolah</th><th>Kota</th><th>Provinsi</th><th>Jalur</th></tr>';
+      const q = $('#dt-cari').value.trim().toLowerCase(), dup = $('#dt-hanya-dup').checked;
+      const cocok = d.data.map((x, i) => [x, i]).filter(([x]) => (!dup || x.dup) && (!q || Object.values(x).join(' ').toLowerCase().includes(q)));
+      const tanda = (x) => (x.dup ? '<span class="dup-tanda">ganda</span>' : '');
+      $('#dt-body').innerHTML = cocok.slice(0, dtBatas).map(([x, i]) => kode
+        ? `<tr class="${x.dup ? 'is-dup' : ''}"><td>${i + 1}</td><td>${esc(x.kode)}</td><td>${esc(x.nama)}${tanda(x)}</td><td>${esc(x.email)}</td><td>${esc(x.status)}</td><td>${esc(x.berlaku)}</td></tr>`
+        : `<tr class="${x.dup ? 'is-dup' : ''}"><td>${i + 1}</td><td>${esc(x.nama)}${tanda(x)}</td><td>${esc(x.sekolah)}</td><td>${esc(x.kota)}</td><td>${esc(x.provinsi)}</td><td>${esc(x.jalur)}</td></tr>`).join('')
+        || `<tr><td colspan="6" class="muted small">${d.total ? 'Tidak ada yang cocok.' : 'Belum ada data. Impor CSV di atas.'}</td></tr>`;
+      $('#dt-lagi').hidden = cocok.length <= dtBatas;
+    }
+    $$('input[name="dt-jenis"]').forEach((r) => r.addEventListener('change', () => { dtBatas = 200; $('#dt-status').textContent = ''; muatDataTersimpan(); }));
+    let dtTimer = 0;
+    $('#dt-cari').addEventListener('input', () => { clearTimeout(dtTimer); dtTimer = setTimeout(() => { dtBatas = 200; renderDataTersimpan(); }, 120); });
+    $('#dt-hanya-dup').addEventListener('change', () => { dtBatas = 200; renderDataTersimpan(); });
+    $('#dt-lagi').addEventListener('click', () => { dtBatas += 300; renderDataTersimpan(); });
+    $('#dt-rapikan').addEventListener('click', async (e) => {
+      if (!dtData || !confirm(`Hapus ${dtData.duplikat} baris ganda? Satu baris per ${dtData.jenis === 'kode' ? 'email' : 'orang'} tetap disimpan.`)) return;
+      sibuk(e.currentTarget, true); const d = await monAdmin({aksi: 'data-rapikan', jenis: dtJenis()}); sibuk(e.currentTarget, false);
+      if (!d.ok) { $('#dt-status').textContent = pesan(d); return; }
+      dtData = d; renderDataTersimpan(); $('#dt-status').textContent = `${nf.format(d.dihapus)} baris ganda dihapus.`;
+    });
+    $('#dt-kosongkan').addEventListener('click', async (e) => {
+      const label = dtJenis() === 'kode' ? 'kode wildcard' : 'finalis';
+      if (!dtData || !confirm(`Semua ${nf.format(dtData.total)} data ${label} akan DIHAPUS. Lanjutkan?`)) return;
+      sibuk(e.currentTarget, true); const d = await monAdmin({aksi: 'data-kosongkan', jenis: dtJenis()}); sibuk(e.currentTarget, false);
+      if (!d.ok) { $('#dt-status').textContent = pesan(d); return; }
+      dtData = d; renderDataTersimpan(); $('#dt-status').textContent = `${nf.format(d.dihapus)} baris dihapus.`;
+    });
+
     /* ---------- Mode uji monster ---------- */
     let ujiTimer = 0;
     function tampilUji(u) {
@@ -1342,7 +1414,7 @@
       sibuk(btn, false);
       if (!d.ok) { st.className = 'alert alert--err'; st.textContent = pesan(d); return; }
       st.className = 'alert alert--ok';
-      st.textContent = `${nf.format(d.jumlah)} baris diimpor` + (d.dilewati ? `, ${nf.format(d.dilewati)} dilewati (email tidak valid/duplikat atau nama kosong).` : '.') + (j === 'kode' ? ' Unduh "Kode wildcard" untuk mengirim email blasting.' : '');
+      st.textContent = `${nf.format(d.jumlah)} baris diimpor` + (d.dilewati ? `, ${nf.format(d.dilewati)} dilewati (${j === 'kode' ? 'email tidak valid/sudah ada' : 'nama kosong atau sudah ada (nama + sekolah sama)'}).` : '.') + (j === 'kode' ? ' Unduh "Kode wildcard" untuk mengirim email blasting.' : ''); muatDataTersimpan();
       csvRows = null; $('#csv').value = ''; $('#pratinjau').hidden = true; $('#drop-label').textContent = 'Pilih atau seret file CSV'; btn.disabled = true;
       muat();
     });

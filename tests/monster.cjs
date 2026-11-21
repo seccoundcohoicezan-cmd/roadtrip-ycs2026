@@ -364,3 +364,21 @@ test('undian 2 tahap: spin nama (lolos / wild card) → spin hadiah, pemenang ti
   assert.ok(adm({aksi: 'peserta', sumber: 'lolos'}).peserta.every((x) => x.menang));
   assert.ok(m.pemenangPublik().pemenang.length >= 3);
 });
+
+test('impor ulang finalis tidak menggandakan data; data tersimpan bisa dilihat & duplikat lama dirapikan', () => {
+  const {app, m} = siapkanMonster('100000');
+  const token = app.post({aksi: 'admin-login', sandi: app.sheets.Admin.rows[1][1]}).token;
+  const baris = [['nama', 'sekolah', 'kota', 'provinsi', 'jalur'], ...Array.from({length: 150}, (_, i) => ['Siswa ' + i, 'SMA ' + i, 'Kota', 'Jateng', 'Seleksi Umum'])];
+  assert.equal(app.post({aksi: 'admin-impor', token, jenis: 'finalis', mode: 'ganti', baris}).jumlah, 150);
+  const dua = app.post({aksi: 'admin-impor', token, jenis: 'finalis', mode: 'tambah', baris});
+  assert.equal(dua.jumlah, 0); assert.equal(dua.dilewati, 150, 'file yang sama diimpor lagi → semua dilewati');
+  const adm = (d) => m.admin({token, ...d});
+  // data lama yang sudah terlanjur ganda (impor dua kali sebelum perbaikan)
+  app.sheets.Finalis.rows.push(...app.sheets.Finalis.rows.slice(1, 151).map((r) => r.slice()));
+  let d = adm({aksi: 'data-lihat', jenis: 'finalis'});
+  assert.equal(d.total, 300); assert.equal(d.unik, 150); assert.equal(d.duplikat, 150);
+  assert.equal(adm({aksi: 'peserta', sumber: 'lolos'}).peserta.length, 150, 'spin menghitung tiap orang sekali');
+  d = adm({aksi: 'data-rapikan', jenis: 'finalis'});
+  assert.equal(d.dihapus, 150); assert.equal(d.total, 150); assert.equal(d.duplikat, 0);
+  assert.equal(adm({aksi: 'data-lihat', jenis: 'kode'}).total, 0);
+});

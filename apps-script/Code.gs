@@ -729,6 +729,11 @@ function impor_(p) {
       const g = k => i[k] < 0 ? '' : cleanCell_(teks_(String(r[i[k]] || ''), 300));
       return [g('nama'), g('sekolah'), g('kota'), g('prov'), /golden/i.test(g('jalur')) ? 'Golden Buzzer' : 'Seleksi Umum', g('foto'), 'YA'];
     });
+    // Nama + sekolah yang sama dianggap orang yang sama: dilewati (impor ulang file yang sama tidak menggandakan data).
+    const kunciF = r => String(r[0]).trim().toLowerCase().replace(/\s+/g, ' ') + '|' + String(r[1]).trim().toLowerCase().replace(/\s+/g, ' ');
+    const adaF = {};
+    if (p.mode !== 'ganti') baris_(sheet, 2).forEach(r => { if (r[0]) adaF[kunciF(r)] = 1; });
+    isi = isi.filter(r => { const k = kunciF(r); if (adaF[k]) return false; adaF[k] = 1; return true; });
   } else {
     const i = {kode: kol(['kode']), email: kol(['email', 'e-mail', 'surel']), nama: kol(['nama']), berlaku: kol(['berlaku', 'kedaluwarsa', 'expired'])};
     if (i.email < 0) return {ok: false, error: 'kolom_email'};

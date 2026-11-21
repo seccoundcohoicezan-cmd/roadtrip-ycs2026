@@ -523,6 +523,9 @@ function buatMonster(app, opsi = {}) {
       out.push({id: 'w:' + String(r[0]).toUpperCase(), sumber: 'wildcard', nama: String(r[2] || '').trim() || email.replace(/^(.{2}).*(@.*)$/, '$1***$2'), sekolah: '', kota: '', provinsi: '', jalur: 'Wild card', kode: String(r[0]).toUpperCase(), status: String(r[3] || '')});
     });
     if (sumber === 'tiket' && event) barisTiket(event).forEach(({r}) => out.push({id: 't:' + String(r[2]), sumber: 'tiket', nama: String(r[3] || ''), sekolah: String(r[4] || ''), kota: '', provinsi: String(r[5] || ''), jalur: 'Tiket ' + String(r[2]), kontribusi: Number(r[8]) || 0, statusTiket: String(r[9] || '')}));
+    // satu orang = satu entri (data yang terimpor dua kali tidak menggandakan peluang)
+    const unik = new Set();
+    for (let i = out.length - 1; i >= 0; i--) { if (unik.has(out[i].id)) out.splice(i, 1); else unik.add(out[i].id); }
     const menang = new Map(st.spin.hasil.map((h) => [h.id, h]));
     out.forEach((x) => { const h = menang.get(x.id); if (h) x.menang = {ke: h.ke, hadiah: h.hadiah}; else if (x.sumber === 'tiket' && /^MENANG/.test(x.statusTiket)) x.menang = {ke: 0, hadiah: x.statusTiket.split(' · ')[1] || ''}; });
     return out;
@@ -581,6 +584,31 @@ function buatMonster(app, opsi = {}) {
     return {ok: true, ...infoSpin()};
   }
 
+  // Data hasil impor (tab Finalis / Kode Wildcard) untuk halaman Impor & Ekspor: lihat, hapus duplikat, kosongkan.
+  function dataImpor(p) {
+    const jenis = p.jenis === 'kode' ? 'kode' : 'finalis', nama = jenis === 'kode' ? 'Kode Wildcard' : 'Finalis';
+    const sh = app.sheets[nama] || app.ctx.tab_(app.ss, jenis);
+    const norm = (v) => String(v || '').trim().toLowerCase().replace(/\s+/g, ' ');
+    const kunci = (r) => (jenis === 'kode' ? norm(r[1]) : norm(r[0]) + '|' + norm(r[1]));
+    const isi = () => sh.rows.slice(1).filter((r) => String(r[0] || '').trim());
+    if (p.aksi === 'data-rapikan' || p.aksi === 'data-kosongkan') {
+      const sebelum = isi().length, lihat = new Set();
+      const sisa = p.aksi === 'data-kosongkan' ? [] : isi().filter((r) => { const k = kunci(r); if (!k.replace('|', '') || lihat.has(k)) return false; lihat.add(k); return true; });
+      sh.rows.splice(1, sh.rows.length - 1, ...sisa);
+      app.cache.remove('reveal');
+      app.ctx.logAdmin_(p.aksi === 'data-kosongkan' ? 'kosongkan ' + jenis : 'hapus duplikat ' + jenis, (sebelum - sisa.length) + ' baris dihapus');
+      ubah();
+      return {...dataImpor({jenis}), dihapus: sebelum - sisa.length};
+    }
+    const hitung = new Map();
+    const baris = isi().map((r) => { const k = kunci(r); hitung.set(k, (hitung.get(k) || 0) + 1); return r; });
+    const lihat = new Set();
+    const data = baris.map((r) => { const k = kunci(r), dup = lihat.has(k); lihat.add(k);
+      return jenis === 'kode' ? {kode: String(r[0]), email: String(r[1] || ''), nama: String(r[2] || ''), status: String(r[3] || ''), berlaku: String(r[4] || ''), dup}
+        : {nama: String(r[0]), sekolah: String(r[1] || ''), kota: String(r[2] || ''), provinsi: String(r[3] || ''), jalur: String(r[4] || ''), tampil: String(r[6] ?? ''), dup}; });
+    return {ok: true, jenis, total: data.length, unik: hitung.size, duplikat: data.length - hitung.size, data};
+  }
+
   function admin(p) {
     if (!adminSah(p.token)) return {ok: false, error: 'sesi_habis'};
     const daftar = ringkasEvent();
@@ -595,6 +623,7 @@ function buatMonster(app, opsi = {}) {
     if (p.aksi === 'spin-hadiah') return spinHadiah(p);
     if (p.aksi === 'spin-batal') { st.spin.tunda = null; return {ok: true}; }
     if (p.aksi === 'hadiah-gambar') return gambarHadiah(p);
+    if (p.aksi === 'data-lihat' || p.aksi === 'data-rapikan' || p.aksi === 'data-kosongkan') return dataImpor(p);
     if (p.aksi === 'uji-mulai') {
       const menit = Math.round(angka(p.menit, 10, 1, 120));
       const target = String(p.target || '').split(/[;,\s]+/).map((x) => Math.round(Number(x.replace(/\./g, '')))).filter((x) => x > 0 && x <= 1e9).slice(0, 10);
