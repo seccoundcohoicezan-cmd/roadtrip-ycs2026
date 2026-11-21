@@ -95,3 +95,8 @@ Field di luar daftar dibuang server. Aturan validasi (panjang, format email, kat
 - Tiap baris tab **Finalis** = 1 duta dengan kode referral stabil `duta-` + 6 karakter (hash nama+sekolah). Link: `/?ref=duta-xxxxxx#satu-kata`.
 - Warga Satu Kata yang kolom **Sumber**-nya = kode itu dihitung sebagai ajakan duta. Daftar: `{totalDuta, totalWarga, duta[{kode,nama,sekolah,kota,provinsi,warga,peringkat}]}`; detail `?kode=`: + 10 warga terbaru (nama disingkat, provinsi, kata; tanpa email).
 - Halaman `/duta/` (noindex, tidak ditautkan dari beranda). Duta otomatis tampil sebagai warga plaza (`/api/kata` → `orang` dengan kata "duta") dan **tidak ikut undian** (spin hanya sumber tiket / wild card; tiket milik duta dikecualikan).
+
+### Top kontributor, riwayat & misi
+- Pengaturan `monster_hadiah_top` (Rp per peringkat, mis. `100000,50000,50000`) + `monster_hadiah_top_syarat` (`selalu`/`menang`). Saat event selesai server menetapkan Top N dari tenaga terbanyak → tab **Top Kontributor** (kontak untuk panitia) dan `status.top` (nama disingkat, tenaga, nominal).
+- `POST /api/monster {aksi:'saya', token, e}` kini juga mengembalikan `peringkat`, `pemain`, `top` (untuk riwayat match di HP pemain).
+- `GET /api/misi` → daftar misi lobi; admin `misi-info` / `misi-atur {misi:[{id?, judul, sub, jenis: gabung|latihan|ingat|bagi|link, link}]}`; admin `top-info {event}`.

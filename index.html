@@ -569,6 +569,9 @@
     .fest__online strong { font-size: var(--fs-body); font-weight: 800; color: var(--heading); font-variant-numeric: tabular-nums; }
     .fest__online .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--green-600); }
     .fest__share { position: absolute; z-index: 6; top: var(--space-3); right: var(--space-3); }
+    .fest__findme { position: absolute; z-index: 6; top: var(--space-3); right: calc(var(--space-3) + 3.25rem); min-height: 2.75rem; box-shadow: var(--e3); }
+    .fest__findme svg { width: 1.1rem; height: 1.1rem; }
+    .fest.is-locked .fest__findme { display: none; }
     .fest__kunci { position: absolute; z-index: 6; left: 50%; top: 50%; translate: -50% -50%; display: none; align-items: center; gap: 8px; padding: 10px 16px; border-radius: var(--r-pill); background: var(--navy-900); color: var(--white); font-weight: 700; font-size: var(--fs-sm); box-shadow: var(--e3); white-space: nowrap; }
     .fest__kunci svg { width: 1rem; height: 1rem; color: var(--sun-400); }
     .fest.is-locked .fest__kunci { display: inline-flex; }
@@ -1428,6 +1431,7 @@
             <canvas id="fest-canvas" role="img" aria-label="Ilustrasi Festival YCS di Bali. Setiap orang kecil adalah satu pelajar yang sudah mengirim kata."></canvas>
             <p class="fest__online"><span class="dot" aria-hidden="true"></span><strong id="fest-total">0</strong> warga festival</p>
             <button class="icon-btn fest__share" type="button" data-share-open="kata" aria-label="Ajak teman ke festival"><svg aria-hidden="true"><use href="#i-share"/></svg></button>
+            <button class="btn btn--cta btn--sm fest__findme" type="button" id="fest-findme" hidden><svg aria-hidden="true"><use href="#i-search"/></svg>Find me</button>
             <p class="fest__kunci"><svg aria-hidden="true"><use href="#i-lock"/></svg>Gabung dulu untuk masuk plaza</p>
           </div>
           <div class="fest__alat" id="fest-alat">
@@ -3192,6 +3196,8 @@
         const list = (d.orang || []).map(([n, k, pv, m]) => ({ n, k, p: pv, m }));
         if (saya && !list.some((e) => e.n === saya.n && e.k === saya.k)) list.unshift(saya);
         if (festApi) festApi.setWarga(list);
+        if (festApi && saya && festApi.tandaiSaya) festApi.tandaiSaya(saya); // karaktermu selalu bertanda KAMU
+        $('#fest-findme').hidden = !saya;
         isiKataRamai(list);
         $('#fest-total').textContent = nf.format(Math.max(d.total || 0, list.length));
       } catch (e) { /* tetap tampil latar festival */ }
@@ -3394,6 +3400,8 @@
       isiIdentitas();
       bukaFestival();
       const w = festApi ? festApi.tambah(saya) : null;
+      if (festApi && festApi.tandaiSaya) festApi.tandaiSaya(saya);
+      $('#fest-findme').hidden = false;
       $('#fest-total').textContent = nf.format(Math.max(festApi ? festApi.jumlah : 1, Number(($('#fest-total').textContent || '0').replace(/\D/g, '')) + (d.sudah ? 0 : 1)));
       $('#fest-info').textContent = d.sudah ? `Kamu sudah ada di festival sebagai "${saya.n}" dengan kata "${saya.k}".` : `Selamat datang di festival, ${saya.n}! Itu kamu yang ditandai.`;
       document.getElementById('satu-kata').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
@@ -3441,6 +3449,15 @@
       pindah(); mq.addEventListener('change', pindah);
     })();
     let hasilCari = [], posCari = 0, qTerakhir = '';
+    // Find me: sorot karaktermu sendiri (bertanda KAMU) di plaza.
+    $('#fest-findme').addEventListener('click', () => {
+      const info = $('#fest-info');
+      const w = festApi && saya && festApi.tandaiSaya ? festApi.tandaiSaya(saya) : null;
+      if (!w) { info.textContent = 'Karaktermu sedang dimuat, coba lagi sebentar.'; muatFestival(); return; }
+      $('.fest__stage').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      festApi.sorot(w, 9000, 'Ini kamu!');
+      info.textContent = `Itu kamu: ${w.n} dengan kata "${w.k}". Tanda KAMU selalu ada di atas karaktermu.`;
+    });
     $('#fest-cari').addEventListener('submit', (e) => {
       e.preventDefault();
       const q = $('#fest-q').value.trim();

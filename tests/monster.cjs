@@ -412,3 +412,29 @@ test('impor ulang finalis tidak menggandakan data; data tersimpan bisa dilihat &
   assert.equal(d.dihapus, 150); assert.equal(d.total, 150); assert.equal(d.duplikat, 0);
   assert.equal(adm({aksi: 'data-lihat', jenis: 'kode'}).total, 0);
 });
+
+test('top kontributor dapat hadiah otomatis saat event selesai; peringkat & hadiah tampil di "saya"; misi bisa diatur admin', () => {
+  const {jam, app, m} = siapkanMonster('100000');
+  const token = app.post({aksi: 'admin-login', sandi: app.sheets.Admin.rows[1][1]}).token;
+  const id = m.lihat().id;
+  const ta = m.masuk({perangkat: 'dev-top-aaaaaaaaaaaa', email: 'ani@mail.com'}, '1.1.1.1').token;
+  const tb = m.masuk({perangkat: 'dev-top-bbbbbbbbbbbb', email: 'budi@mail.com'}, '1.1.1.2').token;
+  const tc = m.masuk({perangkat: 'dev-top-cccccccccccc', email: 'cici@mail.com'}, '1.1.1.3').token;
+  m.tap({token: tb, n: 9, seq: 1, e: id}); m.tap({token: ta, n: 5, seq: 1, e: id}); m.tap({token: tc, n: 2, seq: 1, e: id});
+  assert.equal(m.saya({token: ta}).peringkat, 2);
+  jam.now += 25 * 60000; // event berakhir (bos kabur)
+  const s = m.lihat();
+  assert.notEqual(s.fase, 'tanding');
+  assert.deepEqual(s.top.map((x) => [x.peringkat, x.nama, x.nominal]), [[1, 'Budi S.', 100000], [2, 'Ani L.', 50000], [3, 'Cici A.', 50000]], 'syarat "selalu": tetap dapat hadiah walau bos tidak tumbang');
+  const sa = m.saya({token: ta, e: id});
+  assert.equal(sa.peringkat, 2); assert.deepEqual(sa.top, {peringkat: 2, nominal: 50000}); assert.equal(sa.pemain, 3);
+  const sh = app.sheets['Top Kontributor'];
+  assert.equal(sh.rows.length, 4); assert.equal(sh.rows[1][3], 'Budi Santoso'); assert.equal(sh.rows[1][8], 100000); assert.equal(sh.rows[1][6], 'budi@mail.com');
+  const ti = m.admin({token, aksi: 'top-info', event: id});
+  assert.equal(ti.top.length, 3); assert.equal(ti.top[0].kunci, 'budi@mail.com');
+  // misi
+  assert.equal(m.misiPublik().misi.length, 5);
+  assert.equal(m.admin({token, aksi: 'misi-atur', misi: [{judul: 'Follow IG YCS', jenis: 'link', link: 'javascript:x'}]}).error, 'link_tidak_valid');
+  const mi = m.admin({token, aksi: 'misi-atur', misi: [{judul: 'Follow IG YCS', sub: '@ycs', jenis: 'link', link: 'https://instagram.com/x'}, {id: 'latihan', jenis: 'latihan', judul: 'Latihan dulu'}]});
+  assert.equal(mi.misi.length, 2); assert.equal(m.misiPublik().misi[0].judul, 'Follow IG YCS');
+});

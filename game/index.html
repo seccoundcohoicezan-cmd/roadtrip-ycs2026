@@ -66,6 +66,7 @@
       <button class="icon-btn g-penuh" type="button" id="g-penuh" aria-pressed="false" aria-label="Layar penuh" hidden><svg class="ikon-on" aria-hidden="true"><use href="#i-expand"/></svg><svg class="ikon-off" aria-hidden="true"><use href="#i-shrink"/></svg></button>
       <div class="g-tidur" id="g-tidur">
         <img class="g-tidur__bos" src="/assets/img/monster/raja-potret.webp" width="359" height="430" alt="">
+        <p class="g-hasil" id="g-hasil" hidden></p>
         <p class="badge badge--game" id="g-status-badge">Bos sedang tidur</p>
         <h1 class="g-tidur__judul" id="g-status-judul">Raja Batu muncul sebelum live</h1>
         <div class="g-hitung" id="g-hitung" hidden aria-live="off">
@@ -104,9 +105,19 @@
         <p class="g-kosong" id="g-kode-kosong">Belum punya kode. Kalahkan Raja Batu saat event untuk dapat kode pertamamu!</p>
       </section>
 
+      <!-- Riwayat match -->
+      <section class="g-kartu" id="riwayat" aria-labelledby="g-riwayat-judul">
+        <div class="g-kartu__head"><h2 class="t-h2" id="g-riwayat-judul">Riwayat match</h2><span class="badge badge--info" id="g-riwayat-badge">0 match</span></div>
+        <div class="g-statistik" id="g-statistik" hidden>
+          <div><b id="st-main">0</b><span>Match</span></div><div><b id="st-menang">0</b><span>Bos tumbang</span></div><div><b id="st-kalah">0</b><span>Kalah/kabur</span></div><div><b id="st-terbaik">–</b><span>Peringkat terbaik</span></div>
+        </div>
+        <ul class="g-riwayat" id="g-riwayat"></ul>
+        <p class="g-kosong" id="g-riwayat-kosong">Belum ada match. Hasil tiap event (menang/kalah, tenagamu, peringkat, hadiah) tercatat di sini sampai live berikutnya dan seterusnya.</p>
+      </section>
+
       <!-- Misi -->
       <section class="g-kartu" aria-labelledby="g-misi-judul">
-        <div class="g-kartu__head"><h2 class="t-h2" id="g-misi-judul">Misi pejuang</h2><span class="t-sm" id="g-misi-n">0/5</span></div>
+        <div class="g-kartu__head"><h2 class="t-h2" id="g-misi-judul">Misi pejuang</h2><span class="t-sm" id="g-misi-n">0/0</span></div>
         <div class="meter g-misi-meter" role="progressbar" aria-label="Misi selesai" aria-valuemin="0" aria-valuemax="5" id="g-misi-meter"><div class="meter__fill" id="g-misi-fill"></div></div>
         <ul class="g-misi" id="g-misi"></ul>
         <p class="t-xs g-catatan">Misi menyiapkanmu untuk event. Kode undian hanya didapat dengan mengalahkan Raja Batu saat event berlangsung.</p>

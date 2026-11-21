@@ -245,6 +245,8 @@ function buatMonster(app, opsi = {}) {
     Object.assign(out, {level: Math.min(e.lvl, a.target.length), tenaga: e.tenaga, total: e.total, kalah: e.kalah ? new Date(e.kalah).toISOString() : null, naik: e.naik || null,
       pemain, tiket: e.n, interval: intervalUntuk(a.interval, pemain)});
     if (out.fase !== 'tanding' && st.events[j.id] && !e.final && Object.keys(e.u).length) finalisasi(j.id, out);
+    if (out.fase !== 'tanding' && e.top) out.top = topPublik(e);
+    const mh = nominalTop(m); if (mh.length) out.hadiahTop = mh;
     return out;
   }
 
@@ -316,12 +318,16 @@ function buatMonster(app, opsi = {}) {
     const pid = cekToken(p.token);
     if (!pid) return {ok: false, error: 'sesi_habis'};
     const c = cfg(), t = now(), j = jadwalUntuk(c, t, p.uji || null);
-    const e = j.id && st.events[j.id];
-    if (e && j.fase === 'aktif') prosesJurus(c, j, e, t);
+    const e = (typeof p.e === 'string' && st.events[p.e]) || (j.id && st.events[j.id]);
+    if (e && j.fase === 'aktif' && e === st.events[j.id]) prosesJurus(c, j, e, t);
     const kunci = kunciPemain(pid);
     const hpMaks = hpMaksDari(mUntuk(c, j));
+    const sayaP = e && e.u[pid] ? e.u[pid].p : 0;
+    const peringkat = sayaP ? Object.values(e.u).filter((u) => u.p > sayaP).length + 1 : null;
+    const topSaya = e && e.top ? e.top.find((x) => x.pid === pid) : null;
     return {ok: true, mati: !!(e && e.mati && e.mati[kunci]), matiKe: e && e.mati ? e.mati[kunci] || null : null, hp: e && e.hp && e.hp[kunci] != null ? Math.max(0, e.hp[kunci]) : hpMaks, hpMaks,
-      sasaran: !!(e && e.target && e.target.ke === (e.jurusKe || 0) + 1 && (e.target.area ? !(e.mati && e.mati[kunci]) : e.target.daftar.includes(kunci))), tiket: e && e.tiket[pid] ? e.tiket[pid] : null, saya: e && e.u[pid] ? e.u[pid].p : 0};
+      sasaran: !!(e && e.target && e.target.ke === (e.jurusKe || 0) + 1 && (e.target.area ? !(e.mati && e.mati[kunci]) : e.target.daftar.includes(kunci))), tiket: e && e.tiket[pid] ? e.tiket[pid] : null, saya: sayaP,
+      peringkat, pemain: e ? Object.keys(e.u).length : 0, top: topSaya ? {peringkat: topSaya.peringkat, nominal: topSaya.nominal} : null};
   }
 
   function terbitkanTiket(id, e, pid, a) {
@@ -391,18 +397,38 @@ function buatMonster(app, opsi = {}) {
   }
 
   // Event selesai: kontribusi akhir ditulis ke tab tiket + satu baris ringkasan di tab Monster Event.
+  // Hadiah otomatis Top kontributor (nominal dari Pengaturan monster_hadiah_top, mis. "100000,50000,50000").
+  // syarat "menang" = hanya bila bos tumbang; "selalu" = tetap diberikan walau monster menang/kabur.
+  const nominalTop = (m) => String(m.hadiahTop ?? '').split(/[,;\s]+/).map((x) => Math.round(Number(x.replace(/\./g, '')))).filter((x) => x > 0).slice(0, 5);
+  const identitas = (pid) => { const k = kunciPemain(pid); if (k.startsWith('uji:')) { const o = st.ujiPemain[pid] || {}; return {kunci: k, nama: o.nama || 'Penguji', sekolah: o.sekolah || '', provinsi: o.provinsi || ''}; } const o = peserta(k) || {}; return {kunci: k, nama: o.nama || '', sekolah: o.sekolah || '', provinsi: o.provinsi || ''}; };
+  function tetapkanTop(id, e, out) {
+    const m = (cfg() || {}).monster || {};
+    const nominal = nominalTop(m), syarat = m.hadiahTopSyarat === 'menang' ? 'menang' : 'selalu';
+    e.top = [];
+    if (!nominal.length) return;
+    if (syarat === 'menang' && !out.kalah) { e.topCatatan = 'bos tidak tumbang'; return; }
+    const urut = Object.entries(e.u).filter(([, u]) => u.p > 0).sort((a, b) => b[1].p - a[1].p).slice(0, nominal.length);
+    e.top = urut.map(([pid, u], i) => ({pid, p: u.p, peringkat: i + 1, nominal: nominal[i]}));
+    if (id[0] === 'u') return; // event uji: hanya tampilan, tidak dicatat
+    const sh = app.sheets['Top Kontributor'] || app.ctx.tab_(app.ss, 'top');
+    const waktu = app.ctx.teksWib_(now()) + ' WIB';
+    e.top.forEach((x) => { const o = identitas(x.pid); sh.rows.push([waktu, id, x.peringkat, o.nama, o.sekolah, o.provinsi, o.kunci.replace(/^wa:/, '+'), x.p, x.nominal, 'belum dibayar']); });
+    app.ctx.logAdmin_('hadiah top kontributor', id + ': ' + e.top.map((x) => '#' + x.peringkat + ' ' + identitas(x.pid).nama + ' Rp' + x.nominal).join(', '));
+  }
+  const topPublik = (e) => (e && e.top ? e.top.map((x) => { const o = identitas(x.pid); return {peringkat: x.peringkat, nama: namaTampil(o.nama), provinsi: o.provinsi, tenaga: x.p, nominal: x.nominal}; }) : null);
   function finalisasi(id, out) {
     const e = st.events[id];
     e.final = true;
     // Skema hadiah: kode undian hanya sah (ikut spin) bila Raja Batu tumbang. Monster menang / kabur → kode hangus.
     const HANGUS = 'hangus · bos tidak tumbang';
     const sah = !!out.kalah;
-    if (id[0] === 'u') { (e.ujiRows || []).forEach((r) => { const pid = Object.keys(e.tiket).find((q) => e.tiket[q] === r[2]); if (pid) r[8] = e.u[pid].p; if (!sah && r[9] === 'aktif') r[9] = HANGUS; }); ubah(); return; }
+    if (id[0] === 'u') { (e.ujiRows || []).forEach((r) => { const pid = Object.keys(e.tiket).find((q) => e.tiket[q] === r[2]); if (pid) r[8] = e.u[pid].p; if (!sah && r[9] === 'aktif') r[9] = HANGUS; }); tetapkanTop(id, e, out); ubah(); return; }
     const sh = app.sheets['Tiket Monster'];
     if (sh) {
       const nomorPid = new Map(Object.entries(e.tiket).map(([pid, no]) => [no, pid]));
       sh.rows.forEach((r, i) => { if (i && r[1] === id && nomorPid.has(String(r[2]))) { r[8] = e.u[nomorPid.get(String(r[2]))].p; if (!sah && r[9] === 'aktif') r[9] = HANGUS; } });
     }
+    tetapkanTop(id, e, out);
     const me = app.sheets['Monster Event'] || app.ctx.tab_(app.ss, 'monster');
     me.appendRow([id, out.mulai, out.selesai, out.kalah ? out.kalah : out.monsterMenang ? 'MONSTER MENANG ' + out.monsterMenang : 'kabur', e.total, Object.keys(e.u).length, e.n, '']);
     ubah();
@@ -614,6 +640,36 @@ function buatMonster(app, opsi = {}) {
     return {ok: true, jenis, total: data.length, unik: hitung.size, duplikat: data.length - hitung.size, data};
   }
 
+  // Misi pejuang (lobi /game/): daftar diatur admin. jenis bawaan punya cek otomatis di klien; "link" = selesai saat diklik.
+  const MISI_BAWAAN = [
+    {id: 'gabung', jenis: 'gabung', judul: 'Gabung Festival Satu Kata', sub: 'Karaktermu ikut bertarung', link: '/#satu-kata'},
+    {id: 'wa', jenis: 'link', judul: 'Ikuti saluran WhatsApp YCS', sub: 'Info bos & kode Dana Kaget', link: 'https://whatsapp.com/channel/0029Vb5vVIaId7nEqecJ1I1G'},
+    {id: 'latihan', jenis: 'latihan', judul: 'Selesaikan 1 latihan', sub: 'Asah jari sebelum bos muncul', link: ''},
+    {id: 'ingat', jenis: 'ingat', judul: 'Pasang pengingat bos', sub: 'Biar nggak ketinggalan', link: ''},
+    {id: 'bagi', jenis: 'bagi', judul: 'Tantang teman', sub: 'Bagikan skor latihanmu', link: ''},
+  ];
+  const JENIS_MISI = ['gabung', 'latihan', 'ingat', 'bagi', 'link'];
+  const misiPublik = () => ({ok: true, misi: (st.misi && st.misi.length ? st.misi : MISI_BAWAAN)});
+  function aturMisi(p) {
+    const daftar = Array.isArray(p.misi) ? p.misi : [];
+    if (daftar.length > 12) return {ok: false, error: 'validation'};
+    const bersih = (v, n) => String(v || '').replace(/[\u0000-\u001f<>]/g, '').trim().slice(0, n);
+    const baru = [];
+    for (const x of daftar) {
+      const judul = bersih(x.judul, 60);
+      if (!judul) continue;
+      const jenis = JENIS_MISI.includes(x.jenis) ? x.jenis : 'link';
+      const link = bersih(x.link, 300);
+      if (jenis === 'link' && !/^(https:\/\/|\/)/.test(link)) return {ok: false, error: 'link_tidak_valid', misi: judul};
+      const id = typeof x.id === 'string' && /^[\w-]{2,24}$/.test(x.id) ? x.id : 'm' + crypto.randomBytes(4).toString('hex');
+      baru.push({id, jenis, judul, sub: bersih(x.sub, 90), link: jenis === 'link' || jenis === 'gabung' ? link : ''});
+    }
+    st.misi = baru.length ? baru : null;
+    app.ctx.logAdmin_('atur misi pejuang', baru.length + ' misi');
+    ubah();
+    return misiPublik();
+  }
+
   function admin(p) {
     if (!adminSah(p.token)) return {ok: false, error: 'sesi_habis'};
     const daftar = ringkasEvent();
@@ -628,6 +684,9 @@ function buatMonster(app, opsi = {}) {
     if (p.aksi === 'spin-hadiah') return spinHadiah(p);
     if (p.aksi === 'spin-batal') { st.spin.tunda = null; return {ok: true}; }
     if (p.aksi === 'hadiah-gambar') return gambarHadiah(p);
+    if (p.aksi === 'misi-info') return misiPublik();
+    if (p.aksi === 'misi-atur') return aturMisi(p);
+    if (p.aksi === 'top-info') { const ev = st.events[id]; return {ok: true, event: id || null, top: ev && ev.top ? ev.top.map((x) => ({...identitas(x.pid), peringkat: x.peringkat, tenaga: x.p, nominal: x.nominal})) : [], catatan: ev ? ev.topCatatan || '' : ''}; }
     if (p.aksi === 'data-lihat' || p.aksi === 'data-rapikan' || p.aksi === 'data-kosongkan') return dataImpor(p);
     if (p.aksi === 'uji-mulai') {
       const menit = Math.round(angka(p.menit, 10, 1, 120));
@@ -666,7 +725,7 @@ function buatMonster(app, opsi = {}) {
     return {ok: true, pemenang: [...out, ...undian].reverse().slice(0, 60)};
   }
 
-  return {lihat, masuk, tap, hindar, saya, admin, pemenangPublik, state: st, jadwal, jenisJurus, segarkan: () => { memo.t = 0; }};
+  return {lihat, masuk, tap, hindar, saya, admin, pemenangPublik, misiPublik, state: st, jadwal, jenisJurus, segarkan: () => { memo.t = 0; }};
 }
 
 module.exports = {buatMonster, jadwal, PASCA, MENIT};

@@ -171,3 +171,20 @@ body.is-retak .g-tidur { align-content: end; gap: var(--space-1); padding: var(-
 body.is-retak .g-tidur__bos, body.is-retak .g-tidur__sub, body.is-retak .g-tidur__judul, body.is-retak .g-hitung { display: none !important; }
 body.is-retak .g-tidur .badge { background: var(--coral-500); color: var(--white); animation: g-denyut .8s ease-in-out infinite alternate; }
 @media (prefers-reduced-motion: reduce) { body.is-retak .g-tidur .badge { animation: none; } }
+
+/* Riwayat match & hasil terakhir */
+.g-statistik { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-2); margin-top: var(--space-3); }
+.g-statistik div { display: grid; justify-items: center; padding: var(--space-2); border-radius: var(--r-md); background: var(--surface-soft); text-align: center; }
+.g-statistik b { font-size: var(--fs-h2); font-weight: 800; color: var(--heading); font-variant-numeric: tabular-nums; line-height: 1.1; }
+.g-statistik span { font-size: var(--fs-xs); color: var(--text-2); }
+.g-riwayat { list-style: none; display: grid; gap: var(--space-2); margin: var(--space-3) 0 0; padding: 0; }
+.g-riwayat li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px var(--space-3); padding: var(--space-3); border-radius: var(--r-lg); background: var(--surface-soft); }
+.g-riwayat .g-hasil-ikon { grid-row: span 3; display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 50%; font-size: 1.35rem; background: var(--success-bg); }
+.g-riwayat li.is-kalah .g-hasil-ikon { background: color-mix(in srgb, var(--coral-500) 15%, transparent); }
+.g-riwayat strong { font-weight: 800; }
+.g-riwayat small { color: var(--text-2); font-size: var(--fs-xs); }
+.g-riwayat .g-capaian { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.g-riwayat .g-capaian span { padding: 2px 8px; border-radius: var(--r-pill); background: var(--surface); font-size: var(--fs-xs); font-weight: 700; }
+.g-riwayat .g-capaian .is-top { background: var(--sun-400); color: var(--navy-900); }
+.g-hasil { position: relative; max-width: 22rem; margin: 0; padding: 8px 14px; border-radius: var(--r-lg); background: color-mix(in srgb, var(--white) 14%, transparent); color: var(--white); font-size: var(--fs-sm); font-weight: 700; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--white) 25%, transparent); }
+.g-hasil b { color: var(--sun-400); }

@@ -197,6 +197,10 @@
     .dt-tabel { max-height: 34rem; overflow: auto; }
     .dt-tabel tr.is-dup td { background: color-mix(in srgb, var(--coral-500) 12%, transparent); }
     .dt-tabel td .dup-tanda { display: inline-block; margin-left: .375rem; padding: 0 .4rem; border-radius: 999px; background: var(--coral-500); color: var(--white); font-size: .6875rem; font-weight: 800; }
+    .misi-tabel { table-layout: auto; }
+    .misi-tabel th:nth-child(1), .misi-tabel th:nth-child(2) { width: auto; } .misi-tabel th:nth-child(3) { width: 9rem; } .misi-tabel th:nth-child(4) { width: 14rem; } .misi-tabel th:nth-child(5) { width: 5.5rem; }
+    .misi-tabel td { vertical-align: middle; }
+    .misi-tabel .icon-btn { width: 1.75rem; height: 1.75rem; }
     .uji-link { display: flex; gap: .5rem; flex-wrap: wrap; }
     .uji-link .input { flex: 1; min-width: 14rem; }
     #spin-card:fullscreen { overflow: auto; padding: 1.5rem; background: var(--navy-900); }
@@ -475,6 +479,13 @@
                 <div class="field"><label for="m-monster_interval_ms">Jeda kirim tap (ms)</label><input class="input" type="number" min="500" max="5000" step="100" id="m-monster_interval_ms" data-key="monster_interval_ms"><p class="field__hint">Otomatis diperlambat 2–5× saat pemain di atas 300/1.000/3.000 orang.</p></div>
               </div>
             </section>
+            <section class="set-card" aria-labelledby="g-mon-top">
+              <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-ticket"/></svg></span><div><h2 id="g-mon-top">Hadiah Top kontributor</h2><p>Pemain dengan tenaga terbanyak tiap event langsung dapat hadiah (tanpa undian). Dicatat di tab "Top Kontributor".</p></div></header>
+              <div class="set-grid">
+                <div class="field"><label for="m-monster_hadiah_top">Nominal hadiah per peringkat (Rp)</label><input class="input" id="m-monster_hadiah_top" data-key="monster_hadiah_top" inputmode="numeric" placeholder="100000,50000,50000"><p class="field__hint">Urut Top 1, Top 2, Top 3, … dipisah koma (maks 5). Kosongkan untuk mematikan.</p></div>
+                <div class="field"><label for="m-monster_hadiah_top_syarat">Syarat</label><select class="select" id="m-monster_hadiah_top_syarat" data-key="monster_hadiah_top_syarat"><option value="selalu">Selalu (walau bos tidak tumbang)</option><option value="menang">Hanya bila bos tumbang</option></select></div>
+              </div>
+            </section>
             <div class="savebar"><p id="mon-set-status" role="status">Tidak ada perubahan.</p><button class="btn btn--cta btn--sm" type="submit" id="btn-simpan-mon">Simpan pengaturan monster</button></div>
           </form>
           <section class="set-card" aria-labelledby="g-mon-uji">
@@ -486,6 +497,18 @@
               <div class="field field--full"><span class="label">Link uji</span><div class="uji-link"><input class="input input--mono" id="uji-link" readonly placeholder="Tekan Mulai uji untuk membuat link"><button class="btn btn--soft btn--sm" type="button" id="uji-salin">Salin</button><a class="btn btn--soft btn--sm" id="uji-buka" target="_blank" rel="noopener">Buka</a></div><p class="field__hint" id="uji-status">Tidak ada uji berjalan.</p></div>
               <div class="field field--full"><span class="label">Link gladi seluruh web</span><div class="uji-link"><input class="input input--mono" id="gladi-link" readonly placeholder="Muncul setelah Mulai uji"><button class="btn btn--soft btn--sm" type="button" id="gladi-salin">Salin</button><a class="btn btn--soft btn--sm" id="gladi-buka" target="_blank" rel="noopener">Buka</a></div><p class="field__hint">Bagikan ke tim untuk gladi resik di HP masing-masing. Skenario (live, Dana Kaget, fase, acara, pop-up) diatur dari tombol "Atur" di bar ungu.</p></div>
             </div>
+          </section>
+          <section class="set-card" aria-labelledby="g-mon-topdaftar">
+            <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-ticket"/></svg></span><div><h2 id="g-mon-topdaftar">Top kontributor per event</h2><p>Penerima hadiah otomatis beserta kontaknya (untuk dihubungi panitia).</p></div></header>
+            <div class="spin-alat"><div class="field"><label for="top-event">Event</label><select class="select" id="top-event"></select></div><button class="btn btn--soft btn--sm" type="button" id="top-muat">Muat</button></div>
+            <div class="table-wrap" style="margin-top:.75rem"><table class="mon-adm-tabel"><thead><tr><th>#</th><th>Nama</th><th>Sekolah</th><th>Provinsi</th><th>Kontak</th><th>Tenaga</th><th>Hadiah</th></tr></thead><tbody id="top-tabel"><tr><td colspan="7" class="muted small">Pilih event lalu Muat.</td></tr></tbody></table></div>
+            <p class="field__hint" id="top-info"></p>
+          </section>
+          <section class="set-card" aria-labelledby="g-mon-misi">
+            <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-gear"/></svg></span><div><h2 id="g-mon-misi">Misi pejuang</h2><p>Daftar misi di lobi game (/game/). Jenis bawaan dicek otomatis; jenis "Link" selesai saat pemain membuka link-nya.</p></div></header>
+            <div class="table-wrap"><table class="hadiah-tabel misi-tabel"><thead><tr><th>Judul</th><th>Keterangan</th><th>Jenis</th><th>Link</th><th><span class="visually-hidden">Aksi</span></th></tr></thead><tbody id="misi-body"></tbody></table></div>
+            <div class="mon-adm-aksi"><button class="btn btn--soft btn--sm" type="button" id="misi-tambah">+ Tambah misi</button><button class="btn btn--ghost btn--sm" type="button" id="misi-bawaan">Kembalikan bawaan</button><button class="btn btn--cta btn--sm" type="button" id="misi-simpan">Simpan misi</button></div>
+            <p class="field__hint" id="misi-status"></p>
           </section>
           <section class="set-card" aria-labelledby="g-mon-perangkat">
             <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-lock"/></svg></span><div><h2 id="g-mon-perangkat">Perangkat peserta</h2><p>1 perangkat = 1 peserta. Bila peserta ganti HP, lepas ikatan perangkat lamanya.</p></div></header>
@@ -722,7 +745,7 @@
     function pilih(tab, focus) {
       tabs.forEach((t) => { const on = t === tab; t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1; $('#' + t.getAttribute('aria-controls')).hidden = !on; });
       if (focus) tab.focus();
-      if (tab.id === 't-monster' && typeof statusMon === 'function') { statusMon(); muatUji(); }
+      if (tab.id === 't-monster' && typeof statusMon === 'function') { statusMon(); muatUji(); muatMisi(); muatTop(); }
       if (tab.id === 't-spin') { muatPeserta(); muatHadiah(); }
       if (tab.id === 't-data') muatDataTersimpan();
       if (tab.id === 't-keamanan') statusPrimer();
@@ -1267,6 +1290,44 @@
       if (!d.ok) { $('#dt-status').textContent = pesan(d); return; }
       dtData = d; renderDataTersimpan(); $('#dt-status').textContent = `${nf.format(d.dihapus)} baris dihapus.`;
     });
+
+
+    /* ---------- Misi pejuang & Top kontributor (tab Lawan Monster) ---------- */
+    const JENIS_MISI = [['gabung', 'Gabung festival'], ['latihan', 'Selesaikan latihan'], ['ingat', 'Pasang pengingat'], ['bagi', 'Bagikan/tantang teman'], ['link', 'Buka link']];
+    let misiEdit = [];
+    async function muatMisi() { const d = await monAdmin({aksi: 'misi-info'}); if (d.ok) { misiEdit = d.misi.map((x) => ({...x})); renderMisi(); } }
+    function renderMisi() {
+      $('#misi-body').innerHTML = misiEdit.map((m, i) => `<tr data-i="${i}"><td><input class="input" data-f="judul" maxlength="60" value="${esc(m.judul)}" aria-label="Judul misi"></td><td><input class="input" data-f="sub" maxlength="90" value="${esc(m.sub || '')}" aria-label="Keterangan"></td>
+        <td><select class="select" data-f="jenis" aria-label="Jenis">${JENIS_MISI.map(([v, l]) => `<option value="${v}"${v === m.jenis ? ' selected' : ''}>${l}</option>`).join('')}</select></td>
+        <td><input class="input" data-f="link" maxlength="300" value="${esc(m.link || '')}" placeholder="${m.jenis === 'link' ? 'https://…' : '—'}"${m.jenis === 'link' || m.jenis === 'gabung' ? '' : ' disabled'} aria-label="Link"></td>
+        <td><button class="icon-btn" type="button" data-naik="${i}" aria-label="Naikkan">↑</button><button class="icon-btn" type="button" data-hapus-misi="${i}" aria-label="Hapus misi">✕</button></td></tr>`).join('') || '<tr><td colspan="5" class="muted small">Belum ada misi.</td></tr>';
+    }
+    $('#misi-body').addEventListener('input', (e) => { const tr = e.target.closest('tr[data-i]'); if (!tr || !e.target.dataset.f) return; misiEdit[+tr.dataset.i][e.target.dataset.f] = e.target.value; if (e.target.dataset.f === 'jenis') renderMisi(); $('#misi-status').textContent = 'Ada perubahan yang belum disimpan.'; });
+    $('#misi-body').addEventListener('change', (e) => { if (e.target.dataset.f === 'jenis') { const tr = e.target.closest('tr[data-i]'); misiEdit[+tr.dataset.i].jenis = e.target.value; renderMisi(); } });
+    $('#misi-body').addEventListener('click', (e) => {
+      const h = e.target.closest('[data-hapus-misi]'), n = e.target.closest('[data-naik]');
+      if (h) { misiEdit.splice(+h.dataset.hapusMisi, 1); renderMisi(); $('#misi-status').textContent = 'Ada perubahan yang belum disimpan.'; }
+      if (n && +n.dataset.naik > 0) { const i = +n.dataset.naik; [misiEdit[i - 1], misiEdit[i]] = [misiEdit[i], misiEdit[i - 1]]; renderMisi(); $('#misi-status').textContent = 'Ada perubahan yang belum disimpan.'; }
+    });
+    $('#misi-tambah').addEventListener('click', () => { misiEdit.push({judul: '', sub: '', jenis: 'link', link: ''}); renderMisi(); });
+    $('#misi-bawaan').addEventListener('click', async () => { if (!confirm('Kembalikan daftar misi bawaan?')) return; const d = await monAdmin({aksi: 'misi-atur', misi: []}); if (d.ok) { misiEdit = d.misi.map((x) => ({...x})); renderMisi(); $('#misi-status').textContent = 'Misi bawaan dipulihkan.'; } });
+    $('#misi-simpan').addEventListener('click', async (e) => {
+      sibuk(e.currentTarget, true); const d = await monAdmin({aksi: 'misi-atur', misi: misiEdit}); sibuk(e.currentTarget, false);
+      if (!d.ok) { $('#misi-status').textContent = d.error === 'link_tidak_valid' ? `Link misi "${d.misi}" harus diawali https:// atau /.` : pesan(d); return; }
+      misiEdit = d.misi.map((x) => ({...x})); renderMisi(); $('#misi-status').textContent = 'Tersimpan. Tampil di lobi game dalam ±30 detik.';
+    });
+    async function muatTop(event) {
+      const d = await monAdmin({aksi: 'tiket', event: event || ''});
+      if (d.ok && !event) $('#top-event').innerHTML = d.events.length ? d.events.map((e) => `<option value="${esc(e.id)}">${e.uji ? 'UJI · ' : ''}${esc(e.id)} · ${nf.format(e.pemain)} pemain${e.kalah ? ' · bos tumbang' : ''}</option>`).join('') : '<option value="">Belum ada event</option>';
+      const id = event || $('#top-event').value;
+      if (!id) return;
+      const t = await monAdmin({aksi: 'top-info', event: id});
+      if (!t.ok) { $('#top-info').textContent = pesan(t); return; }
+      $('#top-tabel').innerHTML = t.top.map((x) => `<tr><td>${x.peringkat}</td><td>${esc(x.nama)}</td><td>${esc(x.sekolah)}</td><td>${esc(x.provinsi)}</td><td>${esc(String(x.kunci).replace(/^wa:/, '+'))}</td><td>${nf.format(x.tenaga)}</td><td><strong>Rp${nf.format(x.nominal)}</strong></td></tr>`).join('') || `<tr><td colspan="7" class="muted small">${t.catatan ? 'Tidak ada hadiah: ' + esc(t.catatan) + '.' : 'Belum ada (event belum selesai atau hadiah Top dimatikan).'}</td></tr>`;
+      $('#top-info').textContent = t.top.length ? 'Data juga ada di tab "Top Kontributor" Google Sheet (kolom Status untuk menandai sudah dibayar).' : '';
+    }
+    $('#top-muat').addEventListener('click', () => muatTop($('#top-event').value));
+    $('#top-event').addEventListener('change', () => muatTop($('#top-event').value));
 
     /* ---------- Mode uji monster ---------- */
     let ujiTimer = 0;

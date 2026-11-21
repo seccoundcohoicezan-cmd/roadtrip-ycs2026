@@ -910,6 +910,7 @@
           karakterMati = !!token;
         }
         opsi.saatMenang && opsi.saatMenang(st);
+        catatHasil(st);
       }
       // Nyawa warga dari server (setelah jurus) → samakan jumlah warga tumbang.
       if (st.jurus && st.fase === 'tanding' && st.jurusKe !== jurusSinkron) {
@@ -975,6 +976,21 @@
       ajakTetap = !!ms;
       if (ms) ajakTimer = setTimeout(() => { ajakTetap = false; tampilkan(true); }, ms);
     }
+    // Hasil match pribadi (sekali per event): peringkat kontribusi & hadiah Top dari server → riwayat di lobi.
+    let hasilSaya = null; const hasilDicatat = new Set();
+    async function catatHasil(s0) {
+      if (!s0 || !s0.id || hasilDicatat.has(s0.id)) return;
+      hasilDicatat.add(s0.id);
+      let d = {};
+      if (token) { try { d = await minta({ aksi: 'saya', token, e: s0.id, uji }); } catch (e) { d = {}; } }
+      const ikut = !!(token && (d.saya || sayaPoin || tiketSaya));
+      hasilSaya = { id: s0.id, fase: s0.fase, nama: s0.nama, mulai: s0.mulai, selesai: s0.selesai, live: s0.live ? s0.live.judul : '', uji: !!s0.uji, ikut,
+        tenaga: d.saya || sayaPoin || 0, peringkat: d.peringkat || null, pemain: d.pemain || s0.pemain || 0, top: d.top || null, tiket: d.tiket || tiketSaya || null,
+        tumbang: !!(d.mati || karakterMati), hp: d.hp ?? hpSaya, topList: s0.top || [], level: s0.level || 1, levelMaks: s0.levelMaks || 1 };
+      opsi.saatHasil && opsi.saatHasil(hasilSaya);
+      if (!pesan.hidden) tampilPesan();
+    }
+    const rp = (n) => 'Rp' + nf.format(n);
     function tampilPesan() {
       const jenis = akhir ? akhir.jenis : st.fase === 'menang' ? 'menang' : st.fase === 'monster_menang' ? 'monster' : 'kabur';
       pesan.hidden = false;
@@ -987,6 +1003,14 @@
         monster: `Semua warga tumbang... ${st.nama} menguasai plaza. Ajak lebih banyak teman biar perisai makin kuat di live berikutnya!${tiketku}`,
         kabur: `Waktunya habis, ${st.nama} lari sebelum tumbang. Dikit lagi! Balas di live berikutnya.${sumbang}${tiketku}`,
       }[jenis];
+      // Top kontributor (hadiah otomatis) + capaianmu
+      let topEl = pesan.querySelector('.mon__top');
+      if (!topEl) { topEl = document.createElement('div'); topEl.className = 'mon__top'; pesan.querySelector('p').after(topEl); }
+      const top = st.top || [];
+      const hs = hasilSaya && hasilSaya.id === st.id ? hasilSaya : null;
+      topEl.innerHTML = (hs && hs.top ? `<p class="mon__top-saya">🏆 Kamu Top ${hs.top.peringkat}! Hadiah ${rp(hs.top.nominal)} — panitia menghubungi lewat email/WA yang kamu daftarkan.</p>` : hs && hs.peringkat ? `<p class="mon__top-saya is-biasa">Peringkat kontribusimu #${nf.format(hs.peringkat)} dari ${nf.format(hs.pemain)} pejuang.</p>` : '')
+        + (top.length ? `<ol class="mon__top-list">${top.map((x) => `<li><b>#${x.peringkat}</b> ${x.nama.replace(/[<&]/g, '')}<small>${nf.format(x.tenaga)} tenaga</small><span>${rp(x.nominal)}</span></li>`).join('')}</ol>` : '');
+      topEl.hidden = !topEl.innerHTML;
       const a = pesan.querySelector('a');
       const link = st.live && st.live.link;
       a.hidden = !link;

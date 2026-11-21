@@ -93,6 +93,7 @@
         saatTerkunci: () => { toast('Gabung Festival Satu Kata dulu, karaktermu ikut bertarung.'); $('#g-gabung').hidden = false; $('#g-gabung').scrollIntoView({ behavior: 'smooth', block: 'center' }); },
         saatTiket: (kode, st) => catatKode(kode, st),
         saatMenang: (st) => akhiriEvent(st),
+        saatHasil: (h) => catatRiwayat(h),
       });
     } catch (e) { /* lobi tetap jalan */ }
   }
@@ -133,6 +134,55 @@
     autoPenuh = true; masukPenuh();
   });
 
+  /* ---------- riwayat match (tersimpan di HP; hasil tiap event: menang/kalah, tenaga, peringkat, hadiah Top) ---------- */
+  const KUNCI_RIWAYAT = uji ? 'ycs_riwayat_uji' : 'ycs_riwayat';
+  const HASIL = { menang: ['🏆', 'Bos tumbang!', false], monster_menang: ['💀', 'Raja Batu menang', true], habis: ['💨', 'Bos kabur (waktu habis)', true], kabur: ['💨', 'Bos kabur (waktu habis)', true] };
+  const rp = (n) => 'Rp' + nf.format(n);
+  function catatRiwayat(h) {
+    if (!h || !h.id) return;
+    const lama = baca(KUNCI_RIWAYAT, []), sudah = lama.find((x) => x.id === h.id);
+    if (sudah && sudah.ikut && !h.ikut) return; // jangan timpa hasil yang lengkap dengan data kosong
+    const list = lama.filter((x) => x.id !== h.id);
+    list.push({ ...h, dicatat: now() });
+    simpan(KUNCI_RIWAYAT, list.slice(-30));
+    tampilRiwayat();
+    if (h.top && !(sudah && sudah.top)) toast(`Kamu Top ${h.top.peringkat} kontributor! Hadiah ${rp(h.top.nominal)}.`);
+  }
+  function tampilRiwayat() {
+    const list = baca(KUNCI_RIWAYAT, []).slice().reverse();
+    const ikut = list.filter((x) => x.ikut);
+    $('#g-riwayat-badge').textContent = `${list.length} match`;
+    $('#g-riwayat-kosong').hidden = list.length > 0;
+    $('#g-statistik').hidden = !list.length;
+    $('#st-main').textContent = nf.format(ikut.length);
+    $('#st-menang').textContent = nf.format(ikut.filter((x) => x.fase === 'menang').length);
+    $('#st-kalah').textContent = nf.format(ikut.filter((x) => x.fase !== 'menang').length);
+    const terbaik = ikut.map((x) => x.peringkat).filter(Boolean).sort((a, b) => a - b)[0];
+    $('#st-terbaik').textContent = terbaik ? '#' + nf.format(terbaik) : '–';
+    const e = (t) => String(t || '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    $('#g-riwayat').innerHTML = list.map((x) => {
+      const [ikon, judul, kalah] = HASIL[x.fase] || ['🎮', 'Event selesai', false];
+      const waktu = x.mulai ? new Date(x.mulai).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }) : '';
+      const cap = [];
+      if (x.top) cap.push(`<span class="is-top">🏆 Top ${x.top.peringkat} · ${rp(x.top.nominal)}</span>`);
+      if (x.ikut) {
+        cap.push(`<span>${nf.format(x.tenaga)} tenaga</span>`);
+        if (x.peringkat) cap.push(`<span>Peringkat #${nf.format(x.peringkat)}${x.pemain ? ' dari ' + nf.format(x.pemain) : ''}</span>`);
+        cap.push(`<span>${x.tumbang ? 'Karakter tumbang' : 'Karakter selamat'}</span>`);
+        if (x.tiket) cap.push(`<span>Kode ${e(x.tiket)} ${x.fase === 'menang' ? 'sah' : 'hangus'}</span>`);
+      } else cap.push('<span>Hanya menonton</span>');
+      return `<li class="${kalah ? 'is-kalah' : ''}"><span class="g-hasil-ikon" aria-hidden="true">${ikon}</span><strong>${judul}${x.uji ? ' · uji' : ''}</strong><small>${e(waktu)}${x.live ? ' · ' + e(x.live) : ''}${x.levelMaks > 1 ? ` · level ${x.level}/${x.levelMaks}` : ''}</small><div class="g-capaian">${cap.join('')}</div></li>`;
+    }).join('');
+    // hasil match terakhir tampil di arena sampai event berikutnya dimulai
+    const akhir = list[0], el = $('#g-hasil');
+    if (akhir) {
+      const [ikon, judul] = HASIL[akhir.fase] || ['🎮', 'Event selesai'];
+      el.innerHTML = `${ikon} Match terakhir: <b>${judul}</b>` + (akhir.ikut ? ` · ${nf.format(akhir.tenaga)} tenaga${akhir.peringkat ? ` · #${nf.format(akhir.peringkat)}` : ''}${akhir.top ? ` · Top ${akhir.top.peringkat} (${rp(akhir.top.nominal)})` : ''}` : '');
+      el.hidden = false;
+    } else el.hidden = true;
+  }
+  tampilRiwayat();
+
   /* ---------- status bos & hitung mundur ---------- */
   let cfg = null, stMon = null, target = 0;
   async function muatStatus() {
@@ -155,11 +205,14 @@
     const l = (cfg.live || []).map((x) => Date.parse(x.mulai) - menit).filter((t) => t > now()).sort((a, b) => a - b)[0];
     return l || 0;
   }
+  let pesanDitutup = '';
+  document.addEventListener('click', (e) => { if (e.target.closest('.mon__tutup')) { pesanDitutup = stMon && stMon.id; if (sedangPenuh()) keluarPenuh(); tampilStatus(); } });
   function tampilStatus() {
     const f = stMon ? stMon.fase : '';
     const tanding = f === 'tanding';
     const selesai = ['menang', 'monster_menang', 'habis', 'kabur'].includes(f);
-    $('#g-tidur').hidden = tanding || selesai;
+    // setelah pesan akhir event ditutup, kartu lobi (hasil match terakhir + hitung mundur event berikutnya) tampil lagi
+    $('#g-tidur').hidden = tanding || (selesai && pesanDitutup !== (stMon && stMon.id));
     document.body.classList.toggle('is-tanding', tanding);
     // 1 jam terakhir sebelum muncul: kartu menyusut agar retakan tanah di plaza terlihat
     document.body.classList.toggle('is-retak', f === 'tunggu' && !!stMon.mulai && Date.parse(stMon.mulai) - now() < 3600000);
@@ -210,38 +263,47 @@
   }
 
   /* ---------- misi (hanya lencana; kode undian tetap dari event) ---------- */
-  const MISI = [
-    { id: 'gabung', judul: 'Gabung Festival Satu Kata', sub: 'Karaktermu ikut bertarung', ikon: 'i-users', href: '/#satu-kata', cek: () => !!baca('ycs_fest') },
-    { id: 'wa', judul: 'Ikuti saluran WhatsApp YCS', sub: 'Info bos & kode Dana Kaget', ikon: 'i-whatsapp', href: 'https://whatsapp.com/channel/0029Vb5vVIaId7nEqecJ1I1G' },
-    { id: 'latihan', judul: 'Selesaikan 1 latihan', sub: () => `Rekor: ${nf.format(baca('ycs_latihan_best', 0))}`, ikon: 'i-sword' },
-    { id: 'ingat', judul: 'Pasang pengingat bos', sub: 'Biar nggak ketinggalan', ikon: 'i-bell' },
-    { id: 'bagi', judul: 'Tantang teman', sub: 'Bagikan skor latihanmu', ikon: 'i-share' },
+  // Daftar misi diatur admin (GET /api/misi). jenis: gabung | latihan | ingat | bagi | link (selesai saat diklik).
+  const IKON_MISI = { gabung: 'i-users', latihan: 'i-sword', ingat: 'i-bell', bagi: 'i-share', link: 'i-play' };
+  const MISI_BAWAAN = [
+    { id: 'gabung', jenis: 'gabung', judul: 'Gabung Festival Satu Kata', sub: 'Karaktermu ikut bertarung', link: '/#satu-kata' },
+    { id: 'wa', jenis: 'link', judul: 'Ikuti saluran WhatsApp YCS', sub: 'Info bos & kode Dana Kaget', link: 'https://whatsapp.com/channel/0029Vb5vVIaId7nEqecJ1I1G' },
+    { id: 'latihan', jenis: 'latihan', judul: 'Selesaikan 1 latihan', sub: 'Asah jari sebelum bos muncul' },
+    { id: 'ingat', jenis: 'ingat', judul: 'Pasang pengingat bos', sub: 'Biar nggak ketinggalan' },
+    { id: 'bagi', jenis: 'bagi', judul: 'Tantang teman', sub: 'Bagikan skor latihanmu' },
   ];
+  const keMisi = (x) => ({ ...x, ikon: /whatsapp/.test(x.link || '') ? 'i-whatsapp' : IKON_MISI[x.jenis] || 'i-play',
+    href: x.jenis === 'link' || x.jenis === 'gabung' ? x.link : '', cek: x.jenis === 'gabung' ? () => !!baca('ycs_fest') : null,
+    subTampil: () => (x.jenis === 'latihan' && baca('ycs_latihan_best', 0) ? `${x.sub ? x.sub + ' · ' : ''}Rekor: ${nf.format(baca('ycs_latihan_best', 0))}` : x.sub || '') });
+  let MISI = (baca('ycs_misi_daftar') || MISI_BAWAAN).map(keMisi);
+  fetch('/api/misi').then((r) => r.json()).then((d) => { if (d && d.ok && Array.isArray(d.misi) && d.misi.length) { simpan('ycs_misi_daftar', d.misi); MISI = d.misi.map(keMisi); syncMisi(); } }).catch(() => {});
   const selesaiMisi = () => baca('ycs_misi', {});
-  function tandaiMisi(id) { const m = selesaiMisi(); if (m[id]) { syncMisi(); return; } m[id] = now(); simpan('ycs_misi', m); syncMisi(id); }
+  function tandaiMisi(id) { const per = MISI.filter((q) => q.jenis === id && q.id !== id); if (per.length) { per.forEach((q) => tandaiMisi(q.id)); if (!MISI.some((q) => q.id === id)) return; } const m = selesaiMisi(); if (m[id]) { syncMisi(); return; } m[id] = now(); simpan('ycs_misi', m); syncMisi(id); }
   function syncMisi(baru) {
     const m = selesaiMisi();
     MISI.forEach((x) => { if (x.cek && x.cek()) m[x.id] = m[x.id] || now(); });
+    $('#g-misi-meter').setAttribute('aria-valuemax', String(MISI.length));
     const n = MISI.filter((x) => m[x.id]).length;
     $('#g-misi-n').textContent = `${n}/${MISI.length}`;
     $('#g-misi-fill').style.width = (n / MISI.length * 100) + '%';
     $('#g-misi-meter').setAttribute('aria-valuenow', String(n));
     $('#g-misi').innerHTML = MISI.map((x) => {
-      const ok = !!m[x.id], sub = typeof x.sub === 'function' ? x.sub() : x.sub;
+      const ok = !!m[x.id], sub = x.subTampil();
       const aksi = ok ? '<span class="g-misi__stempel"><svg aria-hidden="true"><use href="#i-check"/></svg>Selesai</span>'
         : x.href ? `<a class="btn btn--soft btn--sm" href="${x.href}" data-misi="${x.id}"${x.href.startsWith('http') ? ' target="_blank" rel="noopener"' : ''}>Kerjakan</a>`
           : `<button class="btn btn--soft btn--sm" type="button" data-misi="${x.id}">Kerjakan</button>`;
-      return `<li class="${ok ? 'is-ok' : ''}${baru === x.id ? ' is-baru' : ''}"><span class="ico ${ok ? 'ico--dana' : 'ico--info'}" aria-hidden="true"><svg><use href="#${x.ikon}"/></svg></span><span class="menu-list__txt"><strong>${x.judul}</strong><small>${sub}</small></span>${aksi}</li>`;
+      const e = (t) => String(t || '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+      return `<li class="${ok ? 'is-ok' : ''}${baru === x.id ? ' is-baru' : ''}"><span class="ico ${ok ? 'ico--dana' : 'ico--info'}" aria-hidden="true"><svg><use href="#${x.ikon}"/></svg></span><span class="menu-list__txt"><strong>${e(x.judul)}</strong><small>${e(sub)}</small></span>${aksi}</li>`;
     }).join('');
     if (baru) { S.aman(); toast('Misi selesai! Lencana didapat.'); }
   }
   $('#g-misi').addEventListener('click', (e) => {
     const b = e.target.closest('[data-misi]'); if (!b) return;
-    const id = b.dataset.misi;
-    if (id === 'wa') setTimeout(() => tandaiMisi('wa'), 400);
-    if (id === 'latihan') latihan.buka();
-    if (id === 'ingat') { if (target) $('#g-ingat').click(); else toast('Jadwal bos belum diumumkan. Coba lagi nanti.'); }
-    if (id === 'bagi') bagikan('Main game Lawan Raja Batu di YCS 2026, kalahkan bos sebelum live dan dapat kode undian HP:', 'bagi');
+    const id = b.dataset.misi, x = MISI.find((q) => q.id === id) || {};
+    if (x.jenis === 'link') setTimeout(() => tandaiMisi(id), 400);
+    if (x.jenis === 'latihan') latihan.buka();
+    if (x.jenis === 'ingat') { if (target) $('#g-ingat').click(); else toast('Jadwal bos belum diumumkan. Coba lagi nanti.'); }
+    if (x.jenis === 'bagi') bagikan('Main game Lawan Raja Batu di YCS 2026, kalahkan bos sebelum live dan dapat kode undian HP:', id);
   });
   syncMisi();
 
