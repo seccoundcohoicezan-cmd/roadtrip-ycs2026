@@ -151,10 +151,50 @@
     .hadiah-tabel .h-persen { font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
     .peluang-tiket { margin: var(--space-3) 0; border: 0; padding: 0; display: grid; gap: .375rem; font-size: .875rem; }
     .peluang-tiket legend { font-weight: 700; margin-bottom: .25rem; }
+    .spin-tahap { display: flex; justify-content: center; gap: .5rem; margin: .75rem 0 0; padding: 0; list-style: none; }
+    .spin-tahap li { display: inline-flex; align-items: center; gap: .375rem; padding: .3rem .8rem .3rem .3rem; border-radius: 999px; background: rgb(6 24 64 / .28); font-weight: 800; font-size: .875rem; opacity: .7; transition: opacity .2s, background .2s; }
+    .spin-tahap li b { display: grid; place-items: center; width: 1.5rem; height: 1.5rem; border-radius: 50%; background: rgb(255 255 255 / .25); }
+    .spin-tahap li.is-aktif { opacity: 1; background: var(--navy-900); }
+    .spin-tahap li.is-aktif b { background: var(--sun-400); color: var(--navy-900); }
+    .spin-tahap li.is-selesai b { background: var(--green-600); }
+    .spin-hasil-hadiah { display: grid; justify-items: center; gap: .25rem; margin: .25rem auto 0; animation: spin-muncul .6s cubic-bezier(.2,1.4,.4,1); }
+    .spin-hasil-hadiah img { width: min(11rem, 40vw); height: min(11rem, 40vw); object-fit: contain; filter: drop-shadow(0 10px 18px rgb(6 24 64 / .45)); }
+    .spin-hasil-hadiah img:not([src]), .spin-hasil-hadiah img[src=""] { display: none; }
+    .spin-hasil-hadiah b { padding: .25rem 1rem; border-radius: 999px; background: var(--navy-900); color: var(--white); font-size: clamp(1.25rem, 3vw, 1.75rem); box-shadow: 0 6px 16px rgb(6 24 64 / .35); }
+    @keyframes spin-muncul { from { transform: scale(.4); opacity: 0; } }
+    .spin-tombol-baris { display: flex; justify-content: center; align-items: center; gap: .5rem; flex-wrap: wrap; }
+    .spin-otolatar { display: flex; gap: .5rem; align-items: center; margin-top: .5rem; font-size: .875rem; font-weight: 600; }
+    .hadiah-tabel th:nth-child(1) { width: 3.25rem; } .hadiah-tabel th:nth-child(2) { width: auto; } .hadiah-tabel th:nth-child(3), .hadiah-tabel th:nth-child(4), .hadiah-tabel th:nth-child(5) { width: 4rem; } .hadiah-tabel th:nth-child(6) { width: 2.25rem; }
+    .h-foto { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; padding: 0; border: 1px dashed var(--line); border-radius: .5rem; background: repeating-conic-gradient(#eef1f6 0 25%, #fff 0 50%) 0 0 / 10px 10px; cursor: pointer; font-size: 1.1rem; color: var(--text-2); overflow: hidden; }
+    .h-foto img { width: 100%; height: 100%; object-fit: contain; }
+    .h-foto.is-proses { opacity: .5; cursor: progress; }
+    .spin-bawah { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: var(--space-4); margin-top: var(--space-4); }
+    @media (max-width: 60rem) { .spin-bawah { grid-template-columns: 1fr; } }
+    .spin-blok { padding: var(--space-4); border: 1px solid var(--line); border-radius: 1.25rem; background: var(--surface); }
+    .spin-blok h3 { font-size: 1.0625rem; }
+    .spin-menang { max-height: 26rem; overflow: auto; }
+    .spin-menang li { padding: .375rem 0; border-bottom: 1px solid var(--line); }
+    .spin-menang li small { display: block; color: var(--text-2); }
+    .spin-peserta__kepala { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem; }
+    .spin-peserta #spin-cari { margin: .75rem 0; }
+    .spin-peserta .table-wrap { max-height: 32rem; overflow: auto; }
+    .spin-peserta td.is-menang { color: var(--green-600); font-weight: 700; }
+    #spin-card:fullscreen .spin-hasil-hadiah img { width: min(24vh, 16rem); height: min(24vh, 16rem); }
+    #spin-card:fullscreen .spin-tahap li { font-size: 1.125rem; }
+    /* Layar penuh (live): roda di kiri, nama & hadiah di kanan → semua terlihat tanpa menggulir */
+    @media (min-aspect-ratio: 5/4) {
+      #spin-card:fullscreen #spin-panggung { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); grid-auto-rows: min-content; align-content: center; column-gap: 2rem; }
+      #spin-card:fullscreen #spin-panggung > * { grid-column: 2; }
+      #spin-card:fullscreen #spin-panggung > .spin-atas { grid-column: 1 / -1; }
+      #spin-card:fullscreen #spin-roda-wrap { grid-column: 1; grid-row: 2 / span 8; align-self: center; width: min(78vh, 46vw); }
+      #spin-card:fullscreen .spin-reel { width: 100%; }
+    }
+
     .uji-link { display: flex; gap: .5rem; flex-wrap: wrap; }
     .uji-link .input { flex: 1; min-width: 14rem; }
     #spin-card:fullscreen { overflow: auto; padding: 1.5rem; background: var(--navy-900); }
     #spin-card:fullscreen > :not(.spin-layout) { display: none; }
+    #spin-card:fullscreen .spin-atur { max-height: calc(100vh - 3rem); overflow: auto; }
     #spin-card:fullscreen .spin-layout { margin: 0; min-height: calc(100vh - 3rem); }
     #spin-card:fullscreen .spin-panggung { display: flex; flex-direction: column; justify-content: center; }
     #spin-card:fullscreen .spin-roda-wrap { width: min(54vh, 34rem); margin-top: .25rem; }
@@ -447,43 +487,64 @@
         </section>
         <!-- Spin undian -->
         <section role="tabpanel" id="p-spin" aria-labelledby="t-spin" tabindex="0" hidden>
-          <div class="content__head"><div><h1>Spin Undian</h1><p class="muted small">Undi tiket Lawan Monster saat live. Atur hadiah &amp; peluang keluarnya, lalu putar di layar penuh.</p></div></div>
+          <div class="content__head"><div><h1>Spin Undian</h1><p class="muted small">Dua tahap saat live: putar <b>nama</b> pemenang dulu, lalu putar <b>hadiah</b>-nya. Peserta diambil dari data yang diimpor (peserta lolos / wild card) atau tiket Lawan Monster.</p></div></div>
           <section class="set-card spin-card" id="spin-card" aria-label="Spin undian">
             <div class="spin-alat">
-              <div class="field"><label for="spin-event">Event</label><select class="select" id="spin-event"></select></div>
+              <div class="field"><label for="spin-sumber">Peserta yang diundi</label><select class="select" id="spin-sumber">
+                <option value="lolos">Peserta lolos (data Finalis)</option>
+                <option value="wildcard">Wild card</option>
+                <option value="semua">Peserta lolos + wild card</option>
+                <option value="tiket">Tiket Lawan Monster</option>
+              </select></div>
+              <div class="field" id="spin-event-wrap" hidden><label for="spin-event">Event monster</label><select class="select" id="spin-event"></select></div>
               <label class="switch spin-latihan" for="spin-latihan"><span>Mode latihan<small>Hasil tidak dicatat, stok tidak berkurang.</small></span><input type="checkbox" id="spin-latihan"></label>
               <button class="btn btn--soft btn--sm" type="button" id="spin-segarkan">Segarkan</button>
               <button class="btn btn--cta btn--sm" type="button" id="spin-layar">Layar penuh (untuk live)</button>
             </div>
             <div class="spin-layout" id="spin-layout">
-              <div class="spin-panggung" id="spin-panggung">
-                <div class="spin-atas"><p class="spin-judul">Undian Pejuang Festival</p><button class="spin-gear" type="button" id="spin-gear" aria-expanded="false" aria-controls="spin-atur">⚙ Atur hadiah &amp; peluang</button></div>
+              <div class="spin-panggung" id="spin-panggung" data-tahap="nama">
+                <div class="spin-atas"><p class="spin-judul" id="spin-judul">Undian Peserta YCS 2026</p><button class="spin-gear" type="button" id="spin-gear" aria-expanded="false" aria-controls="spin-atur">⚙ Atur hadiah</button></div>
+                <ol class="spin-tahap" aria-label="Tahap undian"><li id="tahap-1" class="is-aktif"><b>1</b> Spin nama</li><li id="tahap-2"><b>2</b> Spin hadiah</li></ol>
                 <p class="spin-latihan-tanda" id="spin-latihan-tanda" hidden>MODE LATIHAN · tidak dicatat</p>
-                <div class="spin-roda-wrap" id="spin-roda-wrap"><canvas id="spin-roda" width="560" height="560" aria-label="Roda hadiah"></canvas><span class="spin-penunjuk" aria-hidden="true"></span></div>
+                <div class="spin-roda-wrap" id="spin-roda-wrap"><canvas id="spin-roda" width="640" height="640" aria-label="Roda undian"></canvas><span class="spin-penunjuk" aria-hidden="true"></span></div>
                 <div class="spin-reel" aria-live="polite"><div class="spin-isi" id="spin-isi"><span>Siap diputar</span></div></div>
                 <p class="spin-detail" id="spin-detail"></p>
-                <p class="spin-hadiah" id="spin-hadiah"></p>
-                <button class="btn btn--cta spin-tombol" type="button" id="spin-putar">Putar spin</button>
+                <div class="spin-hasil-hadiah" id="spin-hasil-hadiah" hidden><img id="spin-hasil-img" alt=""><b id="spin-hasil-nama"></b></div>
+                <div class="spin-tombol-baris">
+                  <button class="btn btn--cta spin-tombol" type="button" id="spin-putar">Putar nama</button>
+                  <button class="btn btn--soft btn--sm spin-batal" type="button" id="spin-batal" hidden>Ulang dari nama</button>
+                </div>
                 <p class="spin-info" id="spin-info"></p>
               </div>
               <aside class="spin-atur" id="spin-atur" hidden>
-                <h3>Hadiah &amp; peluang keluar</h3>
-                <p class="field__hint">Bobot menentukan peluang: hadiah berbobot 3 keluar 3× lebih sering daripada berbobot 1. Stok kosong = tanpa batas; hadiah yang stoknya habis tidak ikut diundi.</p>
-                <div class="table-wrap"><table class="hadiah-tabel"><thead><tr><th scope="col">Hadiah</th><th scope="col">Stok</th><th scope="col">Bobot</th><th scope="col">Peluang</th><th scope="col"><span class="visually-hidden">Hapus</span></th></tr></thead><tbody id="hadiah-body"></tbody></table></div>
+                <h3>Daftar hadiah</h3>
+                <p class="field__hint">Klik kotak gambar untuk menambah foto hadiah. Latar foto dihapus otomatis (paling rapi untuk foto produk berlatar polos; PNG yang sudah transparan dipakai apa adanya). Bobot = peluang keluar; stok kosong = tanpa batas.</p>
+                <label class="spin-otolatar"><input type="checkbox" id="hadiah-hapus-latar" checked> Hapus latar otomatis saat unggah</label>
+                <div class="table-wrap"><table class="hadiah-tabel"><thead><tr><th scope="col">Foto</th><th scope="col">Hadiah</th><th scope="col">Stok</th><th scope="col">Bobot</th><th scope="col">Peluang</th><th scope="col"><span class="visually-hidden">Hapus</span></th></tr></thead><tbody id="hadiah-body"></tbody></table></div>
+                <input type="file" id="hadiah-file" accept="image/png,image/jpeg,image/webp" hidden>
                 <button class="btn btn--soft btn--sm" type="button" id="hadiah-tambah">+ Tambah hadiah</button>
-                <fieldset class="peluang-tiket"><legend>Peluang tiket menang</legend>
-                  <label><input type="radio" name="peluang" value="rata" checked> Sama rata (tiap tiket peluangnya sama)</label>
-                  <label><input type="radio" name="peluang" value="kontribusi"> Sebanding kontribusi (makin banyak tenaga, makin besar peluang)</label>
+                <fieldset class="peluang-tiket"><legend>Peluang tiket menang (khusus tiket Lawan Monster)</legend>
+                  <label><input type="radio" name="peluang" value="rata" checked> Sama rata</label>
+                  <label><input type="radio" name="peluang" value="kontribusi"> Sebanding kontribusi tenaga</label>
                 </fieldset>
                 <div class="mon-adm-aksi"><button class="btn btn--cta btn--sm" type="button" id="hadiah-simpan">Simpan hadiah</button></div>
                 <p class="field__hint" id="hadiah-status"></p>
               </aside>
             </div>
-            <ol class="spin-menang" id="spin-menang"></ol>
-            <details class="spin-daftar"><summary id="spin-ringkas">Daftar tiket</summary>
-              <input class="input" id="spin-cari" placeholder="Cari nama, sekolah, atau nomor tiket" style="margin:.75rem 0">
-              <div class="table-wrap"><table class="mon-adm-tabel"><thead><tr><th scope="col">Tiket</th><th scope="col">Nama</th><th scope="col">Sekolah</th><th scope="col">Provinsi</th><th scope="col">Tenaga</th><th scope="col">Status</th><th scope="col">Catatan</th></tr></thead><tbody id="spin-tabel"></tbody></table></div>
-            </details>
+            <div class="spin-bawah">
+              <section class="spin-blok"><h3>Pemenang <span class="muted small" id="spin-menang-n"></span></h3><ol class="spin-menang" id="spin-menang"></ol></section>
+              <section class="spin-blok spin-peserta">
+                <div class="spin-peserta__kepala"><h3 id="spin-ringkas">Daftar peserta</h3>
+                  <div class="seg spin-saring" role="radiogroup" aria-label="Saring peserta">
+                    <label><input type="radio" name="saring" value="semua" checked><span>Semua</span></label>
+                    <label><input type="radio" name="saring" value="belum"><span>Belum menang</span></label>
+                    <label><input type="radio" name="saring" value="menang"><span>Sudah menang</span></label>
+                  </div></div>
+                <input class="input" id="spin-cari" type="search" placeholder="Cari nama, sekolah, kota, provinsi, jalur, atau kode">
+                <div class="table-wrap"><table class="mon-adm-tabel"><thead><tr><th scope="col">#</th><th scope="col">Nama</th><th scope="col">Sekolah</th><th scope="col">Kota</th><th scope="col">Provinsi</th><th scope="col">Jalur</th><th scope="col">Status</th></tr></thead><tbody id="spin-tabel"></tbody></table></div>
+                <button class="btn btn--soft btn--sm" type="button" id="spin-lagi" hidden>Tampilkan lebih banyak</button>
+              </section>
+            </div>
           </section>
         </section>
 
@@ -532,6 +593,7 @@
                 <button class="btn btn--ghost btn--sm" type="button" data-ekspor="dana">Dana Kaget <svg aria-hidden="true"><use href="#i-download"/></svg></button>
                 <button class="btn btn--ghost btn--sm" type="button" data-ekspor="survei">Survei <svg aria-hidden="true"><use href="#i-download"/></svg></button>
                 <button class="btn btn--ghost btn--sm" type="button" data-ekspor="finalis">Finalis <svg aria-hidden="true"><use href="#i-download"/></svg></button>
+                <button class="btn btn--ghost btn--sm" type="button" data-ekspor="hasil">Hasil undian <svg aria-hidden="true"><use href="#i-download"/></svg></button>
               </div>
               <p class="alert alert--info" id="ekspor-status" role="status" style="margin-top:1rem"></p>
             </div>
@@ -637,7 +699,7 @@
       tabs.forEach((t) => { const on = t === tab; t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1; $('#' + t.getAttribute('aria-controls')).hidden = !on; });
       if (focus) tab.focus();
       if (tab.id === 't-monster' && typeof statusMon === 'function') { statusMon(); muatUji(); }
-      if (tab.id === 't-spin') { muatTiket(); muatHadiah(); }
+      if (tab.id === 't-spin') { muatPeserta(); muatHadiah(); }
       if (tab.id === 't-keamanan') statusPrimer();
     }
     tabs.forEach((t, i) => {
@@ -829,8 +891,8 @@
       } catch (e) { $('#mon-status-sub').textContent = 'Gagal memuat status.'; }
       monTimer = setTimeout(statusMon, 3000);
     }
-    /* ---------- Tiket & spin undian (tab Spin Undian) ---------- */
-    let spinData = null, berputar = false, hadiahEdit = [], rodaSudut = 0;
+    /* ---------- Spin undian 2 tahap (tab Spin Undian): nama → hadiah ---------- */
+    let pesertaData = null, berputar = false, hadiahEdit = [], rodaSudut = 0, tahap = 'nama', tundaSpin = null, batasTabel = 200;
     // Warna roda dari token Nusa Cerah (tokens.css); teks di juring kuning memakai navy (putih tidak dipakai di atas Sun).
     const tok = (n) => getComputedStyle(document.documentElement).getPropertyValue('--' + n).trim();
     const WARNA_TOKEN = ['blue-600', 'sun-400', 'coral-500', 'green-600', 'violet-600', 'navy-900', 'blue-500', 'sun-500'];
@@ -838,25 +900,37 @@
     const WARNA = WARNA_TOKEN.map(tok);
     const TEKS_JURING = WARNA_TOKEN.map((n) => tok(TERANG.includes(n) ? 'navy-900' : 'white'));
     const monAdmin = (data) => api('admin-primer', {perintah: 'monster', data});
-    async function muatTiket(event) {
-      const d = await monAdmin({aksi: 'tiket', event: event || $('#spin-event').value || ''});
+    const SUMBER_LABEL = {lolos: 'Peserta lolos', wildcard: 'Wild card', semua: 'Peserta lolos + wild card', tiket: 'Tiket Lawan Monster'};
+    const ERR_SPIN = {tidak_ada_peserta: 'Semua peserta di daftar ini sudah menang atau datanya kosong. Impor data di tab Impor & Ekspor.', tanpa_hadiah: 'Belum ada hadiah. Buka ⚙ Atur hadiah lalu tambahkan.', hadiah_habis: 'Semua stok hadiah habis. Tambah stok di ⚙ Atur hadiah.', putar_nama_dulu: 'Putar nama dulu.', bos_tidak_tumbang: 'Tiket event ini hangus (bos tidak tumbang). Pakai mode latihan untuk gladi.', tidak_ada_tiket: 'Belum ada tiket di event ini.'};
+    const pesanSpin = (d) => ERR_SPIN[d.error] || pesan(d);
+    const singkat = (n) => { const b = String(n || '').trim().split(/\s+/); return b.length > 1 ? b[0] + ' ' + b[b.length - 1][0] + '.' : b[0] || ''; };
+    // Gambar hadiah: data URL → Image (untuk roda & hasil).
+    const gambarCache = new Map();
+    const gambarHadiah = (h) => { if (!h || !h.gambar) return null; let g = gambarCache.get(h.gambar); if (!g) { g = new Image(); g.onload = () => { if (!berputar) gambarRoda(rodaTampil); }; g.src = h.gambar; gambarCache.set(h.gambar, g); } return g; };
+    const hadiahById = (id) => hadiahEdit.find((h) => h.id === id);
+
+    async function muatPeserta() {
+      const sumber = $('#spin-sumber').value;
+      $('#spin-event-wrap').hidden = sumber !== 'tiket';
+      const d = await monAdmin({aksi: 'peserta', sumber, event: sumber === 'tiket' ? $('#spin-event').value || '' : ''});
       if (!d.ok) { $('#spin-info').textContent = pesan(d); return; }
-      spinData = d;
-      $('#spin-event').innerHTML = d.events.length ? d.events.map((e) => `<option value="${esc(e.id)}"${e.id === d.event ? ' selected' : ''}>${e.uji ? 'UJI · ' : ''}${esc(e.id)} · ${nf.format(e.tiket)} tiket${e.kalah ? ' · menang' : ''}</option>`).join('') : '<option value="">Belum ada event</option>';
-      renderTiket();
-      if (!hadiahEdit.length && !berputar) gambarRoda(rodaNama());
+      pesertaData = d;
+      if (sumber === 'tiket') $('#spin-event').innerHTML = d.events.length ? d.events.map((e) => `<option value="${esc(e.id)}"${e.id === d.event ? ' selected' : ''}>${e.uji ? 'UJI · ' : ''}${esc(e.id)} · ${nf.format(e.tiket)} tiket${e.kalah ? ' · bos tumbang' : ''}</option>`).join('') : '<option value="">Belum ada event</option>';
+      if (d.tunda && !berputar && tahap === 'nama') { tundaSpin = d.tunda; keTahap('hadiah'); tampilPemenang(d.tunda.pemenang); }
+      renderPeserta();
+      if (!berputar && tahap === 'nama') gambarRoda(rodaNamaIdle());
     }
-    // Tanpa hadiah: roda berisi nama peserta (maks 12 tiket aktif) agar tetap lingkaran yang berputar.
-    const rodaNama = () => (spinData ? spinData.tiket.filter((x) => x.status === 'aktif') : []).slice(0, 12).map((x) => ({id: x.nomor, nama: x.nama.split(/\s+/)[0] + ' ' + ((x.nama.split(/\s+/)[1] || '')[0] || '') + '.', bobot: 1, persen: 0}));
-    const rodaSekarang = (roda) => (roda && roda.length ? roda : rodaNama());
+    const belumMenang = () => (pesertaData ? pesertaData.peserta.filter((x) => !x.menang) : []);
+    const rodaNamaIdle = () => belumMenang().slice(0, 400).sort(() => Math.random() - 0.5).slice(0, 16).map((x) => ({id: x.id, nama: singkat(x.nama), bobot: 1, persen: 0}));
     async function muatHadiah() {
       const d = await monAdmin({aksi: 'spin-info'});
       if (!d.ok) return;
-      hadiahEdit = d.hadiah.map((h) => ({id: h.id, nama: h.nama, stok: h.stok == null ? '' : String(h.stok), bobot: String(h.bobot), terpakai: h.terpakai}));
+      hadiahEdit = d.hadiah.map((h) => ({id: h.id, nama: h.nama, stok: h.stok == null ? '' : String(h.stok), bobot: String(h.bobot), terpakai: h.terpakai, gambar: h.gambar || '', gambarBaru: false}));
       $$('input[name="peluang"]').forEach((r) => { r.checked = r.value === d.peluang; });
-      renderHadiah(); gambarRoda(rodaSekarang(d.roda));
+      renderHadiah();
+      if (tahap === 'hadiah' && !berputar) gambarRoda(rodaDariEdit());
     }
-    // Daftar hadiah yang ikut diundi menurut isian form (untuk pratinjau persen & roda).
+    // Daftar hadiah yang ikut diundi menurut isian form (pratinjau persen & roda).
     const rodaDariEdit = () => {
       const ikut = hadiahEdit.filter((h) => h.nama.trim() && Number(h.bobot) > 0 && (h.stok === '' || Number(h.stok) > (h.terpakai || 0)));
       const total = ikut.reduce((t, h) => t + Number(h.bobot), 0);
@@ -865,80 +939,171 @@
     function renderHadiah() {
       const roda = rodaDariEdit();
       $('#hadiah-body').innerHTML = hadiahEdit.map((h, i) => {
-        const r = roda.find((x) => x.id === h.id && x.nama === h.nama.trim());
+        const r = roda.find((x) => x.id === h.id);
         const sisa = h.stok === '' ? '' : ` title="Terpakai ${h.terpakai || 0}"`;
-        return `<tr data-i="${i}"><td><input class="input h-nama" aria-label="Nama hadiah" data-f="nama" value="${esc(h.nama)}" maxlength="60" placeholder="mis. Voucher 100rb"></td>
+        return `<tr data-i="${i}"><td><button class="h-foto" type="button" data-foto="${i}" aria-label="${h.gambar ? 'Ganti' : 'Tambah'} foto ${esc(h.nama || 'hadiah')}">${h.gambar ? `<img src="${esc(h.gambar)}" alt="">` : '＋'}</button></td>
+          <td><input class="input h-nama" aria-label="Nama hadiah" data-f="nama" value="${esc(h.nama)}" maxlength="60" placeholder="mis. HP Android"></td>
           <td><input class="input h-angka" aria-label="Stok" data-f="stok" value="${esc(h.stok)}" inputmode="numeric" placeholder="∞"${sisa}></td>
           <td><input class="input h-angka" aria-label="Bobot peluang" data-f="bobot" value="${esc(h.bobot)}" inputmode="decimal"></td>
           <td class="h-persen">${r ? String(r.persen).replace('.', ',') + '%' : (h.stok !== '' && Number(h.stok) <= (h.terpakai || 0) ? 'habis' : '0%')}</td>
           <td><button class="icon-btn" type="button" data-hapus="${i}" aria-label="Hapus hadiah">✕</button></td></tr>`;
-      }).join('') || '<tr><td colspan="5" class="muted small">Belum ada hadiah. Tanpa hadiah, spin hanya memilih pemenang.</td></tr>';
+      }).join('') || '<tr><td colspan="6" class="muted small">Belum ada hadiah. Tambahkan hadiah sebelum spin hadiah.</td></tr>';
     }
+    const ubahHadiah = () => { $('#hadiah-status').textContent = 'Ada perubahan yang belum disimpan.'; if (tahap === 'hadiah' && !berputar) gambarRoda(rodaDariEdit()); };
     $('#hadiah-body').addEventListener('input', (e) => {
-      const tr = e.target.closest('tr[data-i]'); if (!tr) return;
+      const tr = e.target.closest('tr[data-i]'); if (!tr || !e.target.dataset.f) return;
       hadiahEdit[+tr.dataset.i][e.target.dataset.f] = e.target.value;
       const roda = rodaDariEdit();
-      $$('#hadiah-body tr[data-i]').forEach((row) => { const h = hadiahEdit[+row.dataset.i]; const r = roda.find((x) => x.id === h.id && x.nama === h.nama.trim()); row.querySelector('.h-persen').textContent = r ? String(r.persen).replace('.', ',') + '%' : '0%'; });
-      gambarRoda(rodaSekarang(roda));
-      $('#hadiah-status').textContent = 'Ada perubahan yang belum disimpan.';
+      $$('#hadiah-body tr[data-i]').forEach((row) => { const h = hadiahEdit[+row.dataset.i]; const r = roda.find((x) => x.id === h.id); row.querySelector('.h-persen').textContent = r ? String(r.persen).replace('.', ',') + '%' : '0%'; });
+      ubahHadiah();
     });
-    $('#hadiah-body').addEventListener('click', (e) => { const b = e.target.closest('[data-hapus]'); if (!b) return; hadiahEdit.splice(+b.dataset.hapus, 1); renderHadiah(); gambarRoda(rodaSekarang(rodaDariEdit())); $('#hadiah-status').textContent = 'Ada perubahan yang belum disimpan.'; });
-    $('#hadiah-tambah').addEventListener('click', () => { hadiahEdit.push({id: 'h' + Math.random().toString(36).slice(2, 9), nama: '', stok: '', bobot: '1', terpakai: 0}); renderHadiah(); const n = $$('#hadiah-body .h-nama'); n[n.length - 1].focus(); });
+    let fotoUntuk = -1;
+    $('#hadiah-body').addEventListener('click', (e) => {
+      const f = e.target.closest('[data-foto]');
+      if (f) { fotoUntuk = +f.dataset.foto; $('#hadiah-file').value = ''; $('#hadiah-file').click(); return; }
+      const b = e.target.closest('[data-hapus]'); if (!b) return;
+      hadiahEdit.splice(+b.dataset.hapus, 1); renderHadiah(); ubahHadiah();
+    });
+    $('#hadiah-file').addEventListener('change', async () => {
+      const file = $('#hadiah-file').files[0], h = hadiahEdit[fotoUntuk];
+      if (!file || !h) return;
+      const tombol = $(`[data-foto="${fotoUntuk}"]`); if (tombol) tombol.classList.add('is-proses');
+      $('#hadiah-status').textContent = 'Memproses foto…';
+      try { h.gambar = await olahFoto(file, $('#hadiah-hapus-latar').checked); h.gambarBaru = true; renderHadiah(); ubahHadiah(); $('#hadiah-status').textContent = 'Foto siap. Klik "Simpan hadiah".'; }
+      catch (err) { $('#hadiah-status').textContent = 'Foto tidak bisa dibaca (pakai JPG/PNG/WebP).'; if (tombol) tombol.classList.remove('is-proses'); }
+    });
+    // Foto hadiah: diperkecil (maks 320 px), latar polos dihapus (flood-fill dari tepi + tepi halus), dipotong rapat, WebP transparan.
+    function olahFoto(file, hapusLatar) {
+      return new Promise((selesai, gagal) => {
+        const img = new Image(), url = URL.createObjectURL(file);
+        img.onerror = () => { URL.revokeObjectURL(url); gagal(new Error('gambar')); };
+        img.onload = () => {
+          URL.revokeObjectURL(url);
+          const k = Math.min(1, 360 / Math.max(img.naturalWidth, img.naturalHeight)), w = Math.max(1, Math.round(img.naturalWidth * k)), h = Math.max(1, Math.round(img.naturalHeight * k));
+          const c = document.createElement('canvas'); c.width = w; c.height = h;
+          const x = c.getContext('2d', {willReadFrequently: true}); x.drawImage(img, 0, 0, w, h);
+          const d = x.getImageData(0, 0, w, h), px = d.data;
+          let tembus = 0, tepi = 0;
+          for (let i = 0; i < w; i++) for (const j of [0, h - 1]) { tepi++; if (px[(j * w + i) * 4 + 3] < 200) tembus++; }
+          if (hapusLatar && tembus / tepi < 0.3) hapusLatarFoto(px, w, h);
+          x.putImageData(d, 0, 0);
+          // potong rapat ke isi + jarak 4%
+          let x0 = w, y0 = h, x1 = -1, y1 = -1;
+          for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) if (px[(j * w + i) * 4 + 3] > 24) { if (i < x0) x0 = i; if (i > x1) x1 = i; if (j < y0) y0 = j; if (j > y1) y1 = j; }
+          if (x1 < 0) { x0 = 0; y0 = 0; x1 = w - 1; y1 = h - 1; }
+          const pad = Math.round(Math.max(x1 - x0, y1 - y0) * 0.04), cw = x1 - x0 + 1 + pad * 2, ch = y1 - y0 + 1 + pad * 2;
+          const s2 = Math.min(1, 320 / Math.max(cw, ch)), o = document.createElement('canvas'); o.width = Math.round(cw * s2); o.height = Math.round(ch * s2);
+          o.getContext('2d').drawImage(c, x0 - pad, y0 - pad, cw, ch, 0, 0, o.width, o.height);
+          let hasil = o.toDataURL('image/webp', 0.86);
+          if (!/^data:image\/webp/.test(hasil)) hasil = o.toDataURL('image/png');
+          for (let q = 0.75; hasil.length > 190000 && q > 0.3; q -= 0.15) hasil = o.toDataURL('image/webp', q);
+          if (hasil.length > 195000) { gagal(new Error('besar')); return; }
+          selesai(hasil);
+        };
+        img.src = url;
+      });
+    }
+    function hapusLatarFoto(px, w, h) {
+      // warna latar = median warna tepi; isi dari tepi selama warnanya dekat latar (atau dekat tetangganya → gradasi lembut)
+      const tepi = [];
+      for (let i = 0; i < w; i += 2) { tepi.push((i) * 4, ((h - 1) * w + i) * 4); }
+      for (let j = 0; j < h; j += 2) { tepi.push((j * w) * 4, (j * w + w - 1) * 4); }
+      const med = [0, 1, 2].map((k) => { const v = tepi.map((o) => px[o + k]).sort((a, b) => a - b); return v[v.length >> 1]; });
+      const jarak = (o, r, g, b) => Math.hypot(px[o] - r, px[o + 1] - g, px[o + 2] - b);
+      const latar = new Uint8Array(w * h), antri = new Int32Array(w * h);
+      let kepala = 0, ekor = 0;
+      const coba = (n, dari) => {
+        if (latar[n]) return;
+        const o = n * 4;
+        const dekatLatar = jarak(o, med[0], med[1], med[2]) < 42;
+        const dekatTetangga = dari >= 0 && jarak(o, px[dari * 4], px[dari * 4 + 1], px[dari * 4 + 2]) < 10 && jarak(o, med[0], med[1], med[2]) < 90;
+        if (dekatLatar || dekatTetangga) { latar[n] = 1; antri[ekor++] = n; }
+      };
+      for (let i = 0; i < w; i++) { coba(i, -1); coba((h - 1) * w + i, -1); }
+      for (let j = 0; j < h; j++) { coba(j * w, -1); coba(j * w + w - 1, -1); }
+      while (kepala < ekor) {
+        const n = antri[kepala++], i = n % w, j = (n / w) | 0;
+        if (i > 0) coba(n - 1, n); if (i < w - 1) coba(n + 1, n); if (j > 0) coba(n - w, n); if (j < h - 1) coba(n + w, n);
+      }
+      for (let n = 0; n < w * h; n++) {
+        if (latar[n]) { px[n * 4 + 3] = 0; continue; }
+        const i = n % w, j = (n / w) | 0;
+        const tepiLatar = (i > 0 && latar[n - 1]) || (i < w - 1 && latar[n + 1]) || (j > 0 && latar[n - w]) || (j < h - 1 && latar[n + w]);
+        if (tepiLatar) px[n * 4 + 3] = Math.min(px[n * 4 + 3], 150); // tepi halus
+      }
+    }
+    $('#hadiah-tambah').addEventListener('click', () => { hadiahEdit.push({id: 'h' + Math.random().toString(36).slice(2, 9), nama: '', stok: '', bobot: '1', terpakai: 0, gambar: '', gambarBaru: false}); renderHadiah(); const n = $$('#hadiah-body .h-nama'); n[n.length - 1].focus(); });
     $('#hadiah-simpan').addEventListener('click', async (e) => {
       const btn = e.currentTarget;
       sibuk(btn, true);
       const peluang = ($$('input[name="peluang"]').find((r) => r.checked) || {}).value || 'rata';
       const d = await monAdmin({aksi: 'spin-atur', hadiah: hadiahEdit.map((h) => ({id: h.id, nama: h.nama, stok: h.stok, bobot: h.bobot})), peluang});
+      if (!d.ok) { sibuk(btn, false); $('#hadiah-status').textContent = d.error === 'nilai_tidak_valid' ? 'Stok/bobot tidak valid pada "' + d.hadiah + '".' : pesan(d); return; }
+      // foto dikirim satu per satu (ukuran permintaan tetap kecil)
+      let gagalFoto = 0;
+      for (const h of hadiahEdit.filter((x) => x.gambarBaru && x.nama.trim())) {
+        const g = await monAdmin({aksi: 'hadiah-gambar', id: h.id, gambar: h.gambar});
+        if (g.ok) h.gambarBaru = false; else gagalFoto++;
+      }
       sibuk(btn, false);
-      if (!d.ok) { $('#hadiah-status').textContent = d.error === 'nilai_tidak_valid' ? 'Stok/bobot tidak valid pada "' + d.hadiah + '".' : pesan(d); return; }
-      $('#hadiah-status').textContent = 'Tersimpan.';
-      hadiahEdit = d.hadiah.map((h) => ({id: h.id, nama: h.nama, stok: h.stok == null ? '' : String(h.stok), bobot: String(h.bobot), terpakai: h.terpakai}));
-      renderHadiah(); gambarRoda(rodaSekarang(d.roda));
+      await muatHadiah();
+      $('#hadiah-status').textContent = gagalFoto ? `Tersimpan, tapi ${gagalFoto} foto gagal diunggah (terlalu besar?).` : 'Tersimpan.';
     });
     $$('input[name="peluang"]').forEach((r) => r.addEventListener('change', () => { $('#hadiah-status').textContent = 'Ada perubahan yang belum disimpan.'; }));
     $('#spin-gear').addEventListener('click', () => {
       const buka = $('#spin-atur').hidden;
       $('#spin-atur').hidden = !buka; $('#spin-layout').classList.toggle('is-atur', buka); $('#spin-gear').setAttribute('aria-expanded', String(buka));
     });
-    // Roda hadiah: juring sebanding peluang. sudut = rotasi roda (rad); penunjuk di atas.
+
+    /* Roda: juring sebanding bobot; pada tahap hadiah tiap juring menampilkan foto hadiah. Penunjuk di atas. */
     let rodaTampil = [];
     function gambarRoda(roda, sudut = rodaSudut) {
       rodaTampil = roda || [];
       const c = $('#spin-roda'), x = c.getContext('2d'), R = c.width / 2;
       x.clearRect(0, 0, c.width, c.height);
-      if (!rodaTampil.length) { // tetap lingkaran walau belum ada hadiah/tiket
+      if (!rodaTampil.length) {
         x.beginPath(); x.arc(R, R, R - 8, 0, Math.PI * 2); x.fillStyle = 'rgba(255,255,255,.18)'; x.fill(); x.strokeStyle = tok('white'); x.lineWidth = 4; x.stroke();
-        x.fillStyle = tok('white'); x.font = '700 22px "Plus Jakarta Sans", system-ui, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('Belum ada tiket', R, R + 70);
-        x.beginPath(); x.arc(R, R, 34, 0, Math.PI * 2); x.fillStyle = tok('white'); x.fill(); x.fillStyle = tok('navy-900'); x.font = '800 18px "Plus Jakarta Sans", system-ui, sans-serif'; x.fillText('YCS', R, R);
-        return;
+        x.fillStyle = tok('white'); x.font = '700 24px "Plus Jakarta Sans", system-ui, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
+        x.fillText(tahap === 'hadiah' ? 'Belum ada hadiah' : 'Belum ada peserta', R, R + 80);
+      } else {
+        const total = rodaTampil.reduce((t, h) => t + h.bobot, 0), denganFoto = tahap === 'hadiah';
+        let a = sudut - Math.PI / 2;
+        rodaTampil.forEach((h, i) => {
+          const besar = h.bobot / total * Math.PI * 2;
+          x.beginPath(); x.moveTo(R, R); x.arc(R, R, R - 8, a, a + besar); x.closePath();
+          x.fillStyle = WARNA[i % WARNA.length]; x.fill(); x.strokeStyle = tok('white'); x.lineWidth = 4; x.stroke();
+          x.save(); x.translate(R, R); x.rotate(a + besar / 2);
+          const img = denganFoto ? gambarHadiah(hadiahById(h.id)) : null;
+          const ukImg = Math.min(R * 0.34, besar * R * 0.62);
+          if (img && img.complete && img.naturalWidth && besar > 0.18) {
+            x.save(); x.translate(R - 16 - ukImg / 2, 0); x.rotate(Math.PI / 2);
+            const k = Math.min(ukImg / img.naturalWidth, ukImg / img.naturalHeight);
+            x.shadowColor = 'rgba(6,24,64,.35)'; x.shadowBlur = 6;
+            x.drawImage(img, -img.naturalWidth * k / 2, -img.naturalHeight * k / 2, img.naturalWidth * k, img.naturalHeight * k);
+            x.restore();
+          }
+          const ujung = img && img.complete && img.naturalWidth && besar > 0.18 ? R - 26 - ukImg : R - 28;
+          x.fillStyle = TEKS_JURING[i % WARNA.length];
+          x.font = '800 ' + Math.max(13, Math.min(26, (denganFoto ? 230 : 300) / Math.max(6, h.nama.length))) + 'px "Plus Jakarta Sans", system-ui, sans-serif';
+          x.textAlign = 'right'; x.textBaseline = 'middle'; x.shadowColor = 'rgba(6,24,64,.25)'; x.shadowBlur = 2;
+          if (besar > 0.1) x.fillText(h.nama.length > 20 ? h.nama.slice(0, 19) + '…' : h.nama, ujung, 0);
+          x.font = '700 14px "Plus Jakarta Sans", system-ui, sans-serif'; if (besar > 0.25 && h.persen) x.fillText(String(h.persen).replace('.', ',') + '%', ujung, 22);
+          x.restore();
+          a += besar;
+        });
       }
-      const total = rodaTampil.reduce((t, h) => t + h.bobot, 0);
-      let a = sudut - Math.PI / 2;
-      rodaTampil.forEach((h, i) => {
-        const besar = h.bobot / total * Math.PI * 2;
-        x.beginPath(); x.moveTo(R, R); x.arc(R, R, R - 8, a, a + besar); x.closePath();
-        x.fillStyle = WARNA[i % WARNA.length]; x.fill();
-        x.strokeStyle = tok('white'); x.lineWidth = 4; x.stroke();
-        x.save(); x.translate(R, R); x.rotate(a + besar / 2);
-        x.fillStyle = TEKS_JURING[i % WARNA.length]; x.font = '800 ' + Math.max(14, Math.min(26, 300 / Math.max(6, h.nama.length))) + 'px "Plus Jakarta Sans", system-ui, sans-serif';
-        x.textAlign = 'right'; x.textBaseline = 'middle'; x.shadowColor = 'rgba(6,24,64,.25)'; x.shadowBlur = 2;
-        if (besar > 0.12) x.fillText(h.nama.length > 22 ? h.nama.slice(0, 21) + '…' : h.nama, R - 26, 0);
-        x.font = '700 14px "Plus Jakarta Sans", system-ui, sans-serif'; if (besar > 0.2 && h.persen) x.fillText(String(h.persen).replace('.', ',') + '%', R - 26, 22);
-        x.restore();
-        a += besar;
-      });
-      x.beginPath(); x.arc(R, R, 34, 0, Math.PI * 2); x.fillStyle = tok('white'); x.fill();
-      x.fillStyle = tok('navy-900'); x.font = '800 18px "Plus Jakarta Sans", system-ui, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('YCS', R, R);
+      x.beginPath(); x.arc(R, R, 40, 0, Math.PI * 2); x.fillStyle = tok('white'); x.fill();
+      x.fillStyle = tok('navy-900'); x.font = '800 20px "Plus Jakarta Sans", system-ui, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('YCS', R, R);
     }
-    // Putar roda sampai tengah juring hadiah pemenang berada di bawah penunjuk.
-    function putarRoda(roda, idHadiah, ms) {
+    // Putar roda sampai tengah juring target berada di bawah penunjuk (ease-out panjang, sedikit "tik" di akhir).
+    function putarRoda(roda, idTarget, ms) {
       return new Promise((selesai) => {
-        if (!roda.length || !idHadiah) { selesai(); return; }
+        if (!roda.length || !idTarget) { selesai(); return; }
         const total = roda.reduce((t, h) => t + h.bobot, 0);
         let awal = 0;
-        for (const h of roda) { const b = h.bobot / total * Math.PI * 2; if (h.id === idHadiah) { awal += b / 2 + (Math.random() - 0.5) * b * 0.6; break; } awal += b; }
+        for (const h of roda) { const b = h.bobot / total * Math.PI * 2; if (h.id === idTarget) { awal += b / 2 + (Math.random() - 0.5) * b * 0.6; break; } awal += b; }
         const dari = rodaSudut, normal = ((dari % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
-        const ke = dari - normal + Math.PI * 2 * 6 + (Math.PI * 2 - awal);
+        const ke = dari - normal + Math.PI * 2 * 7 + (Math.PI * 2 - awal);
         const t0 = performance.now();
         const langkah = (t) => {
           const k = Math.min(1, (t - t0) / ms), e = 1 - Math.pow(1 - k, 4);
@@ -949,47 +1114,88 @@
         requestAnimationFrame(langkah);
       });
     }
-    function renderTiket() {
-      const t = spinData ? spinData.tiket : [];
-      const q = $('#spin-cari').value.trim().toLowerCase();
-      const aktif = t.filter((x) => x.status === 'aktif').length;
-      $('#spin-ringkas').textContent = `Daftar tiket (${nf.format(t.length)} tiket, ${nf.format(aktif)} belum menang)`;
-      $('#spin-info').textContent = t.length ? `${nf.format(aktif)} tiket ikut undian.` : 'Belum ada tiket di event ini.';
-      $('#spin-putar').disabled = !aktif || berputar;
-      $('#spin-tabel').innerHTML = t.filter((x) => !q || [x.nomor, x.nama, x.sekolah, x.provinsi].join(' ').toLowerCase().includes(q)).slice(0, 500)
-        .map((x) => `<tr><td>${esc(x.nomor)}</td><td>${esc(x.nama)}</td><td>${esc(x.sekolah)}</td><td>${esc(x.provinsi)}</td><td>${nf.format(Number(x.kontribusi) || 0)}</td><td>${esc(x.status)}</td><td>${esc(x.catatan || '')}</td></tr>`).join('');
-      $('#spin-menang').innerHTML = t.filter((x) => /^MENANG/.test(x.status)).sort((a, b) => a.status.localeCompare(b.status, 'id', {numeric: true}))
-        .map((x) => `<li><strong>${esc(x.nama)}</strong> (${esc(x.sekolah)}, ${esc(x.provinsi)}) · tiket ${esc(x.nomor)} · ${esc(x.status.replace(/^MENANG #\d+ · /, ''))}</li>`).join('');
+    function keTahap(t) {
+      tahap = t;
+      $('#spin-panggung').dataset.tahap = t;
+      $('#tahap-1').className = t === 'nama' ? 'is-aktif' : 'is-selesai';
+      $('#tahap-2').className = t === 'hadiah' ? 'is-aktif' : '';
+      $('#spin-putar').textContent = t === 'hadiah' ? 'Putar hadiah' : 'Putar nama';
+      $('#spin-batal').hidden = t !== 'hadiah';
+      $('#spin-roda').setAttribute('aria-label', t === 'hadiah' ? 'Roda hadiah' : 'Roda nama peserta');
     }
-    $('#spin-cari').addEventListener('input', renderTiket);
-    $('#spin-event').addEventListener('change', () => muatTiket($('#spin-event').value));
-    $('#spin-segarkan').addEventListener('click', () => { muatTiket(); muatHadiah(); });
+    function tampilPemenang(w) {
+      $('#spin-isi').innerHTML = `<span>${esc(w.nama)}</span>`;
+      $('#spin-detail').textContent = [w.sekolah, w.kota, w.provinsi, w.jalur].filter(Boolean).join(' · ');
+    }
+    function renderPeserta() {
+      const t = pesertaData ? pesertaData.peserta : [];
+      const q = $('#spin-cari').value.trim().toLowerCase(), saring = ($$('input[name="saring"]').find((r) => r.checked) || {}).value || 'semua';
+      const sisa = t.filter((x) => !x.menang).length;
+      $('#spin-ringkas').textContent = `Daftar peserta · ${SUMBER_LABEL[pesertaData ? pesertaData.sumber : 'lolos']} (${nf.format(t.length)} orang, ${nf.format(sisa)} belum menang)`;
+      if (!berputar && tahap === 'nama' && $('#spin-hasil-hadiah').hidden) $('#spin-info').textContent = t.length ? `${nf.format(sisa)} peserta ikut undian.` : 'Data peserta kosong. Impor dulu di tab Impor & Ekspor.';
+      $('#spin-putar').disabled = berputar || (tahap === 'nama' && !sisa);
+      const cocok = t.filter((x) => (saring === 'semua' || (saring === 'menang') === !!x.menang) && (!q || [x.nama, x.sekolah, x.kota, x.provinsi, x.jalur, x.kode].join(' ').toLowerCase().includes(q)));
+      $('#spin-tabel').innerHTML = cocok.slice(0, batasTabel).map((x, i) => `<tr><td>${i + 1}</td><td>${esc(x.nama)}</td><td>${esc(x.sekolah)}</td><td>${esc(x.kota)}</td><td>${esc(x.provinsi)}</td><td>${esc(x.jalur)}</td><td class="${x.menang ? 'is-menang' : ''}">${x.menang ? 'Menang' + (x.menang.hadiah ? ' · ' + esc(x.menang.hadiah) : '') : 'Ikut undian'}</td></tr>`).join('')
+        || `<tr><td colspan="7" class="muted small">${t.length ? 'Tidak ada yang cocok.' : 'Belum ada data.'}</td></tr>`;
+      $('#spin-lagi').hidden = cocok.length <= batasTabel;
+      const hasil = pesertaData ? pesertaData.hasil : [];
+      $('#spin-menang-n').textContent = hasil.length ? `(${hasil.length})` : '';
+      $('#spin-menang').innerHTML = hasil.map((h) => `<li><strong>#${h.ke} ${esc(h.nama)}</strong> → ${esc(h.hadiah)}<small>${esc([h.sekolah, h.provinsi, h.jalur].filter(Boolean).join(' · '))} · ${esc(h.waktu)}</small></li>`).join('') || '<li class="muted small">Belum ada pemenang.</li>';
+    }
+    let cariTimer = 0;
+    $('#spin-cari').addEventListener('input', () => { clearTimeout(cariTimer); cariTimer = setTimeout(() => { batasTabel = 200; renderPeserta(); }, 120); });
+    $$('input[name="saring"]').forEach((r) => r.addEventListener('change', () => { batasTabel = 200; renderPeserta(); }));
+    $('#spin-lagi').addEventListener('click', () => { batasTabel += 300; renderPeserta(); });
+    $('#spin-sumber').addEventListener('change', () => { if (tahap === 'hadiah') return; batasTabel = 200; muatPeserta(); });
+    $('#spin-event').addEventListener('change', () => muatPeserta());
+    $('#spin-segarkan').addEventListener('click', () => { muatPeserta(); muatHadiah(); });
     $('#spin-latihan').addEventListener('change', () => { $('#spin-latihan-tanda').hidden = !$('#spin-latihan').checked; });
     $('#spin-layar').addEventListener('click', () => { const c = $('#spin-card'); if (document.fullscreenElement) document.exitFullscreen(); else if (c.requestFullscreen) c.requestFullscreen(); });
-    $('#spin-putar').addEventListener('click', async () => {
+    $('#spin-batal').addEventListener('click', async () => {
       if (berputar) return;
-      berputar = true; $('#spin-putar').disabled = true; $('#spin-detail').textContent = ''; $('#spin-hadiah').textContent = '';
-      const nama = (spinData ? spinData.tiket.filter((x) => x.status === 'aktif').map((x) => x.nama) : []).sort(() => Math.random() - 0.5);
-      const isi = $('#spin-isi');
-      let i = 0, jeda = 50, putar = true;
+      await monAdmin({aksi: 'spin-batal'});
+      tundaSpin = null; keTahap('nama'); $('#spin-isi').innerHTML = '<span>Siap diputar</span>'; $('#spin-detail').textContent = ''; $('#spin-hasil-hadiah').hidden = true;
+      gambarRoda(rodaNamaIdle()); renderPeserta();
+    });
+    const tunggu = (ms) => new Promise((r) => setTimeout(r, ms));
+    async function putarNama() {
+      const sumber = $('#spin-sumber').value;
+      const nama = belumMenang().map((x) => x.nama).sort(() => Math.random() - 0.5);
+      $('#spin-hasil-hadiah').hidden = true; $('#spin-detail').textContent = '';
+      const isi = $('#spin-isi'); let i = 0, jeda = 50, putar = true;
       const gulir = () => { if (!putar) return; isi.innerHTML = `<span>${esc(nama[i++ % Math.max(1, nama.length)] || '…')}</span>`; setTimeout(gulir, jeda); };
       gulir();
-      const d = await monAdmin({aksi: 'spin', event: $('#spin-event').value, latihan: $('#spin-latihan').checked});
-      if (!d.ok) { putar = false; berputar = false; isi.innerHTML = '<span>Gagal</span>'; $('#spin-info').textContent = d.error === 'hadiah_habis' ? 'Semua hadiah sudah habis. Tambah stok di Atur hadiah.' : pesan(d); renderTiket(); return; }
-      // Pemenang & hadiah dipilih server; animasi roda dan nama berhenti tepat di hasil itu.
-      const lama = 4800, akhir = Date.now() + lama;
-      const melambat = () => { jeda = Math.min(420, jeda * 1.12); if (Date.now() < akhir - 300) setTimeout(melambat, 200); };
+      const d = await monAdmin({aksi: 'spin-nama', sumber, event: sumber === 'tiket' ? $('#spin-event').value : '', latihan: $('#spin-latihan').checked});
+      if (!d.ok) { putar = false; isi.innerHTML = '<span>—</span>'; $('#spin-info').textContent = pesanSpin(d); return; }
+      const lama = 5200, akhir = Date.now() + lama;
+      const melambat = () => { jeda = Math.min(460, jeda * 1.12); if (Date.now() < akhir - 300) setTimeout(melambat, 200); };
       melambat();
-      gambarRoda(d.rodaPutar || [], rodaSudut);
-      await Promise.all([putarRoda(d.rodaPutar || [], d.targetRoda || (d.hadiah && d.hadiah.id), lama), new Promise((r) => setTimeout(r, lama))]);
+      await Promise.all([putarRoda(d.rodaPutar, d.targetRoda, lama), tunggu(lama)]);
       putar = false;
-      isi.innerHTML = `<span>🎉 ${esc(d.pemenang.nama)}</span>`;
-      $('#spin-detail').textContent = `${d.pemenang.sekolah} · ${d.pemenang.provinsi} · tiket ${d.pemenang.nomor}`;
-      $('#spin-hadiah').textContent = d.hadiah ? 'Hadiah: ' + d.hadiah.nama : '';
-      $('#spin-info').textContent = d.latihan ? 'Latihan: hasil tidak dicatat.' : `Pemenang ke-${d.ke} tercatat di tab Tiket Monster.`;
-      berputar = false;
-      if (d.hadiah) gambarRoda(rodaSekarang(d.roda), rodaSudut);
-      if (!d.latihan) { muatTiket(d.event); muatHadiah(); } else $('#spin-putar').disabled = false;
+      tundaSpin = d; tampilPemenang(d.pemenang);
+      $('#spin-info').textContent = `${d.pemenang.nama} terpilih! Sekarang putar hadiahnya.`;
+      keTahap('hadiah');
+      await tunggu(900);
+      rodaSudut = 0; gambarRoda(rodaDariEdit());
+    }
+    async function putarHadiah() {
+      const d = await monAdmin({aksi: 'spin-hadiah'});
+      if (!d.ok) { $('#spin-info').textContent = pesanSpin(d); if (d.error === 'putar_nama_dulu') keTahap('nama'); return; }
+      $('#spin-info').textContent = 'Memutar hadiah…';
+      await putarRoda(d.rodaPutar, d.targetRoda, 5600);
+      const h = hadiahById(d.hadiah.id) || {};
+      $('#spin-hasil-img').src = h.gambar || ''; $('#spin-hasil-img').alt = d.hadiah.nama; $('#spin-hasil-nama').textContent = d.hadiah.nama;
+      $('#spin-hasil-hadiah').hidden = false;
+      $('#spin-info').textContent = d.latihan ? 'Latihan: hasil tidak dicatat.' : `Pemenang ke-${d.ke}: ${d.pemenang.nama} mendapat ${d.hadiah.nama}. Tercatat di tab "Hasil Undian".`;
+      tundaSpin = null; keTahap('nama');
+      $('#spin-putar').textContent = 'Putar nama berikutnya';
+      await Promise.all([muatHadiah(), muatPeserta()]);
+    }
+    $('#spin-putar').addEventListener('click', async () => {
+      if (berputar) return;
+      berputar = true; $('#spin-putar').disabled = true; $('#spin-batal').disabled = true;
+      try { if (tahap === 'nama') await putarNama(); else await putarHadiah(); }
+      finally { berputar = false; $('#spin-batal').disabled = false; renderPeserta(); }
     });
 
     /* ---------- Mode uji monster ---------- */

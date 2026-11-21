@@ -61,7 +61,8 @@ function buatMonster(app, opsi = {}) {
   st.events = st.events || {};       // id event → {lvl, tenaga, total, kalah, naik, u:{pid:{p,q}}, tiket:{pid:nomor}, n, final}
   st.uji = st.uji || null;           // mode uji monster: {kode, mulai, sampai} — event terpisah, hanya lewat link ?uji-monster=kode
   st.ujiPemain = st.ujiPemain || {}; // pid → identitas penguji (tidak mengikat perangkat)
-  st.spin = st.spin || {hadiah: [], peluang: 'rata'}; // hadiah: [{id, nama, stok|null, bobot, terpakai}]
+  st.spin = st.spin || {hadiah: [], peluang: 'rata'}; // hadiah: [{id, nama, stok|null, bobot, terpakai, gambar?}]
+  st.spin.hasil = st.spin.hasil || []; // undian 2 tahap: [{ke, id, sumber, nama, sekolah, kota, provinsi, jalur, hadiah, hadiahId, waktu}]
   const ember = new Map();           // batas kecepatan per pemain (tidak perlu disimpan)
   const aktif = new Map();           // id event → Map(pid → terakhir aktif)
   const ipHitung = new Map();        // batas token per IP: ip → {n, sampai}
@@ -448,7 +449,7 @@ function buatMonster(app, opsi = {}) {
   }
   function aturSpin(p) {
     const daftar = Array.isArray(p.hadiah) ? p.hadiah : [];
-    if (daftar.length > 30) return {ok: false, error: 'validation'};
+    if (daftar.length > 40) return {ok: false, error: 'validation'};
     const lama = new Map(st.spin.hadiah.map((h) => [h.id, h]));
     const baru = [];
     for (const h of daftar) {
@@ -458,7 +459,8 @@ function buatMonster(app, opsi = {}) {
       const bobot = Number(String(h.bobot).replace(',', '.'));
       if ((stok != null && (!Number.isFinite(stok) || stok < 0 || stok > 1e6)) || !Number.isFinite(bobot) || bobot < 0 || bobot > 1e6) return {ok: false, error: 'nilai_tidak_valid', hadiah: nama};
       const id = typeof h.id === 'string' && /^[\w-]{4,20}$/.test(h.id) ? h.id : crypto.randomBytes(5).toString('base64url');
-      baru.push({id, nama, stok, bobot, terpakai: (lama.get(id) || {}).terpakai || 0});
+      const l = lama.get(id) || {};
+      baru.push({id, nama, stok, bobot, terpakai: l.terpakai || 0, ...(l.gambar ? {gambar: l.gambar} : {})});
     }
     st.spin.hadiah = baru;
     st.spin.peluang = p.peluang === 'kontribusi' ? 'kontribusi' : 'rata';
@@ -502,6 +504,83 @@ function buatMonster(app, opsi = {}) {
       hadiah: hadiah ? {id: hadiah.id, nama: hadiah.nama} : null, rodaPutar: rodaInfo.length ? rodaInfo : rodaNama, targetRoda: hadiah ? hadiah.id : String(pilih.r[2]), sisa: latihan ? calon.length : calon.length - 1};
   }
 
+
+  /* ---------- Undian 2 tahap: spin NAMA (peserta lolos / wild card / tiket) → spin HADIAH ---------- */
+  // Sumber peserta: 'lolos' = tab Finalis (hasil impor), 'wildcard' = tab Kode Wildcard, 'semua' = keduanya,
+  // 'tiket' = tiket Lawan Monster event terpilih. Pemenang tidak ikut lagi di putaran berikutnya.
+  const SUMBER = ['lolos', 'wildcard', 'semua', 'tiket'];
+  const idDari = (...x) => crypto.createHash('sha1').update(x.map((v) => String(v || '').trim().toLowerCase()).join('|')).digest('base64url').slice(0, 12);
+  const baris = (nama) => { const sh = app.sheets[nama]; return sh ? sh.rows.slice(1) : []; };
+  function pesertaDari(sumber, event) {
+    const out = [];
+    if (sumber === 'lolos' || sumber === 'semua') baris('Finalis').forEach((r) => {
+      if (!String(r[0] || '').trim() || /^(tidak|no|false|0)$/i.test(String(r[6] ?? '').trim())) return;
+      out.push({id: 'f:' + idDari(r[0], r[1], r[3]), sumber: 'lolos', nama: String(r[0]).trim(), sekolah: String(r[1] || ''), kota: String(r[2] || ''), provinsi: String(r[3] || ''), jalur: String(r[4] || 'Seleksi Umum')});
+    });
+    if (sumber === 'wildcard' || sumber === 'semua') baris('Kode Wildcard').forEach((r) => {
+      if (!String(r[0] || '').trim() || /hangus/i.test(String(r[3]))) return;
+      const email = String(r[1] || '');
+      out.push({id: 'w:' + String(r[0]).toUpperCase(), sumber: 'wildcard', nama: String(r[2] || '').trim() || email.replace(/^(.{2}).*(@.*)$/, '$1***$2'), sekolah: '', kota: '', provinsi: '', jalur: 'Wild card', kode: String(r[0]).toUpperCase(), status: String(r[3] || '')});
+    });
+    if (sumber === 'tiket' && event) barisTiket(event).forEach(({r}) => out.push({id: 't:' + String(r[2]), sumber: 'tiket', nama: String(r[3] || ''), sekolah: String(r[4] || ''), kota: '', provinsi: String(r[5] || ''), jalur: 'Tiket ' + String(r[2]), kontribusi: Number(r[8]) || 0, statusTiket: String(r[9] || '')}));
+    const menang = new Map(st.spin.hasil.map((h) => [h.id, h]));
+    out.forEach((x) => { const h = menang.get(x.id); if (h) x.menang = {ke: h.ke, hadiah: h.hadiah}; else if (x.sumber === 'tiket' && /^MENANG/.test(x.statusTiket)) x.menang = {ke: 0, hadiah: x.statusTiket.split(' · ')[1] || ''}; });
+    return out;
+  }
+  const acakBobot = (arr, w) => { const total = arr.reduce((s, x) => s + w(x), 0); let r = crypto.randomInt(Math.max(1, Math.round(total * 1000))) / 1000; for (const x of arr) { r -= w(x); if (r < 0) return x; } return arr[arr.length - 1]; };
+  const acak = (arr) => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = crypto.randomInt(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  function spinNama(p) {
+    const sumber = SUMBER.includes(p.sumber) ? p.sumber : 'lolos', latihan = !!p.latihan;
+    const event = sumber === 'tiket' ? p.event : '';
+    if (sumber === 'tiket') {
+      if (!event) return {ok: false, error: 'tidak_ada_tiket'};
+      if (!latihan && st.events[event] && !st.events[event].kalah) return {ok: false, error: 'bos_tidak_tumbang'};
+    }
+    const calon = pesertaDari(sumber, event).filter((x) => !x.menang);
+    if (!calon.length) return {ok: false, error: 'tidak_ada_peserta'};
+    const pilih = sumber === 'tiket' && st.spin.peluang === 'kontribusi' ? acakBobot(calon, (x) => Math.max(1, x.kontribusi || 1)) : calon[crypto.randomInt(calon.length)];
+    const roda = acak([pilih, ...acak(calon.filter((x) => x !== pilih)).slice(0, 15)]).map((x) => ({id: x.id, nama: namaTampil(x.nama), bobot: 1, persen: 0}));
+    st.spin.tunda = {pemenang: pilih, sumber, event, latihan, t: now()};
+    return {ok: true, tahap: 'nama', latihan, sumber, pemenang: pilih, rodaPutar: roda, targetRoda: pilih.id, sisa: calon.length - (latihan ? 0 : 1)};
+  }
+  function spinHadiah(p) {
+    const tunda = st.spin.tunda;
+    if (!tunda || now() - tunda.t > 60 * MENIT) return {ok: false, error: 'putar_nama_dulu'};
+    if (!st.spin.hadiah.length) return {ok: false, error: 'tanpa_hadiah'};
+    const roda = tersedia();
+    if (!roda.length) return {ok: false, error: 'hadiah_habis'};
+    const hadiah = acakBobot(roda, (h) => h.bobot), w = tunda.pemenang;
+    const rodaInfo = peluangHadiah(roda).map((h) => ({id: h.id, nama: h.nama, bobot: h.bobot, persen: h.persen}));
+    let ke = null;
+    if (!tunda.latihan) {
+      ke = st.spin.hasil.length + 1;
+      const waktu = app.ctx.teksWib_(now()) + ' WIB';
+      st.spin.hasil.push({ke, id: w.id, sumber: w.sumber, nama: w.nama, sekolah: w.sekolah, kota: w.kota, provinsi: w.provinsi, jalur: w.jalur, hadiah: hadiah.nama, hadiahId: hadiah.id, waktu});
+      hadiah.terpakai += 1; tulisHadiah();
+      const sh = app.sheets['Hasil Undian'] || app.ctx.tab_(app.ss, 'hasil');
+      sh.rows.push([waktu, ke, {lolos: 'Peserta lolos', wildcard: 'Wild card', tiket: 'Tiket ' + tunda.event}[w.sumber] || w.sumber, w.nama, w.sekolah, w.kota, w.provinsi, w.jalur, hadiah.nama, '']);
+      if (w.sumber === 'tiket') {
+        const t = barisTiket(tunda.event).find(({r}) => 't:' + String(r[2]) === w.id);
+        if (t) t.r[9] = ['MENANG #' + (barisTiket(tunda.event).filter((x) => /^MENANG/.test(String(x.r[9]))).length + 1), hadiah.nama, waktu].join(' · ');
+      }
+      app.ctx.logAdmin_('undian ' + w.sumber, w.nama + ' → ' + hadiah.nama);
+      ubah();
+    }
+    st.spin.tunda = null;
+    return {...infoSpin(), ok: true, tahap: 'hadiah', latihan: tunda.latihan, ke, pemenang: w, hadiah: {id: hadiah.id, nama: hadiah.nama}, rodaPutar: rodaInfo, targetRoda: hadiah.id};
+  }
+  // Gambar hadiah (data URL webp/png bertransparansi, sudah diperkecil & latarnya dihapus di browser admin).
+  function gambarHadiah(p) {
+    const h = st.spin.hadiah.find((x) => x.id === p.id);
+    if (!h) return {ok: false, error: 'tidak_ditemukan'};
+    const g = String(p.gambar || '');
+    if (g && (!/^data:image\/(webp|png);base64,[A-Za-z0-9+/=]+$/.test(g) || g.length > 200000)) return {ok: false, error: 'gambar_tidak_valid'};
+    if (g) h.gambar = g; else delete h.gambar;
+    app.ctx.logAdmin_('gambar hadiah', h.nama + (g ? '' : ' (dihapus)'));
+    ubah();
+    return {ok: true, ...infoSpin()};
+  }
+
   function admin(p) {
     if (!adminSah(p.token)) return {ok: false, error: 'sesi_habis'};
     const daftar = ringkasEvent();
@@ -511,6 +590,11 @@ function buatMonster(app, opsi = {}) {
     if (p.aksi === 'spin-info') return {ok: true, ...infoSpin()};
     if (p.aksi === 'spin-atur') return aturSpin(p);
     if (p.aksi === 'spin') return spin(id, !!p.latihan);
+    if (p.aksi === 'peserta') { const sumber = SUMBER.includes(p.sumber) ? p.sumber : 'lolos'; return {ok: true, sumber, event: id || null, events: daftar, peserta: pesertaDari(sumber, sumber === 'tiket' ? id : ''), hasil: st.spin.hasil.slice().reverse(), tunda: st.spin.tunda && now() - st.spin.tunda.t < 60 * MENIT ? st.spin.tunda : null}; }
+    if (p.aksi === 'spin-nama') return spinNama({...p, event: id});
+    if (p.aksi === 'spin-hadiah') return spinHadiah(p);
+    if (p.aksi === 'spin-batal') { st.spin.tunda = null; return {ok: true}; }
+    if (p.aksi === 'hadiah-gambar') return gambarHadiah(p);
     if (p.aksi === 'uji-mulai') {
       const menit = Math.round(angka(p.menit, 10, 1, 120));
       const target = String(p.target || '').split(/[;,\s]+/).map((x) => Math.round(Number(x.replace(/\./g, '')))).filter((x) => x > 0 && x <= 1e9).slice(0, 10);
@@ -540,12 +624,12 @@ function buatMonster(app, opsi = {}) {
   // Daftar pemenang publik (landing): hanya event asli, nama disingkat "Nama I." + provinsi + hadiah.
   function pemenangPublik() {
     const sh = app.sheets['Tiket Monster'];
-    if (!sh) return {ok: true, pemenang: []};
-    const out = sh.rows.slice(1).filter((r) => /^MENANG/.test(String(r[9])) && r[1] && String(r[1])[0] !== 'u').map((r) => {
+    const out = (sh ? sh.rows.slice(1) : []).filter((r) => /^MENANG/.test(String(r[9])) && r[1] && String(r[1])[0] !== 'u').map((r) => {
       const bagian = String(r[9]).split(' · ');
       return {nama: namaTampil(r[3]), provinsi: String(r[5] || ''), hadiah: bagian.length >= 3 ? bagian[1] : '', waktu: bagian[bagian.length - 1].replace(/^MENANG #\d+\s*/, ''), ke: Number((bagian[0].match(/#(\d+)/) || [])[1]) || 0};
-    }).reverse().slice(0, 60);
-    return {ok: true, pemenang: out};
+    });
+    const undian = st.spin.hasil.map((h) => ({nama: namaTampil(h.nama), provinsi: h.provinsi || '', hadiah: h.hadiah, waktu: String(h.waktu || '').replace(/ WIB$/, ''), ke: h.ke}));
+    return {ok: true, pemenang: [...out, ...undian].reverse().slice(0, 60)};
   }
 
   return {lihat, masuk, tap, hindar, saya, admin, pemenangPublik, state: st, jadwal, jenisJurus, segarkan: () => { memo.t = 0; }};

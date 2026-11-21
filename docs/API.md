@@ -84,3 +84,9 @@ Field di luar daftar dibuang server. Aturan validasi (panjang, format email, kat
 - `GET /health`: status server & sinkron.
 - `POST /internal/sandi-baru {rahasia}`: reset password admin.
 - Alias lama: `/exec` (protokol Apps Script), `/monster`, `/monster/pemenang`.
+
+### Spin undian 2 tahap (admin, `POST /api/admin` → `admin-primer`, `perintah: monster`)
+- `peserta {sumber: lolos|wildcard|semua|tiket, event?}` → `{peserta[{id, sumber, nama, sekolah, kota, provinsi, jalur, menang?}], hasil[], tunda}` — lolos = tab Finalis (impor), wildcard = tab Kode Wildcard.
+- `spin-nama {sumber, event?, latihan}` → pemenang dipilih acak di server (crypto), pemenang lama tidak ikut; disimpan sebagai `tunda`.
+- `spin-hadiah` → hadiah dipilih sesuai bobot & stok untuk pemenang `tunda`; hasil asli dicatat di `st.spin.hasil` + tab **Hasil Undian** (+ status tiket bila sumber tiket).
+- `spin-batal`, `hadiah-gambar {id, gambar: data:image/webp|png;base64 ≤200 KB}` (foto diperkecil & latarnya dihapus di browser admin).
