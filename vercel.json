@@ -35,15 +35,15 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://ycs-data.194-238-23-221.sslip.io/api/:path*"
+      "destination": "https://ycs-data.169-58-232-156.sslip.io/api/:path*"
     },
     {
       "source": "/srv/monster",
-      "destination": "https://ycs-data.194-238-23-221.sslip.io/api/monster"
+      "destination": "https://ycs-data.169-58-232-156.sslip.io/api/monster"
     },
     {
       "source": "/srv/pemenang",
-      "destination": "https://ycs-data.194-238-23-221.sslip.io/api/pemenang"
+      "destination": "https://ycs-data.169-58-232-156.sslip.io/api/pemenang"
     }
   ]
 }

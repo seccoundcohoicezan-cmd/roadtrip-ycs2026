@@ -51,11 +51,11 @@ node tools/uji-beban-monster.cjs http://127.0.0.1:8787 400 20
 ## Deploy
 
 - **Situs**: Vercel otomatis dari `main` (statis).
-- **Server**: Dokploy project **YCS 2026** → aplikasi **YCS Data** (`ycs-data.194-238-23-221.sslip.io`, server KVM 8), otomatis dari `main`, `server/Dockerfile` dengan konteks build root repo, volume `ycs-data` → `/data`.
+- **Server**: Dokploy project **YCS 2026** → aplikasi **YCS Data** (`ycs-data.169-58-232-156.sslip.io`, server KVM 8), otomatis dari `main`, `server/Dockerfile` dengan konteks build root repo, volume `ycs-data` → `/data`.
   - Env: `PRIMARY_SECRET`, `MONSTER_SECRET`, `SHEET_URL`, `DATA_DIR=/data`, `ALLOWED_ORIGINS`, `SINKRON_MS`.
   - Saat redeploy (±10 dtk), state tersimpan dan perubahan yang belum terkirim diteruskan setelah server hidup lagi.
 - **Apps Script** (cadangan): `cd apps-script && clasp push && clasp deploy -i <deploymentId>`. Perlu setiap kali `Code.gs` berubah, agar skema Sheet cadangan ikut.
-- Status: `GET https://ycs-data.194-238-23-221.sslip.io/health` atau admin → Keamanan → **Data & cadangan**.
+- Status: `GET https://ycs-data.169-58-232-156.sslip.io/health` atau admin → Keamanan → **Data & cadangan**.
 - **Reset password admin**: `POST /internal/sandi-baru {"rahasia": PRIMARY_SECRET}`. Password baru muncul di tab **Admin** sel B2 Sheet.
 
 ## Aset ilustrasi
