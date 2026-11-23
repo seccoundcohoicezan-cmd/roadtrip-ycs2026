@@ -2074,6 +2074,7 @@
     <div class="sukses__aksi">
       <button class="btn btn--cta btn--lg btn--block" type="button" id="sukses-ajak"><svg aria-hidden="true"><use href="#i-share"/></svg>Ajak teman</button>
       <button class="btn btn--light btn--lg" type="button" id="sukses-unduh"><svg aria-hidden="true"><use href="#i-download"/></svg>Unduh kartu</button>
+      <a class="btn btn--primary btn--lg btn--block" id="sukses-game" href="/game/" hidden><svg aria-hidden="true"><use href="#i-arrow"/></svg>Kembali ke game: lawan Raja Batu</a>
       <button class="btn btn--lg sukses__plaza" type="button" data-sukses-tutup>Lihat plaza</button>
     </div>
   </dialog>
@@ -3417,7 +3418,11 @@
       $('#kw-nama').textContent = saya.n;
       $('#kw-prov').textContent = saya.p || '';
       if (window.YCSFestival) window.YCSFestival.gambarModel($('#kw-orang'), saya.m || karakter || 1);
+      // datang dari game (belum punya karakter) → tombol kembali ke arena + kembali otomatis
+      const dariGame = new URLSearchParams(location.search).get('ke') === 'game';
+      $('#sukses-game').hidden = !dariGame;
       sukses.showModal();
+      if (dariGame) { const t = setTimeout(() => { location.href = '/game/'; }, 6000); sukses.addEventListener('close', () => clearTimeout(t), { once: true }); }
     }
     $$('[data-sukses-tutup]', sukses).forEach((b) => b.addEventListener('click', () => {
       sukses.close();

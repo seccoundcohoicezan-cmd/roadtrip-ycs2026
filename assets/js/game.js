@@ -90,7 +90,7 @@
         identitas: () => baca('ycs_identitas'),
         saya: () => saya,
         bolehTap: () => !!saya,
-        saatTerkunci: () => { toast('Gabung Festival Satu Kata dulu, karaktermu ikut bertarung.'); $('#g-gabung').hidden = false; $('#g-gabung').scrollIntoView({ behavior: 'smooth', block: 'center' }); },
+        saatTerkunci: () => tampilBuat(true),
         saatTiket: (kode, st) => catatKode(kode, st),
         saatMenang: (st) => akhiriEvent(st),
         saatHasil: (h) => catatRiwayat(h),
@@ -130,7 +130,7 @@
   document.addEventListener('fullscreenchange', () => { syncPenuh(); pudar(); });
   document.addEventListener('webkitfullscreenchange', () => { syncPenuh(); pudar(); });
   arena.addEventListener('pointerup', (e) => {
-    if (autoPenuh || !document.body.classList.contains('is-tanding') || sedangPenuh() || e.target.closest('button, a')) return;
+    if (autoPenuh || !document.body.classList.contains('is-tanding') || sedangPenuh() || e.target.closest('button, a, .g-buat') || (!saya && !uji)) return;
     autoPenuh = true; masukPenuh();
   });
 
@@ -183,6 +183,19 @@
   }
   tampilRiwayat();
 
+  /* ---------- belum punya karakter: arahkan buat karakter dulu ---------- */
+  // Muncul otomatis saat event berjalan (sekali, bisa ditutup "Nonton dulu") dan setiap kali arena diketuk tanpa karakter.
+  let buatDitutup = false;
+  function tampilBuat(paksa) {
+    if (saya || uji) { $('#g-buat').hidden = true; return; }
+    if (!paksa && buatDitutup) return;
+    if (sedangPenuh()) keluarPenuh();
+    $('#g-buat').hidden = false;
+    $('#g-gabung').hidden = false;
+    if (paksa && navigator.vibrate) try { navigator.vibrate(20); } catch (e) {}
+  }
+  $('#g-buat-nonton').addEventListener('click', () => { buatDitutup = true; $('#g-buat').hidden = true; toast('Mode nonton. Ketuk arena kapan saja untuk membuat karakter.'); });
+
   /* ---------- status bos & hitung mundur ---------- */
   let cfg = null, stMon = null, target = 0;
   async function muatStatus() {
@@ -214,6 +227,7 @@
     // setelah pesan akhir event ditutup, kartu lobi (hasil match terakhir + hitung mundur event berikutnya) tampil lagi
     $('#g-tidur').hidden = tanding || (selesai && pesanDitutup !== (stMon && stMon.id));
     document.body.classList.toggle('is-tanding', tanding);
+    if (tanding && !saya && !uji) tampilBuat(false); else if (!tanding) $('#g-buat').hidden = true;
     // 1 jam terakhir sebelum muncul: kartu menyusut agar retakan tanah di plaza terlihat
     document.body.classList.toggle('is-retak', f === 'tunggu' && !!stMon.mulai && Date.parse(stMon.mulai) - now() < 3600000);
     tPenuh.hidden = !tanding && !sedangPenuh();

@@ -64,6 +64,15 @@
         <p class="fest__info g-info" id="fest-info" role="status"></p>
       </div>
       <button class="icon-btn g-penuh" type="button" id="g-penuh" aria-pressed="false" aria-label="Layar penuh" hidden><svg class="ikon-on" aria-hidden="true"><use href="#i-expand"/></svg><svg class="ikon-off" aria-hidden="true"><use href="#i-shrink"/></svg></button>
+      <div class="g-buat" id="g-buat" hidden role="dialog" aria-labelledby="g-buat-judul">
+        <div class="g-buat__kartu">
+          <span class="g-buat__ikon" aria-hidden="true"><svg><use href="#i-users"/></svg></span>
+          <h2 class="g-buat__judul" id="g-buat-judul">Kamu belum punya karakter</h2>
+          <p class="g-buat__teks">Hanya karakter warga festival yang bisa menyerang Raja Batu. Buat karaktermu dulu: kirim satu kata di Festival Satu Kata (gratis, ±1 menit), lalu kamu otomatis kembali ke sini.</p>
+          <a class="btn btn--cta btn--lg btn--block" id="g-buat-ke" href="/?ke=game#satu-kata"><svg aria-hidden="true"><use href="#i-sword"/></svg>Buat karakter sekarang</a>
+          <button class="btn btn--light btn--sm" type="button" id="g-buat-nonton">Nonton dulu</button>
+        </div>
+      </div>
       <div class="g-tidur" id="g-tidur">
         <img class="g-tidur__bos" src="/assets/img/monster/raja-potret.webp" width="359" height="430" alt="">
         <p class="g-hasil" id="g-hasil" hidden></p>
@@ -82,7 +91,7 @@
 
     <div class="g-isi">
       <!-- Gabung dulu (wajib untuk event asli) -->
-      <a class="g-gabung" id="g-gabung" href="/#satu-kata" hidden>
+      <a class="g-gabung" id="g-gabung" href="/?ke=game#satu-kata" hidden>
         <span class="ico ico--festival" aria-hidden="true"><svg><use href="#i-users"/></svg></span>
         <span class="menu-list__txt"><strong>Gabung Festival Satu Kata dulu</strong><small>Karaktermu ikut bertarung. Gratis, 1 menit.</small></span>
         <span class="btn btn--primary btn--sm" aria-hidden="true">Gabung</span>
