@@ -936,6 +936,23 @@
       mulaiGambar();
     }
 
+    // Warga plaza lain ikut menyerang Raja Batu (partikel tenaga dari posisi mereka). Hanya animasi: tenaga & HP dari server.
+    let ramaiTimer = 0;
+    function aturRamai() {
+      const jalan = st.fase === 'tanding' && (st.ramai || 0) > 0 && !gerakMinim;
+      if (!jalan) { clearInterval(ramaiTimer); ramaiTimer = 0; return; }
+      if (ramaiTimer) return;
+      ramaiTimer = setInterval(() => {
+        if (st.fase !== 'tanding' || !panggungTerlihat || document.hidden || !fest || !fest.tampil) return;
+        const calon = fest.tampil.filter((w) => w.layar && !w.mati && w !== fest.saya);
+        if (!calon.length) return;
+        const n = Math.max(1, Math.min(4, Math.round((st.ramai || 0) / 120)));
+        for (let i = 0; i < n; i++) {
+          const w = calon[Math.floor(Math.random() * calon.length)];
+          setTimeout(() => { if (w.layar) tembak(w.layar.x, w.layar.y + w.layar.h * 0.3, false, true); }, i * 160 + Math.random() * 200);
+        }
+      }, 850);
+    }
     function tampilkan(adaEvent) {
       const tanding = st.fase === 'tanding';
       const tampil = adaEvent && ditutup !== st.id && (st.fase !== 'tunggu' || Date.parse(st.mulai) - now() < 60 * 60000);
@@ -952,7 +969,9 @@
       if (fest && fest.tandaiSaya && tanding && opsi.saya && !fest.saya) fest.tandaiSaya(opsi.saya());
       $('.mon__nama').textContent = (st.uji ? 'MODE UJI · ' : '') + st.nama;
       $('.mon__lvl').textContent = st.levelMaks ? `Level ${st.level || 1}/${st.levelMaks}` : '';
-      $('.mon__pemain').textContent = st.pemain ? `${nf.format(st.pemain)} pejuang` : '';
+      const nPejuang = (st.pemain || 0) + (st.ramai || 0);
+      $('.mon__pemain').textContent = nPejuang ? `${nf.format(nPejuang)} pejuang` : '';
+      aturRamai();
       const hati = st.jurus && hpSaya != null && token ? '♥'.repeat(Math.max(0, hpSaya)) + '♡'.repeat(Math.max(0, (st.hpMaks || 5) - hpSaya)) + ' · ' : '';
       $('.mon__saya').textContent = hati + (tiketSaya ? `Tiket ${tiketSaya} · ${nf.format(sayaPoin)} tenaga` : sayaPoin ? `Kontribusimu ${nf.format(sayaPoin)}` : `+${poin()} per tap`);
       const kt = $('.mon__tiket');
@@ -985,7 +1004,7 @@
       if (token) { try { d = await minta({ aksi: 'saya', token, e: s0.id, uji }); } catch (e) { d = {}; } }
       const ikut = !!(token && (d.saya || sayaPoin || tiketSaya));
       hasilSaya = { id: s0.id, fase: s0.fase, nama: s0.nama, mulai: s0.mulai, selesai: s0.selesai, live: s0.live ? s0.live.judul : '', uji: !!s0.uji, ikut,
-        tenaga: d.saya || sayaPoin || 0, peringkat: d.peringkat || null, pemain: d.pemain || s0.pemain || 0, top: d.top || null, tiket: d.tiket || tiketSaya || null,
+        tenaga: d.saya || sayaPoin || 0, peringkat: d.peringkat || null, pemain: (d.pemain || s0.pemain || 0) + (s0.ramai || 0), top: d.top || null, tiket: d.tiket || tiketSaya || null,
         tumbang: !!(d.mati || karakterMati), hp: d.hp ?? hpSaya, topList: s0.top || [], level: s0.level || 1, levelMaks: s0.levelMaks || 1 };
       opsi.saatHasil && opsi.saatHasil(hasilSaya);
       if (!pesan.hidden) tampilPesan();

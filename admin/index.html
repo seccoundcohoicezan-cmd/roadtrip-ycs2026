@@ -250,6 +250,7 @@
     <symbol id="i-gift" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9M12 8v13M12 8S10.5 3 8 3a2.5 2.5 0 0 0 0 5M12 8s1.5-5 4-5a2.5 2.5 0 0 1 0 5"/></g></symbol>
     <symbol id="i-bell" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9m4.3 13a1.9 1.9 0 0 0 3.4 0"/></symbol>
     <symbol id="i-bolt" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><circle cx="17" cy="9" r="2.6"/><path d="M16.5 14.6c2.6 0 4.5 1.6 5 4.4"/></g></symbol>
     <symbol id="i-trash" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13"/></symbol>
   </svg>
 
@@ -296,6 +297,7 @@
           <button role="tab" id="t-pengaturan" aria-controls="p-pengaturan" aria-selected="false" tabindex="-1"><svg aria-hidden="true"><use href="#i-gear"/></svg>Pengaturan</button>
           <button role="tab" id="t-live" aria-controls="p-live" aria-selected="false" tabindex="-1"><svg aria-hidden="true"><use href="#i-play"/></svg>Jadwal Live</button>
           <button role="tab" id="t-monster" aria-controls="p-monster" aria-selected="false" tabindex="-1"><svg aria-hidden="true"><use href="#i-bolt"/></svg>Lawan Monster</button>
+          <button role="tab" id="t-warga" aria-controls="p-warga" aria-selected="false" tabindex="-1"><svg aria-hidden="true"><use href="#i-users"/></svg>Warga Festival</button>
           <button role="tab" id="t-spin" aria-controls="p-spin" aria-selected="false" tabindex="-1"><svg aria-hidden="true"><use href="#i-ticket"/></svg>Spin Undian</button>
           <button role="tab" id="t-data" aria-controls="p-data" aria-selected="false" tabindex="-1"><svg aria-hidden="true"><use href="#i-db"/></svg>Impor &amp; Ekspor</button>
           <button role="tab" id="t-keamanan" aria-controls="p-keamanan" aria-selected="false" tabindex="-1"><svg aria-hidden="true"><use href="#i-lock"/></svg>Keamanan</button>
@@ -516,6 +518,33 @@
           </section>
         </section>
         <!-- Spin undian -->
+        <section role="tabpanel" id="p-warga" aria-labelledby="t-warga" tabindex="0" hidden>
+          <div class="content__head"><div><h1>Warga Festival</h1><p class="muted small">Warga pembuka (dummy) agar plaza Festival Satu Kata dan arena Raja Batu terlihat ramai sejak awal. Di website tampil persis seperti warga asli (nama, kata, provinsi, karakter) tanpa tanda apa pun.</p></div></div>
+          <form id="f-warga" novalidate>
+            <section class="set-card" aria-labelledby="g-warga-atur">
+              <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-users"/></svg></span><div><h2 id="g-warga-atur">Warga pembuka</h2><p id="warga-ringkas">Memuat…</p></div></header>
+              <div class="set-grid">
+                <label class="switch field--full" for="w-aktif"><span>Tampilkan warga pembuka<small>Matikan kapan saja; warga asli tidak terpengaruh.</small></span><input type="checkbox" id="w-aktif"></label>
+                <div class="field"><label for="w-jumlah">Jumlah warga pembuka</label><input class="input" id="w-jumlah" type="number" min="0" max="2000" step="50" inputmode="numeric"><input type="range" id="w-jumlah-geser" min="0" max="2000" step="50" aria-label="Geser jumlah warga" style="width:100%;margin-top:.5rem;accent-color:var(--blue-600)"><p class="field__hint">0–2.000 warga. Plaza menampilkan maksimal 2.000 orang; warga asli selalu didahulukan.</p></div>
+                <div class="field"><label for="w-pejuang">Ikut perang Raja Batu (%)</label><input class="input" id="w-pejuang" type="number" min="0" max="100" step="5" inputmode="numeric"><p class="field__hint">Persentase warga pembuka yang ikut "menyerang" saat perang: menambah hitungan pejuang dan animasi serangan dari plaza. Tidak mengurangi HP bos, tidak dapat tiket, tidak masuk undian/Top kontributor.</p></div>
+                <label class="switch field--full" for="w-kurangi"><span>Kurangi otomatis saat warga asli bertambah<small>Contoh: 2.000 pembuka, 300 warga asli → tampil 1.700 pembuka. Habis sendiri ketika warga asli mencapai 2.000.</small></span><input type="checkbox" id="w-kurangi"></label>
+              </div>
+            </section>
+            <section class="set-card" aria-labelledby="g-warga-kustom">
+              <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-gear"/></svg></span><div><h2 id="g-warga-kustom">Nama &amp; kata kustom (opsional)</h2><p>Satu baris satu warga: <code>Nama Lengkap;kata;provinsi</code> (provinsi boleh kosong). Nama otomatis disingkat seperti warga asli ("Budi Santoso" → "Budi S."). Sisanya diisi otomatis dengan nama &amp; kata yang bervariasi.</p></div></header>
+              <div class="field field--full"><label for="w-kustom">Daftar kustom</label><textarea class="input textarea" id="w-kustom" rows="7" placeholder="Budi Santoso;semangat;Jawa Tengah&#10;Siti Aminah;jujur;Jawa Barat&#10;Made Wirawan;berkarya"></textarea><p class="field__hint" id="w-kustom-info">Kata: 2–20 huruf (boleh tanda hubung), lolos filter kata terlarang.</p></div>
+              <div class="mon-adm-aksi"><button class="btn btn--ghost btn--sm" type="button" id="w-acak">Acak ulang nama otomatis</button></div>
+            </section>
+            <section class="set-card" aria-labelledby="g-warga-lihat">
+              <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-grid"/></svg></span><div><h2 id="g-warga-lihat">Pratinjau warga pembuka</h2><p>Hanya terlihat di admin.</p></div></header>
+              <div class="field"><label for="w-cari">Cari nama / kata / provinsi</label><input class="input" id="w-cari" type="search" placeholder="cth. semangat"></div>
+              <div class="table-wrap" style="margin-top:.75rem;max-height:22rem;overflow:auto"><table class="mon-adm-tabel"><thead><tr><th>#</th><th>Nama tampil</th><th>Kata</th><th>Provinsi</th></tr></thead><tbody id="w-tabel"></tbody></table></div>
+              <p class="field__hint" id="w-tabel-info"></p>
+            </section>
+            <div class="savebar"><p id="w-status" role="status">Tidak ada perubahan.</p><button class="btn btn--cta btn--sm" type="submit" id="w-simpan">Simpan warga festival</button></div>
+          </form>
+        </section>
+
         <section role="tabpanel" id="p-spin" aria-labelledby="t-spin" tabindex="0" hidden>
           <div class="content__head"><div><h1>Spin Undian</h1><p class="muted small">Dua tahap saat live: putar <b>nama</b> pemenang dulu, lalu putar <b>hadiah</b>-nya. Yang diundi: pemegang tiket Lawan Monster atau wild card. Peserta lolos (data Finalis) <b>tidak ikut undian</b> — mereka duta yang mengajak warga lewat link referral di <a href="/duta/" target="_blank" rel="noopener">/duta/</a>.</p></div></div>
           <section class="set-card spin-card" id="spin-card" aria-label="Spin undian">
@@ -747,6 +776,7 @@
       if (focus) tab.focus();
       if (tab.id === 't-monster' && typeof statusMon === 'function') { statusMon(); muatUji(); muatMisi(); muatTop(); }
       if (tab.id === 't-spin') { muatPeserta(); muatHadiah(); }
+      if (tab.id === 't-warga') muatWarga();
       if (tab.id === 't-data') muatDataTersimpan();
       if (tab.id === 't-keamanan') statusPrimer();
     }
@@ -1328,6 +1358,41 @@
     }
     $('#top-muat').addEventListener('click', () => muatTop($('#top-event').value));
     $('#top-event').addEventListener('change', () => muatTop($('#top-event').value));
+
+
+    /* ---------- Warga Festival (warga pembuka/dummy) ---------- */
+    let wargaData = null;
+    function isiWarga(d) {
+      wargaData = d;
+      $('#w-aktif').checked = d.aktif; $('#w-jumlah').value = d.jumlah; $('#w-jumlah-geser').value = d.jumlah; $('#w-pejuang').value = d.pejuang; $('#w-kurangi').checked = d.kurangi;
+      $('#w-kustom').value = d.teksKustom || '';
+      $('#warga-ringkas').textContent = d.aktif ? `Aktif · tampil ${nf.format(d.tampil)} warga pembuka + ${nf.format(d.asli)} warga asli · ${nf.format(d.ramai)} ikut perang` : `Nonaktif · warga asli ${nf.format(d.asli)}`;
+      $('#w-kustom-info').textContent = d.kustom ? `${nf.format(d.kustom)} warga kustom tersimpan; sisanya otomatis.` : 'Kata: 2–20 huruf (boleh tanda hubung), lolos filter kata terlarang.';
+      tabelWarga();
+    }
+    function tabelWarga() {
+      if (!wargaData) return;
+      const q = $('#w-cari').value.trim().toLowerCase();
+      const semua = wargaData.contoh.map((x, i) => [i + 1, ...x]);
+      const cocok = q ? semua.filter((x) => (x[1] + ' ' + x[2] + ' ' + x[3]).toLowerCase().includes(q)) : semua;
+      $('#w-tabel').innerHTML = cocok.slice(0, 200).map((x) => `<tr><td>${x[0]}</td><td>${esc(x[1])}</td><td>${esc(x[2])}</td><td>${esc(x[3])}</td></tr>`).join('') || '<tr><td colspan="4" class="muted small">Belum ada warga pembuka (atur jumlah lalu simpan).</td></tr>';
+      $('#w-tabel-info').textContent = semua.length ? `${nf.format(cocok.length)} dari ${nf.format(semua.length)} warga${cocok.length > 200 ? ' (200 pertama ditampilkan)' : ''}.` : '';
+    }
+    async function muatWarga() { const d = await monAdmin({aksi: 'dummy-info'}); if (d.ok) isiWarga(d); else $('#warga-ringkas').textContent = pesan(d); }
+    const tandaWarga = () => { $('#w-status').textContent = 'Ada perubahan yang belum disimpan.'; };
+    $('#f-warga').addEventListener('input', (e) => { if (e.target.id === 'w-cari') return tabelWarga(); if (e.target.id === 'w-jumlah-geser') $('#w-jumlah').value = e.target.value; if (e.target.id === 'w-jumlah') $('#w-jumlah-geser').value = e.target.value; tandaWarga(); });
+    $('#f-warga').addEventListener('change', (e) => { if (e.target.type === 'checkbox') tandaWarga(); });
+    async function simpanWarga(acakUlang, tombol) {
+      sibuk(tombol, true);
+      const d = await monAdmin({aksi: 'dummy-atur', aktif: $('#w-aktif').checked, jumlah: +$('#w-jumlah').value || 0, pejuang: +$('#w-pejuang').value || 0, kurangi: $('#w-kurangi').checked, kustom: $('#w-kustom').value, acakUlang});
+      sibuk(tombol, false);
+      if (!d.ok) { $('#w-status').textContent = d.error === 'kustom_salah' ? (d.baris.length ? `Baris ${d.baris.join(', ')} tidak valid (format Nama;kata;provinsi, kata 2–20 huruf).` : '') + (d.kata.length ? ` Kata ditolak filter: ${d.kata.join(', ')}.` : '') : pesan(d); return; }
+      isiWarga(d);
+      $('#w-status').textContent = 'Tersimpan. Plaza & arena diperbarui dalam ±1–2 menit.';
+      toast('Warga festival tersimpan');
+    }
+    $('#f-warga').addEventListener('submit', (e) => { e.preventDefault(); simpanWarga(false, $('#w-simpan')); });
+    $('#w-acak').addEventListener('click', (e) => { if (confirm('Acak ulang nama & kata warga otomatis? Warga kustom tetap.')) simpanWarga(true, e.currentTarget); });
 
     /* ---------- Mode uji monster ---------- */
     let ujiTimer = 0;

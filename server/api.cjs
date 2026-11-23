@@ -3,6 +3,7 @@
 // Lihat docs/API.md untuk daftar lengkap.
 const crypto = require('node:crypto');
 const {buatDuta} = require('./duta.cjs');
+const {buatDummy} = require('./dummy.cjs');
 
 // Kode galat → status HTTP (galat lain → 422).
 const STATUS = {kata_ditolak: 422, nama_ditolak: 422, validation: 400, sesi_habis: 401, sandi_salah: 401, terlalu_banyak: 429, rate_limit: 429, busy: 503, server: 502, save_failed: 502, connection: 502};
@@ -32,6 +33,9 @@ const opsional = (v, max, re) => v === undefined || v === '' || (typeof v === 's
 function buatApi(data) {
   const app = () => data.app;
   const duta = buatDuta(app, {state: () => data.monster.state, ubah: () => data.tandai()});
+  const dummy = buatDummy({state: () => data.monster.state, ubah: () => data.tandai()});
+  const nAsli = () => { try { const d = app().get('kata'); return d && d.ok ? d.total || 0 : 0; } catch (e) { return 0; } };
+  const kataDiblokir = (k) => { try { return !!app().ctx.kataDiblokir_(k, app().ctx.bacaPengaturan_()); } catch (e) { return false; } };
   const jawab = (body, cache = CACHE.tidak, kode, header) => ({kode: kode || (body.ok ? 200 : (STATUS[body.error] || 422)), body, cache, header});
   // GET Code.gs: bila skema ikut diperbarui (pastikanSkema_), tandai agar tersimpan & diteruskan.
   function baca(aksi) {
@@ -93,6 +97,7 @@ function buatApi(data) {
     if (p.aksi !== 'admin-primer') return jawab(tulis({...p, ipHash: ipHash(ip)}));
     const sah = typeof p.token === 'string' && p.token.length >= 40 && !!app().cache.get('adm:' + app().ctx.hash_(p.token));
     if (!sah) return jawab({ok: false, error: 'sesi_habis'});
+    if (p.perintah === 'monster' && p.data && /^dummy-/.test(p.data.aksi)) { const d = dummy.admin(p.data, nAsli(), kataDiblokir); if (d.ok) app().ctx.logAdmin_('warga dummy', `${d.aktif ? 'aktif' : 'nonaktif'} ${d.jumlah}`); return jawab(d); }
     if (p.perintah === 'monster') return jawab(data.monster.admin({...p.data, token: p.token}));
     if (p.perintah === 'tarik-sheet') {
       if (!data.adaSheet) return jawab({ok: false, error: 'tanpa_sheet'});
@@ -108,7 +113,8 @@ function buatApi(data) {
 
   /* ---------- Lawan Monster ---------- */
   function monsterGet(uji) {
-    const st = data.monster.lihat(uji);
+    let st = data.monster.lihat(uji);
+    if (!uji && st.id && st.fase !== 'tunggu') { const r = dummy.ramai(nAsli()); if (r) st = {...st, ramai: r}; } // pejuang tampilan (warga plaza)
     const cache = uji ? CACHE.tidak : st.fase === 'tanding' ? 'public, max-age=0, s-maxage=1, stale-while-revalidate=2'
       : st.mulai && st.fase === 'tunggu' ? 'public, max-age=0, s-maxage=' + Math.max(1, Math.min(15, Math.floor((Date.parse(st.mulai) - Date.now()) / 1000) - 1)) : 'public, max-age=0, s-maxage=10';
     return jawab(st, cache);
@@ -129,7 +135,7 @@ function buatApi(data) {
       const d = baca('kata');
       if (d.ok !== true) return jawab({ok: false, error: 'connection'});
       const dt = duta.orangPlaza(); // peserta lolos = warga plaza (kata tulisan mereka sendiri; tidak menambah hitungan kata)
-      return jawab({...d, orang: dt.slice(0, 500).concat(d.orang || []), duta: dt.length}, CACHE.kata);
+      return jawab(dummy.gabungKata({...d, orang: dt.slice(0, 500).concat(d.orang || []), duta: dt.length}, d.total || 0), CACHE.kata);
     }},
     'POST kata': {maks: FORMULIR.kata.maks, fn: (p, ip) => formulir('kata', p, ip)},
     'POST dana': {maks: FORMULIR.dana.maks, fn: (p, ip) => formulir('dana', p, ip)},

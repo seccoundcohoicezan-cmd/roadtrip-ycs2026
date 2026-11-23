@@ -129,7 +129,20 @@
     .nav__list .nav__link { position: relative; }
     .nav__dot { width: .5rem; height: .5rem; margin-left: 2px; border-radius: 50%; background: var(--coral-500); animation: k-pulse 1.4s infinite; }
     .header-tools { display: flex; align-items: center; gap: var(--space-3); }
-    .header-tools .header-game, .header-tools .theme-toggle, .header-tools .nav-code { display: none; }
+    .header-tools .header-game, .header-tools .nav-code { display: none; }
+    @media (max-width: 63.99rem) {
+      .header-tools .theme-toggle { position: relative; display: inline-flex; align-items: center; justify-content: space-between; width: 4.5rem; height: 2.5rem; padding: 0 .5rem; border-radius: var(--r-pill); background: var(--surface-soft); box-shadow: inset 0 0 0 1px var(--line), var(--e1); color: var(--text-3); transition: background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
+      .header-tools .theme-toggle::before { content: ""; position: absolute; top: .25rem; left: .25rem; width: 2rem; height: 2rem; border-radius: 50%; background: var(--sun-400); box-shadow: 0 2px 6px rgb(0 0 0 / .18); transition: transform 280ms cubic-bezier(.3,1.4,.5,1), background-color var(--dur) var(--ease); }
+      .header-tools .theme-toggle svg { position: relative; z-index: 1; display: block !important; width: 1.125rem; height: 1.125rem; transition: color var(--dur) var(--ease); }
+      .header-tools .theme-toggle .icon-sun { order: -1; color: var(--navy-900); }
+      .header-tools .theme-toggle .icon-moon { color: var(--text-3); }
+      .header-tools .theme-toggle[aria-pressed="true"]::before { transform: translateX(2rem); background: var(--blue-500, #3B6BFF); }
+      .header-tools .theme-toggle[aria-pressed="true"] .icon-sun { color: var(--text-3); }
+      .header-tools .theme-toggle[aria-pressed="true"] .icon-moon { color: #fff; }
+      .header-tools .theme-toggle:hover { background: var(--surface-soft); }
+      .header-tools .theme-toggle:focus-visible { box-shadow: inset 0 0 0 1px var(--line), var(--ring); }
+      @media (prefers-reduced-motion: reduce) { .header-tools .theme-toggle::before { transition: none; } }
+    }
     .theme-toggle .icon-sun { display: none; }
     :root[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
     :root[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
@@ -2205,7 +2218,7 @@
       toastTimer = setTimeout(() => toastEl.classList.remove('is-visible'), 3200);
     }
 
-    /* ---------- Tema (tombol bulat di header desktop + di menu Lainnya) ---------- */
+    /* ---------- Tema (sakelar di pojok kanan atas HP, tombol bulat di header desktop, + di menu Lainnya) ---------- */
     const themeBtns = $$('.theme-toggle');
     themeBtns.forEach((b) => { b.hidden = false; });
     const isDark = () => doc.dataset.theme ? doc.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
