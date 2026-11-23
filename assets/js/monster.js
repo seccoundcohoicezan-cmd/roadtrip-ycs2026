@@ -251,7 +251,8 @@
     }
     function terapkanSasaran() {
       if (!fest || !fest.cariNK) return;
-      sasaranWarga = (st && st.fase === 'tanding' && st.jurusTarget || []).map(([n, k]) => fest.cariNK(n, k)).filter(Boolean);
+      const ada = (n, k) => fest.cariNK(n, k) || (fest.pastikan && n ? fest.pastikan({ n, k, p: '', m: 0 }) : null);
+      sasaranWarga = (st && st.fase === 'tanding' && st.jurusTarget || []).map(([n, k]) => ada(n, k)).filter(Boolean);
       fest.setSasaran(sasaranWarga);
       aku_sasaran = !!(fest.saya && sasaranWarga.includes(fest.saya));
     }
@@ -591,7 +592,7 @@
       if (!info || !info.kena || !fest || !fest.cariNK) return;
       const g = geometri(), hpMaks = st.hpMaks || 5;
       info.kena.forEach(([n, k, hp, mati]) => {
-        const w = fest.cariNK(n, k);
+        const w = fest.cariNK(n, k) || (fest.pastikan && n ? fest.pastikan({ n, k, p: '', m: 0 }) : null);
         if (!w) return;
         fest.kena(w, hp, hpMaks);
         if (w === fest.saya) { hatiBerkurang(hp, hpMaks, info.jenis === 'meteor'); hpSaya = hp; if (mati) setMati(true); else tampilAjak(info.jenis === 'meteor' ? `Karaktermu kena meteor! Nyawa tinggal ${hp} dari ${hpMaks}. Pasang PERISAI saat hujan meteor.` : `Karaktermu kena! Nyawa tinggal ${hp} dari ${hpMaks}. Tekan HINDAR saat jadi sasaran.`, 2600); }

@@ -194,6 +194,8 @@
   function YCSFestival(canvas, opsi = {}) {
     const ctx = canvas.getContext('2d');
     const gerakMinim = opsi.gerakMinim ?? matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // Kapasitas gambar sekaligus: HP ringan 1.200, lainnya 2.000 (total warga bisa puluhan ribu; tampil bergilir).
+    const MAKS_GAMBAR = opsi.maksGambar || ((navigator.deviceMemory && navigator.deviceMemory <= 3) || (navigator.hardwareConcurrency || 8) <= 4 ? 1200 : 2000);
     const wadah = opsi.wadahBalon || canvas.parentElement;
     const latar = new Image();
     let siapLatar = false, W = 0, H = 0, dpr = 1, warga = [], raf = 0, terlihat = true, tAkhir = 0, tLalu = 0;
@@ -303,6 +305,8 @@
 
     function gerak(dt) {
       if (gerakMinim) return;
+      // warga yang pulang: hapus setelah sampai gerbang (atau maks 20 dtk)
+      if (warga.some((w) => w.pergi)) { const t = performance.now(); warga = warga.filter((w) => !w.pergi || (t - w.pergi < 20000 && !(w.y < 0.02 && Math.abs(w.x - w.tx) < 0.03))); }
       for (const w of warga) {
         if (w.mati) { w.jalan = false; continue; }
         if (zona && !w.kabur && diZona(w.x, w.y)) keluarZona(w);
@@ -312,7 +316,7 @@
         if (w.jeda > 0) { w.jeda -= dt; w.jalan = false; continue; }
         const dx = w.tx - w.x, dy = (w.ty - w.y) * 0.6;
         const jarak = Math.hypot(dx, dy);
-        if (jarak < 0.004) { w.kabur = false; tujuanBaru(w, w.r); continue; }
+        if (jarak < 0.004) { if (w.pergi) { w.y = 0; continue; } w.kabur = false; tujuanBaru(w, w.r); continue; }
         const s = (0.6 + 0.6 * w.y) * w.v * dt * (w.kabur ? 2.6 : panik ? 1.5 : 1);
         const nx = w.x + (dx / jarak) * Math.min(s, jarak), ny = w.y + (dy / jarak) * Math.min(s, jarak) / 0.6;
         // Langkah berikutnya masuk zona monster → pilih tujuan lain (jangan menembus monster).
@@ -790,10 +794,43 @@
 
     const api = {
       // list: [{n: nama tampil, k: kata, p: provinsi}], terbaru lebih dulu. Maksimal 2.000 warga.
+      // Plaza bergilir (server mengirim maks 2.000 dari puluhan ribu warga): warga baru datang lewat gerbang,
+      // warga yang tidak lagi dikirim pulang lewat gerbang lalu hilang. Kapasitas gambar menyesuaikan HP.
       setWarga(list) {
-        const lama = new Map(warga.map((w) => [w.n + '|' + w.k, w]));
-        warga = list.slice(0, 2000).map((e, i) => lama.get(e.n + '|' + e.k) || siapkanWarga(e, i, false));
+        // kunci = nama|kata|urutan kembar (di puluhan ribu warga banyak nama+kata sama; tetap orang berbeda)
+        const kunciDari = (l, f) => { const hit = new Map(); return l.map((e) => { const k = e.n + '|' + e.k; const c = hit.get(k) || 0; hit.set(k, c + 1); return f(e, k + '|' + c); }); };
+        const lama = new Map();
+        kunciDari(warga.filter((w) => !w.pergi), (w, k) => lama.set(w.kunci || k, w));
+        const awal = !warga.length;
+        let gerbang = 0;
+        const dipakai = new Set();
+        const hasil = kunciDari(list.slice(0, MAKS_GAMBAR), (e, k) => {
+          const ada = lama.get(k);
+          if (ada && !dipakai.has(ada)) { dipakai.add(ada); ada.pergi = 0; ada.kunci = k; return ada; }
+          const w = siapkanWarga(e, dipakai.size, !awal && !gerakMinim && gerbang++ < 60);
+          w.kunci = k; dipakai.add(w);
+          return w;
+        });
+        const t = performance.now();
+        warga.forEach((w) => {
+          if (dipakai.has(w)) return;
+          if (w.tetap || w === wargaSaya) { hasil.push(w); return; }
+          if (awal || gerakMinim || w.mati) return;
+          if (!w.pergi) { w.pergi = t; w.tx = 0.44 + w.r() * 0.12; w.ty = 0; w.jeda = w.r() * 6; w.diam = false; }
+          hasil.push(w);
+        });
+        warga = hasil;
         mulai();
+      },
+      // Pastikan warga tertentu ada di plaza (hasil cari / sasaran Raja Batu yang sedang tidak tampil).
+      pastikan(e) {
+        const ada = warga.find((w) => w.n === e.n && w.k === e.k);
+        if (ada) { ada.pergi = 0; ada.tetap = true; return ada; }
+        const w = siapkanWarga(e, warga.length, false);
+        w.tetap = true;
+        warga.push(w);
+        mulai();
+        return w;
       },
       // Warga baru masuk dari gerbang lalu berjalan ke tengah plaza.
       tambah(e) {

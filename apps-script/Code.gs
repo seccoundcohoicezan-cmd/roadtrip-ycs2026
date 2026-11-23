@@ -512,8 +512,9 @@ function kataPublik_() {
     orang.push([e.n, e.k, e.p, e.m]);
   });
   const kata = Object.keys(hit).map(k => [k, hit[k]]).sort((a, b) => b[1] - a[1]).slice(0, 150);
-  // Warga festival: maksimal 2.000 terbaru (terbaru lebih dulu). Duta (peserta lolos) ditambahkan di server Node (server/duta.cjs).
-  const out = {ok: true, total: total, kata: kata, orang: orang.reverse().slice(0, 2000), diperbarui: isoWib_(Date.now())};
+  // Seluruh warga (terbaru lebih dulu, hingga 60.000). Server Node (server/plaza.cjs) memilih yang digambar di plaza
+  // secara bergilir; duta (server/duta.cjs) & warga pembuka (server/dummy.cjs) ditambahkan di sana.
+  const out = {ok: true, total: total, kata: kata, orang: orang.reverse().slice(0, 60000), diperbarui: isoWib_(Date.now())};
   try { c.put('kata', JSON.stringify(out), 60); } catch (e) { /* lebih dari batas cache: dilayani dari CDN */ }
   return out;
 }

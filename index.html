@@ -3470,12 +3470,23 @@
       festApi.sorot(w, 9000, 'Ini kamu!');
       info.textContent = `Itu kamu: ${w.n} dengan kata "${w.k}". Tanda KAMU selalu ada di atas karaktermu.`;
     });
-    $('#fest-cari').addEventListener('submit', (e) => {
+    $('#fest-cari').addEventListener('submit', async (e) => {
       e.preventDefault();
       const q = $('#fest-q').value.trim();
       const info = $('#fest-info');
       if (q.length < 2) { info.textContent = 'Ketik minimal 2 huruf nama.'; return; }
-      if (q !== qTerakhir) { hasilCari = festApi ? festApi.cari(q) : []; posCari = 0; qTerakhir = q; }
+      if (q !== qTerakhir) {
+        hasilCari = festApi ? festApi.cari(q) : []; posCari = 0; qTerakhir = q;
+        // plaza menggambar sebagian warga secara bergilir → cari juga di seluruh warga lalu munculkan karakternya
+        if (festApi && festApi.pastikan) {
+          try {
+            info.textContent = 'Mencari di seluruh warga…';
+            const d = await (await fetch('/api/kata?cari=' + encodeURIComponent(q.toLowerCase()), { headers: { Accept: 'application/json' } })).json();
+            const ada = new Set(hasilCari.map((w) => w.n + '|' + w.k));
+            (d.hasil || []).forEach(([n, k, pv, m]) => { if (!ada.has(n + '|' + k)) hasilCari.push(festApi.pastikan({ n, k, p: pv, m })); });
+          } catch (err) { /* cukup hasil lokal */ }
+        }
+      }
       if (!hasilCari.length) { info.textContent = `"${q}" belum ada di festival. Ajak dia kirim satu kata!`; return; }
       const w = hasilCari[posCari % hasilCari.length];
       info.textContent = `Ketemu: ${w.n} (${w.k})` + (hasilCari.length > 1 ? ` · ${posCari % hasilCari.length + 1} dari ${hasilCari.length}, tekan Temukan lagi untuk berikutnya` : '');

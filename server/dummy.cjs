@@ -55,20 +55,14 @@ function buatDummy(opsi = {}) {
     return Math.max(0, d.kurangi ? d.jumlah - (nAsli || 0) : d.jumlah);
   }
   // Gabungkan ke respons /api/kata: diselipkan merata (urutan stabil dari seed) + hitungan kata & total.
-  function gabungKata(d, nAsli) {
-    const n = jumlahTampil(nAsli);
-    if (!n) return d;
-    const semua = daftar().slice(0, n);
-    const asli = d.orang || [];
-    const muat = semua.slice(0, Math.max(0, MAKS - asli.length)); // warga asli selalu tampil; plaza maks 2.000
-    const r = acak(simpanan().seed ^ 0x9e3779b9);
-    const orang = asli.slice();
-    // sisipkan di posisi acak (stabil) — bukan blok di belakang
-    for (const o of muat) orang.splice(Math.floor(r() * (orang.length + 1)), 0, o);
-    const hit = new Map((d.kata || []).map(([k, c]) => [k, c]));
-    semua.forEach((o) => hit.set(o[1], (hit.get(o[1]) || 0) + 1));
-    const kata = [...hit.entries()].sort((a, b) => b[1] - a[1]).slice(0, 150);
-    return {...d, orang, kata, total: (d.total || 0) + n};
+  // Warga pembuka yang sedang tampil (format sama dengan warga asli).
+  function tampil(nAsli) { const n = jumlahTampil(nAsli); return n ? daftar().slice(0, n) : []; }
+  // Hitungan kata ramai: kata warga asli + kata warga pembuka.
+  function hitungKata(kata, dm) {
+    if (!dm.length) return kata || [];
+    const hit = new Map((kata || []).map(([k, c]) => [k, c]));
+    dm.forEach((o) => hit.set(o[1], (hit.get(o[1]) || 0) + 1));
+    return [...hit.entries()].sort((a, b) => b[1] - a[1]).slice(0, 150);
   }
   // Untuk arena: berapa "pejuang" tampilan tambahan (animasi serangan + hitungan pejuang). Tidak memengaruhi HP bos.
   function ramai(nAsli) { const d = simpanan(); return Math.round(jumlahTampil(nAsli) * Math.max(0, Math.min(100, Number(d.pejuang) || 0)) / 100); }
@@ -117,7 +111,7 @@ function buatDummy(opsi = {}) {
     }
     return {ok: false, error: 'validation'};
   }
-  return {gabungKata, ramai, admin, jumlahTampil, MAKS};
+  return {tampil, hitungKata, ramai, admin, jumlahTampil, MAKS};
 }
 
 module.exports = {buatDummy, buatOtomatis, namaTampil};

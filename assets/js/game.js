@@ -35,7 +35,7 @@
   if (window.YCSFestival) festApi = window.YCSFestival($('#fest-canvas'), { wadahBalon: stage, balonAktif: true });
   async function muatWarga() {
     try {
-      const d = await (await fetch('/api/kata', { headers: { Accept: 'application/json' } })).json();
+      const d = await (await fetch('/api/kata', { headers: { Accept: 'application/json' }, cache: 'no-cache' })).json();
       if (!d.ok || !festApi) return;
       const list = (d.orang || []).map(([n, k, p, m]) => ({ n, k, p, m }));
       if (saya && !list.some((e) => e.n === saya.n && e.k === saya.k)) list.unshift(saya);
@@ -44,6 +44,7 @@
     } catch (e) { /* plaza tetap tampil */ }
   }
   muatWarga();
+  setInterval(() => { if (!document.hidden && !document.body.classList.contains('is-tanding')) muatWarga(); }, 90000);
 
   /* ---------- kode undian (tersimpan di perangkat) ---------- */
   const KUNCI_KODE = uji ? 'ycs_kode_uji' : 'ycs_kode_undian';

@@ -4,6 +4,7 @@
 const crypto = require('node:crypto');
 const {buatDuta} = require('./duta.cjs');
 const {buatDummy} = require('./dummy.cjs');
+const {buatPlaza} = require('./plaza.cjs');
 
 // Kode galat → status HTTP (galat lain → 422).
 const STATUS = {kata_ditolak: 422, nama_ditolak: 422, validation: 400, sesi_habis: 401, sandi_salah: 401, terlalu_banyak: 429, rate_limit: 429, busy: 503, server: 502, save_failed: 502, connection: 502};
@@ -34,6 +35,7 @@ function buatApi(data) {
   const app = () => data.app;
   const duta = buatDuta(app, {state: () => data.monster.state, ubah: () => data.tandai()});
   const dummy = buatDummy({state: () => data.monster.state, ubah: () => data.tandai()});
+  const plaza = buatPlaza();
   const nAsli = () => { try { const d = app().get('kata'); return d && d.ok ? d.total || 0 : 0; } catch (e) { return 0; } };
   const kataDiblokir = (k) => { try { return !!app().ctx.kataDiblokir_(k, app().ctx.bacaPengaturan_()); } catch (e) { return false; } };
   const jawab = (body, cache = CACHE.tidak, kode, header) => ({kode: kode || (body.ok ? 200 : (STATUS[body.error] || 422)), body, cache, header});
@@ -131,11 +133,16 @@ function buatApi(data) {
     'GET now': {fn: () => jawab({ok: true, now: Date.now()})},
     'GET stats': {fn: () => { const d = baca('stats'); return d.ok === true ? jawab(d, CACHE.stats) : jawab({ok: false, error: 'connection'}); }},
     'GET reveal': {fn: reveal},
-    'GET kata': {fn: () => {
+    'GET kata': {fn: (p, ip, url) => {
       const d = baca('kata');
       if (d.ok !== true) return jawab({ok: false, error: 'connection'});
       const dt = duta.orangPlaza(); // peserta lolos = warga plaza (kata tulisan mereka sendiri; tidak menambah hitungan kata)
-      return jawab(dummy.gabungKata({...d, orang: dt.slice(0, 500).concat(d.orang || []), duta: dt.length}, d.total || 0), CACHE.kata);
+      const asli = d.orang || [], dm = dummy.tampil(d.total || 0);
+      const q = url && url.searchParams.get('cari');
+      if (q != null) return jawab({ok: true, hasil: plaza.cari(q.slice(0, 40), asli, dt, dm)}, 'public, max-age=0, s-maxage=30, stale-while-revalidate=60');
+      // Plaza bergilir: semua warga dihitung (hingga 50.000+), yang digambar maks 2.000 sekaligus & berganti tiap menit.
+      const orang = plaza.sampel(dt, asli, dm);
+      return jawab({...d, orang, kata: dummy.hitungKata(d.kata, dm), total: (d.total || 0) + dm.length, duta: dt.length, tampil: orang.length}, CACHE.kata);
     }},
     'POST kata': {maks: FORMULIR.kata.maks, fn: (p, ip) => formulir('kata', p, ip)},
     'POST dana': {maks: FORMULIR.dana.maks, fn: (p, ip) => formulir('dana', p, ip)},

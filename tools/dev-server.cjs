@@ -93,7 +93,7 @@ function seed(p, res) {
     const kata = ['sejahtera', 'maju', 'damai', 'berani', 'jujur', 'bersatu', 'hebat', 'peduli', 'cerdas', 'toleran', 'mandiri', 'adil', 'gotong-royong', 'kreatif', 'berkarakter'];
     const prov = ['Jawa Tengah', 'Bali', 'Jawa Timur', 'DI Yogyakarta', 'Jawa Barat', 'Sulawesi Selatan', 'DKI Jakarta'];
     for (let i = 0; i < p.kata; i++) {
-      const nama = depan[i % depan.length] + ' ' + belakang[(i * 7) % belakang.length];
+      const nama = i === 0 && p.kataNamaTertua ? p.kataNamaTertua : depan[i % depan.length] + ' ' + belakang[(i * 7) % belakang.length];
       kt.rows.push(['2026-11-01 10:00', 'k-' + i, kata[(i * 3) % kata.length], prov[(i * 5) % prov.length], 'web', 'YA', nama.trim(), 'SMA ' + (i % 30 + 1), `w${i}@mail.com`, 'Ya', (i % 10) + 1]);
     }
   }
