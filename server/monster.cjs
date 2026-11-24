@@ -59,7 +59,8 @@ function buatMonster(app, opsi = {}) {
   st.perangkat = st.perangkat || {}; // id perangkat → {email, fp, ip, t}
   st.email = st.email || {};         // email → id perangkat
   st.events = st.events || {};       // id event → {lvl, tenaga, total, kalah, naik, u:{pid:{p,q}}, tiket:{pid:nomor}, n, final}
-  st.uji = st.uji || null;           // mode uji monster: {kode, mulai, sampai} — event terpisah, hanya lewat link ?uji-monster=kode
+  st.tiketN = Number(st.tiketN) || 0; // kode undian terakhir, global lintas event (#0001, #0002, …); uji: st.tiketUjiN
+  st.uji = st.uji || null;         // mode uji monster: {kode, mulai, sampai} — event terpisah, hanya lewat link ?uji-monster=kode
   st.ujiPemain = st.ujiPemain || {}; // pid → identitas penguji (tidak mengikat perangkat)
   st.spin = st.spin || {hadiah: [], peluang: 'rata'}; // hadiah: [{id, nama, stok|null, bobot, terpakai, gambar?}]
   st.spin.hasil = st.spin.hasil || []; // undian 2 tahap: [{ke, id, sumber, nama, sekolah, kota, provinsi, jalur, hadiah, hadiahId, waktu}]
@@ -330,19 +331,38 @@ function buatMonster(app, opsi = {}) {
       peringkat, pemain: e ? Object.keys(e.u).length : 0, top: topSaya ? {peringkat: topSaya.peringkat, nominal: topSaya.nominal} : null};
   }
 
+  // Kode undian unik untuk SEMUA event (bukan per event): dulu tiap event mulai dari #0001 sehingga peserta berbeda
+  // di event berbeda memegang kode yang sama. Penghitung global st.tiketN (event uji: st.tiketUjiN, kode #U0001)
+  // dilanjutkan dari kode terbesar yang pernah terbit (state + tab "Tiket Monster"), jadi tidak bentrok dengan kode lama
+  // walau state event di-reset atau server pindah.
+  const angkaKode = (k) => { const m = /^#(U?)(\d+)$/.exec(String(k || '').trim()); return m ? {uji: !!m[1], n: Number(m[2])} : null; };
+  let lantaiKode = null;
+  function nomorBaru(uji) {
+    if (!lantaiKode) {
+      lantaiKode = {asli: 0, uji: 0};
+      const catat = (k) => { const a = angkaKode(k); if (a) lantaiKode[a.uji ? 'uji' : 'asli'] = Math.max(lantaiKode[a.uji ? 'uji' : 'asli'], a.n); };
+      Object.values(st.events).forEach((e) => Object.values(e.tiket || {}).forEach(catat));
+      const sh = app.sheets['Tiket Monster'];
+      if (sh) sh.rows.slice(1).forEach((r) => catat(r[2]));
+    }
+    const kunci = uji ? 'tiketUjiN' : 'tiketN', lantai = uji ? lantaiKode.uji : lantaiKode.asli;
+    st[kunci] = Math.max(Number(st[kunci]) || 0, lantai) + 1;
+    return '#' + (uji ? 'U' : '') + String(st[kunci]).padStart(4, '0'); // diawali # agar Sheet tidak mengubahnya jadi angka
+  }
+
   function terbitkanTiket(id, e, pid, a) {
     const perangkat = pidKe.get(pid) || '', info = st.perangkat[perangkat] || {};
     if (id[0] === 'u') { // tiket uji: disimpan di memori server, tidak ditulis ke Sheet
       const o = st.ujiPemain[pid] || {};
       e.n += 1;
-      const nomor = '#' + String(e.n).padStart(4, '0');
+      const nomor = nomorBaru(true);
       e.tiket[pid] = nomor;
       (e.ujiRows = e.ujiRows || []).push([new Date(now()).toISOString(), id, nomor, o.nama || '', o.sekolah || '', o.provinsi || '', o.email || '', perangkat.slice(0, 8), e.u[pid].p, 'aktif', 'UJI']);
       return nomor;
     }
     const orang = peserta(info.email) || {};
-    e.n += 1;
-    const nomor = '#' + String(e.n).padStart(4, '0'); // diawali # agar Sheet tidak mengubahnya jadi angka
+    e.n += 1; // jumlah tiket event ini (ringkasan Monster Event)
+    const nomor = nomorBaru(false);
     e.tiket[pid] = nomor;
     // Tanda perangkat mirip (sidik jari + IP sama) untuk ditinjau panitia, bukan diblokir otomatis (HP sekolah bisa sama).
     let catatan = '';
