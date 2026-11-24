@@ -895,53 +895,42 @@
     .social-row { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 
     /* ============ Jejak perjalanan ============ */
-    .memories {
-      position: relative; padding-block: var(--space-7) var(--space-8);
-      background:
-        radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--navy-900) 12%, transparent) 1px, transparent 0) 0 0 / 22px 22px,
-        var(--blue-50);
-      overflow: hidden;
+    /* Sengaja polos: foto asli lurus tanpa bingkai/selotip/miring, angka tanpa kartu — biar terasa dokumentasi, bukan template. */
+    .memories { position: relative; padding-block: var(--space-7) var(--space-8); background: var(--blue-50); }
+    :root[data-theme="dark"] .memories { background: var(--navy-950); }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .memories { background: var(--navy-950); } }
+    .memories__head { display: grid; gap: var(--space-3); }
+    .memories__meta { font-size: var(--fs-sm); font-weight: 600; color: var(--text-2); }
+    .memories__title { font-size: var(--fs-display); font-weight: 800; line-height: 1.15; max-width: 18ch; }
+    .memories__lead { color: var(--text-2); max-width: 36rem; }
+    @media (min-width: 64rem) {
+      .memories__head { grid-template-columns: 1fr 1fr; align-items: end; column-gap: var(--space-7); }
+      .memories__meta { grid-column: 1 / -1; }
     }
-    :root[data-theme="dark"] .memories { background: radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--white) 6%, transparent) 1px, transparent 0) 0 0 / 22px 22px, var(--navy-950); }
-    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .memories { background: radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--white) 6%, transparent) 1px, transparent 0) 0 0 / 22px 22px, var(--navy-950); } }
-    .memories__head { display: grid; gap: var(--space-3); max-width: 44rem; }
-    .memories__title { font-size: var(--fs-display); font-weight: 800; line-height: 1.15; }
-    .memories__title .brush { color: var(--sun-400); font-size: 1.1em; }
-    :root[data-theme="dark"] .memories__title .brush { color: var(--sun-400); }
-    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .memories__title .brush { color: var(--sun-400); } }
-    .memories__doodle { width: 3rem; right: 6%; top: 2.5rem; color: var(--sun-400); display: none; }
-    @media (min-width: 48rem) { .memories__doodle { display: block; } }
 
-    .stats { list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-3); margin-top: var(--space-5); }
-    .stat {
-      --tilt: 0deg;
-      padding: var(--space-3) var(--space-4); border-radius: var(--r-md); background: var(--surface); border: 2px solid var(--blue-600);
-      box-shadow: 4px 4px 0 var(--blue-600); transform: rotate(var(--tilt));
-      transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
-    }
-    .stat:hover { transform: rotate(0) translate(-2px, -2px); box-shadow: 6px 6px 0 var(--blue-600); }
-    .stat:nth-child(1) { --tilt: -1.5deg; }
-    .stat:nth-child(2) { --tilt: 1deg; background: var(--warning-bg); }
-    .stat:nth-child(3) { --tilt: -.5deg; }
-    .stat:nth-child(4) { --tilt: 1.5deg; background: var(--surface-soft); }
-    .stat strong { display: block; font-size: var(--fs-h1); font-weight: 800; line-height: 1.1; color: var(--heading); }
-    .stat span { font-size: var(--fs-sm); font-weight: 600; color: var(--text-2); }
+    .stats { list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-4) var(--space-5); margin-top: var(--space-6); }
+    .stat { padding-top: var(--space-3); border-top: 1px solid var(--line); }
+    .stat strong { display: block; font-size: var(--fs-h1); font-weight: 800; line-height: 1.1; color: var(--heading); font-variant-numeric: tabular-nums; }
+    .stat span { display: block; margin-top: .25rem; font-size: var(--fs-sm); color: var(--text-2); }
     @media (min-width: 48rem) { .stats { grid-template-columns: repeat(4, 1fr); } }
 
-    .marquee { position: relative; margin-top: var(--space-6); overflow-x: auto; scroll-snap-type: x mandatory; padding-block: var(--space-4) var(--space-5); }
-    .marquee.is-animated { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
-    .marquee__track { list-style: none; display: flex; gap: var(--space-5); width: max-content; padding-inline: var(--space-4); }
-    .marquee.is-animated .marquee__track { animation: marquee 70s linear infinite; }
-    .marquee.is-animated:hover .marquee__track,
-    .marquee.is-animated:focus-within .marquee__track,
-    .marquee.is-paused .marquee__track { animation-play-state: paused; }
-    @keyframes marquee { to { transform: translateX(-50%); } }
-    .marquee__track > li { scroll-snap-align: center; flex: none; width: clamp(14rem, 26vw, 19rem); }
-    .marquee__track > li:nth-child(odd) .polaroid { --tilt: -2.5deg; }
-    .marquee__track > li:nth-child(even) .polaroid { --tilt: 2deg; margin-top: 1.25rem; }
-    .marquee__track > li:nth-child(3n) .polaroid { --tilt: 3.5deg; }
-    .marquee__controls { display: flex; justify-content: center; margin-top: var(--space-2); }
-    .marquee__controls[hidden] { display: none; }
+    /* HP: geser horizontal. Desktop: grid foto, foto pertama besar. */
+    .trip-grid {
+      list-style: none; display: grid; grid-auto-flow: column; grid-auto-columns: 78%; gap: var(--space-3);
+      margin-top: var(--space-6); overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: var(--space-2);
+      scrollbar-width: thin;
+    }
+    .trip-grid > li { scroll-snap-align: start; }
+    .trip-photo { margin: 0; display: grid; gap: .5rem; height: 100%; grid-template-rows: 1fr auto; }
+    .trip-photo img { width: 100%; height: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--r-sm); background: var(--blue-100); }
+    .trip-photo figcaption { font-size: var(--fs-sm); color: var(--text-2); line-height: 1.3; }
+    @media (min-width: 48rem) {
+      .trip-grid { grid-auto-flow: row; grid-template-columns: repeat(4, 1fr); overflow: visible; scroll-snap-type: none; padding-bottom: 0; gap: var(--space-5) var(--space-4); }
+      .trip-grid > li:first-child { grid-column: span 2; grid-row: span 2; }
+      .trip-grid > li:first-child img { aspect-ratio: auto; min-height: 0; }
+      .trip-grid > li:nth-child(6) { grid-column: span 2; }
+      .trip-grid > li:nth-child(6) img { aspect-ratio: 8 / 3; }
+    }
 
     /* Foto di panel Squad & follow */
     .squad-photo {
@@ -1863,36 +1852,28 @@
 
     <!-- ========== JEJAK PERJALANAN ========== -->
     <section class="memories" id="jejak" aria-labelledby="mem-title">
-      <svg class="doodle doodle--float memories__doodle" aria-hidden="true"><use href="#d-star"/></svg>
       <div class="container">
         <div class="memories__head reveal">
-          <p class="t-over">Jejak perjalanan sebelumnya</p>
-          <h2 class="memories__title" id="mem-title">Begini serunya <span class="brush scribble">ke Bali</span> bareng STEKOM</h2>
-          <p class="muted">Dokumentasi Kunjungan Duta Teladan Universitas STEKOM ke Bali, 24 Desember 2025 – 3 Januari 2026. Tahun ini giliranmu!</p>
+          <p class="memories__meta">Bali, 24 Desember 2025 – 3 Januari 2026</p>
+          <h2 class="memories__title" id="mem-title">Perjalanan Duta Teladan STEKOM ke Bali</h2>
+          <p class="memories__lead">Ini dokumentasi rombongan tahun lalu: 11 hari keliling Jawa Timur dan Bali bareng pelajar dari berbagai daerah. Tahun ini giliranmu.</p>
         </div>
         <ul class="stats reveal">
           <li class="stat"><strong>11 hari</strong><span>perjalanan edukatif</span></li>
           <li class="stat"><strong>7</strong><span>destinasi di Jawa Timur &amp; Bali</span></li>
           <li class="stat"><strong>150</strong><span>delegasi pelajar terpilih</span></li>
-          <li class="stat"><strong>100%</strong><span>gratis untuk delegasi</span></li>
+          <li class="stat"><strong>Gratis</strong><span>seluruh biaya delegasi ditanggung</span></li>
         </ul>
-      </div>
-      <div class="marquee" id="marquee" role="region" aria-label="Galeri foto perjalanan, bisa digeser" tabindex="0">
-        <ul class="marquee__track">
-          <li><figure class="polaroid"><img src="assets/img/ycs-rombongan-banner-800.webp" srcset="assets/img/ycs-rombongan-banner-480.webp 480w, assets/img/ycs-rombongan-banner-800.webp 800w, assets/img/ycs-rombongan-banner-1600.webp 1600w" sizes="(min-width: 64rem) 19rem, 60vw" width="1600" height="1066" alt="Rombongan Duta Teladan STEKOM berfoto bersama spanduk program di taman air Bali" loading="lazy" decoding="async"><figcaption>Satu rombongan, satu cerita</figcaption></figure></li>
-          <li><figure class="polaroid"><img src="assets/img/ycs-kayak-800.webp" srcset="assets/img/ycs-kayak-480.webp 480w, assets/img/ycs-kayak-800.webp 800w, assets/img/ycs-kayak-1600.webp 1600w" sizes="(min-width: 64rem) 19rem, 60vw" width="1600" height="1066" alt="Tiga pelajar mendayung kayak di teluk dengan kapal layar di belakang" loading="lazy" decoding="async"><figcaption>Kayak di teluk</figcaption></figure></li>
-          <li><figure class="polaroid"><img src="assets/img/ycs-busana-bali-800.webp" srcset="assets/img/ycs-busana-bali-480.webp 480w, assets/img/ycs-busana-bali-800.webp 800w, assets/img/ycs-busana-bali-1600.webp 1600w" sizes="(min-width: 64rem) 19rem, 60vw" width="1600" height="1066" alt="Tiga pelajar berbusana adat Bali di tangga pura" loading="lazy" decoding="async"><figcaption>Belajar budaya Bali</figcaption></figure></li>
-          <li><figure class="polaroid"><img src="assets/img/ycs-squad-danau-800.webp" srcset="assets/img/ycs-squad-danau-480.webp 480w, assets/img/ycs-squad-danau-800.webp 800w, assets/img/ycs-squad-danau-1600.webp 1600w" sizes="(min-width: 64rem) 19rem, 60vw" width="1600" height="1066" alt="Empat pelajar putri berpose di dermaga tepi danau" loading="lazy" decoding="async"><figcaption>Teman baru se-Indonesia</figcaption></figure></li>
-          <li><figure class="polaroid"><img src="assets/img/ycs-gwk-800.webp" srcset="assets/img/ycs-gwk-480.webp 480w, assets/img/ycs-gwk-800.webp 800w, assets/img/ycs-gwk-1600.webp 1536w" sizes="(min-width: 64rem) 19rem, 60vw" width="1536" height="1024" alt="Rombongan pelajar berfoto di depan patung Garuda Wisnu Kencana" loading="lazy" decoding="async"><figcaption>Sampai di GWK!</figcaption></figure></li>
-          <li><figure class="polaroid"><img src="assets/img/ycs-main-air-800.webp" srcset="assets/img/ycs-main-air-480.webp 480w, assets/img/ycs-main-air-800.webp 800w, assets/img/ycs-main-air-1600.webp 1600w" sizes="(min-width: 64rem) 19rem, 60vw" width="1600" height="1066" alt="Pelajar berpelampung bermain air di pantai" loading="lazy" decoding="async"><figcaption>Main air sampai puas</figcaption></figure></li>
-          <li><figure class="polaroid"><img src="assets/img/ycs-kumpul-rombongan-800.webp" srcset="assets/img/ycs-kumpul-rombongan-480.webp 480w, assets/img/ycs-kumpul-rombongan-800.webp 800w, assets/img/ycs-kumpul-rombongan-1600.webp 1600w" sizes="(min-width: 64rem) 19rem, 60vw" width="1600" height="1066" alt="Rombongan pelajar berpose dengan properti foto sebelum berangkat" loading="lazy" decoding="async"><figcaption>Siap berangkat!</figcaption></figure></li>
-          <li><figure class="polaroid"><img src="assets/img/ycs-tirta-gangga-800.webp" srcset="assets/img/ycs-tirta-gangga-480.webp 480w, assets/img/ycs-tirta-gangga-800.webp 800w, assets/img/ycs-tirta-gangga-1600.webp 1600w" sizes="(min-width: 64rem) 19rem, 60vw" width="1600" height="1066" alt="Rombongan pelajar di taman air dengan kolam dan pura" loading="lazy" decoding="async"><figcaption>Taman air & pura</figcaption></figure></li>
+        <ul class="trip-grid" aria-label="Foto perjalanan">
+          <li><figure class="trip-photo"><img src="assets/img/ycs-rombongan-banner-800.webp" srcset="assets/img/ycs-rombongan-banner-480.webp 480w, assets/img/ycs-rombongan-banner-800.webp 800w, assets/img/ycs-rombongan-banner-1600.webp 1600w" sizes="(min-width: 72rem) 36rem, (min-width: 48rem) 50vw, 78vw" width="1600" height="1066" alt="Rombongan Duta Teladan STEKOM berfoto bersama spanduk program di taman air Bali" decoding="async"><figcaption>Foto bersama satu rombongan</figcaption></figure></li>
+          <li><figure class="trip-photo"><img src="assets/img/ycs-kayak-800.webp" srcset="assets/img/ycs-kayak-480.webp 480w, assets/img/ycs-kayak-800.webp 800w, assets/img/ycs-kayak-1600.webp 1600w" sizes="(min-width: 72rem) 17rem, (min-width: 48rem) 25vw, 78vw" width="1600" height="1066" alt="Tiga pelajar mendayung kayak di teluk dengan kapal layar di belakang" loading="lazy" decoding="async"><figcaption>Kayak di teluk</figcaption></figure></li>
+          <li><figure class="trip-photo"><img src="assets/img/ycs-busana-bali-800.webp" srcset="assets/img/ycs-busana-bali-480.webp 480w, assets/img/ycs-busana-bali-800.webp 800w, assets/img/ycs-busana-bali-1600.webp 1600w" sizes="(min-width: 72rem) 17rem, (min-width: 48rem) 25vw, 78vw" width="1600" height="1066" alt="Tiga pelajar berbusana adat Bali di tangga pura" loading="lazy" decoding="async"><figcaption>Belajar budaya Bali</figcaption></figure></li>
+          <li><figure class="trip-photo"><img src="assets/img/ycs-squad-danau-800.webp" srcset="assets/img/ycs-squad-danau-480.webp 480w, assets/img/ycs-squad-danau-800.webp 800w, assets/img/ycs-squad-danau-1600.webp 1600w" sizes="(min-width: 72rem) 17rem, (min-width: 48rem) 25vw, 78vw" width="1600" height="1066" alt="Empat pelajar putri berpose di dermaga tepi danau" loading="lazy" decoding="async"><figcaption>Teman baru se-Indonesia</figcaption></figure></li>
+          <li><figure class="trip-photo"><img src="assets/img/ycs-gwk-800.webp" srcset="assets/img/ycs-gwk-480.webp 480w, assets/img/ycs-gwk-800.webp 800w, assets/img/ycs-gwk-1600.webp 1536w" sizes="(min-width: 72rem) 17rem, (min-width: 48rem) 25vw, 78vw" width="1536" height="1024" alt="Rombongan pelajar berfoto di depan patung Garuda Wisnu Kencana" loading="lazy" decoding="async"><figcaption>Garuda Wisnu Kencana</figcaption></figure></li>
+          <li><figure class="trip-photo"><img src="assets/img/ycs-main-air-800.webp" srcset="assets/img/ycs-main-air-480.webp 480w, assets/img/ycs-main-air-800.webp 800w, assets/img/ycs-main-air-1600.webp 1600w" sizes="(min-width: 72rem) 36rem, (min-width: 48rem) 50vw, 78vw" width="1600" height="1066" alt="Pelajar berpelampung bermain air di pantai" loading="lazy" decoding="async"><figcaption>Main air di pantai</figcaption></figure></li>
+          <li><figure class="trip-photo"><img src="assets/img/ycs-kumpul-rombongan-800.webp" srcset="assets/img/ycs-kumpul-rombongan-480.webp 480w, assets/img/ycs-kumpul-rombongan-800.webp 800w, assets/img/ycs-kumpul-rombongan-1600.webp 1600w" sizes="(min-width: 72rem) 17rem, (min-width: 48rem) 25vw, 78vw" width="1600" height="1066" alt="Rombongan pelajar berpose dengan properti foto sebelum berangkat" loading="lazy" decoding="async"><figcaption>Kumpul sebelum berangkat</figcaption></figure></li>
+          <li><figure class="trip-photo"><img src="assets/img/ycs-tirta-gangga-800.webp" srcset="assets/img/ycs-tirta-gangga-480.webp 480w, assets/img/ycs-tirta-gangga-800.webp 800w, assets/img/ycs-tirta-gangga-1600.webp 1600w" sizes="(min-width: 72rem) 17rem, (min-width: 48rem) 25vw, 78vw" width="1600" height="1066" alt="Rombongan pelajar di taman air dengan kolam dan pura" loading="lazy" decoding="async"><figcaption>Taman air &amp; pura</figcaption></figure></li>
         </ul>
-      </div>
-      <div class="marquee__controls" hidden>
-        <button class="btn btn--ghost btn--sm" type="button" id="marquee-toggle" aria-pressed="false" aria-controls="marquee">
-          <svg aria-hidden="true"><use href="#i-pause"/></svg><span>Jeda galeri</span>
-        </button>
       </div>
     </section>
 
@@ -3571,29 +3552,6 @@
       if (blob) unduhBlob(blob);
       toast('Foto kartu diunduh. Lampirkan fotonya saat membagikan link di bawah.');
       bagikan(data);
-    }
-
-    /* ---------- Galeri berjalan ---------- */
-    const marquee = $('#marquee');
-    if (!reduceMotion) {
-      const track = $('.marquee__track', marquee);
-      // Gandakan isi agar animasi -50% berulang tanpa jeda; salinan disembunyikan dari pembaca layar.
-      [...track.children].forEach((li) => {
-        const c = li.cloneNode(true);
-        c.setAttribute('aria-hidden', 'true');
-        c.dataset.clone = '';
-        track.append(c);
-      });
-      marquee.classList.add('is-animated');
-      const ctl = $('.marquee__controls');
-      const btn = $('#marquee-toggle');
-      ctl.hidden = false;
-      btn.addEventListener('click', () => {
-        const paused = marquee.classList.toggle('is-paused');
-        btn.setAttribute('aria-pressed', String(paused));
-        $('span', btn).textContent = paused ? 'Lanjutkan galeri' : 'Jeda galeri';
-        $('use', btn).setAttribute('href', paused ? '#i-play' : '#i-pause');
-      });
     }
 
     /* ---------- Latar foto lazy ---------- */
