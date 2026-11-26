@@ -143,6 +143,35 @@ test('server data: impor dari Sheet, tulis lewat /exec, diteruskan ke Sheet (app
   fs.rmSync(dir, {recursive: true, force: true});
 });
 
+test('kode undian unik lintas event: tidak mulai lagi dari #0001, lanjut dari Sheet walau state di-reset', () => {
+  const {jam, app, m} = siapkanMonster('1000000');
+  const ta = m.masuk({perangkat: 'dev-aaaaaaaaaaaaaaaa', email: 'ani@mail.com'}, '1.1.1.1').token;
+  const tb = m.masuk({perangkat: 'dev-bbbbbbbbbbbbbbbb', email: 'budi@mail.com'}, '1.1.1.1').token;
+  const tc = m.masuk({perangkat: 'dev-cccccccccccccccc', email: 'cici@mail.com'}, '2.2.2.2').token;
+  const mulaiEvent = () => {
+    app.sheets.Pengaturan.rows.find((x) => x[0] === 'monster_mulai_manual')[1] = String(jam.now - 1000);
+    app.cache.remove('cfg'); m.segarkan(); jam.now += 1100;
+    return m.lihat().id;
+  };
+  const id1 = m.lihat().id;
+  assert.equal(m.tap({token: ta, n: 5, seq: 1, e: id1}).tiket, '#0001');
+  assert.equal(m.tap({token: tb, n: 5, seq: 1, e: id1}).tiket, '#0002');
+  jam.now += 60 * 60000; // event 1 selesai
+  m.lihat();
+  const id2 = mulaiEvent();
+  assert.notEqual(id2, id1);
+  assert.equal(m.tap({token: tc, n: 5, seq: 1, e: id2}).tiket, '#0003', 'peserta lain di event berikutnya tidak mendapat #0001 lagi');
+  assert.equal(m.tap({token: ta, n: 5, seq: 1, e: id2}).tiket, '#0004', 'peserta yang sama dapat kode baru, bukan #0001 lagi');
+  // server pindah / state event hilang: kode tetap lanjut dari tab "Tiket Monster"
+  jam.now += 60 * 60000; m.lihat();
+  const m2 = buatMonster(app, {now: () => jam.now, rahasia: 'r'.repeat(40), state: {perangkat: m.state.perangkat, email: m.state.email}});
+  app.sheets.Pengaturan.rows.find((x) => x[0] === 'monster_mulai_manual')[1] = String(jam.now - 1000);
+  app.cache.remove('cfg'); jam.now += 1100;
+  const id3 = m2.lihat().id;
+  assert.equal(m2.tap({token: tb, n: 5, seq: 1, e: id3}).tiket, '#0005');
+  const semua = app.sheets['Tiket Monster'].rows.slice(1).map((x) => x[2]);
+  assert.equal(new Set(semua).size, semua.length, 'tidak ada kode kembar di Sheet: ' + semua);
+});
 test('mode uji: event terpisah lewat kode, tanpa ikatan perangkat, tiket tidak masuk Sheet', () => {
   const {jam, app, m} = siapkanMonster();
   app.sheets.Pengaturan.rows.find((x) => x[0] === 'monster_aktif')[1] = 'TIDAK';
@@ -158,7 +187,7 @@ test('mode uji: event terpisah lewat kode, tanpa ikatan perangkat, tiket tidak m
   assert.equal(a.ok, true, 'tanpa email festival pun boleh');
   assert.equal(Object.keys(m.state.perangkat).length, 0, 'perangkat tidak diikat');
   const r = m.tap({token: a.token, n: 10, seq: 1, e: s.id, uji: u.kode});
-  assert.equal(r.terima, 10); assert.equal(r.tiket, '#0001');
+  assert.equal(r.terima, 10); assert.equal(r.tiket, '#U0001', 'kode uji berawalan U, tidak bentrok dengan kode asli');
   assert.equal(m.tap({token: a.token, n: 10, seq: 2, e: s.id}).buang, true, 'tanpa kode uji tidak masuk event uji');
   assert.equal((app.sheets['Tiket Monster'] || {rows: [0]}).rows.length, 1, 'tiket uji tidak ditulis ke Sheet');
   const t = m.admin({token, aksi: 'tiket', event: s.id});
