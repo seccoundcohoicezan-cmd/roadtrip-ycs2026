@@ -76,6 +76,9 @@
     .chip-mini:hover { border-color: var(--primary); }
     .pop-preview { display: grid; overflow: hidden; max-width: 22rem; border-radius: 1.25rem; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--e2); }
     .pop-preview img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+    .pop-preview img[hidden] { display: none; }
+    .popup-peringatan { margin: 0 0 .5rem; padding: .5rem .75rem; border-radius: .75rem; background: var(--warning-bg, #fff4d6); color: var(--warning, #8a5a00); font-size: .8125rem; font-weight: 700; }
+    .popup-peringatan[hidden] { display: none; }
     .pop-preview > div { display: grid; gap: .375rem; padding: 1rem; }
     .pop-preview p { font-size: .875rem; color: var(--text-2); white-space: pre-line; }
     .pv-btn { justify-self: start; margin-top: .25rem; padding: .5rem 1rem; border-radius: var(--r-pill); background: var(--sun-400); color: var(--white); font-weight: 800; font-size: .875rem; }
@@ -349,8 +352,12 @@
                 <div class="field field--full"><label for="s-popup_teks">Isi singkat</label><textarea class="input textarea" id="s-popup_teks" data-key="popup_teks" maxlength="300" rows="2" placeholder="Contoh: Tonton live jam 19.00 WIB, kode akses dibagikan di siaran."></textarea></div>
                 <div class="field"><label for="s-popup_link">Link tujuan saat diklik</label><input class="input" id="s-popup_link" data-key="popup_link" placeholder="https://… atau #dana atau /klaim/"><p class="field__hint">Pintasan: <button type="button" class="chip-mini" data-isi="#dana">Dana Kaget</button> <button type="button" class="chip-mini" data-isi="/klaim/">Wildcard</button> <button type="button" class="chip-mini" data-isi="#satu-kata">Satu Kata</button> <button type="button" class="chip-mini" data-isi="#live">Live</button> <button type="button" class="chip-mini" data-isi="/survei/">Survei</button></p></div>
                 <div class="field"><label for="s-popup_tombol">Teks tombol</label><input class="input" id="s-popup_tombol" data-key="popup_tombol" maxlength="40"></div>
-                <div class="field field--full"><label for="s-popup_gambar">Gambar <span class="opt">(opsional, URL https, rasio 16:9)</span></label><input class="input" type="url" id="s-popup_gambar" data-key="popup_gambar" placeholder="https://"></div>
+                <div class="field field--full"><label for="s-popup_gambar">Gambar <span class="opt">(opsional, rasio 16:9)</span></label>
+                  <div class="uji-link"><input class="input" type="text" inputmode="url" id="s-popup_gambar" data-key="popup_gambar" placeholder="Tempel link Google Drive / URL gambar https, atau unggah"><button class="btn btn--soft btn--sm" type="button" id="popup-unggah">Unggah gambar</button><button class="btn btn--soft btn--sm" type="button" id="popup-hapus-gambar">Hapus</button></div>
+                  <input type="file" id="popup-file" accept="image/png,image/jpeg,image/webp" hidden>
+                  <p class="field__hint" id="popup-gambar-info">Link Google Drive: file harus dibagikan "Siapa saja yang memiliki link". Unggahan JPG/PNG/WebP diperkecil otomatis (maks 1600 px).</p></div>
                 <div class="field field--full"><span class="label">Pratinjau</span>
+                  <p class="popup-peringatan" id="pv-peringatan" role="status" hidden></p>
                   <div class="pop-preview" aria-live="polite"><img id="pv-img" alt="" hidden><div><strong id="pv-judul">Judul pop-up</strong><p id="pv-teks"></p><span class="pv-btn" id="pv-btn">Lihat selengkapnya</span></div></div>
                 </div>
               </div>
@@ -835,15 +842,71 @@
       setInputs().forEach((el) => { out[el.dataset.key] = el.dataset.type === 'bool' ? (el.checked ? 'YA' : 'TIDAK') : el.dataset.type === 'waktu' ? dariInput(el.value) : el.value.trim(); });
       return out;
     }
+    // Sama dengan gambarLangsung_ di Code.gs: link berbagi Google Drive → URL gambar langsung.
+    function gambarLangsung(u) {
+      u = String(u || '').trim();
+      const m = /^https:\/\/(?:drive|docs)\.google\.com\/(?:file\/d\/([\w-]{20,})|(?:open|uc|thumbnail)\?(?:.*&)?id=([\w-]{20,}))/.exec(u);
+      return m ? 'https://lh3.googleusercontent.com/d/' + (m[1] || m[2]) + '=w1600' : u;
+    }
+    const INFO_GAMBAR = $('#popup-gambar-info').textContent;
     function pratinjauPopup() {
-      $('#pv-judul').textContent = $('#s-popup_judul').value || 'Judul pop-up';
-      $('#pv-teks').textContent = $('#s-popup_teks').value;
+      const judul = $('#s-popup_judul').value.trim(), teks = $('#s-popup_teks').value.trim();
+      $('#pv-judul').textContent = judul || (teks ? '' : 'Judul pop-up');
+      $('#pv-teks').textContent = teks;
       $('#pv-btn').textContent = $('#s-popup_tombol').value || 'Lihat selengkapnya';
       $('#pv-btn').hidden = !$('#s-popup_link').value;
-      const g = $('#s-popup_gambar').value;
-      $('#pv-img').hidden = !/^https:/.test(g);
-      if (/^https:/.test(g)) $('#pv-img').src = g;
+      const g = gambarLangsung($('#s-popup_gambar').value);
+      const sah = /^(https:\/\/\S+|\/api\/popup-gambar\?v=[\w-]+)$/.test(g);
+      const img = $('#pv-img');
+      img.hidden = !sah;
+      $('#popup-gambar-info').textContent = g && !sah ? 'Isi dengan link https (Google Drive atau URL gambar), atau klik "Unggah gambar".' : INFO_GAMBAR;
+      if (sah && img.getAttribute('src') !== g) {
+        img.onload = () => { if (/^Gambar tidak bisa/.test($('#popup-gambar-info').textContent)) $('#popup-gambar-info').textContent = INFO_GAMBAR; };
+        img.onerror = () => { img.hidden = true; $('#popup-gambar-info').textContent = 'Gambar tidak bisa dimuat. Untuk Google Drive, ubah akses file menjadi "Siapa saja yang memiliki link", atau unggah gambarnya langsung.'; };
+        img.src = g;
+      }
+      const aktif = $('#s-popup_aktif').checked, adaIsi = !!(judul || teks || g);
+      const w = $('#pv-peringatan');
+      w.textContent = !aktif && adaIsi ? 'Pop-up belum tampil di web: nyalakan "Tampilkan pop-up", lalu klik "Simpan pengaturan".'
+        : aktif && !adaIsi ? 'Isi judul, isi singkat, atau gambar agar pop-up bisa tampil.' : '';
+      w.hidden = !w.textContent;
     }
+    // Unggah gambar pop-up: diperkecil di browser (maks 1600 px, JPEG) lalu disimpan di server data.
+    function kecilkanGambar(file) {
+      return new Promise((selesai, gagal) => {
+        const img = new Image(), url = URL.createObjectURL(file);
+        img.onerror = () => { URL.revokeObjectURL(url); gagal(new Error('gambar')); };
+        img.onload = () => {
+          URL.revokeObjectURL(url);
+          let k = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight)), hasil = '';
+          for (let coba = 0; coba < 4; coba++, k *= 0.75) {
+            const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(img.naturalWidth * k)); c.height = Math.max(1, Math.round(img.naturalHeight * k));
+            const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height);
+            for (let q = 0.85; q > 0.5; q -= 0.1) { hasil = c.toDataURL('image/jpeg', q); if (hasil.length < 500000) return selesai(hasil); }
+          }
+          gagal(new Error('besar'));
+        };
+        img.src = url;
+      });
+    }
+    $('#popup-unggah').addEventListener('click', () => $('#popup-file').click());
+    $('#popup-hapus-gambar').addEventListener('click', () => { $('#s-popup_gambar').value = ''; $('#f-set').dispatchEvent(new Event('input')); });
+    $('#popup-file').addEventListener('change', async (e) => {
+      const file = e.target.files[0]; e.target.value = '';
+      if (!file) return;
+      const btn = $('#popup-unggah'), info = $('#popup-gambar-info');
+      sibuk(btn, true); info.textContent = 'Mengunggah gambar…';
+      try {
+        const gambar = await kecilkanGambar(file);
+        const d = await api('admin-primer', {perintah: 'popup-gambar', data: {gambar}});
+        if (!d.ok) throw new Error(d.error || 'gagal');
+        $('#s-popup_gambar').value = d.url;
+        $('#f-set').dispatchEvent(new Event('input'));
+        info.textContent = 'Gambar terunggah. Klik "Simpan pengaturan" agar tampil di web.';
+      } catch (err) {
+        info.textContent = err.message === 'gambar' ? 'File tidak bisa dibaca (pakai JPG/PNG/WebP).' : err.message === 'besar' ? 'Gambar terlalu besar.' : 'Unggah gagal (' + err.message + '). Coba lagi.';
+      } finally { sibuk(btn, false); }
+    });
     $$('.chip-mini[data-isi]').forEach((b) => b.addEventListener('click', () => {
       $('#s-popup_link').value = b.dataset.isi;
       $('#f-set').dispatchEvent(new Event('input'));

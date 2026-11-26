@@ -3628,19 +3628,23 @@
     let popKunci = '';
     function tampilPopup() {
       const d = cfg && cfg.popup;
-      if (!d || !d.aktif || !d.judul || !pop.showModal) return;
+      if (!d || !d.aktif || !(d.judul || d.teks || d.gambar) || !pop.showModal) return;
       popKunci = [d.judul, d.teks, d.link, d.gambar].join('|');
       try { if (localStorage.getItem('ycs_popup') === popKunci) return; } catch (e) {}
       const luar = /^https?:/i.test(d.link || '');
       const link = d.link || '#';
-      $('#info-pop-title').textContent = d.judul;
+      $('#info-pop-title').textContent = d.judul || '';
+      $('#info-pop-title').hidden = !d.judul;
       $('#info-pop-text').textContent = d.teks || '';
+      $('#info-pop-text').hidden = !d.teks;
+      if (d.judul) pop.setAttribute('aria-labelledby', 'info-pop-title'); else { pop.removeAttribute('aria-labelledby'); pop.setAttribute('aria-label', 'Info YCS'); }
       const cta = $('#info-pop-cta');
       cta.textContent = d.tombol || 'Lihat selengkapnya';
       cta.hidden = !d.link;
       [cta, $('#info-pop-img-link')].forEach((a) => { a.href = link; if (luar) { a.target = '_blank'; a.rel = 'noopener'; } });
       const img = $('#info-pop-img');
       img.hidden = !d.gambar;
+      img.onerror = () => { img.hidden = true; }; // gambar gagal dimuat (mis. file Drive belum dibagikan publik) → pop-up tetap tampil tanpa gambar
       if (d.gambar) img.src = d.gambar;
       setTimeout(() => { if (!document.querySelector('dialog[open]')) pop.showModal(); }, 1500);
     }

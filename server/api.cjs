@@ -5,6 +5,7 @@ const crypto = require('node:crypto');
 const {buatDuta} = require('./duta.cjs');
 const {buatDummy} = require('./dummy.cjs');
 const {buatPlaza} = require('./plaza.cjs');
+const {buatGambar} = require('./gambar.cjs');
 
 // Kode galat → status HTTP (galat lain → 422).
 const STATUS = {kata_ditolak: 422, nama_ditolak: 422, validation: 400, sesi_habis: 401, sandi_salah: 401, terlalu_banyak: 429, rate_limit: 429, busy: 503, server: 502, save_failed: 502, connection: 502};
@@ -36,6 +37,7 @@ function buatApi(data) {
   const duta = buatDuta(app, {state: () => data.monster.state, ubah: () => data.tandai()});
   const dummy = buatDummy({state: () => data.monster.state, ubah: () => data.tandai()});
   const plaza = buatPlaza();
+  const gambar = buatGambar(data.dataDir);
   const nAsli = () => { try { const d = app().get('kata'); return d && d.ok ? d.total || 0 : 0; } catch (e) { return 0; } };
   const kataDiblokir = (k) => { try { return !!app().ctx.kataDiblokir_(k, app().ctx.bacaPengaturan_()); } catch (e) { return false; } };
   const jawab = (body, cache = CACHE.tidak, kode, header) => ({kode: kode || (body.ok ? 200 : (STATUS[body.error] || 422)), body, cache, header});
@@ -101,6 +103,7 @@ function buatApi(data) {
     if (!sah) return jawab({ok: false, error: 'sesi_habis'});
     if (p.perintah === 'monster' && p.data && /^dummy-/.test(p.data.aksi)) { const d = dummy.admin(p.data, nAsli(), kataDiblokir); if (d.ok) app().ctx.logAdmin_('warga dummy', `${d.aktif ? 'aktif' : 'nonaktif'} ${d.jumlah}`); return jawab(d); }
     if (p.perintah === 'monster') return jawab(data.monster.admin({...p.data, token: p.token}));
+    if (p.perintah === 'popup-gambar') { const d = gambar.simpan(p.data && p.data.gambar); if (d.ok) app().ctx.logAdmin_('unggah gambar pop-up', d.url); return jawab(d); }
     if (p.perintah === 'tarik-sheet') {
       if (!data.adaSheet) return jawab({ok: false, error: 'tanpa_sheet'});
       if (data.tertunda()) return jawab({ok: false, error: 'masih_sinkron'});
@@ -130,6 +133,12 @@ function buatApi(data) {
   // rute: 'METODE nama' → {maks: byte body, fn(body, ip, url)}
   const rute = {
     'GET config': {fn: config},
+    'GET popup-gambar': {fn: (p, ip, url) => {
+      const g = gambar.ambil();
+      if (!g) return jawab({ok: false, error: 'tidak_ada'}, 'public, max-age=0, s-maxage=30', 404);
+      const tepat = url.searchParams.get('v') === g.v;
+      return {kode: 200, mentah: g.buf, cache: tepat ? 'public, max-age=31536000, immutable' : 'public, max-age=0, s-maxage=30', header: {'Content-Type': g.mime}};
+    }},
     'GET now': {fn: () => jawab({ok: true, now: Date.now()})},
     'GET stats': {fn: () => { const d = baca('stats'); return d.ok === true ? jawab(d, CACHE.stats) : jawab({ok: false, error: 'connection'}); }},
     'GET reveal': {fn: reveal},
