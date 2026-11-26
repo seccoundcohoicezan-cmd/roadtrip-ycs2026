@@ -731,6 +731,16 @@
     .bos-banner svg { width: 1rem; height: 1rem; }
     .bos-banner__dot { width: .625rem; height: .625rem; flex: none; border-radius: 50%; background: var(--coral-500); animation: k-pulse 1.4s infinite; }
     @media (min-width: 64rem) { .bos-banner { bottom: var(--space-5); } }
+    /* Pertempuran berlangsung: pita merah berdenyut + tombol Join (terlihat dari luar /game/) */
+    .bos-banner.is-perang .bos-banner__dot { display: none; }
+    .bos-banner.is-perang { gap: .375rem; font-size: .8125rem; padding: 6px 6px 6px 12px; background: linear-gradient(90deg, #7A0F1E, #B3122E); box-shadow: 0 10px 28px -10px rgba(179, 18, 46, .7); animation: perang-denyut 1.6s ease-in-out infinite; }
+    .bos-banner.is-perang strong { color: #FFE066; letter-spacing: .02em; }
+    .bos-banner__join { display: none; align-items: center; gap: .25rem; padding: 6px 11px; border-radius: var(--r-pill); background: var(--sun-400); color: var(--navy-950); font-weight: 800; }
+    .bos-banner.is-perang .bos-banner__join { display: inline-flex; }
+    .bos-banner.is-perang > svg { display: none; }
+    .bos-banner__sub { opacity: .85; font-size: var(--fs-xs); }
+    @keyframes perang-denyut { 50% { box-shadow: 0 10px 34px -6px rgba(255, 80, 60, .85); } }
+    @media (prefers-reduced-motion: reduce) { .bos-banner.is-perang { animation: none; } }
     /* ---- Sukses gabung + kartu share (m04) ---- */
     dialog.sukses { width: 100%; max-width: 30rem; max-height: 100dvh; margin: auto; padding: var(--space-6) var(--margin-m) var(--space-5); border: 0; border-radius: var(--r-xl); overflow: auto; background: linear-gradient(180deg, var(--blue-500) 0%, var(--blue-600) 45%, var(--navy-900) 100%); color: var(--white); text-align: center; }
     dialog.sukses::backdrop { background: var(--scrim); }
@@ -2034,7 +2044,7 @@
   </footer>
 
   <!-- ========== ACTION BAR ========== -->
-  <a class="bos-banner" id="bos-banner" href="game/" hidden><span class="bos-banner__dot" aria-hidden="true"></span><span id="bos-banner-teks"></span><svg aria-hidden="true"><use href="#i-chevron-right"/></svg></a>
+  <a class="bos-banner" id="bos-banner" href="game/" hidden><span class="bos-banner__dot" aria-hidden="true"></span><span id="bos-banner-teks"></span><span class="bos-banner__join" aria-hidden="true">Join Pertempuran</span><svg aria-hidden="true"><use href="#i-chevron-right"/></svg></a>
 
   <!-- ========== BOTTOM NAV seluler (5 item, design system) ========== -->
   <nav class="tabbar-wrap" aria-label="Navigasi bawah">
@@ -3224,7 +3234,10 @@
         const b = $('#bos-banner');
         const tanding = st.fase === 'tanding', tunggu = st.fase === 'tunggu' && st.mulai;
         b.hidden = !(tanding || tunggu);
-        if (tanding) $('#bos-banner-teks').innerHTML = '<strong>Raja Batu muncul!</strong> Lawan sekarang, dapat kode undian';
+        b.classList.toggle('is-perang', tanding);
+        const nPejuang = (st.pemain || 0) + (st.ramai || 0);
+        b.setAttribute('aria-label', tanding ? 'Pertempuran berlangsung melawan Raja Batu. Join pertempuran' : '');
+        if (tanding) $('#bos-banner-teks').innerHTML = '⚔️ <strong>Pertempuran Berlangsung</strong>' + (nPejuang ? ` <span class="bos-banner__sub">${nf.format(nPejuang)} pejuang</span>` : '');
         else if (tunggu) $('#bos-banner-teks').innerHTML = '<strong>Raja Batu</strong> muncul ' + new Date(st.mulai).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }) + ' WIB';
       } catch (e) { /* abaikan */ }
     }

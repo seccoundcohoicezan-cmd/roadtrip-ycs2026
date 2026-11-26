@@ -145,5 +145,28 @@
     btn.disabled = on;
   }
 
+  /* ---------- Pertempuran berlangsung: pita "Join Pertempuran" di halaman turunan (bukan admin) ---------- */
+  if (!/^\/admin\//.test(location.pathname)) {
+    const css = document.createElement('style');
+    css.textContent = '.perang-pita{position:fixed;z-index:60;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;align-items:center;gap:.5rem;max-width:calc(100% - 1.5rem);padding:6px 6px 6px 14px;border-radius:999px;background:linear-gradient(90deg,#7A0F1E,#B3122E);color:#fff;font-size:.875rem;text-decoration:none;white-space:nowrap;box-shadow:0 10px 28px -10px rgba(179,18,46,.7);animation:perang-pita 1.6s ease-in-out infinite}'
+      + '.perang-pita[hidden]{display:none}.perang-pita strong{color:#FFE066}.perang-pita small{opacity:.85}'
+      + '.perang-pita b{padding:6px 12px;border-radius:999px;background:#FFC93C;color:#0A1A3F;font-weight:800}'
+      + '@keyframes perang-pita{50%{box-shadow:0 10px 34px -6px rgba(255,80,60,.85)}}@media (prefers-reduced-motion:reduce){.perang-pita{animation:none}}';
+    document.head.append(css);
+    const pita = Object.assign(document.createElement('a'), {className: 'perang-pita', href: '/game/', hidden: true});
+    pita.setAttribute('aria-label', 'Pertempuran berlangsung melawan Raja Batu. Join pertempuran');
+    document.body.append(pita);
+    const cek = async () => {
+      try {
+        const st = await (await fetch('/api/monster')).json();
+        const n = (st.pemain || 0) + (st.ramai || 0);
+        pita.hidden = st.fase !== 'tanding';
+        if (!pita.hidden) pita.innerHTML = '⚔️ <strong>Pertempuran Berlangsung</strong>' + (n ? ` <small>${nf.format(n)} pejuang</small>` : '') + ' <b>Join Pertempuran</b>';
+      } catch (e) { /* abaikan */ }
+    };
+    cek();
+    setInterval(() => { if (!document.hidden) cek(); }, 20000);
+  }
+
   window.YCS = {$, $$, toast, post, config, offset, uuid, perangkat, ref, waktu, nf, wilayah, isiWilayah, pasangBagikan, hitungMundur, sibuk};
 })();
