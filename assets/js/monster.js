@@ -118,6 +118,44 @@
       if (hpAnim != null && hp < hpAnim && window.YCSRajaRig) window.YCSRajaRig.hatiPecah(stage, Math.max(0, hp), maks || (st && st.hpMaks) || 5, meteor ? 'nyawa · kena meteor' : 'nyawa');
       hpAnim = hp;
     }
+    /* ---------- Suara pertempuran (assets/js/game-suara.js) ---------- */
+    // Efek jurus dijadwalkan pada jam audio begitu jurus mulai tampil → bunyi tepat di detik benturan animasi,
+    // tidak bergantung pada kelancaran frame. Meteor: siul saat mulai jatuh, ledakan saat menghantam (posisi kiri/kanan ikut).
+    const SU = () => window.YCSSuara;
+    let suaraKe = 0;
+    function suaraJurus(ps) {
+      const S = SU();
+      if (!S || !aktif || ps == null || suaraKe === aktif.ke) return;
+      suaraKe = aktif.ke;
+      const D = aktif.D / 1000, dtk = (p) => (p - ps) * D; // detik dari sekarang menuju progres p
+      if (ps < LEPAS) S.kumpulApi(0, dtk(LEPAS));
+      if (aktif.jenis === 'meteor') {
+        const tancap = LEPAS + 0.07 * (1 - LEPAS);
+        if (dtk(tancap) >= 0) S.benturan('meteor', dtk(tancap));
+        if (!hujan) return;
+        const a0 = LEPAS * 0.75, sk = 1 - a0, JATUH = 0.13; // pemetaan sama dengan gambarHujanMeteor / RIG.gambarHujan
+        hujan.daftar.forEach((m, i) => {
+          const pan = (m.tx / Math.max(1, W)) * 2 - 1, kena = dtk(a0 + sk * m.tl), jatuh = dtk(a0 + sk * (m.tl - JATUH));
+          if (kena < 0) return;
+          if (jatuh >= 0 && i % 2 === 0) S.siulMeteor(jatuh, kena - jatuh, pan, Math.min(1.2, m.r));
+          S.ledakan(kena, 0.45 + 0.45 * m.r, pan);
+        });
+        return;
+      }
+      const kontak = LEPAS + 0.12 * (1 - LEPAS); // rig: 0–0,12 fase serang = meledak maju sampai kontak
+      if (dtk(kontak) < 0) return;
+      S.ayun(Math.max(0, dtk(LEPAS) - 0.05), Math.max(0.06, dtk(kontak) - Math.max(0, dtk(LEPAS) - 0.05)), aktif.jenis === 'tebas');
+      S.benturan(aktif.jenis, dtk(kontak));
+      if (aktif.jenis === 'hentak' || aktif.jenis === 'tusuk') S.ledakan(dtk(LEPAS), 0.7, 0);
+    }
+    // Musik latar: menyala selama pertempuran, berhenti saat selesai; makin intens saat bos sekarat / jurus mendekat.
+    function suaraFase() {
+      const S = SU(); if (!S) return;
+      if (st && st.fase === 'tanding' && !akhir) { if (!S.ingin) S.musikMulai(); }
+      else if (S.ingin) S.musikBerhenti(2);
+    }
+    // Combo tap (candu): ketukan beruntun (jeda < 700 ms) menaikkan nada & angka; kelipatan 10 = perayaan kecil.
+    let combo = 0, tCombo = 0, comboTampil = null;
     let perisaiKe = 0; // nomor jurus meteor yang kamu tahan dengan PERISAI
     let tiketSaya = null, blokir = null, karakterMati = false, hindarKe = 0, hpSaya = null, aku_sasaran = false; // karakter milik pemain: tumbang = tidak bisa menyerang // blokir: {error, nama} bila aturan 1 perangkat = 1 peserta menolak
 
@@ -725,7 +763,7 @@
       const p = (t - masuk) / MASUK_MS;
       if (p < 0) return {dy: -H * 1.3, sx: 1, sy: 1};
       if (p < 1) return {dy: -(1 - p * p) * H * 1.15, sx: 1 - 0.08 * p, sy: 1 + 0.12 * p};
-      if (!mendarat) { mendarat = t; if (navigator.vibrate && !gerakMinim) try { navigator.vibrate([60, 30, 90]); } catch (e) {} }
+      if (!mendarat) { mendarat = t; if (SU()) { SU().ledakan(0, 1.5, 0); SU().benturan('hentak', 0); } if (navigator.vibrate && !gerakMinim) try { navigator.vibrate([60, 30, 90]); } catch (e) {} }
       const q = (t - mendarat) / 600;
       if (q >= 1) { if (t - mendarat > 2600) masuk = 0; return null; }
       const pegas = Math.sin(q * Math.PI * 2.5) * Math.exp(-q * 4);
@@ -763,6 +801,8 @@
       if (tampil && !(akhir && akhir.jenis === 'kabur' && (jalan.x < -0.3 || jalan.x > 1.3))) {
         if (akhir && akhir.jenis === 'monster') { ctx.fillStyle = `rgba(120,0,10,${0.35 * Math.min(1, (t - akhir.t0) / 800)})`; ctx.fillRect(0, 0, W, H); }
         const ps = mati == null ? progresSerang() : null;
+        suaraJurus(ps);
+        if (SU() && st.fase === 'tanding') { const sisa = sisaJurus(); SU().intensitas(Math.max(Math.min(1, tampilTenaga / Math.max(1, target())), sisa < 3000 ? 0.7 : 0.2)); }
         if (ps != null && ps < LEPAS && st.wujud === 'lucu') gambarAura(g, t);
         const om = offsetMasuk(t);
         if (om) { ctx.save(); ctx.translate(g.x, g.kaki + om.dy); ctx.scale(om.sx, om.sy); ctx.translate(-g.x, -g.kaki); }
@@ -781,6 +821,7 @@
         let x, y, s;
         if (u < p.d1) { const k = mudah(u / p.d1); x = p.x0 + (p.x1 - p.x0) * k; y = p.y0 + (p.y1 - p.y0) * k; s = 14 + 10 * k; }
         else if (u < p.d1 + p.d2) {
+          if (p.diri && !p.meletus) { p.meletus = true; ledakTap(p.x1, p.y1, 1); }
           const k = (u - p.d1) / p.d2, kk = k * k;
           const tx = p.keMonster ? g.x : bar.x, ty = p.keMonster ? g.kaki - g.tinggi * 0.5 : bar.y;
           const cx = (p.x1 + tx) / 2, cy = Math.min(p.y1, ty) - H * 0.18; // lengkung ke atas
@@ -792,17 +833,20 @@
         ctx.drawImage(bola, x - s / 2, y - s / 2, s, s);
         ctx.globalCompositeOperation = 'source-over';
       }
-      // angka +N
-      ctx.font = '800 15px Poppins, system-ui, sans-serif';
+      gambarLetusan(t);
+      // angka +N (membal sedikit saat muncul; ukuran ikut combo)
       ctx.textAlign = 'center';
       for (let i = teks.length - 1; i >= 0; i--) {
-        const a = teks[i], u = (t - a.t0) / 800;
+        const a = teks[i], u = Math.max(0, (t - a.t0) / 800);
         if (u >= 1) { teks.splice(i, 1); continue; }
-        ctx.globalAlpha = 1 - u;
+        const bal = u < 0.15 ? 1 + 0.35 * Math.sin(u / 0.15 * Math.PI) : 1, uk = Math.round(15 * (a.besar || 1) * bal);
+        ctx.font = `800 ${uk}px Poppins, system-ui, sans-serif`;
+        ctx.globalAlpha = 1 - u * u;
         ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(91,10,22,.75)'; ctx.fillStyle = a.warna || '#FFE066';
         ctx.strokeText(a.s, a.x, a.y - u * 30); ctx.fillText(a.s, a.x, a.y - u * 30);
         ctx.globalAlpha = 1;
       }
+      gambarCombo(t);
       if (akhir) {
         const lama = akhir.jenis === 'menang' ? 4400 : akhir.jenis === 'monster' ? 2800 : 2400;
         const p = Math.min(1, (t - akhir.t0) / lama);
@@ -815,7 +859,7 @@
       tampilTenaga = gerakMinim ? tujuan : tampilTenaga + (tujuan - tampilTenaga) * Math.min(1, dt * 6);
       tulisBar();
       tulisNyawa();
-      const hidup = partikel.length || teks.length || sinarJurus.length || konfeti.length || (akhir && !akhir.selesai) || (st.fase === 'tanding' && !gerakMinim) || (tumbuh.t0 && t - tumbuh.t0 < 900) || masuk;
+      const hidup = partikel.length || teks.length || letusan.length || (comboTampil && t - comboTampil.t0 < 900) || sinarJurus.length || konfeti.length || (akhir && !akhir.selesai) || (st.fase === 'tanding' && !gerakMinim) || (tumbuh.t0 && t - tumbuh.t0 < 900) || masuk;
       if (hidup && panggungTerlihat && !document.hidden) raf = requestAnimationFrame(gambar);
       else tLalu = 0;
     }
@@ -897,6 +941,7 @@
         tampilAjak(`Level ${st.level}! ${st.nama} membesar, tiap tap kini bernilai ${poin()} poin.`, 3500);
       }
       if (st.level) levelLama = st.level;
+      suaraFase();
       // menang: putar animasi sekali (bila halaman dibuka setelah menang, langsung tampil pesan)
       // Tiga akhir: menang (monster tumbang), monster menang (nyawa warga habis), kabur (waktu habis).
       const jenisAkhir = { menang: 'menang', monster_menang: 'monster', habis: 'kabur' }[st.fase];
@@ -912,6 +957,7 @@
         }
         opsi.saatMenang && opsi.saatMenang(st);
         catatHasil(st);
+        if (baruSaja && SU()) { SU().musikBerhenti(1.5); if (jenisAkhir === 'menang') SU().menang(); else SU().kalah(); }
       }
       // Nyawa warga dari server (setelah jurus) → samakan jumlah warga tumbang.
       if (st.jurus && st.fase === 'tanding' && st.jurusKe !== jurusSinkron) {
@@ -1094,6 +1140,46 @@
 
     /* ---------- Tap ---------- */
     let sayaPoin = 0;
+    // Letusan saat tenaga mendarat: cincin + percikan (kuat 2 = kelipatan combo). Dibatasi agar HP tetap lancar.
+    const letusan = [];
+    function ledakTap(x, y, kuat) {
+      if (gerakMinim) return;
+      if (letusan.length > 24) letusan.shift();
+      letusan.push({ x, y, t0: performance.now(), kuat, sud: Math.random() * 6.283 });
+      mulaiGambar();
+    }
+    function gambarLetusan(t) {
+      if (!letusan.length) return;
+      ctx.save(); ctx.globalCompositeOperation = 'lighter';
+      for (let i = letusan.length - 1; i >= 0; i--) {
+        const L = letusan[i], u = Math.max(0, (t - L.t0) / (L.kuat > 1 ? 520 : 340)); // t (frame) bisa sedikit lebih awal dari t0
+        if (u >= 1) { letusan.splice(i, 1); continue; }
+        const e = 1 - Math.pow(1 - u, 3), R = (L.kuat > 1 ? 70 : 26) * e + 6;
+        ctx.globalAlpha = 1 - u; ctx.strokeStyle = L.kuat > 1 ? '#FFC93C' : '#FFE9A8'; ctx.lineWidth = (L.kuat > 1 ? 6 : 3) * (1 - u) + 1;
+        ctx.beginPath(); ctx.arc(L.x, L.y, R, 0, 6.283); ctx.stroke();
+        const n = L.kuat > 1 ? 12 : 6;
+        for (let j = 0; j < n; j++) {
+          const a = L.sud + j / n * 6.283, v = R * 1.25, uk = (L.kuat > 1 ? 12 : 8) * (1 - u);
+          ctx.drawImage(bola, L.x + Math.cos(a) * v - uk / 2, L.y + Math.sin(a) * v * 0.8 - uk / 2, uk, uk);
+        }
+      }
+      ctx.restore();
+    }
+    // Penghitung combo besar di atas jari: berdenyut tiap ketukan, warnanya memanas seiring combo.
+    function gambarCombo(t) {
+      const c = comboTampil;
+      if (!c) return;
+      const u = Math.max(0, (t - c.t0) / 900);
+      if (u >= 1 || t - tCombo > 700) { if (u >= 1) comboTampil = null; return; }
+      const bal = 1 + 0.4 * Math.max(0, 1 - (t - c.t0) / 120), uk = Math.round(Math.min(34, 18 + c.n * 0.4) * bal);
+      const panas = Math.min(1, c.n / 40), warna = `rgb(255,${Math.round(230 - 140 * panas)},${Math.round(110 - 80 * panas)})`;
+      ctx.save(); ctx.textAlign = 'center'; ctx.font = `900 ${uk}px Poppins, system-ui, sans-serif`;
+      ctx.globalAlpha = u < 0.7 ? 1 : (1 - u) / 0.3;
+      const x = Math.max(60, Math.min(W - 60, c.x)), y = Math.max(40, c.y - 54);
+      ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(60,8,20,.85)'; ctx.fillStyle = warna;
+      ctx.strokeText(`${c.n}x`, x, y); ctx.fillText(`${c.n}x`, x, y);
+      ctx.restore();
+    }
     function tembak(x, y, diri, keMonster) {
       if (partikel.length >= MAKS_PARTIKEL) partikel.shift();
       const t = performance.now();
@@ -1124,8 +1210,14 @@
       simpanAntre();
       if (!navigator.onLine) tampilAjak(`Koneksi terputus. ${nf.format(pending())} tap disimpan dan dikirim saat tersambung.`);
       tembak(tx, ty, true, false);
-      teks.push({ s: '+' + poin(), x: tx, y: ty - 10, t0: performance.now() });
-      if (navigator.vibrate && !gerakMinim) try { navigator.vibrate(8); } catch (e) {}
+      const tk = performance.now();
+      combo = tk - tCombo < 700 ? combo + 1 : 1; tCombo = tk;
+      const pan = (tx / Math.max(1, W)) * 2 - 1, S = SU();
+      if (S) { S.tap(combo, pan); S.tapKena(gerakMinim ? 0 : 0.42, combo, pan, kenaMonster); } // 0,42 dtk = tenaga mendarat (d1 di tembak)
+      teks.push({ s: '+' + poin(), x: tx, y: ty - 10, t0: tk, besar: Math.min(1.6, 1 + combo / 40) });
+      if (combo >= 3) comboTampil = { n: combo, t0: tk, x: tx, y: ty };
+      if (combo % 10 === 0) { if (S) S.milestone(combo); teks.push({ s: combo >= 50 ? `x${combo} GILA!` : combo >= 25 ? `x${combo} MANTAP!` : `x${combo} COMBO!`, x: W / 2, y: H * 0.3, t0: tk, warna: '#FFC93C', besar: 2.2 }); ledakTap(tx, ty, 2); }
+      if (navigator.vibrate && !gerakMinim) try { navigator.vibrate(combo % 10 === 0 ? [10, 20, 10] : 8); } catch (e) {}
     }
     // Tap dihitung saat jari diangkat tanpa bergeser, jadi menggulir halaman di atas panggung tetap bisa.
     const sentuh = new Map();
