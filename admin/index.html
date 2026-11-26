@@ -355,7 +355,7 @@
                 <div class="field field--full"><label for="s-popup_gambar">Gambar <span class="opt">(opsional, rasio 16:9)</span></label>
                   <div class="uji-link"><input class="input" type="text" inputmode="url" id="s-popup_gambar" data-key="popup_gambar" placeholder="Tempel link Google Drive / URL gambar https, atau unggah"><button class="btn btn--soft btn--sm" type="button" id="popup-unggah">Unggah gambar</button><button class="btn btn--soft btn--sm" type="button" id="popup-hapus-gambar">Hapus</button></div>
                   <input type="file" id="popup-file" accept="image/png,image/jpeg,image/webp" hidden>
-                  <p class="field__hint" id="popup-gambar-info">Link Google Drive: file harus dibagikan "Siapa saja yang memiliki link". Unggahan JPG/PNG/WebP diperkecil otomatis (maks 1600 px).</p></div>
+                  <p class="field__hint" id="popup-gambar-info">Link Google Drive: file harus dibagikan "Siapa saja yang memiliki link". Unggahan JPG/PNG/WebP diperkecil otomatis (maks 960 px, ±100 KB) agar pop-up cepat tampil.</p></div>
                 <div class="field field--full"><span class="label">Pratinjau</span>
                   <p class="popup-peringatan" id="pv-peringatan" role="status" hidden></p>
                   <div class="pop-preview" aria-live="polite"><img id="pv-img" alt="" hidden><div><strong id="pv-judul">Judul pop-up</strong><p id="pv-teks"></p><span class="pv-btn" id="pv-btn">Lihat selengkapnya</span></div></div>
@@ -845,8 +845,8 @@
     // Sama dengan gambarLangsung_ di Code.gs: link berbagi Google Drive → URL gambar langsung.
     function gambarLangsung(u) {
       u = String(u || '').trim();
-      const m = /^https:\/\/(?:drive|docs)\.google\.com\/(?:file\/d\/([\w-]{20,})|(?:open|uc|thumbnail)\?(?:.*&)?id=([\w-]{20,}))/.exec(u);
-      return m ? 'https://lh3.googleusercontent.com/d/' + (m[1] || m[2]) + '=w1600' : u;
+      const m = /^https:\/\/(?:(?:drive|docs)\.google\.com\/(?:file\/d\/([\w-]{20,})|(?:open|uc|thumbnail)\?(?:.*&)?id=([\w-]{20,}))|lh3\.googleusercontent\.com\/d\/([\w-]{20,})(?:=[\w-]*)?$)/.exec(u);
+      return m ? 'https://lh3.googleusercontent.com/d/' + (m[1] || m[2] || m[3]) + '=w800-rw' : u;
     }
     const INFO_GAMBAR = $('#popup-gambar-info').textContent;
     function pratinjauPopup() {
@@ -871,18 +871,19 @@
         : aktif && !adaIsi ? 'Isi judul, isi singkat, atau gambar agar pop-up bisa tampil.' : '';
       w.hidden = !w.textContent;
     }
-    // Unggah gambar pop-up: diperkecil di browser (maks 1600 px, JPEG) lalu disimpan di server data.
+    // Unggah gambar pop-up: diperkecil di browser (maks 960 px, WebP/JPEG ±100 KB) lalu disimpan di server data.
     function kecilkanGambar(file) {
       return new Promise((selesai, gagal) => {
         const img = new Image(), url = URL.createObjectURL(file);
         img.onerror = () => { URL.revokeObjectURL(url); gagal(new Error('gambar')); };
         img.onload = () => {
           URL.revokeObjectURL(url);
-          let k = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight)), hasil = '';
+          let k = Math.min(1, 960 / Math.max(img.naturalWidth, img.naturalHeight)), hasil = '';
           for (let coba = 0; coba < 4; coba++, k *= 0.75) {
             const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(img.naturalWidth * k)); c.height = Math.max(1, Math.round(img.naturalHeight * k));
             const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height);
-            for (let q = 0.85; q > 0.5; q -= 0.1) { hasil = c.toDataURL('image/jpeg', q); if (hasil.length < 500000) return selesai(hasil); }
+            const jenis = /^data:image\/webp/.test(c.toDataURL('image/webp', 0.5)) ? 'image/webp' : 'image/jpeg';
+            for (let q = 0.8; q > 0.45; q -= 0.1) { hasil = c.toDataURL(jenis, q); if (hasil.length < 200000) return selesai(hasil); }
           }
           gagal(new Error('besar'));
         };

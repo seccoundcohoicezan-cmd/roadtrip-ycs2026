@@ -161,10 +161,10 @@ test('pop-up: link Google Drive diubah ke gambar langsung, gambar unggahan diter
   let pop = app.get('config').popup;
   assert.equal(pop.aktif, true);
   assert.equal(pop.judul, '');
-  assert.equal(pop.gambar, `https://lh3.googleusercontent.com/d/${id}=w1600`);
-  for (const u of [`https://drive.google.com/open?id=${id}`, `https://drive.google.com/uc?export=view&id=${id}`]) {
+  assert.equal(pop.gambar, `https://lh3.googleusercontent.com/d/${id}=w800-rw`);
+  for (const u of [`https://drive.google.com/open?id=${id}`, `https://drive.google.com/uc?export=view&id=${id}`, `https://lh3.googleusercontent.com/d/${id}=w1600`]) {
     assert.equal(app.post({aksi: 'admin-simpan-pengaturan', token, nilai: {popup_gambar: u}}).ok, true);
-    assert.equal(app.get('config').popup.gambar, `https://lh3.googleusercontent.com/d/${id}=w1600`);
+    assert.equal(app.get('config').popup.gambar, `https://lh3.googleusercontent.com/d/${id}=w800-rw`);
   }
   assert.equal(app.post({aksi: 'admin-simpan-pengaturan', token, nilai: {popup_gambar: '/api/popup-gambar?v=abc_DEF-123'}}).ok, true);
   assert.equal(app.get('config').popup.gambar, '/api/popup-gambar?v=abc_DEF-123');

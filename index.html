@@ -1000,10 +1000,12 @@
     .credits p { font-size: var(--fs-btn-sm); }
 
     /* ============ Pop-up informasi (diatur dari admin) ============ */
-    .info-pop { width: min(100% - 2rem, 26rem); padding: 0; border: 0; border-radius: var(--r-lg); overflow: hidden; background: var(--surface); color: var(--text); box-shadow: 0 40px 80px -24px color-mix(in srgb, var(--navy-900) 60%, transparent); }
-    .info-pop[open] { animation: muncul-pop .35s cubic-bezier(.2, 1.2, .4, 1); }
-    @keyframes muncul-pop { from { opacity: 0; transform: translateY(24px) scale(.95); } }
-    .info-pop::backdrop { background: color-mix(in srgb, var(--navy-900) 60%, transparent); backdrop-filter: blur(3px); }
+    .info-pop { width: min(100% - 2rem, 26rem); padding: 0; border: 0; border-radius: var(--r-lg); overflow: hidden; background: var(--surface); color: var(--text); box-shadow: 0 16px 40px -16px rgba(10, 36, 99, .4); }
+    /* Ringan untuk HP: tanpa blur latar, animasi hanya opacity + geser (GPU), tanpa efek pantul. */
+    .info-pop[open] { animation: muncul-pop .2s ease-out; }
+    @keyframes muncul-pop { from { opacity: 0; transform: translateY(12px); } }
+    @media (prefers-reduced-motion: reduce) { .info-pop[open] { animation: none; } }
+    .info-pop::backdrop { background: rgba(10, 36, 99, .6); }
     .info-pop__img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--surface-soft); }
     .info-pop__img[hidden] { display: none; }
     .info-pop__body { display: grid; gap: var(--space-3); padding: var(--space-5); }
@@ -2127,7 +2129,7 @@
   </dialog>
 
   <dialog class="info-pop" id="info-pop" aria-labelledby="info-pop-title">
-    <a id="info-pop-img-link" href="#" tabindex="-1" aria-hidden="true"><img class="info-pop__img" id="info-pop-img" alt="" width="800" height="450" hidden></a>
+    <a id="info-pop-img-link" href="#" tabindex="-1" aria-hidden="true"><img class="info-pop__img" id="info-pop-img" alt="" width="800" height="450" decoding="async" fetchpriority="high" hidden></a>
     <div class="info-pop__body">
       <span class="info-pop__badge">Info YCS</span>
       <h2 id="info-pop-title"></h2>
@@ -2381,6 +2383,7 @@
     let cfg = null;
     const ambilConfig = () => fetch(CONFIG.configEndpoint, { headers: { Accept: 'application/json' }, cache: 'no-cache' })
       .then((r) => r.json()).then((d) => { if (d && d.ok) cfg = d; return cfg; }).catch(() => cfg);
+    const cfgAwal = ambilConfig(); // satu permintaan awal, dipakai bersama (fase, pop-up, orb)
 
     const fmtTgl = new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' });
     const fmtTglPendek = new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Jakarta' });
@@ -2535,7 +2538,7 @@
       terapkanDana();
     }
 
-    Promise.all([ambilConfig(), offsetReady]).then(() => {
+    Promise.all([cfgAwal, offsetReady]).then(() => {
       if (!cfg) { target = Date.parse(CONFIG.pengumuman); tulisTarget(); }
       terapkanConfig();
       siap = true;
@@ -3625,12 +3628,17 @@
     /* ---------- Pop-up informasi ---------- */
     // Muncul sekali per isi pop-up; bila panitia mengubah isinya, pop-up tampil lagi.
     const pop = $('#info-pop');
+    // Tampil langsung: data pop-up terakhir disimpan di perangkat, jadi kunjungan berikutnya tidak menunggu /api/config.
+    // Saat config tiba, pop-up diperbarui atau ditutup bila panitia mematikannya.
     let popKunci = '';
-    function tampilPopup() {
-      const d = cfg && cfg.popup;
-      if (!d || !d.aktif || !(d.judul || d.teks || d.gambar) || !pop.showModal) return;
-      popKunci = [d.judul, d.teks, d.link, d.gambar].join('|');
-      try { if (localStorage.getItem('ycs_popup') === popKunci) return; } catch (e) {}
+    const kunciPop = (d) => [d.judul, d.teks, d.link, d.gambar].join('|');
+    const popSah = (d) => !!(d && d.aktif && (d.judul || d.teks || d.gambar));
+    function tampilPopup(d) {
+      if (!popSah(d) || !pop.showModal) return;
+      const kunci = kunciPop(d);
+      try { if (localStorage.getItem('ycs_popup') === kunci) return; } catch (e) {}
+      if (pop.open && popKunci === kunci) return;
+      popKunci = kunci;
       const luar = /^https?:/i.test(d.link || '');
       const link = d.link || '#';
       $('#info-pop-title').textContent = d.judul || '';
@@ -3645,15 +3653,25 @@
       const img = $('#info-pop-img');
       img.hidden = !d.gambar;
       img.onerror = () => { img.hidden = true; }; // gambar gagal dimuat (mis. file Drive belum dibagikan publik) → pop-up tetap tampil tanpa gambar
-      if (d.gambar) img.src = d.gambar;
-      setTimeout(() => { if (!document.querySelector('dialog[open]')) pop.showModal(); }, 1500);
+      if (d.gambar) { if (img.getAttribute('src') !== d.gambar) img.src = d.gambar; } else img.removeAttribute('src');
+      if (!pop.open && !document.querySelector('dialog[open]')) pop.showModal();
     }
+    let popSimpan = null;
+    try { popSimpan = JSON.parse(localStorage.getItem('ycs_popup_data') || 'null'); } catch (e) {}
+    if (popSimpan) tampilPopup(popSimpan);
+    cfgAwal.then(() => {
+      if (!cfg) return; // config gagal dimuat → biarkan pop-up tersimpan
+      const d = cfg.popup;
+      try { if (popSah(d)) localStorage.setItem('ycs_popup_data', JSON.stringify(d)); else localStorage.removeItem('ycs_popup_data'); } catch (e) {}
+      if (!popSah(d)) { if (pop.open) pop.close(); return; }
+      tampilPopup(d);
+    });
     const tutupPopup = () => { try { localStorage.setItem('ycs_popup', popKunci); } catch (e) {} pop.close(); };
     $$('[data-pop-close]', pop).forEach((b) => b.addEventListener('click', tutupPopup));
     [$('#info-pop-cta'), $('#info-pop-img-link')].forEach((a) => a.addEventListener('click', () => { try { localStorage.setItem('ycs_popup', popKunci); } catch (e) {} pop.close(); }));
     pop.addEventListener('cancel', () => { try { localStorage.setItem('ycs_popup', popKunci); } catch (e) {} });
     pop.addEventListener('click', (e) => { if (e.target === pop) tutupPopup(); });
-    Promise.all([ambilConfig(), offsetReady]).then(() => { syncOrb(); tampilPopup(); setInterval(syncOrb, 30000); });
+    Promise.all([cfgAwal, offsetReady]).then(() => { syncOrb(); setInterval(syncOrb, 30000); });
   })();
   </script>
 </body>

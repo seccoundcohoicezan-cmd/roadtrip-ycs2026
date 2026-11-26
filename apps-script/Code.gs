@@ -391,8 +391,8 @@ function konfigPublik_() {
 // File di Drive harus dibagikan "Siapa saja yang memiliki link".
 function gambarLangsung_(u) {
   u = String(u || '').trim();
-  const m = /^https:\/\/(?:drive|docs)\.google\.com\/(?:file\/d\/([\w-]{20,})|(?:open|uc|thumbnail)\?(?:.*&)?id=([\w-]{20,}))/.exec(u);
-  return m ? 'https://lh3.googleusercontent.com/d/' + (m[1] || m[2]) + '=w1600' : u;
+  const m = /^https:\/\/(?:(?:drive|docs)\.google\.com\/(?:file\/d\/([\w-]{20,})|(?:open|uc|thumbnail)\?(?:.*&)?id=([\w-]{20,}))|lh3\.googleusercontent\.com\/d\/([\w-]{20,})(?:=[\w-]*)?$)/.exec(u);
+  return m ? 'https://lh3.googleusercontent.com/d/' + (m[1] || m[2] || m[3]) + '=w800-rw' : u;
 }
 // Pengaturan mentah Lawan Monster; aturan level & jadwal dihitung di api/_monster.js (jam server Vercel).
 function monsterPublik_(cfg) {
