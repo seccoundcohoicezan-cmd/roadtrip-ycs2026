@@ -3591,8 +3591,11 @@
     let popKunci = '';
     const kunciPop = (d) => [d.judul, d.teks, d.link, d.gambar].join('|');
     const popSah = (d) => !!(d && d.aktif && (d.judul || d.teks || d.gambar));
+    // Sama dengan gambarLangsung_ di Code.gs, untuk config lama dari cache CDN / perangkat yang masih berisi link berbagi Drive.
+    const gambarLangsung = (u) => { const m = /^https:\/\/(?:(?:drive|docs)\.google\.com\/(?:file\/d\/([\w-]{20,})|(?:open|uc|thumbnail)\?(?:.*&)?id=([\w-]{20,}))|lh3\.googleusercontent\.com\/d\/([\w-]{20,})(?:=[\w-]*)?$)/.exec(String(u || '').trim()); return m ? 'https://lh3.googleusercontent.com/d/' + (m[1] || m[2] || m[3]) + '=w800-rw' : (u || ''); };
     function tampilPopup(d) {
       if (!popSah(d) || !pop.showModal) return;
+      d = {...d, gambar: gambarLangsung(d.gambar)};
       const kunci = kunciPop(d);
       try { if (localStorage.getItem('ycs_popup') === kunci) return; } catch (e) {}
       if (pop.open && popKunci === kunci) return;
