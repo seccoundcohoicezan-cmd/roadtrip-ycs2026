@@ -45,7 +45,7 @@ http.createServer(async (req, res) => {
       const r = await fetch(`http://127.0.0.1:${DATA_PORT}${tujuan}${url.search}`, {method: req.method, headers: {'content-type': 'application/json', 'x-forwarded-for': req.headers['x-forwarded-for'] || '127.0.0.1'}, body: req.method === 'POST' ? await baca(req) : undefined});
       res.statusCode = r.status;
       ['content-type', 'cache-control', 'retry-after'].forEach((h) => r.headers.get(h) && res.setHeader(h, r.headers.get(h)));
-      return res.end(await r.text());
+      return res.end(Buffer.from(await r.arrayBuffer())); // biner utuh (gambar pop-up)
     }
     let file = path.join(ROOT, decodeURIComponent(url.pathname));
     if (!file.startsWith(ROOT)) { res.statusCode = 403; return res.end(); }

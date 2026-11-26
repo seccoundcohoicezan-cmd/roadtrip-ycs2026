@@ -151,6 +151,30 @@ test('pop-up informasi: hanya tampil di config bila aktif, link tujuan divalidas
   assert.equal(pop.link, '/dana-kaget/');
 });
 
+test('pop-up: link Google Drive diubah ke gambar langsung, gambar unggahan diterima, tampil tanpa judul', () => {
+  const app = muat({now: Date.parse('2026-11-10T09:00:00+07:00')});
+  app.get('siapkan');
+  const {token} = app.post({aksi: 'admin-login', sandi: app.sheets.Admin.rows[1][1]});
+  const id = '1Zaean0Wv85UW2H6keEcFoYON3suwhui9';
+  // isi tanpa judul (kasus laporan MRKT-83): dulu pop-up tidak pernah tampil
+  assert.equal(app.post({aksi: 'admin-simpan-pengaturan', token, nilai: {popup_aktif: 'YA', popup_teks: 'Kalahkan Monster', popup_gambar: `https://drive.google.com/file/d/${id}/view?usp=drive_link`}}).ok, true);
+  let pop = app.get('config').popup;
+  assert.equal(pop.aktif, true);
+  assert.equal(pop.judul, '');
+  assert.equal(pop.gambar, `https://lh3.googleusercontent.com/d/${id}=w800-rw`);
+  for (const u of [`https://drive.google.com/open?id=${id}`, `https://drive.google.com/uc?export=view&id=${id}`, `https://lh3.googleusercontent.com/d/${id}=w1600`]) {
+    assert.equal(app.post({aksi: 'admin-simpan-pengaturan', token, nilai: {popup_gambar: u}}).ok, true);
+    assert.equal(app.get('config').popup.gambar, `https://lh3.googleusercontent.com/d/${id}=w800-rw`);
+  }
+  assert.equal(app.post({aksi: 'admin-simpan-pengaturan', token, nilai: {popup_gambar: '/api/popup-gambar?v=abc_DEF-123'}}).ok, true);
+  assert.equal(app.get('config').popup.gambar, '/api/popup-gambar?v=abc_DEF-123');
+  assert.equal(app.post({aksi: 'admin-simpan-pengaturan', token, nilai: {popup_gambar: '/admin/rahasia'}}).error, 'nilai_tidak_valid');
+  assert.equal(app.post({aksi: 'admin-simpan-pengaturan', token, nilai: {popup_gambar: 'javascript:alert(1)'}}).error, 'nilai_tidak_valid');
+  // aktif tetapi kosong → tidak tampil
+  assert.equal(app.post({aksi: 'admin-simpan-pengaturan', token, nilai: {popup_teks: '', popup_gambar: ''}}).ok, true);
+  assert.equal(app.get('config').popup.aktif, false);
+});
+
 test('Satu Kata: wajib identitas + saluran, 1 email = 1 orang, kata kasar ditolak, warga festival publik tanpa email', () => {
   const app = muat({now: Date.parse('2026-11-10T09:00:00+07:00')});
   app.get('siapkan');

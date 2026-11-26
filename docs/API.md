@@ -22,6 +22,7 @@ Formulir mengirim `requestId` (UUID) agar kiriman ulang tidak tercatat dua kali.
 |---|---|---|
 | `GET /api/config` | 30 dtk | pengaturan publik: `pengumuman`, `fase` (`pra`/`pasca`), `live[]`, `linkLive`, `klaim`, `survei`, `dana`, `event`, `saluran`, `acara`, `popup`, `monster` |
 | `GET /api/now` | — | `{now}` jam server (ms) untuk hitung mundur |
+| `GET /api/popup-gambar?v=` | 1 tahun bila `v` cocok | gambar pop-up hasil unggah admin (biner JPEG/PNG/WebP); 404 bila belum ada |
 | `GET /api/stats` | 120 dtk | `road {current, target}`, leaderboard `provinsi[]`, `kota[]` |
 | `GET /api/reveal` | 5 mnt | `finalis[]` setelah `waktu_pengumuman`; sebelum itu 425 |
 | `GET /api/kata` | 60 dtk | awan kata `kata[[kata, n]]`, warga festival `orang[[nama, kata, provinsi, karakter]]`, `total` |
@@ -44,6 +45,7 @@ Field di luar daftar dibuang server. Aturan validasi (panjang, format email, kat
 `admin-primer` + `perintah`:
 - `status`: status server & sinkron Sheet.
 - `tarik-sheet`: muat ulang isi Sheet.
+- `popup-gambar` + `data.gambar` (data URL JPEG/PNG/WebP, maks 400 KB): simpan gambar pop-up → `{ok, url:"/api/popup-gambar?v=…"}`. URL ini lalu disimpan ke `popup_gambar` lewat `admin-simpan-pengaturan`. `popup_gambar` juga menerima link berbagi Google Drive (diubah otomatis ke URL gambar langsung).
 - `monster` + `data.aksi`:
   - `tiket`, `spin` (+`latihan`), `spin-info`, `spin-atur` (`hadiah[{nama, stok, bobot}]`, `peluang`)
   - **Skema hadiah (MRKT-62):** kode undian (`#0001`) dicadangkan saat peserta ikut menyerang (status `aktif`). Bila event berakhir tanpa Raja Batu tumbang (monster menang / kabur), semua kode event itu diubah menjadi `hangus · bos tidak tumbang`. `spin` non-latihan pada event yang bosnya tidak tumbang → `{ok:false, error:"bos_tidak_tumbang"}`. Berlaku juga untuk event uji.

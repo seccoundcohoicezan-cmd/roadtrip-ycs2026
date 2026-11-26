@@ -143,6 +143,7 @@ function buatData(o = {}) {
     get siap() { return siap; }, get app() { return app; }, get monster() { return monster; },
     tertunda: () => kotor || sinkronJalan,
     adaSheet: !!o.sheetUrl,
+    dataDir: o.dataDir || null,
   };
 }
 

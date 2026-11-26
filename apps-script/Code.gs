@@ -57,7 +57,7 @@ const PENGATURAN = [
   ['popup_aktif', 'TIDAK', 'YA = tampilkan pop-up informasi di beranda (sekali per isi; tampil lagi bila isinya diubah).'],
   ['popup_judul', '', 'Judul pop-up.'],
   ['popup_teks', '', 'Isi singkat pop-up.'],
-  ['popup_gambar', '', 'Opsional: URL gambar https (rasio 16:9).'],
+  ['popup_gambar', '', 'Opsional: URL gambar https, link berbagi Google Drive (publik), atau gambar unggahan admin (rasio 16:9).'],
   ['popup_tombol', 'Lihat selengkapnya', 'Teks tombol.'],
   ['popup_link', '', 'Tujuan saat pop-up/tombol diklik: link https://, halaman situs (mis. /klaim/), atau bagian (#live).'],
   ['waktu_acara_mulai', '2026-12-23 08:00', 'Mulai acara utama (keberangkatan ke Bali). Setelah pengumuman, countdown beranda menghitung ke waktu ini.'],
@@ -384,8 +384,15 @@ function konfigPublik_() {
     saluran: cfg.link_saluran || '',
     acara: {mulai: isNaN(waktu_(cfg.waktu_acara_mulai)) ? null : isoWib_(waktu_(cfg.waktu_acara_mulai)), selesai: isNaN(waktu_(cfg.waktu_acara_selesai)) ? null : isoWib_(waktu_(cfg.waktu_acara_selesai))},
     monster: monsterPublik_(cfg),
-    popup: ya_(cfg.popup_aktif) && cfg.popup_judul ? {aktif: true, judul: cfg.popup_judul, teks: cfg.popup_teks || '', gambar: cfg.popup_gambar || '', tombol: cfg.popup_tombol || '', link: cfg.popup_link || ''} : {aktif: false}
+    popup: ya_(cfg.popup_aktif) && (cfg.popup_judul || cfg.popup_teks || cfg.popup_gambar) ? {aktif: true, judul: cfg.popup_judul || '', teks: cfg.popup_teks || '', gambar: gambarLangsung_(cfg.popup_gambar || ''), tombol: cfg.popup_tombol || '', link: cfg.popup_link || ''} : {aktif: false}
   };
+}
+// Link berbagi Google Drive (…/file/d/ID/view, open?id=ID, uc?id=ID) bukan file gambar; ubah ke URL gambar langsung.
+// File di Drive harus dibagikan "Siapa saja yang memiliki link".
+function gambarLangsung_(u) {
+  u = String(u || '').trim();
+  const m = /^https:\/\/(?:(?:drive|docs)\.google\.com\/(?:file\/d\/([\w-]{20,})|(?:open|uc|thumbnail)\?(?:.*&)?id=([\w-]{20,}))|lh3\.googleusercontent\.com\/d\/([\w-]{20,})(?:=[\w-]*)?$)/.exec(u);
+  return m ? 'https://lh3.googleusercontent.com/d/' + (m[1] || m[2] || m[3]) + '=w800-rw' : u;
 }
 // Pengaturan mentah Lawan Monster; aturan level & jadwal dihitung di api/_monster.js (jam server Vercel).
 function monsterPublik_(cfg) {
@@ -800,7 +807,7 @@ function admin_(p) {
         if (KUNCI_WAKTU.indexOf(k) >= 0 && v) { const t = waktu_(v); if (isNaN(t)) { salah.push(k); return; } v = teksWib_(t); }
         if (KUNCI_ANGKA.indexOf(k) >= 0) { if (!/^\d{1,9}$/.test(v)) { salah.push(k); return; } }
         if (/^link/.test(k) && v && !/^https:\/\/\S+$/.test(v)) { salah.push(k); return; }
-        if (k === 'popup_gambar' && v && !/^https:\/\/\S+$/.test(v)) { salah.push(k); return; }
+        if (k === 'popup_gambar' && v) { v = gambarLangsung_(v); if (!/^(https:\/\/\S+|\/api\/popup-gambar\?v=[\w-]+)$/.test(v)) { salah.push(k); return; } }
         if (k === 'popup_link' && v && !/^(https:\/\/\S+|\/[\w\-\/?=&#.%]*|#[\w-]+)$/.test(v)) { salah.push(k); return; }
         if (/^monster_/.test(k) && KUNCI_YA_TIDAK.indexOf(k) < 0 && KUNCI_WAKTU.indexOf(k) < 0) { const m = nilaiMonster_(k, v); if (m === null) { salah.push(k); return; } v = m; }
         // Tombol "Mulai sekarang": catat jam server sebagai awal event baru (id event = waktu ini, progres mulai dari nol).

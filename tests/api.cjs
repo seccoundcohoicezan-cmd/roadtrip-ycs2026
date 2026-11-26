@@ -83,3 +83,27 @@ test('daftar festival dengan nomor WhatsApp (tanpa email): valid, 1 nomor = 1 wa
   const masuk = m.masuk({perangkat: 'dev-wa-aaaaaaaaaaaaa', wa: '081234567890'}, '1.1.1.1');
   assert.equal(masuk.ok, true); assert.equal(masuk.nama, 'Raka P.');
 });
+
+test('gambar pop-up: unggah lewat admin-primer, dilayani biner dengan cache sesuai versi', async () => {
+  const {app, rute} = siapkan();
+  const {token} = app.post({aksi: 'admin-login', sandi: app.sheets.Admin.rows[1][1]});
+  const kosong = await rute['GET popup-gambar'].fn(null, '', url('popup-gambar'));
+  assert.equal(kosong.kode, 404);
+  const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64');
+  const tolak = await rute['POST admin'].fn({aksi: 'admin-primer', token: 'x'.repeat(40), perintah: 'popup-gambar', data: {gambar: 'data:image/png;base64,' + png.toString('base64')}}, '');
+  assert.equal(tolak.body.error, 'sesi_habis');
+  const salah = await rute['POST admin'].fn({aksi: 'admin-primer', token, perintah: 'popup-gambar', data: {gambar: 'data:image/svg+xml;base64,PHN2Zz4='}}, '');
+  assert.equal(salah.body.error, 'gambar_tidak_valid');
+  const ok = await rute['POST admin'].fn({aksi: 'admin-primer', token, perintah: 'popup-gambar', data: {gambar: 'data:image/png;base64,' + png.toString('base64')}}, '');
+  assert.equal(ok.body.ok, true);
+  assert.match(ok.body.url, /^\/api\/popup-gambar\?v=[\w-]+$/);
+  const g = await rute['GET popup-gambar'].fn(null, '', new URL('http://x' + ok.body.url));
+  assert.equal(g.kode, 200); assert.equal(g.header['Content-Type'], 'image/png');
+  assert.ok(Buffer.compare(g.mentah, png) === 0);
+  assert.match(g.cache, /immutable/);
+  const lama = await rute['GET popup-gambar'].fn(null, '', url('popup-gambar?v=lama'));
+  assert.doesNotMatch(lama.cache, /immutable/);
+  // URL hasil unggah lolos validasi pengaturan
+  assert.equal(app.post({aksi: 'admin-simpan-pengaturan', token, nilai: {popup_aktif: 'YA', popup_gambar: ok.body.url}}).ok, true);
+  assert.equal(app.get('config').popup.gambar, ok.body.url);
+});

@@ -45,6 +45,7 @@ function buatHttp(data, o = {}) {
         if (!body || typeof body !== 'object' || Array.isArray(body)) return kirim(req, res, 400, {ok: false, error: 'validation'});
       }
       const j = await r.fn(body, ipDari(req), url);
+      if (j.mentah) { res.writeHead(j.kode, {'Cache-Control': j.cache, 'X-Content-Type-Options': 'nosniff', 'Content-Length': j.mentah.length, ...j.header}); return res.end(req.method === 'HEAD' ? undefined : j.mentah); }
       return kirim(req, res, j.kode, j.body, j.cache, j.header);
     }
 
