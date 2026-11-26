@@ -184,7 +184,7 @@
 dialog.sheet {
   position: fixed; inset: auto 0 0 0; margin: 0 auto; width: 100%; max-width: 32rem; max-height: 88dvh; overflow: auto;
   padding: 10px 20px calc(24px + env(safe-area-inset-bottom)); border: 0; border-radius: var(--r-xl) var(--r-xl) 0 0;
-  background: var(--surface); color: var(--text); box-shadow: var(--e3);
+  background: var(--surface); color: var(--text); box-shadow: var(--e3); overscroll-behavior: contain;
 }
 dialog.sheet::backdrop { background: var(--scrim); }
 dialog.sheet[open] { animation: k-sheet 260ms var(--ease); }
