@@ -196,14 +196,9 @@
       if (!box.querySelector('button')) box.innerHTML = '<span class="lt-pot__judul">Coba potion</span>' + P.URUT.map((j) => `<button type="button" class="lt-pot__b lt-pot__b--${j}" data-pot="${j}">${P.ikon(j)}<b>1</b><small>${P.DATA[j].nama}</small></button>`).join('');
       P.URUT.forEach((j) => { const b = box.querySelector(`[data-pot="${j}"]`), ada = st && !st.potDipakai[j]; b.classList.toggle('is-kosong', !ada); b.querySelector('b').textContent = ada ? '1' : '0'; b.setAttribute('aria-label', `Coba ${P.DATA[j].nama} (setara ${P.DATA[j].tap} tap)${ada ? '' : ', sudah dicoba'}`); });
     }
-    function ajakPotion(tetap) {
-      const a = $('#lt-pot-ajak'); if (!a) return;
-      a.hidden = false; clearTimeout(ajakPotion.t);
-      if (!tetap) ajakPotion.t = setTimeout(() => { if (st && P.URUT.some((j) => !st.potDipakai[j])) a.hidden = true; }, 5000);
-    }
     function cobaPotion(jenis) {
       if (!st || st.fase !== 'main' || !P) return;
-      if (st.potDipakai[jenis]) { ajakPotion(true); return; }
+      if (st.potDipakai[jenis]) { teks('Sudah dicoba', W / 2, H * 0.62, W8.white, 18); return; } // ajakan potion hanya di layar hasil, tidak mengganggu permainan
       st.potDipakai[jenis] = true; tulisPot();
       const b = bos(), t0 = performance.now(), d = P.DATA[jenis], total = Math.round(d.tap * SKALA_POT), kena = P.KENA[jenis], bagi = Math.round(total / kena.length);
       st.efekPot.push({ jenis, t0, seed: Math.floor(Math.random() * 1000) });
@@ -216,7 +211,7 @@
         teks('-' + dmg, b.cx + (Math.random() - 0.5) * b.w * 0.6, b.y + b.h * (0.2 + Math.random() * 0.4), d.warna, 30);
         if (st.hp <= 0) selesai(true);
       }, ms));
-      setTimeout(() => { if (st) { teks(`setara ${d.tap} tap!`, W / 2, H * 0.38, W8.white, 20); ajakPotion(P.URUT.every((j) => st.potDipakai[j])); } }, kena[kena.length - 1] + 200);
+      setTimeout(() => { if (st) teks(`setara ${d.tap} tap!`, W / 2, H * 0.38, W8.white, 20); }, kena[kena.length - 1] + 200);
     }
     function gambarPotion(t, b) {
       if (!P || !st.efekPot.length) return;
@@ -253,7 +248,6 @@
         $('#lt-skor').textContent = new Intl.NumberFormat('id-ID').format(skor);
         $('#lt-hasil-sub').textContent = `${st.dmg} serangan · combo terbaik ${st.comboMaks} · ${st.aman}× menghindar${skor > terbaik ? ' · rekor baru!' : ` · rekor ${new Intl.NumberFormat('id-ID').format(Math.max(terbaik, skor))}`}`;
         $('#lt-ajak-hadiah').textContent = teksHadiah();
-        $('#lt-pot-ajak').hidden = true;
         $('#lt-hasil').hidden = false; $('#lt-lagi').focus();
         opsi.saatSelesai && opsi.saatSelesai({ menang, skor, rekor: skor > terbaik });
       }, menang ? 1400 : 700);
@@ -397,7 +391,7 @@
 
     function mulai() {
       W8 = warna(); st = baru(); st.mulai = performance.now() + 250; dlg.classList.remove('is-main'); // jeda singkat: dialog selesai memudar dulu
-      tombolJurus(false); tulisPot(); $('#lt-pot-ajak').hidden = true; $('#lt-hasil').hidden = true; $('#lt-waktu').textContent = DURASI; $('#lt-combo').textContent = ''; hati();
+      tombolJurus(false); tulisPot(); $('#lt-hasil').hidden = true; $('#lt-waktu').textContent = DURASI; $('#lt-combo').textContent = ''; hati();
       cancelAnimationFrame(raf); ukur(); raf = requestAnimationFrame(gambar);
       if (S().musikMulai) { if (musikSebelum === null) musikSebelum = S().ingin || false; S().musikMulai('latihan'); }
     }
