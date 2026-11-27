@@ -114,7 +114,7 @@
 
       <!-- Misi + tas pejuang (equipment) -->
       <section class="g-kartu g-tas" id="misi" aria-labelledby="g-misi-judul">
-        <div class="g-kartu__head"><h2 class="t-h2" id="g-misi-judul">Misi pejuang</h2><span class="t-sm" id="g-misi-n">0/0</span></div>
+        <div class="g-kartu__head"><h2 class="t-h2" id="g-misi-judul">Misi harian</h2><span class="t-sm" id="g-misi-n">0/0</span></div>
         <div class="g-tas__bekal" aria-labelledby="g-tas-judul">
           <p class="g-tas__judul" id="g-tas-judul">Tas pejuangmu</p>
           <div class="g-tas__nyawa" id="g-tas-nyawa" aria-label="Nyawa karakter"></div>
@@ -122,10 +122,11 @@
           <p class="g-tas__info" id="g-tas-info"></p>
         </div>
         <div class="g-tas__peti">
-          <span class="g-tas__peti-ikon" aria-hidden="true">🎁</span>
-          <div><strong id="g-peti-judul">Selesaikan 5 misi → 1 Peti Equipment</strong><small>Isi peti: 1 Racun + 1 Gempa + 1 Petir. Diklaim otomatis.</small>
-            <div class="meter g-misi-meter" role="progressbar" aria-label="Misi menuju peti" aria-valuemin="0" aria-valuemax="5" id="g-misi-meter"><div class="meter__fill" id="g-misi-fill"></div></div></div>
+          <span class="g-tas__peti-ikon" id="g-peti-ikon" aria-hidden="true">🎁</span>
+          <div><strong id="g-peti-judul">Selesaikan 5 misi hari ini → dapat potion</strong><small id="g-peti-sub">Misi reset tiap hari 00.00 WIB.</small>
+            <div class="meter g-misi-meter" role="progressbar" aria-label="Misi hari ini" aria-valuemin="0" aria-valuemax="5" id="g-misi-meter"><div class="meter__fill" id="g-misi-fill"></div></div></div>
         </div>
+        <ol class="g-gilir" id="g-gilir" hidden aria-label="Hadiah misi bergilir"></ol>
         <ul class="g-misi" id="g-misi"></ul>
         <p class="t-xs g-catatan">Potion dipakai saat Raja Batu muncul: ketuk botolnya di sisi kiri arena. Coba gratis di mode latihan.</p>
       </section>

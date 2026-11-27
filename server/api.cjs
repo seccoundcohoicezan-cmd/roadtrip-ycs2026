@@ -163,7 +163,7 @@ function buatApi(data) {
     'POST monster': {maks: 4096, fn: (p, ip) => monsterPost(p, ip, false)},
     'POST monster/admin': {maks: 4096, fn: (p, ip) => monsterPost(p, ip, true)},
     'GET pemenang': {fn: () => jawab(data.monster.pemenangPublik(), CACHE.pemenang)},
-    'GET misi': {fn: () => jawab(data.monster.misiPublik(), 'public, max-age=0, s-maxage=30, stale-while-revalidate=120')},
+    'GET misi': {fn: () => jawab(data.monster.misiLobi(), 'public, max-age=0, s-maxage=30, stale-while-revalidate=30')},
     'POST duta': {maks: 2048, fn: (p, ip) => { const d = p && p.aksi === 'kata' ? duta.tulisKata(p, ipHash(ip) || 'x') : {ok: false, error: 'validation'}; return jawab(d, CACHE.tidak, d.ok ? 200 : d.error === 'terlalu_banyak' ? 429 : d.error === 'tidak_ditemukan' ? 404 : 422); }},
     'GET duta': {fn: (p, ip, url) => { const d = duta.lihat(url.searchParams.get('kode') || ''); return jawab(d, 'public, max-age=0, s-maxage=20, stale-while-revalidate=60', d.ok ? 200 : 404); }},
   };

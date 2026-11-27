@@ -173,8 +173,8 @@
       if (!adaIdentitas() || blokir) return null;
       try {
         await pastikanToken();
-        const m = baca('ycs_misi') || {};
-        const d = await minta({ aksi: 'misi', token, misi: Object.keys(m), uji });
+        const m = baca('ycs_misi') || {}, hari = (ms) => new Date(ms + 7 * 3600e3).toISOString().slice(0, 10), h = hari(now());
+        const d = await minta({ aksi: 'misi', token, misi: Object.keys(m).filter((k) => typeof m[k] === 'number' && m[k] > 1e12 && hari(m[k]) === h), uji }); // hanya misi hari ini
         if (d && d.ok) { setBekal(d.bekal); return d; }
       } catch (e) { /* coba lagi nanti */ }
       return null;
@@ -207,7 +207,7 @@
       if (!st || st.fase !== 'tanding' || akhir) { tampilAjak('Potion dipakai saat Raja Batu muncul.', 2200); return; }
       if (!bolehTap()) { opsi.saatTerkunci && opsi.saatTerkunci(); return; }
       if (karakterMati) { tampilAjak('Karaktermu sudah tumbang di event ini.', 2200); return; }
-      if (!bekal || !bekal.sisa || !bekal.sisa[jenis]) { tampilAjak('Potion habis! Kerjakan Misi Pejuang: tiap 5 misi = 1 peti berisi Racun, Gempa, dan Petir.', 3800); opsi.saatButuhPotion && opsi.saatButuhPotion(); return; }
+      if (!bekal || !bekal.sisa || !bekal.sisa[jenis]) { tampilAjak('Potion habis! Selesaikan 5 Misi Harian di lobi untuk dapat potion hari ini.', 3800); opsi.saatButuhPotion && opsi.saatButuhPotion(); return; }
       if (potJalan) return;
       potJalan = true;
       const rid = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
@@ -226,7 +226,7 @@
           if (!d.dup) tampilAjak(`${POT.DATA[jenis].nama} kena! +${nf.format(d.pts || perkiraan)} tenaga untukmu.`, 2400);
         } else {
           if (d.bekal) setBekal(d.bekal); else { bekal.sisa[jenis]++; tulisTas(); }
-          tampilAjak(d.error === 'potion_habis' ? 'Potion habis. Kerjakan Misi Pejuang untuk dapat lagi.' : 'Potion belum bisa dipakai sekarang.', 2600);
+          tampilAjak(d.error === 'potion_habis' ? 'Potion habis. Kerjakan Misi Harian untuk dapat lagi.' : 'Potion belum bisa dipakai sekarang.', 2600);
         }
       } catch (e) { bekal.sisa[jenis]++; tulisTas(); tampilAjak('Koneksi gagal, potion tidak terpakai. Coba lagi.', 2600); }
       finally { potJalan = false; }

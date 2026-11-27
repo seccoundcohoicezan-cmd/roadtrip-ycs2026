@@ -107,5 +107,7 @@ Field di luar daftar dibuang server. Aturan validasi (panjang, format email, kat
 `POST /api/monster` (butuh `token` dari `masuk`):
 - `{aksi: "misi", token, misi: ["gabung", "wa", ...], uji?}` → klaim misi yang selesai di HP. Hanya id yang ada di daftar misi yang dihitung. Respons `{ok, baru, bekal}`.
 - `{aksi: "potion", token, jenis: "racun"|"gempa"|"petir", rid, e, uji?}` → pakai potion saat event aktif. Tenaga = tap × poin level (racun 50, gempa 150, petir 200). `rid` membuat kirim ulang tidak terpakai dua kali. Galat: `potion_habis`, `bukan_waktunya`, `tumbang` (409).
-- `bekal` = `{misi, totalMisi, perPeti: 5, peti, sisa: {racun, gempa, petir}, tap, hpMaks, selesai}`. Tiap 5 misi = 1 peti = 1 potion tiap jenis. Ikut juga di respons `saya`.
+- Misi **harian**: dihitung per hari WIB, reset 00.00 WIB. Menyelesaikan 5 misi (atau semua bila kurang dari 5) = hadiah sekali per hari sesuai `monster_hadiah_misi`: `gilir` (bawaan, bergantian Racun → Petir → Gempa), `racun`/`petir`/`gempa` (tetap), atau `semua` (1 tiap jenis). Respons `misi` berisi `hadiah` (jenis yang baru didapat, atau null).
+- `bekal` = `{misi, totalMisi, perPeti, peti, sisa: {racun, gempa, petir}, tap, hpMaks, selesai, hari, hadiahHari, besok, sudahDapat, mode, reset}`. Ikut juga di respons `saya`.
+- `GET /api/misi` kini juga berisi `hadiah: {mode, hariIni, besok, reset, perPeti}` untuk lobi.
 - `GET /api/monster` kini selalu menyertakan `hadiahTop` (nominal Top kontributor dari `monster_hadiah_top`) bila diatur, untuk papan hadiah lobi.

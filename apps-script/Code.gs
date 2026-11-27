@@ -4,7 +4,7 @@ const HEADERS_LAMA = ['Waktu', 'ID permintaan', 'Nama', 'Sekolah', 'Email', 'Bin
 const HEADERS = HEADERS_LAMA.concat(['Kota/Kabupaten', 'Provinsi']);
 const REKAP_NAME = 'Rekap';
 const REKAP_VERSI = '3';
-const SKEMA_VERSI = '12';
+const SKEMA_VERSI = '13';
 const MAKS_KARAKTER = 40; // jumlah karakter adat di assets/js/festival.js (saat ini 24, cadangan untuk tambahan)
 const WIB = 7 * 3600 * 1000;
 
@@ -88,10 +88,11 @@ const PENGATURAN = [
   ['monster_tiket_min', '1', 'Minimal poin kontribusi untuk mendapat 1 tiket undian per event (1 perangkat = 1 peserta = 1 tiket).'],
   ['monster_nama', 'Raja Batu', 'Nama monster yang tampil di layar.'],
   ['monster_hadiah_top', '100000,50000,50000', 'Hadiah otomatis Top kontributor tiap event (Rp, urut peringkat 1,2,3,…; dipisah koma; kosong = tanpa hadiah).'],
+  ['monster_hadiah_misi', 'gilir', 'Hadiah menyelesaikan 5 Misi Pejuang (misi reset tiap hari 00.00 WIB): gilir = bergantian tiap hari Racun → Petir → Gempa; racun / petir / gempa = selalu potion itu; semua = 1 Racun + 1 Gempa + 1 Petir.'],
   ['monster_hadiah_top_syarat', 'selalu', 'selalu = Top kontributor tetap dapat hadiah walau bos tidak tumbang; menang = hanya bila bos tumbang.'],
   ['monster_wujud', 'raja_batu', 'raja_batu = ilustrasi Raja Batu dari panitia; lucu = monster kartun gambar kode (lebih ramah anak).']
 ];
-const MONSTER_PILIHAN = {monster_pemicu: ['sebelum_live', 'jadwal', 'manual'], monster_darurat: ['NORMAL', 'MULAI', 'STOP'], monster_wujud: ['raja_batu', 'lucu'], monster_hadiah_top_syarat: ['selalu', 'menang']};
+const MONSTER_PILIHAN = {monster_pemicu: ['sebelum_live', 'jadwal', 'manual'], monster_darurat: ['NORMAL', 'MULAI', 'STOP'], monster_wujud: ['raja_batu', 'lucu'], monster_hadiah_top_syarat: ['selalu', 'menang'], monster_hadiah_misi: ['gilir', 'racun', 'petir', 'gempa', 'semua']};
 const MONSTER_ANGKA = {monster_menit_sebelum: [1, 180], monster_durasi: [1, 180], monster_level: [1, 10], monster_target_dasar: [10, 1e9], monster_interval_ms: [500, 5000], monster_batas_tap: [3, 30], monster_tiket_min: [1, 1000000], monster_jurus_detik: [4, 60], monster_jurus_damage: [0, 100], monster_perisai: [0, 100], monster_hp_warga: [1, 20]};
 const MONSTER_DESIMAL = {monster_jurus_anim: [0.6, 4]};
 const KUNCI_YA_TIDAK = ['pakai_link_cadangan', 'klaim_aktif', 'survei_aktif', 'dana_aktif', 'dana_tampilkan_sisa', 'popup_aktif', 'monster_aktif', 'monster_jurus_aktif'];
@@ -403,7 +404,7 @@ function monsterPublik_(cfg) {
     target: cfg.monster_target, level: cfg.monster_level, targetDasar: cfg.monster_target_dasar, targetKali: cfg.monster_target_kali,
     poin: cfg.monster_poin, skalaNaik: cfg.monster_skala_naik, interval: cfg.monster_interval_ms, batasTap: cfg.monster_batas_tap,
     nama: cfg.monster_nama || 'Raja Batu', wujud: cfg.monster_wujud || 'raja_batu', tiketMin: cfg.monster_tiket_min || '1',
-    jurus: cfg.monster_jurus_aktif == null ? true : ya_(cfg.monster_jurus_aktif), jurusDetik: cfg.monster_jurus_detik || '8', jurusDamage: cfg.monster_jurus_damage || '4', perisai: cfg.monster_perisai || '2', jurusAnim: cfg.monster_jurus_anim || '1.6', hpWarga: cfg.monster_hp_warga || '5', hadiahTop: cfg.monster_hadiah_top == null ? '100000,50000,50000' : cfg.monster_hadiah_top, hadiahTopSyarat: cfg.monster_hadiah_top_syarat || 'selalu'
+    jurus: cfg.monster_jurus_aktif == null ? true : ya_(cfg.monster_jurus_aktif), jurusDetik: cfg.monster_jurus_detik || '8', jurusDamage: cfg.monster_jurus_damage || '4', perisai: cfg.monster_perisai || '2', jurusAnim: cfg.monster_jurus_anim || '1.6', hpWarga: cfg.monster_hp_warga || '5', hadiahTop: cfg.monster_hadiah_top == null ? '100000,50000,50000' : cfg.monster_hadiah_top, hadiahTopSyarat: cfg.monster_hadiah_top_syarat || 'selalu', hadiahMisi: cfg.monster_hadiah_misi || 'gilir'
   };
 }
 // Validasi satu nilai monster_*; hasil null = tidak valid.

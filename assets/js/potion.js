@@ -18,7 +18,7 @@
   let nIkon = 0; // id gradien unik per ikon: id kembar membuat url(#..) menunjuk ke SVG lain yang mungkin tersembunyi
   function ikon(jenis) {
     const d = DATA[jenis], id = 'pg-' + jenis + '-' + (++nIkon);
-    return `<svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset=".35" stop-color="${d.warna}"/><stop offset="1" stop-color="${d.gelap}"/></linearGradient></defs>`
+    return `<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset=".35" stop-color="${d.warna}"/><stop offset="1" stop-color="${d.gelap}"/></linearGradient></defs>`
       + '<rect x="10" y="2.5" width="4" height="2" rx=".6" fill="#8a5a2b"/><path d="M10.4 4.5h3.2v3.2c2.9 1 4.9 3.7 4.9 6.8a6.5 6.5 0 0 1-13 0c0-3.1 2-5.8 4.9-6.8Z" fill="url(#' + id + ')" stroke="#fff" stroke-opacity=".7" stroke-width=".8"/>'
       + '<ellipse cx="9.4" cy="11.6" rx="1" ry="1.8" fill="#fff" opacity=".55"/>' + SIMBOL[jenis] + '</svg>';
   }

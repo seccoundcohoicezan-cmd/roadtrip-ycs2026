@@ -96,7 +96,7 @@
         saatTiket: (kode, st) => catatKode(kode, st),
         saatMenang: (st) => akhiriEvent(st),
         saatHasil: (h) => catatRiwayat(h),
-        saatBekal: (b) => tulisBekal(b),
+        saatBekal: (b) => { tulisBekal(b); syncMisi(); },
         saatButuhPotion: () => sorotMisi(),
       });
     } catch (e) { /* lobi tetap jalan */ }
@@ -301,23 +301,46 @@
     href: x.jenis === 'link' || x.jenis === 'gabung' ? x.link : '', cek: x.jenis === 'gabung' ? () => !!baca('ycs_fest') : null,
     subTampil: () => (x.jenis === 'latihan' && baca('ycs_latihan_best', 0) ? `${x.sub ? x.sub + ' · ' : ''}Rekor: ${nf.format(baca('ycs_latihan_best', 0))}` : x.sub || '') });
   let MISI = (baca('ycs_misi_daftar') || MISI_BAWAAN).map(keMisi);
-  fetch('/api/misi').then((r) => r.json()).then((d) => { if (d && d.ok && Array.isArray(d.misi) && d.misi.length) { simpan('ycs_misi_daftar', d.misi); MISI = d.misi.map(keMisi); syncMisi(); } }).catch(() => {});
-  const selesaiMisi = () => baca('ycs_misi', {});
+  let hadiahMisi = baca('ycs_misi_hadiah'); // {mode, hariIni:[jenis], besok:[jenis], reset, perPeti} dari server
+  fetch('/api/misi').then((r) => r.json()).then((d) => { if (d && d.ok && Array.isArray(d.misi) && d.misi.length) { simpan('ycs_misi_daftar', d.misi); MISI = d.misi.map(keMisi); if (d.hadiah) { hadiahMisi = d.hadiah; simpan('ycs_misi_hadiah', d.hadiah); } syncMisi(); } }).catch(() => {});
+  // Misi harian: hanya misi yang diselesaikan HARI INI (WIB) yang dihitung; besok mulai dari nol lagi.
+  const hariWib = (ms) => new Date(ms + 7 * 3600e3).toISOString().slice(0, 10);
+  const selesaiMisi = () => { const m = baca('ycs_misi', {}), h = hariWib(now()), out = {}; Object.keys(m).forEach((k) => { if (typeof m[k] === 'number' && m[k] > 1e12 && hariWib(m[k]) === h) out[k] = m[k]; }); return out; };
   function tandaiMisi(id) { const per = MISI.filter((q) => q.jenis === id && q.id !== id); if (per.length) { per.forEach((q) => tandaiMisi(q.id)); if (!MISI.some((q) => q.id === id)) return; } const m = selesaiMisi(); if (m[id]) { syncMisi(); return; } m[id] = now(); simpan('ycs_misi', m); syncMisi(id); }
-  // Tiap 5 misi selesai = 1 Peti Equipment (1 Racun + 1 Gempa + 1 Petir), diklaim otomatis ke server.
+  // Selesaikan 5 misi hari ini = hadiah potion hari itu (bergilir Racun → Petir → Gempa, atau tetap sesuai admin), diklaim otomatis.
   const PER_PETI = 5;
+  const GILIR = ['racun', 'petir', 'gempa'];
+  // Cadangan bila info server belum ada: hitung giliran dari nomor hari WIB (sama dengan server).
+  function infoHadiah() {
+    const b = monApi && monApi.bekal;
+    if (b && b.hadiahHari) return { mode: b.mode, hariIni: b.hadiahHari, besok: b.besok, reset: b.reset, sudah: b.sudahDapat };
+    if (hadiahMisi && hadiahMisi.reset && hadiahMisi.reset > now()) return { ...hadiahMisi, sudah: false };
+    const n = Math.floor((now() + 7 * 3600e3) / 86400e3);
+    return { mode: 'gilir', hariIni: [GILIR[n % 3]], besok: [GILIR[(n + 1) % 3]], reset: (n + 1) * 86400e3 - 7 * 3600e3, sudah: false };
+  }
+  const namaPot = (arr) => (arr || []).map((j) => (window.YCSPotion ? window.YCSPotion.DATA[j].nama : j)).join(' + ');
   function syncMisi(baru) {
     const m = selesaiMisi();
     let ubah = false;
     MISI.forEach((x) => { if (x.cek && x.cek() && !m[x.id]) { m[x.id] = now(); ubah = true; } });
     if (ubah) simpan('ycs_misi', m);
-    const n = MISI.filter((x) => m[x.id]).length, peti = Math.floor(n / PER_PETI), dalam = n - peti * PER_PETI;
-    const penuh = n >= MISI.length && MISI.length < PER_PETI * (peti + 1);
-    $('#g-misi-n').textContent = `${n}/${MISI.length}`;
-    $('#g-misi-meter').setAttribute('aria-valuemax', String(PER_PETI));
-    $('#g-misi-meter').setAttribute('aria-valuenow', String(penuh ? PER_PETI : dalam));
-    $('#g-misi-fill').style.width = ((penuh ? PER_PETI : dalam) / PER_PETI * 100) + '%';
-    $('#g-peti-judul').textContent = peti && (penuh || dalam === 0) ? `${peti} Peti Equipment didapat! 🎉` : `${dalam}/${PER_PETI} misi → 1 Peti Equipment`;
+    const n = MISI.filter((x) => m[x.id]).length, target = Math.max(1, Math.min(PER_PETI, MISI.length)), dalam = Math.min(n, target);
+    const H = infoHadiah(), beres = H.sudah || dalam >= target, P = window.YCSPotion;
+    $('#g-misi-n').textContent = `${n}/${MISI.length} hari ini`;
+    $('#g-misi-meter').setAttribute('aria-valuemax', String(target));
+    $('#g-misi-meter').setAttribute('aria-valuenow', String(dalam));
+    $('#g-misi-fill').style.width = (dalam / target * 100) + '%';
+    if (P && H.hariIni && H.hariIni.length) $('#g-peti-ikon').innerHTML = P.ikon(H.hariIni[H.hariIni.length - 1]);
+    const jam = Math.max(0, Math.ceil((H.reset - now()) / 3600e3));
+    $('#g-peti-judul').textContent = beres ? `Hadiah hari ini (${namaPot(H.hariIni)}) masuk tas! 🎉` : `${dalam}/${target} misi → hadiah hari ini: ${namaPot(H.hariIni)}`;
+    $('#g-peti-sub').textContent = (H.mode === 'gilir' ? `Hadiah bergilir tiap hari. Besok: ${namaPot(H.besok)}. ` : H.mode === 'semua' ? 'Hadiah: 1 Racun + 1 Gempa + 1 Petir. ' : 'Hadiah tetap dari panitia. ')
+      + `Misi reset 00.00 WIB${jam ? ` (±${jam} jam lagi)` : ''}.`;
+    const gl = $('#g-gilir');
+    gl.hidden = H.mode !== 'gilir' || !P;
+    if (!gl.hidden) {
+      const n0 = Math.floor((now() + 7 * 3600e3) / 86400e3);
+      gl.innerHTML = [0, 1, 2].map((d) => { const j = GILIR[(n0 + d) % 3]; return `<li class="${d ? '' : 'is-hari-ini'}">${P.ikon(j)}<strong>${P.DATA[j].nama}</strong><small>${d === 0 ? 'Hari ini' : d === 1 ? 'Besok' : 'Lusa'}</small></li>`; }).join('');
+    }
     if (ubah || baru) monApi && monApi.syncBekal && monApi.syncBekal();
     $('#g-misi').innerHTML = MISI.map((x) => {
       const ok = !!m[x.id], sub = x.subTampil();
@@ -327,7 +350,7 @@
       const e = (t) => String(t || '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
       return `<li class="${ok ? 'is-ok' : ''}${baru === x.id ? ' is-baru' : ''}"><span class="ico ${ok ? 'ico--dana' : 'ico--info'}" aria-hidden="true"><svg><use href="#${x.ikon}"/></svg></span><span class="menu-list__txt"><strong>${e(x.judul)}</strong><small>${e(sub)}</small></span>${aksi}</li>`;
     }).join('');
-    if (baru) { S.aman(); toast(n % PER_PETI === 0 ? 'Misi selesai! 🎁 Peti Equipment terbuka: +1 Racun, +1 Gempa, +1 Petir!' : `Misi selesai! ${PER_PETI - dalam} misi lagi untuk Peti Equipment.`); }
+    if (baru) { S.aman(); toast(dalam >= target ? `Misi hari ini beres! +1 ${namaPot(H.hariIni)} masuk tas pejuang.` : `Misi selesai! ${target - dalam} misi lagi untuk dapat ${namaPot(H.hariIni)}.`); }
     tulisBekal(monApi && monApi.bekal);
   }
   $('#g-misi').addEventListener('click', (e) => {
@@ -348,11 +371,12 @@
       return `<li class="${n ? '' : 'is-kosong'}">${P.ikon(j)}<b>x${n}</b><strong>${d.nama}</strong><small>= ${d.tap} tap</small></li>`; }).join('');
     const idt = baca('ycs_identitas');
     $('#g-tas-info').textContent = !(idt && (idt.email || idt.wa)) && !uji ? 'Gabung Festival Satu Kata dulu supaya potion bisa diklaim ke karaktermu.'
-      : b && b.peti ? 'Potion siap dipakai saat Raja Batu muncul. Ketuk botolnya di sisi kiri arena.' : 'Belum punya potion. Selesaikan misi di bawah untuk membuka Peti Equipment.';
+      : b && b.sisa && Object.values(b.sisa).some(Boolean) ? 'Potion siap dipakai saat Raja Batu muncul. Ketuk botolnya di sisi kiri arena.' : 'Belum punya potion. Selesaikan misi hari ini di bawah untuk dapat potion.';
   }
   function sorotMisi() { const el = $('#misi'); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); el.classList.remove('is-sorot'); void el.offsetWidth; el.classList.add('is-sorot'); } }
   syncMisi();
   tulisBekal(null);
+  setInterval(() => { if (!document.hidden) syncMisi(); }, 60000); // lewat 00.00 WIB → misi kosong lagi
 
   /* ---------- papan hadiah (nominal Top dari pengaturan admin monster_hadiah_top) ---------- */
   function tulisPapan() {
