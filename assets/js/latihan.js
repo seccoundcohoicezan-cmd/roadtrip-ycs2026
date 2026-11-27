@@ -24,7 +24,7 @@
 
     function baru() {
       return { nJurus: 0, meteor: null, perisai: 0, tKena: 0, tLalu: 0, hp: HP, hati: HATI, sisa: DURASI, combo: 0, comboMaks: 0, tTap: 0, dmg: 0, aman: 0, kritis: 0, partikel: [], konfeti: [], bara: [], debu: [], benturan: false, jejak: [], jurus: 'tusuk', urutJurus: 0, retak: null, getar: 0, kilat: 0, merah: 0,
-        mulai: 0, jalan: false, akhir: null, tJurus: 0, awasSampai: 0, hindarOk: false, fase: 'hitung', hitung: 3, posX: 0.5, arah: 1, frame: 0, tRuntuh: 0, tAkhir: 0 };
+        potDipakai: {}, efekPot: [], mulai: 0, jalan: false, akhir: null, tJurus: 0, awasSampai: 0, hindarOk: false, fase: 'hitung', hitung: 3, posX: 0.5, arah: 1, frame: 0, tRuntuh: 0, tAkhir: 0 };
     }
     const lamaSerang = () => (st.jurus === 'meteor' ? SERANG_METEOR : SERANG);
     const sedangSerang = (t) => !!(st.tSerang && t - st.tSerang < lamaSerang());
@@ -188,6 +188,43 @@
       if (h.length === 1) return `Top 1 kontributor dapat ${rp(h[0])}`;
       return 'Top 1 & 2 kontributor dapat Rp100.000';
     }
+    /* ---------- Coba potion (gratis 1x per jenis tiap ronde) ---------- */
+    // Di latihan kerusakan diskalakan (HP bos latihan kecil): Racun 10, Gempa 30, Petir 40 — angka "setara N tap" tetap ditampilkan.
+    const P = window.YCSPotion, SKALA_POT = 0.2;
+    function tulisPot() {
+      const box = $('#lt-pot'); if (!P || !box) return;
+      if (!box.querySelector('button')) box.innerHTML = '<span class="lt-pot__judul">Coba potion</span>' + P.URUT.map((j) => `<button type="button" class="lt-pot__b lt-pot__b--${j}" data-pot="${j}">${P.ikon(j)}<b>1</b><small>${P.DATA[j].nama}</small></button>`).join('');
+      P.URUT.forEach((j) => { const b = box.querySelector(`[data-pot="${j}"]`), ada = st && !st.potDipakai[j]; b.classList.toggle('is-kosong', !ada); b.querySelector('b').textContent = ada ? '1' : '0'; b.setAttribute('aria-label', `Coba ${P.DATA[j].nama} (setara ${P.DATA[j].tap} tap)${ada ? '' : ', sudah dicoba'}`); });
+    }
+    function ajakPotion(tetap) {
+      const a = $('#lt-pot-ajak'); if (!a) return;
+      a.hidden = false; clearTimeout(ajakPotion.t);
+      if (!tetap) ajakPotion.t = setTimeout(() => { if (st && P.URUT.some((j) => !st.potDipakai[j])) a.hidden = true; }, 5000);
+    }
+    function cobaPotion(jenis) {
+      if (!st || st.fase !== 'main' || !P) return;
+      if (st.potDipakai[jenis]) { ajakPotion(true); return; }
+      st.potDipakai[jenis] = true; tulisPot();
+      const b = bos(), t0 = performance.now(), d = P.DATA[jenis], total = Math.round(d.tap * SKALA_POT), kena = P.KENA[jenis], bagi = Math.round(total / kena.length);
+      st.efekPot.push({ jenis, t0, seed: Math.floor(Math.random() * 1000) });
+      S().potion(jenis);
+      teks(d.teks, W / 2, H * 0.3, d.warna, 40);
+      kena.forEach((ms, i) => setTimeout(() => {
+        if (!st || st.fase !== 'main') return;
+        const dmg = i === kena.length - 1 ? total - bagi * (kena.length - 1) : bagi;
+        st.hp = Math.max(0, st.hp - dmg); st.dmg += dmg; st.kilat = performance.now();
+        teks('-' + dmg, b.cx + (Math.random() - 0.5) * b.w * 0.6, b.y + b.h * (0.2 + Math.random() * 0.4), d.warna, 30);
+        if (st.hp <= 0) selesai(true);
+      }, ms));
+      setTimeout(() => { if (st) { teks(`setara ${d.tap} tap!`, W / 2, H * 0.38, W8.white, 20); ajakPotion(P.URUT.every((j) => st.potDipakai[j])); } }, kena[kena.length - 1] + 200);
+    }
+    function gambarPotion(t, b) {
+      if (!P || !st.efekPot.length) return;
+      for (let i = st.efekPot.length - 1; i >= 0; i--) {
+        const rr = P.gambar(x, st.efekPot[i], t, { x: b.cx, kaki: b.kaki, tinggi: b.h }, W, H, gerakMinim);
+        if (rr.selesai) st.efekPot.splice(i, 1); else if (rr.getar && !gerakMinim) { st.getar = t; st.getarAmp = Math.max(st.getarAmp || 0, rr.getar * 1.6); }
+      }
+    }
     function tombolJurus(meteor) {
       $('#lt-hindar').innerHTML = meteor ? '<svg aria-hidden="true"><use href="#i-shield"/></svg>PERISAI' : '<svg aria-hidden="true"><use href="#i-run"/></svg>HINDAR';
       $('#lt-hindar').classList.toggle('is-perisai', meteor);
@@ -216,6 +253,7 @@
         $('#lt-skor').textContent = new Intl.NumberFormat('id-ID').format(skor);
         $('#lt-hasil-sub').textContent = `${st.dmg} serangan · combo terbaik ${st.comboMaks} · ${st.aman}× menghindar${skor > terbaik ? ' · rekor baru!' : ` · rekor ${new Intl.NumberFormat('id-ID').format(Math.max(terbaik, skor))}`}`;
         $('#lt-ajak-hadiah').textContent = teksHadiah();
+        $('#lt-pot-ajak').hidden = true;
         $('#lt-hasil').hidden = false; $('#lt-lagi').focus();
         opsi.saatSelesai && opsi.saatSelesai({ menang, skor, rekor: skor > terbaik });
       }, menang ? 1400 : 700);
@@ -337,6 +375,7 @@
         }
       }
       gambarPartikelBenturan(t, f);
+      gambarPotion(t, b);
       if (st.jurus === 'meteor' && st.meteor && st.tSerang && sedangSerang(t) && window.YCSRajaRig) {
         const u = (t - st.tSerang) / SERANG_METEOR;
         const g = window.YCSRajaRig.gambarHujan(x, st.meteor, u, Math.min(W, H) * 0.05, H, { hemat: gerakMinim });
@@ -358,7 +397,7 @@
 
     function mulai() {
       W8 = warna(); st = baru(); st.mulai = performance.now() + 250; dlg.classList.remove('is-main'); // jeda singkat: dialog selesai memudar dulu
-      tombolJurus(false); $('#lt-hasil').hidden = true; $('#lt-waktu').textContent = DURASI; $('#lt-combo').textContent = ''; hati();
+      tombolJurus(false); tulisPot(); $('#lt-pot-ajak').hidden = true; $('#lt-hasil').hidden = true; $('#lt-waktu').textContent = DURASI; $('#lt-combo').textContent = ''; hati();
       cancelAnimationFrame(raf); ukur(); raf = requestAnimationFrame(gambar);
       if (S().musikMulai) { if (musikSebelum === null) musikSebelum = S().ingin || false; S().musikMulai('latihan'); }
     }
@@ -399,6 +438,8 @@
     $('#lt-lagi').addEventListener('click', () => { S().klik(); mulai(); });
     dlg.addEventListener('close', () => { cancelAnimationFrame(raf); st = null; dlg.classList.remove('is-buka', 'is-main'); keluarPenuh(); pulihkanMusik(); });
     $('#lt-asli').addEventListener('click', () => { S().klik(); tutup(); opsi.saatAjak && opsi.saatAjak(); });
+    $('#lt-pot').addEventListener('click', (e) => { const b = e.target.closest('[data-pot]'); if (b) { e.stopPropagation(); cobaPotion(b.dataset.pot); } });
+    dlg.querySelectorAll('[data-ke-misi]').forEach((b) => b.addEventListener('click', () => { S().klik(); tutup(); opsi.saatMisi && opsi.saatMisi(); }));
     return { buka, tutup };
   }
   window.YCSLatihan = { buat };

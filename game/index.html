@@ -97,6 +97,39 @@
         <span class="btn btn--primary btn--sm" aria-hidden="true">Gabung</span>
       </a>
 
+      <!-- Papan hadiah -->
+      <section class="g-kartu g-papan" aria-labelledby="g-papan-judul">
+        <div class="g-kartu__head"><h2 class="t-h2" id="g-papan-judul">Papan hadiah</h2><span class="badge badge--sun">Tiap event</span></div>
+        <div class="g-papan__utama">
+          <span class="g-papan__ikon" aria-hidden="true">📱</span>
+          <div><small>Hadiah utama · SPIN undian</small><strong><span id="g-papan-hp">8</span> Unit HP</strong><span>Kalahkan Raja Batu → dapat kode undian → diundi saat live</span></div>
+        </div>
+        <ol class="g-papan__top" id="g-papan-top">
+          <li><span class="g-papan__medali g-papan__medali--1">1</span><div><strong>Top 1 Kontributor</strong><small>Hit terbanyak</small></div><b>Rp100.000</b></li>
+          <li><span class="g-papan__medali g-papan__medali--2">2</span><div><strong>Top 2 Kontributor</strong><small>Hit terbanyak ke-2</small></div><b>Rp100.000</b></li>
+          <li><span class="g-papan__medali g-papan__medali--3">3</span><div><strong>Top 3 Kontributor</strong><small>Hit terbanyak ke-3</small></div><b>Rp50.000</b></li>
+        </ol>
+        <p class="t-xs g-catatan">Hit = tenaga dari tap + potion selama event. Makin banyak hit, makin dekat ke Top 1.</p>
+      </section>
+
+      <!-- Misi + tas pejuang (equipment) -->
+      <section class="g-kartu g-tas" id="misi" aria-labelledby="g-misi-judul">
+        <div class="g-kartu__head"><h2 class="t-h2" id="g-misi-judul">Misi pejuang</h2><span class="t-sm" id="g-misi-n">0/0</span></div>
+        <div class="g-tas__bekal" aria-labelledby="g-tas-judul">
+          <p class="g-tas__judul" id="g-tas-judul">Tas pejuangmu</p>
+          <div class="g-tas__nyawa" id="g-tas-nyawa" aria-label="Nyawa karakter"></div>
+          <ul class="g-tas__pot" id="g-tas-pot"></ul>
+          <p class="g-tas__info" id="g-tas-info"></p>
+        </div>
+        <div class="g-tas__peti">
+          <span class="g-tas__peti-ikon" aria-hidden="true">🎁</span>
+          <div><strong id="g-peti-judul">Selesaikan 5 misi → 1 Peti Equipment</strong><small>Isi peti: 1 Racun + 1 Gempa + 1 Petir. Diklaim otomatis.</small>
+            <div class="meter g-misi-meter" role="progressbar" aria-label="Misi menuju peti" aria-valuemin="0" aria-valuemax="5" id="g-misi-meter"><div class="meter__fill" id="g-misi-fill"></div></div></div>
+        </div>
+        <ul class="g-misi" id="g-misi"></ul>
+        <p class="t-xs g-catatan">Potion dipakai saat Raja Batu muncul: ketuk botolnya di sisi kiri arena. Coba gratis di mode latihan.</p>
+      </section>
+
       <!-- Skema hadiah -->
       <section class="g-kartu" aria-labelledby="g-cara">
         <h2 class="t-h2" id="g-cara">Cara dapat HP</h2>
@@ -124,14 +157,6 @@
         <p class="g-kosong" id="g-riwayat-kosong">Belum ada match. Hasil tiap event (menang/kalah, tenagamu, peringkat, hadiah) tercatat di sini sampai live berikutnya dan seterusnya.</p>
       </section>
 
-      <!-- Misi -->
-      <section class="g-kartu" aria-labelledby="g-misi-judul">
-        <div class="g-kartu__head"><h2 class="t-h2" id="g-misi-judul">Misi pejuang</h2><span class="t-sm" id="g-misi-n">0/0</span></div>
-        <div class="meter g-misi-meter" role="progressbar" aria-label="Misi selesai" aria-valuemin="0" aria-valuemax="5" id="g-misi-meter"><div class="meter__fill" id="g-misi-fill"></div></div>
-        <ul class="g-misi" id="g-misi"></ul>
-        <p class="t-xs g-catatan">Misi menyiapkanmu untuk event. Kode undian hanya didapat dengan mengalahkan Raja Batu saat event berlangsung.</p>
-      </section>
-
       <!-- Pemenang -->
       <section class="g-kartu" aria-labelledby="g-juara-judul">
         <h2 class="t-h2" id="g-juara-judul">Yang udah bawa pulang hadiah</h2>
@@ -157,6 +182,8 @@
     <canvas class="lt-kanvas" id="lt-kanvas" aria-label="Arena latihan: ketuk Raja Batu untuk menyerang"></canvas>
     <p class="lt-combo" id="lt-combo" aria-live="off"></p>
     <p class="lt-awas" id="lt-awas" hidden>Jurus datang! Tekan HINDAR!</p>
+    <div class="lt-pot" id="lt-pot" role="group" aria-label="Coba potion gratis"></div>
+    <div class="lt-pot-ajak" id="lt-pot-ajak" hidden><span>🎁 Mau potion asli untuk lawan bos?</span><button type="button" class="btn btn--sm" data-ke-misi>Dapatkan potion › Kerjakan misi</button></div>
     <button class="lt-hindar" type="button" id="lt-hindar" hidden><svg aria-hidden="true"><use href="#i-run"/></svg>HINDAR</button>
     <p class="lt-mulai" id="lt-mulai" aria-live="assertive"></p>
     <div class="lt-hasil" id="lt-hasil" hidden>
@@ -167,6 +194,7 @@
       <div class="lt-ajak">
         <p><span aria-hidden="true">🏆</span> <b>Siap lawan Raja Batu asli?</b> <span id="lt-ajak-hadiah">Top 1 &amp; 2 kontributor dapat Rp100.000</span>, plus kode undian HP.</p>
         <button class="btn btn--primary btn--block" type="button" id="lt-asli"><svg aria-hidden="true"><use href="#i-sword"/></svg>Lawan Raja Batu asli</button>
+        <button class="btn btn--block lt-ajak__misi" type="button" data-ke-misi>🎁 Dapatkan potion › Kerjakan misi</button>
       </div>
       <div class="lt-hasil__aksi">
         <button class="btn btn--cta btn--lg btn--block" type="button" id="lt-lagi"><svg aria-hidden="true"><use href="#i-sword"/></svg>Main lagi</button>
@@ -192,6 +220,7 @@
 
   <script src="/assets/js/festival.js"></script>
   <script src="/assets/js/raja-rig.js"></script>
+  <script src="/assets/js/potion.js"></script>
   <script src="/assets/js/monster.js"></script>
   <script src="/assets/js/game-suara.js"></script>
   <script src="/assets/js/latihan.js"></script>

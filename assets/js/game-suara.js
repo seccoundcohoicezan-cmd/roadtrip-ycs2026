@@ -114,6 +114,31 @@
   };
   function benturan(jenis, tunda) { if (!siap()) return; const t = T(tunda); (BENTUR[jenis] || BENTUR.tusuk)(t); musikRedam(t, 0.5); }
 
+  /* ===================== Potion (Racun / Gempa / Petir) — selaras dengan YCSPotion.KENA ===================== */
+  function potion(jenis, tunda = 0) {
+    if (!siap()) return; const t = T(tunda);
+    if (jenis === 'petir') {
+      osc(t, 'sawtooth', 120, 0.14, 0.05, { a: 0.1, r: 0.02, f2: 900 }); // listrik mengumpul
+      [0.156, 0.39, 0.624].forEach((d, i) => {
+        derau(t + d, 0.16, 0.9, { tipe: 'highpass', f: 1800, f2: 600, q: 0.6, pan: (i - 1) * 0.5 }); // CETAR
+        osc(t + d, 'sine', 90, 0.4, 0.6, { a: 0.002, r: 0.5, f2: 35 });
+        derau(t + d + 0.03, 1.4, 0.3, { f: 600, f2: 60, q: 0.4 }); // gemuruh guntur
+      });
+      musikRedam(t + 0.15, 0.8);
+    } else if (jenis === 'gempa') {
+      osc(t, 'sine', 42, 1.3, 0.7, { a: 0.05, r: 0.4 }); osc(t, 'sine', 39, 1.3, 0.6, { a: 0.05, r: 0.4 });
+      derau(t, 1.5, 0.5, { f: 300, f2: 60, q: 0.5, a: 0.04 });
+      osc(t + 0.225, 'sine', 70, 0.4, 0.8, { a: 0.002, r: 0.5, f2: 28 });
+      for (let i = 0; i < 16; i++) derau(t + 0.2 + Math.random() * 0.9, 0.05, 0.12 + Math.random() * 0.1, { tipe: 'bandpass', f: 900 + Math.random() * 1800, q: 2, pan: Math.random() * 2 - 1 }); // batu berjatuhan
+      musikRedam(t, 1.2);
+    } else {
+      derau(t, 1.9, 0.14, { tipe: 'bandpass', f: 2600, q: 1.2, a: 0.25 }); // desis kabut
+      for (let i = 0; i < 18; i++) { const d = 0.1 + Math.random() * 1.7, f = 260 + Math.random() * 300; osc(t + d, 'sine', f, 0.06, 0.08, { a: 0.003, r: 0.05, f2: f * 2.6, pan: Math.random() * 1.6 - 0.8 }); } // gelembung
+      [0.3, 0.7, 1.1, 1.5].forEach((d) => osc(t + d, 'square', 180, 0.05, 0.05, { a: 0.002, r: 0.06, f2: 90 })); // tik kerusakan
+    }
+    getar(jenis === 'gempa' ? [80, 40, 120, 40, 200] : jenis === 'petir' ? [40, 120, 40, 120, 60] : [20, 60, 20]);
+  }
+
   /* ===================== Tap: candu (nada naik per combo, skala pentatonik) ===================== */
   const PENTA = [0, 2, 4, 7, 9];
   const nadaCombo = (combo) => { const i = Math.max(0, combo - 1) % 15; return 392 * Math.pow(2, (Math.floor(i / 5) * 12 + PENTA[i % 5]) / 12); };
@@ -250,7 +275,7 @@
     musikMulai(mode = 'perang') { this.ingin = mode; musikMulai(mode); },
     musikBerhenti(pelan) { this.ingin = false; musikBerhenti(pelan); },
     intensitas(v) { if (musik) musik.intens = Math.max(0, Math.min(1, v)); },
-    kumpulApi, ayun, benturan, ledakan, siulMeteor, tap, tapKena, milestone,
+    kumpulApi, ayun, benturan, ledakan, siulMeteor, tap, tapKena, milestone, potion,
   };
   // Browser hanya mengizinkan suara setelah interaksi: sentuhan pertama di halaman menyalakan musik bila pertempuran berlangsung.
   const buka = () => { if (window.YCSSuara.ingin && nyala) musikMulai(window.YCSSuara.ingin); else if (nyala) siap(); };

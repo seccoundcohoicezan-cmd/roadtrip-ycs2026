@@ -62,6 +62,7 @@ function buatMonster(app, opsi = {}) {
   st.tiketN = Number(st.tiketN) || 0; // kode undian terakhir, global lintas event (#0001, #0002, …); uji: st.tiketUjiN
   st.uji = st.uji || null;         // mode uji monster: {kode, mulai, sampai} — event terpisah, hanya lewat link ?uji-monster=kode
   st.ujiPemain = st.ujiPemain || {}; // pid → identitas penguji (tidak mengikat perangkat)
+  st.bekal = st.bekal || {}; // kunci peserta → {misi: {id: waktu}, pakai: {racun, gempa, petir}, rid: [..]} (potion dari Misi Pejuang)
   st.spin = st.spin || {hadiah: [], peluang: 'rata'}; // hadiah: [{id, nama, stok|null, bobot, terpakai, gambar?}]
   st.spin.hasil = st.spin.hasil || []; // undian 2 tahap: [{ke, id, sumber, nama, sekolah, kota, provinsi, jalur, hadiah, hadiahId, waktu}]
   const ember = new Map();           // batas kecepatan per pemain (tidak perlu disimpan)
@@ -229,6 +230,7 @@ function buatMonster(app, opsi = {}) {
     if (j.dihentikan) dasar.dihentikan = true;
     if (j.uji) dasar.uji = true;
     if (j.ujiSalah) dasar.ujiSalah = true;
+    const htop = nominalTop(m); if (htop.length) dasar.hadiahTop = htop;
     if (!j.id) return dasar;
     const live = j.live ? {judul: j.live.judul, platform: j.live.platform, link: j.live.link, mulai: new Date(j.live.mulai).toISOString()} : null;
     const out = {...dasar, id: j.id, mulai: new Date(j.mulai).toISOString(), selesai: new Date(j.selesai).toISOString(), live, levelMaks: a.target.length, target: a.target, poin: a.poin, skala: a.skala};
@@ -247,7 +249,6 @@ function buatMonster(app, opsi = {}) {
       pemain, tiket: e.n, interval: intervalUntuk(a.interval, pemain)});
     if (out.fase !== 'tanding' && st.events[j.id] && !e.final && Object.keys(e.u).length) finalisasi(j.id, out);
     if (out.fase !== 'tanding' && e.top) out.top = topPublik(e);
-    const mh = nominalTop(m); if (mh.length) out.hadiahTop = mh;
     return out;
   }
 
@@ -328,7 +329,7 @@ function buatMonster(app, opsi = {}) {
     const topSaya = e && e.top ? e.top.find((x) => x.pid === pid) : null;
     return {ok: true, mati: !!(e && e.mati && e.mati[kunci]), matiKe: e && e.mati ? e.mati[kunci] || null : null, hp: e && e.hp && e.hp[kunci] != null ? Math.max(0, e.hp[kunci]) : hpMaks, hpMaks,
       sasaran: !!(e && e.target && e.target.ke === (e.jurusKe || 0) + 1 && (e.target.area ? !(e.mati && e.mati[kunci]) : e.target.daftar.includes(kunci))), tiket: e && e.tiket[pid] ? e.tiket[pid] : null, saya: sayaP,
-      peringkat, pemain: e ? Object.keys(e.u).length : 0, top: topSaya ? {peringkat: topSaya.peringkat, nominal: topSaya.nominal} : null};
+      peringkat, pemain: e ? Object.keys(e.u).length : 0, top: topSaya ? {peringkat: topSaya.peringkat, nominal: topSaya.nominal} : null, bekal: bekalPublik(kunci)};
   }
 
   // Kode undian unik untuk SEMUA event (bukan per event): dulu tiap event mulai dari #0001 sehingga peserta berbeda
@@ -373,6 +374,64 @@ function buatMonster(app, opsi = {}) {
     const sh = app.sheets['Tiket Monster'] || app.ctx.tab_(app.ss, 'tiket');
     sh.appendRow([new Date(now()), id, nomor, orang.nama || '', orang.sekolah || '', orang.provinsi || '', kontakTampil(info.email || ''), perangkat.slice(0, 8), e.u[pid].p, 'aktif', catatan]);
     return nomor;
+  }
+
+  /* ---------- Equipment dari Misi Pejuang ---------- */
+  // Tiap MISI_PER_PETI misi selesai = 1 peti equipment berisi 1 potion tiap jenis. Potion = tap instan (dikali poin level),
+  // dicatat & dibatasi di server (tidak bisa dipalsukan dari HP). Misi yang dihitung hanya yang ada di daftar misi saat ini.
+  const POTION = {racun: 50, gempa: 150, petir: 200};
+  const MISI_PER_PETI = 5;
+  const bekalDari = (kunci) => (st.bekal[kunci] = st.bekal[kunci] || {misi: {}, pakai: {}, rid: []});
+  function bekalPublik(kunci) {
+    if (!kunci) return null;
+    const b = st.bekal[kunci] || {misi: {}, pakai: {}};
+    const ids = misiPublik().misi.map((x) => x.id), selesai = ids.filter((id) => b.misi[id]).length;
+    const peti = Math.floor(selesai / MISI_PER_PETI), sisa = {};
+    Object.keys(POTION).forEach((j) => { sisa[j] = Math.max(0, peti - ((b.pakai || {})[j] || 0)); });
+    const c = cfg();
+    return {misi: selesai, totalMisi: ids.length, perPeti: MISI_PER_PETI, peti, sisa, tap: POTION, hpMaks: hpMaksDari(mUntuk(c, jadwal(c, now()))), selesai: Object.keys(b.misi).filter((id) => ids.includes(id))};
+  }
+  function klaimMisi(p) {
+    const pid = cekToken(p.token);
+    if (!pid) return {ok: false, error: 'sesi_habis'};
+    const kunci = kunciPemain(pid);
+    if (!kunci) return {ok: false, error: 'sesi_habis'};
+    const ids = new Set(misiPublik().misi.map((x) => x.id)), daftar = Array.isArray(p.misi) ? p.misi.slice(0, 20) : [];
+    const b = bekalDari(kunci); let baru = 0;
+    daftar.forEach((id) => { if (typeof id === 'string' && ids.has(id) && !b.misi[id]) { b.misi[id] = now(); baru++; } });
+    if (baru) ubah();
+    return {ok: true, baru, bekal: bekalPublik(kunci)};
+  }
+  function pakaiPotion(p) {
+    const pid = cekToken(p.token);
+    if (!pid) return {ok: false, error: 'sesi_habis'};
+    const jenis = String(p.jenis || ''), rid = String(p.rid || '');
+    if (!POTION[jenis] || !/^[\w-]{8,40}$/.test(rid)) return {ok: false, error: 'validation'};
+    const c = cfg(), t = now(), j = jadwalUntuk(c, t, p.uji || null);
+    if (j.fase !== 'aktif' || p.e !== j.id) return {ok: false, error: 'bukan_waktunya', status: status(c, j, t)};
+    if ((pid[0] === '~') !== !!j.uji) return {ok: false, error: 'sesi_habis'};
+    const kunci = kunciPemain(pid), b = bekalDari(kunci);
+    if (b.rid.includes(rid)) return {ok: true, dup: true, jenis, bekal: bekalPublik(kunci)}; // kirim ulang: tidak terpakai dua kali
+    const a = aturan(mUntuk(c, j)), e = ev(j.id), maks = a.target.length;
+    prosesJurus(c, j, e, t);
+    if (e.mati && e.mati[kunci]) return {ok: false, error: 'tumbang'};
+    if (e.kalah || e.monsterMenang || t >= j.selesai) return {ok: false, error: 'bukan_waktunya', status: status(c, j, t)};
+    if (!bekalPublik(kunci).sisa[jenis]) return {ok: false, error: 'potion_habis', bekal: bekalPublik(kunci)};
+    b.pakai[jenis] = (b.pakai[jenis] || 0) + 1;
+    b.rid.push(rid); if (b.rid.length > 30) b.rid.shift();
+    const u = e.u[pid] || (e.u[pid] = {p: 0, q: -1});
+    if (e.lvl > maks) e.lvl = maks;
+    const pts = POTION[jenis] * (a.poin[e.lvl - 1] || e.lvl);
+    e.tenaga += pts; e.total += pts; u.p += pts;
+    if (e.tenaga >= a.target[e.lvl - 1]) {
+      if (e.lvl < maks) { e.lvl += 1; e.tenaga = 0; e.naik = t; }
+      else { e.tenaga = a.target[e.lvl - 1]; e.kalah = t; }
+    }
+    if (!e.tiket[pid] && u.p >= angka(mUntuk(c, j).tiketMin, 1, 1, 1e9)) terbitkanTiket(j.id, e, pid, a);
+    if (!aktif.has(j.id)) aktif.set(j.id, new Map());
+    aktif.get(j.id).set(pid, t);
+    ubah();
+    return {ok: true, jenis, pts, saya: u.p, tiket: e.tiket[pid] || null, bekal: bekalPublik(kunci), status: status(c, j, t)};
   }
 
   function tap(p) {
@@ -745,7 +804,7 @@ function buatMonster(app, opsi = {}) {
     return {ok: true, pemenang: [...out, ...undian].reverse().slice(0, 60)};
   }
 
-  return {lihat, masuk, tap, hindar, saya, admin, pemenangPublik, misiPublik, state: st, jadwal, jenisJurus, segarkan: () => { memo.t = 0; }};
+  return {lihat, masuk, tap, hindar, saya, klaimMisi, pakaiPotion, bekalPublik, admin, pemenangPublik, misiPublik, state: st, jadwal, jenisJurus, segarkan: () => { memo.t = 0; }};
 }
 
 module.exports = {buatMonster, jadwal, PASCA, MENIT};

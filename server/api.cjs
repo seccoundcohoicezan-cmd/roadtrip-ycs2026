@@ -9,7 +9,7 @@ const {buatGambar} = require('./gambar.cjs');
 
 // Kode galat → status HTTP (galat lain → 422).
 const STATUS = {kata_ditolak: 422, nama_ditolak: 422, validation: 400, sesi_habis: 401, sandi_salah: 401, terlalu_banyak: 429, rate_limit: 429, busy: 503, server: 502, save_failed: 502, connection: 502};
-const STATUS_MONSTER = {sesi_habis: 401, rate_limit: 429, validation: 400};
+const STATUS_MONSTER = {sesi_habis: 401, rate_limit: 429, validation: 400, potion_habis: 409, bukan_waktunya: 409, tumbang: 409};
 
 // Formulir: aksi publik → aksi Code.gs + field yang boleh diteruskan. Field lain dibuang.
 const FORMULIR = {
@@ -125,7 +125,7 @@ function buatApi(data) {
     return jawab(st, cache);
   }
   function monsterPost(p, ip, adminSaja) {
-    const aksi = {masuk: () => data.monster.masuk(p, ip), tap: () => data.monster.tap(p), hindar: () => data.monster.hindar(p), saya: () => data.monster.saya(p)}[p && p.aksi];
+    const aksi = {masuk: () => data.monster.masuk(p, ip), tap: () => data.monster.tap(p), hindar: () => data.monster.hindar(p), saya: () => data.monster.saya(p), misi: () => data.monster.klaimMisi(p), potion: () => data.monster.pakaiPotion(p)}[p && p.aksi];
     const out = adminSaja ? data.monster.admin(p || {}) : aksi ? aksi() : {ok: false, error: 'validation'};
     return jawab(out, CACHE.tidak, out.ok ? 200 : (STATUS_MONSTER[out.error] || 422));
   }
