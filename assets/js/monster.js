@@ -40,6 +40,7 @@
       <p class="mon__awas" hidden></p>
       <button type="button" class="mon__hindar" hidden><svg aria-hidden="true" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="14" cy="4.5" r="2"/><path d="m8 21 3-6 3 2v5M6 11l3-3 4 1 3 4 3 1M11 15l1-5"/></g></svg>HINDAR</button>
       <div class="mon__tiket" hidden><small>Tiket kamu</small><strong></strong><span></span></div>
+      <div class="mon__tas" hidden role="group" aria-label="Potion kamu"><span class="mon__tas-judul">Potion</span></div>
       <p class="mon__ajak"></p>
       <div class="mon__pesan" hidden><h3></h3><p></p><a class="btn btn--live btn--sm" target="_blank" rel="noopener" hidden><svg aria-hidden="true" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5.5v13l11-6.5Z"/></svg>Tonton live</a><button type="button" class="btn btn--soft btn--sm mon__bagi">Ajak teman</button><button type="button" class="btn btn--soft btn--sm mon__tutup">Kembali ke festival</button></div>`;
     stage.append(el);
@@ -150,12 +151,86 @@
     }
     // Musik latar: menyala selama pertempuran, berhenti saat selesai; makin intens saat bos sekarat / jurus mendekat.
     function suaraFase() {
+      tulisTas();
       const S = SU(); if (!S) return;
       if (st && st.fase === 'tanding' && !akhir) { if (!S.ingin) S.musikMulai('perang'); } // saat latihan dibuka, musik latihan dibiarkan
       else if (S.ingin === 'perang') S.musikBerhenti(2);
     }
     // Combo tap (candu): ketukan beruntun (jeda < 700 ms) menaikkan nada & angka; kelipatan 10 = perayaan kecil.
     let combo = 0, tCombo = 0, comboTampil = null;
+    /* ---------- Potion (equipment dari Misi Pejuang; jumlah & efek dicatat server) ---------- */
+    const POT = window.YCSPotion;
+    let bekal = null, potGetar = 0;
+    const efekPot = [];
+    const adaIdentitas = () => { const i = (opsi.identitas && opsi.identitas()) || {}; return !!(i.email || i.wa || uji); };
+    function setBekal(b) {
+      if (!b) return;
+      bekal = b; tulisTas();
+      opsi.saatBekal && opsi.saatBekal(b);
+    }
+    // Misi yang selesai di HP dikirim ke server (klaim otomatis) → server menghitung peti & sisa potion.
+    async function syncBekal() {
+      if (!adaIdentitas() || blokir) return null;
+      try {
+        await pastikanToken();
+        const m = baca('ycs_misi') || {};
+        const d = await minta({ aksi: 'misi', token, misi: Object.keys(m), uji });
+        if (d && d.ok) { setBekal(d.bekal); return d; }
+      } catch (e) { /* coba lagi nanti */ }
+      return null;
+    }
+    function tulisTas() {
+      const tas = $('.mon__tas');
+      if (!POT) { tas.hidden = true; return; }
+      if (!tas.querySelector('.mon__pot')) tas.insertAdjacentHTML('beforeend', POT.URUT.map((j) => `<button type="button" class="mon__pot mon__pot--${j}" data-pot="${j}">${POT.ikon(j)}<b>0</b><small>${POT.DATA[j].nama}</small></button>`).join(''));
+      POT.URUT.forEach((j) => {
+        const n = bekal && bekal.sisa ? bekal.sisa[j] || 0 : 0, b = tas.querySelector(`[data-pot="${j}"]`);
+        b.querySelector('b').textContent = n; b.classList.toggle('is-kosong', !n);
+        b.setAttribute('aria-label', `${POT.DATA[j].nama}: ${n} tersisa, setara ${POT.DATA[j].tap} tap`);
+      });
+      tas.hidden = !(st && st.fase === 'tanding' && !akhir);
+    }
+    function mulaiEfekPotion(jenis, pts) {
+      const t0 = performance.now(), g = geometri();
+      efekPot.push({ jenis, t0, seed: Math.floor(Math.random() * 1000) });
+      if (SU()) SU().potion(jenis);
+      const kena = POT.KENA[jenis], bagi = Math.round(pts / kena.length);
+      kena.forEach((ms, i) => setTimeout(() => {
+        pukul = performance.now();
+        teks.push({ s: '-' + nf.format(i === kena.length - 1 ? pts - bagi * (kena.length - 1) : bagi), x: g.x + (Math.random() - 0.5) * g.lebar * 0.5, y: g.atas + g.tinggi * (0.2 + Math.random() * 0.4), t0: performance.now(), warna: POT.DATA[jenis].warna, besar: 1.8 });
+      }, ms));
+      teks.push({ s: POT.DATA[jenis].teks, x: W / 2, y: H * 0.26, t0: t0 + 100, warna: POT.DATA[jenis].warna, besar: 2.6 });
+      mulaiGambar();
+    }
+    let potJalan = false;
+    async function pakaiPotion(jenis) {
+      if (!st || st.fase !== 'tanding' || akhir) { tampilAjak('Potion dipakai saat Raja Batu muncul.', 2200); return; }
+      if (!bolehTap()) { opsi.saatTerkunci && opsi.saatTerkunci(); return; }
+      if (karakterMati) { tampilAjak('Karaktermu sudah tumbang di event ini.', 2200); return; }
+      if (!bekal || !bekal.sisa || !bekal.sisa[jenis]) { tampilAjak('Potion habis! Kerjakan Misi Pejuang: tiap 5 misi = 1 peti berisi Racun, Gempa, dan Petir.', 3800); opsi.saatButuhPotion && opsi.saatButuhPotion(); return; }
+      if (potJalan) return;
+      potJalan = true;
+      const rid = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+      bekal.sisa[jenis]--; tulisTas(); // langsung terasa; dikembalikan bila server menolak
+      const perkiraan = POT.DATA[jenis].tap * poin();
+      mulaiEfekPotion(jenis, perkiraan);
+      try {
+        await pastikanToken();
+        let d = null;
+        for (let i = 0; i < 3 && !d; i++) { try { d = await minta({ aksi: 'potion', token, jenis, rid, e: st.id, uji }); } catch (e) { if (i === 2) throw e; } }
+        if (d.ok) {
+          if (d.bekal) setBekal(d.bekal);
+          if (d.saya) sayaPoin = d.saya;
+          if (d.tiket && d.tiket !== tiketSaya) { tiketSaya = d.tiket; opsi.saatTiket && opsi.saatTiket(d.tiket, st); }
+          if (d.status) terapkan(d.status);
+          if (!d.dup) tampilAjak(`${POT.DATA[jenis].nama} kena! +${nf.format(d.pts || perkiraan)} tenaga untukmu.`, 2400);
+        } else {
+          if (d.bekal) setBekal(d.bekal); else { bekal.sisa[jenis]++; tulisTas(); }
+          tampilAjak(d.error === 'potion_habis' ? 'Potion habis. Kerjakan Misi Pejuang untuk dapat lagi.' : 'Potion belum bisa dipakai sekarang.', 2600);
+        }
+      } catch (e) { bekal.sisa[jenis]++; tulisTas(); tampilAjak('Koneksi gagal, potion tidak terpakai. Coba lagi.', 2600); }
+      finally { potJalan = false; }
+    }
     let perisaiKe = 0; // nomor jurus meteor yang kamu tahan dengan PERISAI
     let tiketSaya = null, blokir = null, karakterMati = false, hindarKe = 0, hpSaya = null, aku_sasaran = false; // karakter milik pemain: tumbang = tidak bisa menyerang // blokir: {error, nama} bila aturan 1 perangkat = 1 peserta menolak
 
@@ -787,7 +862,7 @@
       tLalu = t;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, W, H);
-      let getar = getarLayar();
+      let getar = Math.max(getarLayar(), gerakMinim ? 0 : potGetar * 9);
       if (mendarat && t - mendarat < 500 && !gerakMinim) getar = Math.max(getar, 14 * (1 - (t - mendarat) / 500));
       if (getar) ctx.translate((Math.random() - 0.5) * getar, (Math.random() - 0.5) * getar);
 
@@ -809,6 +884,8 @@
         (st.wujud === 'lucu' ? gambarMonsterLucu : gambarRajaBatu)(g, t, kedip, mati);
         if (om) ctx.restore();
         gambarDebuMendarat(t, g);
+        potGetar = 0;
+        for (let i = efekPot.length - 1; i >= 0; i--) { const rr = POT.gambar(ctx, efekPot[i], t, { x: g.x, kaki: g.kaki, tinggi: g.tinggi }, W, H, gerakMinim); if (rr.selesai) efekPot.splice(i, 1); else potGetar = Math.max(potGetar, rr.getar); }
         if (ps != null && !gerakMinim) { gambarJurusEfek(g, ps); gambarHujanMeteor(ps, t); }
         else if (perisaiKe && perisaiKe === (st.jurusKe || 0) + 1 && fest && fest.saya && fest.saya.layar && !fest.saya.mati && window.YCSRajaRig) window.YCSRajaRig.gambarPerisai(ctx, fest.saya.layar.x, fest.saya.layar.kaki, fest.saya.layar.h * 0.85, t, 1, 0);
         aturZona(akhir && akhir.selesai && akhir.jenis !== 'monster' ? null : g);
@@ -859,7 +936,7 @@
       tampilTenaga = gerakMinim ? tujuan : tampilTenaga + (tujuan - tampilTenaga) * Math.min(1, dt * 6);
       tulisBar();
       tulisNyawa();
-      const hidup = partikel.length || teks.length || letusan.length || (comboTampil && t - comboTampil.t0 < 900) || sinarJurus.length || konfeti.length || (akhir && !akhir.selesai) || (st.fase === 'tanding' && !gerakMinim) || (tumbuh.t0 && t - tumbuh.t0 < 900) || masuk;
+      const hidup = partikel.length || teks.length || letusan.length || efekPot.length || (comboTampil && t - comboTampil.t0 < 900) || sinarJurus.length || konfeti.length || (akhir && !akhir.selesai) || (st.fase === 'tanding' && !gerakMinim) || (tumbuh.t0 && t - tumbuh.t0 < 900) || masuk;
       if (hidup && panggungTerlihat && !document.hidden) raf = requestAnimationFrame(gambar);
       else tLalu = 0;
     }
@@ -1098,12 +1175,14 @@
       } catch (e) { hindarKe = 0; }
     }
     $('.mon__hindar').addEventListener('click', hindar);
+    $('.mon__tas').addEventListener('click', (e) => { const b = e.target.closest('[data-pot]'); if (b) { e.stopPropagation(); pakaiPotion(b.dataset.pot); } });
     // Setelah tiap jurus: apakah karaktermu ikut tumbang?
     async function cekKarakter() {
       if (!token || karakterMati) return;
       try {
         const d = await minta({ aksi: 'saya', token, uji });
         if (d.ok) {
+          if (d.bekal) setBekal(d.bekal);
           const turun = hpSaya != null && d.hp < hpSaya;
           hatiBerkurang(d.hp, d.hpMaks, st && st.jurusInfo && st.jurusInfo.jenis === 'meteor');
           hpSaya = d.hp; if (fest && fest.saya) fest.setNyawa(fest.saya, d.hp, d.hpMaks);
@@ -1330,7 +1409,8 @@
 
     poll(0);
     jadwalKirim();
-    return { get status() { return st; }, segarkan: () => poll(0) };
+    syncBekal();
+    return { get status() { return st; }, segarkan: () => poll(0), get bekal() { return bekal; }, syncBekal };
   }
 
   window.YCSMonster = { pasang };

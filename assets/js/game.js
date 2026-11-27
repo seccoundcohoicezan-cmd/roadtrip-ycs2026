@@ -84,9 +84,10 @@
   $('#dapat-bagi').addEventListener('click', () => bagikan(`Aku ikut kalahkan Raja Batu di YCS 2026 dan dapat kode undian ${$('#dapat-kode').textContent}! Ayo ikut, siapa tahu kamu yang bawa pulang HP:`));
   tampilKode();
 
+  let monApi = null;
   if (window.YCSMonster) {
     try {
-      window.YCSMonster.pasang({
+      monApi = window.YCSMonster.pasang({
         stage, festApi, now, endpoint: '/api/monster',
         identitas: () => baca('ycs_identitas'),
         saya: () => saya,
@@ -95,6 +96,8 @@
         saatTiket: (kode, st) => catatKode(kode, st),
         saatMenang: (st) => akhiriEvent(st),
         saatHasil: (h) => catatRiwayat(h),
+        saatBekal: (b) => tulisBekal(b),
+        saatButuhPotion: () => sorotMisi(),
       });
     } catch (e) { /* lobi tetap jalan */ }
   }
@@ -207,6 +210,7 @@
       ]);
       stMon = m; cfg = c;
       akhiriEvent(m);
+      tulisPapan();
     } catch (e) { /* biarkan status lama */ }
     tampilStatus();
   }
@@ -265,6 +269,7 @@
   const latihan = window.YCSLatihan.buat($('#latihan'), {
     saatSelesai: () => { tandaiMisi('latihan'); },
     hadiahTop: () => (stMon && stMon.hadiahTop) || null,
+    saatMisi: () => sorotMisi(),
     // Ajakan "Lawan Raja Batu asli": kembali ke lobi (status & hitung mundur bos), atau langsung arena bila sedang bertanding.
     saatAjak: () => { window.scrollTo({ top: 0, behavior: 'smooth' }); if (!(stMon && stMon.fase === 'tanding')) toast('Raja Batu asli muncul sebelum live. Pantau hitung mundurnya di sini!'); },
   });
@@ -299,14 +304,21 @@
   fetch('/api/misi').then((r) => r.json()).then((d) => { if (d && d.ok && Array.isArray(d.misi) && d.misi.length) { simpan('ycs_misi_daftar', d.misi); MISI = d.misi.map(keMisi); syncMisi(); } }).catch(() => {});
   const selesaiMisi = () => baca('ycs_misi', {});
   function tandaiMisi(id) { const per = MISI.filter((q) => q.jenis === id && q.id !== id); if (per.length) { per.forEach((q) => tandaiMisi(q.id)); if (!MISI.some((q) => q.id === id)) return; } const m = selesaiMisi(); if (m[id]) { syncMisi(); return; } m[id] = now(); simpan('ycs_misi', m); syncMisi(id); }
+  // Tiap 5 misi selesai = 1 Peti Equipment (1 Racun + 1 Gempa + 1 Petir), diklaim otomatis ke server.
+  const PER_PETI = 5;
   function syncMisi(baru) {
     const m = selesaiMisi();
-    MISI.forEach((x) => { if (x.cek && x.cek()) m[x.id] = m[x.id] || now(); });
-    $('#g-misi-meter').setAttribute('aria-valuemax', String(MISI.length));
-    const n = MISI.filter((x) => m[x.id]).length;
+    let ubah = false;
+    MISI.forEach((x) => { if (x.cek && x.cek() && !m[x.id]) { m[x.id] = now(); ubah = true; } });
+    if (ubah) simpan('ycs_misi', m);
+    const n = MISI.filter((x) => m[x.id]).length, peti = Math.floor(n / PER_PETI), dalam = n - peti * PER_PETI;
+    const penuh = n >= MISI.length && MISI.length < PER_PETI * (peti + 1);
     $('#g-misi-n').textContent = `${n}/${MISI.length}`;
-    $('#g-misi-fill').style.width = (n / MISI.length * 100) + '%';
-    $('#g-misi-meter').setAttribute('aria-valuenow', String(n));
+    $('#g-misi-meter').setAttribute('aria-valuemax', String(PER_PETI));
+    $('#g-misi-meter').setAttribute('aria-valuenow', String(penuh ? PER_PETI : dalam));
+    $('#g-misi-fill').style.width = ((penuh ? PER_PETI : dalam) / PER_PETI * 100) + '%';
+    $('#g-peti-judul').textContent = peti && (penuh || dalam === 0) ? `${peti} Peti Equipment didapat! 🎉` : `${dalam}/${PER_PETI} misi → 1 Peti Equipment`;
+    if (ubah || baru) monApi && monApi.syncBekal && monApi.syncBekal();
     $('#g-misi').innerHTML = MISI.map((x) => {
       const ok = !!m[x.id], sub = x.subTampil();
       const aksi = ok ? '<span class="g-misi__stempel"><svg aria-hidden="true"><use href="#i-check"/></svg>Selesai</span>'
@@ -315,7 +327,8 @@
       const e = (t) => String(t || '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
       return `<li class="${ok ? 'is-ok' : ''}${baru === x.id ? ' is-baru' : ''}"><span class="ico ${ok ? 'ico--dana' : 'ico--info'}" aria-hidden="true"><svg><use href="#${x.ikon}"/></svg></span><span class="menu-list__txt"><strong>${e(x.judul)}</strong><small>${e(sub)}</small></span>${aksi}</li>`;
     }).join('');
-    if (baru) { S.aman(); toast('Misi selesai! Lencana didapat.'); }
+    if (baru) { S.aman(); toast(n % PER_PETI === 0 ? 'Misi selesai! 🎁 Peti Equipment terbuka: +1 Racun, +1 Gempa, +1 Petir!' : `Misi selesai! ${PER_PETI - dalam} misi lagi untuk Peti Equipment.`); }
+    tulisBekal(monApi && monApi.bekal);
   }
   $('#g-misi').addEventListener('click', (e) => {
     const b = e.target.closest('[data-misi]'); if (!b) return;
@@ -325,7 +338,28 @@
     if (x.jenis === 'ingat') { if (target) $('#g-ingat').click(); else toast('Jadwal bos belum diumumkan. Coba lagi nanti.'); }
     if (x.jenis === 'bagi') bagikan('Main game Lawan Raja Batu di YCS 2026, kalahkan bos sebelum live dan dapat kode undian HP:', id);
   });
+  /* ---------- tas pejuang: nyawa & potion (jumlah dari server) ---------- */
+  function tulisBekal(b) {
+    const P = window.YCSPotion; if (!P) return;
+    const hp = (b && b.hpMaks) || 5;
+    $('#g-tas-nyawa').innerHTML = Array.from({ length: hp }, () => '<svg aria-hidden="true"><use href="#i-heart"/></svg>').join('') + `<span>Nyawa ${hp}</span>`;
+    $('#g-tas-nyawa').setAttribute('aria-label', `Nyawa karakter ${hp}`);
+    $('#g-tas-pot').innerHTML = P.URUT.map((j) => { const n = b && b.sisa ? b.sisa[j] || 0 : 0, d = P.DATA[j];
+      return `<li class="${n ? '' : 'is-kosong'}">${P.ikon(j)}<b>x${n}</b><strong>${d.nama}</strong><small>= ${d.tap} tap</small></li>`; }).join('');
+    const idt = baca('ycs_identitas');
+    $('#g-tas-info').textContent = !(idt && (idt.email || idt.wa)) && !uji ? 'Gabung Festival Satu Kata dulu supaya potion bisa diklaim ke karaktermu.'
+      : b && b.peti ? 'Potion siap dipakai saat Raja Batu muncul. Ketuk botolnya di sisi kiri arena.' : 'Belum punya potion. Selesaikan misi di bawah untuk membuka Peti Equipment.';
+  }
+  function sorotMisi() { const el = $('#misi'); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); el.classList.remove('is-sorot'); void el.offsetWidth; el.classList.add('is-sorot'); } }
   syncMisi();
+  tulisBekal(null);
+
+  /* ---------- papan hadiah (nominal Top dari pengaturan admin monster_hadiah_top) ---------- */
+  function tulisPapan() {
+    const h = (stMon && stMon.hadiahTop) || [100000, 100000, 50000];
+    const urut = ['Hit terbanyak', 'Hit terbanyak ke-2', 'Hit terbanyak ke-3', 'Hit terbanyak ke-4', 'Hit terbanyak ke-5'];
+    $('#g-papan-top').innerHTML = h.map((n, i) => `<li><span class="g-papan__medali g-papan__medali--${Math.min(i + 1, 3)}">${i + 1}</span><div><strong>Top ${i + 1} Kontributor</strong><small>${urut[i]}</small></div><b>Rp${nf.format(n)}</b></li>`).join('');
+  }
 
   /* ---------- pemenang ---------- */
   async function muatJuara() {

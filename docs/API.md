@@ -102,3 +102,10 @@ Field di luar daftar dibuang server. Aturan validasi (panjang, format email, kat
 - Pengaturan `monster_hadiah_top` (Rp per peringkat, mis. `100000,50000,50000`) + `monster_hadiah_top_syarat` (`selalu`/`menang`). Saat event selesai server menetapkan Top N dari tenaga terbanyak → tab **Top Kontributor** (kontak untuk panitia) dan `status.top` (nama disingkat, tenaga, nominal).
 - `POST /api/monster {aksi:'saya', token, e}` kini juga mengembalikan `peringkat`, `pemain`, `top` (untuk riwayat match di HP pemain).
 - `GET /api/misi` → daftar misi lobi; admin `misi-info` / `misi-atur {misi:[{id?, judul, sub, jenis: gabung|latihan|ingat|bagi|link, link}]}`; admin `top-info {event}`.
+
+### Equipment / potion (Misi Pejuang → Lawan Monster)
+`POST /api/monster` (butuh `token` dari `masuk`):
+- `{aksi: "misi", token, misi: ["gabung", "wa", ...], uji?}` → klaim misi yang selesai di HP. Hanya id yang ada di daftar misi yang dihitung. Respons `{ok, baru, bekal}`.
+- `{aksi: "potion", token, jenis: "racun"|"gempa"|"petir", rid, e, uji?}` → pakai potion saat event aktif. Tenaga = tap × poin level (racun 50, gempa 150, petir 200). `rid` membuat kirim ulang tidak terpakai dua kali. Galat: `potion_habis`, `bukan_waktunya`, `tumbang` (409).
+- `bekal` = `{misi, totalMisi, perPeti: 5, peti, sisa: {racun, gempa, petir}, tap, hpMaks, selesai}`. Tiap 5 misi = 1 peti = 1 potion tiap jenis. Ikut juga di respons `saya`.
+- `GET /api/monster` kini selalu menyertakan `hadiahTop` (nominal Top kontributor dari `monster_hadiah_top`) bila diatur, untuk papan hadiah lobi.

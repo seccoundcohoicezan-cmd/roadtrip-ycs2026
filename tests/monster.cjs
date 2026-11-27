@@ -467,3 +467,26 @@ test('top kontributor dapat hadiah otomatis saat event selesai; peringkat & hadi
   const mi = m.admin({token, aksi: 'misi-atur', misi: [{judul: 'Follow IG YCS', sub: '@ycs', jenis: 'link', link: 'https://instagram.com/x'}, {id: 'latihan', jenis: 'latihan', judul: 'Latihan dulu'}]});
   assert.equal(mi.misi.length, 2); assert.equal(m.misiPublik().misi[0].judul, 'Follow IG YCS');
 });
+
+test('equipment: 5 misi = 1 peti (racun/gempa/petir), potion menambah tenaga di server, tidak bisa dipakai dua kali', () => {
+  const {m} = siapkanMonster('2000,5000');
+  const tok = m.masuk({perangkat: 'dev-potion-aaaaaaaaa', email: 'cici@mail.com'}, '1.1.1.9').token;
+  const id = m.lihat().id;
+  // misi belum lengkap → belum ada potion; id misi asing diabaikan
+  let r = m.klaimMisi({token: tok, misi: ['gabung', 'wa', 'palsu', 'latihan']});
+  assert.equal(r.ok, true); assert.equal(r.bekal.misi, 3); assert.equal(r.bekal.peti, 0); assert.deepEqual(r.bekal.sisa, {racun: 0, gempa: 0, petir: 0});
+  assert.equal(m.pakaiPotion({token: tok, jenis: 'petir', rid: 'rid-00000001', e: id}).error, 'potion_habis');
+  r = m.klaimMisi({token: tok, misi: ['ingat', 'bagi', 'gabung']});
+  assert.equal(r.baru, 2); assert.equal(r.bekal.peti, 1); assert.deepEqual(r.bekal.sisa, {racun: 1, gempa: 1, petir: 1});
+  assert.equal(m.saya({token: tok}).bekal.sisa.petir, 1, 'bekal ikut di respons saya');
+  // petir = 200 tap x poin level 1
+  const p1 = m.pakaiPotion({token: tok, jenis: 'petir', rid: 'rid-00000002', e: id});
+  assert.equal(p1.ok, true); assert.equal(p1.pts, 200); assert.equal(p1.saya, 200); assert.equal(p1.bekal.sisa.petir, 0);
+  assert.equal(m.pakaiPotion({token: tok, jenis: 'petir', rid: 'rid-00000002', e: id}).dup, true, 'kirim ulang rid sama tidak memotong dua kali');
+  assert.equal(m.pakaiPotion({token: tok, jenis: 'petir', rid: 'rid-00000003', e: id}).error, 'potion_habis');
+  assert.equal(m.pakaiPotion({token: tok, jenis: 'gempa', rid: 'rid-00000004', e: id}).pts, 150);
+  assert.equal(m.pakaiPotion({token: tok, jenis: 'racun', rid: 'rid-00000005', e: id}).saya, 400);
+  assert.equal(m.pakaiPotion({token: tok, jenis: 'api', rid: 'rid-00000006', e: id}).error, 'validation');
+  assert.equal(m.pakaiPotion({token: 'x.y', jenis: 'racun', rid: 'rid-00000007', e: id}).error, 'sesi_habis');
+  assert.equal(m.pakaiPotion({token: tok, jenis: 'racun', rid: 'rid-00000008', e: 'event-lain'}).error, 'bukan_waktunya');
+});

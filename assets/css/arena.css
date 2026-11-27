@@ -149,3 +149,21 @@
 .mon__top-list li small { grid-column: 2; color: var(--text-2); font-size: var(--fs-xs); }
 .mon__top-list li span { grid-row: 1 / span 2; grid-column: 3; font-weight: 800; color: var(--green-600); }
 .mon__top-list li b { grid-row: 1 / span 2; color: var(--blue-600); }
+
+/* ===== Potion (tas pejuang) di arena: kolom tombol botol di sisi kanan, jumlah di lencana ===== */
+.mon__tas { position: absolute; left: var(--space-2); top: 50%; z-index: 3; display: grid; gap: 6px; justify-items: center; transform: translateY(-50%); pointer-events: auto; }
+.mon__tas[hidden] { display: none; }
+.mon__tas-judul { padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--navy-950) 70%, transparent); color: var(--white); font: 800 10px/1.4 var(--font-sans); letter-spacing: .06em; text-transform: uppercase; }
+.mon__pot { position: relative; display: grid; justify-items: center; width: 58px; padding: 6px 0 4px; border: 0; border-radius: 16px; background: color-mix(in srgb, var(--navy-950) 72%, transparent); color: var(--white); cursor: pointer; box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--white) 22%, transparent), var(--e2); transition: transform .12s; }
+.mon__pot:active { transform: scale(.92); }
+.mon__pot svg { width: 34px; height: 34px; filter: drop-shadow(0 2px 6px rgba(0,0,0,.4)); }
+.mon__pot small { font: 800 10px/1.2 var(--font-sans); }
+.mon__pot b { position: absolute; top: -4px; right: -4px; min-width: 22px; height: 22px; padding: 0 5px; border-radius: 999px; background: var(--sun-400); color: var(--navy-950); font: 900 12px/22px var(--font-sans); text-align: center; box-shadow: 0 0 0 2px var(--navy-950); }
+.mon__pot--racun:not(.is-kosong) { box-shadow: inset 0 0 0 2px #3DDC4A, 0 0 14px -2px #3DDC4A; }
+.mon__pot--gempa:not(.is-kosong) { box-shadow: inset 0 0 0 2px #FF9A3C, 0 0 14px -2px #FF9A3C; }
+.mon__pot--petir:not(.is-kosong) { box-shadow: inset 0 0 0 2px #FFE14D, 0 0 14px -2px #FFE14D; animation: pot-kilau 1.4s ease-in-out infinite; }
+.mon__pot.is-kosong { opacity: .55; }
+.mon__pot.is-kosong svg { filter: grayscale(1); }
+.mon__pot.is-kosong b { background: #9aa3b5; }
+@keyframes pot-kilau { 50% { box-shadow: inset 0 0 0 2px #FFE14D, 0 0 22px 2px #FFE14D; } }
+@media (prefers-reduced-motion: reduce) { .mon__pot--petir { animation: none !important; } }
