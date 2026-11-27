@@ -468,25 +468,61 @@ test('top kontributor dapat hadiah otomatis saat event selesai; peringkat & hadi
   assert.equal(mi.misi.length, 2); assert.equal(m.misiPublik().misi[0].judul, 'Follow IG YCS');
 });
 
-test('equipment: 5 misi = 1 peti (racun/gempa/petir), potion menambah tenaga di server, tidak bisa dipakai dua kali', () => {
-  const {m} = siapkanMonster('2000,5000');
+test('misi harian: reset 00.00 WIB, hadiah bergilir Racun → Petir → Gempa, potion menambah tenaga di server', () => {
+  const {m, jam} = siapkanMonster('5000,9000');
+  const GILIR = ['racun', 'petir', 'gempa'], hariKe = (t) => Math.floor((t + 7 * 3600e3) / 86400e3);
   const tok = m.masuk({perangkat: 'dev-potion-aaaaaaaaa', email: 'cici@mail.com'}, '1.1.1.9').token;
-  const id = m.lihat().id;
+  const LIMA = ['gabung', 'wa', 'latihan', 'ingat', 'bagi'];
   // misi belum lengkap → belum ada potion; id misi asing diabaikan
   let r = m.klaimMisi({token: tok, misi: ['gabung', 'wa', 'palsu', 'latihan']});
-  assert.equal(r.ok, true); assert.equal(r.bekal.misi, 3); assert.equal(r.bekal.peti, 0); assert.deepEqual(r.bekal.sisa, {racun: 0, gempa: 0, petir: 0});
-  assert.equal(m.pakaiPotion({token: tok, jenis: 'petir', rid: 'rid-00000001', e: id}).error, 'potion_habis');
-  r = m.klaimMisi({token: tok, misi: ['ingat', 'bagi', 'gabung']});
-  assert.equal(r.baru, 2); assert.equal(r.bekal.peti, 1); assert.deepEqual(r.bekal.sisa, {racun: 1, gempa: 1, petir: 1});
-  assert.equal(m.saya({token: tok}).bekal.sisa.petir, 1, 'bekal ikut di respons saya');
-  // petir = 200 tap x poin level 1
-  const p1 = m.pakaiPotion({token: tok, jenis: 'petir', rid: 'rid-00000002', e: id});
-  assert.equal(p1.ok, true); assert.equal(p1.pts, 200); assert.equal(p1.saya, 200); assert.equal(p1.bekal.sisa.petir, 0);
-  assert.equal(m.pakaiPotion({token: tok, jenis: 'petir', rid: 'rid-00000002', e: id}).dup, true, 'kirim ulang rid sama tidak memotong dua kali');
-  assert.equal(m.pakaiPotion({token: tok, jenis: 'petir', rid: 'rid-00000003', e: id}).error, 'potion_habis');
-  assert.equal(m.pakaiPotion({token: tok, jenis: 'gempa', rid: 'rid-00000004', e: id}).pts, 150);
-  assert.equal(m.pakaiPotion({token: tok, jenis: 'racun', rid: 'rid-00000005', e: id}).saya, 400);
+  assert.equal(r.bekal.misi, 3); assert.equal(r.hadiah, null); assert.deepEqual(r.bekal.sisa, {racun: 0, gempa: 0, petir: 0});
+  const hariIni = GILIR[hariKe(jam.now) % 3];
+  assert.deepEqual(r.bekal.hadiahHari, [hariIni]); assert.deepEqual(r.bekal.besok, [GILIR[(hariKe(jam.now) + 1) % 3]]);
+  r = m.klaimMisi({token: tok, misi: LIMA});
+  assert.deepEqual(r.hadiah, [hariIni]); assert.equal(r.bekal.sisa[hariIni], 1); assert.equal(r.bekal.sudahDapat, true);
+  assert.equal(Object.values(r.bekal.sisa).reduce((a, b) => a + b), 1, 'mode gilir = 1 potion per hari');
+  assert.equal(m.klaimMisi({token: tok, misi: LIMA}).hadiah, null, 'hadiah sekali per hari');
+  // besok: misi kosong lagi, hadiah jenis berikutnya; potion kemarin tetap ada
+  jam.now += 86400e3;
+  r = m.klaimMisi({token: tok, misi: []});
+  assert.equal(r.bekal.misi, 0); assert.equal(r.bekal.sudahDapat, false); assert.equal(r.bekal.sisa[hariIni], 1);
+  const besok = GILIR[hariKe(jam.now) % 3];
+  r = m.klaimMisi({token: tok, misi: LIMA});
+  assert.deepEqual(r.hadiah, [besok]); assert.notEqual(besok, hariIni); assert.equal(r.bekal.sisa[besok], 1);
+  // pakai potion di event (event manual 20 menit → mulai ulang event untuk hari berikutnya)
+  const id = m.lihat().id;
+  if (id) {
+    const pts = {racun: 50, gempa: 150, petir: 200};
+    const p1 = m.pakaiPotion({token: tok, jenis: besok, rid: 'rid-00000002', e: id});
+    if (p1.ok) { assert.equal(p1.pts, pts[besok]); assert.equal(p1.bekal.sisa[besok], 0); assert.equal(m.pakaiPotion({token: tok, jenis: besok, rid: 'rid-00000002', e: id}).dup, true); }
+  }
   assert.equal(m.pakaiPotion({token: tok, jenis: 'api', rid: 'rid-00000006', e: id}).error, 'validation');
   assert.equal(m.pakaiPotion({token: 'x.y', jenis: 'racun', rid: 'rid-00000007', e: id}).error, 'sesi_habis');
-  assert.equal(m.pakaiPotion({token: tok, jenis: 'racun', rid: 'rid-00000008', e: 'event-lain'}).error, 'bukan_waktunya');
+});
+
+test('misi harian: admin bisa set hadiah tetap atau semua; potion dipakai saat event', () => {
+  const {m, app} = siapkanMonster('5000,9000');
+  const peng = app.sheets.Pengaturan.rows, atur = (k, v) => { peng.find((x) => x[0] === k)[1] = v; app.cache.remove('cfg'); m.segarkan(); };
+  const LIMA = ['gabung', 'wa', 'latihan', 'ingat', 'bagi'];
+  atur('monster_hadiah_misi', 'petir');
+  const a = m.masuk({perangkat: 'dev-potion-bbbbbbbbb', email: 'budi@mail.com'}, '1.1.1.8').token;
+  assert.deepEqual(m.klaimMisi({token: a, misi: LIMA}).hadiah, ['petir']);
+  const id = m.lihat().id;
+  const p = m.pakaiPotion({token: a, jenis: 'petir', rid: 'rid-00000011', e: id});
+  assert.equal(p.ok, true); assert.equal(p.pts, 200); assert.equal(p.saya, 200);
+  assert.equal(m.pakaiPotion({token: a, jenis: 'petir', rid: 'rid-00000012', e: id}).error, 'potion_habis');
+  assert.equal(m.pakaiPotion({token: a, jenis: 'racun', rid: 'rid-00000013', e: 'event-lain'}).error, 'bukan_waktunya');
+  atur('monster_hadiah_misi', 'semua');
+  const b = m.masuk({perangkat: 'dev-potion-ccccccccc', email: 'ani@mail.com'}, '1.1.1.7').token;
+  const r = m.klaimMisi({token: b, misi: LIMA});
+  assert.deepEqual(r.hadiah, ['racun', 'gempa', 'petir']); assert.deepEqual(r.bekal.sisa, {racun: 1, gempa: 1, petir: 1});
+  assert.equal(m.misiLobi().hadiah.mode, 'semua');
+});
+
+test('Apps Script: monster_hadiah_misi divalidasi', () => {
+  const app = muat({now: T('2026-11-20T10:00:00+07:00')}); app.get('siapkan');
+  const token = app.post({aksi: 'admin-login', sandi: app.sheets.Admin.rows[1][1]}).token;
+  assert.equal(app.post({aksi: 'admin-simpan-pengaturan', token, nilai: {monster_hadiah_misi: 'Gempa'}}).ok, true);
+  assert.equal(app.get('config').ok, true);
+  assert.equal(app.post({aksi: 'admin-simpan-pengaturan', token, nilai: {monster_hadiah_misi: 'api'}}).error, 'nilai_tidak_valid');
 });

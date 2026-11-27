@@ -376,32 +376,65 @@ function buatMonster(app, opsi = {}) {
     return nomor;
   }
 
-  /* ---------- Equipment dari Misi Pejuang ---------- */
-  // Tiap MISI_PER_PETI misi selesai = 1 peti equipment berisi 1 potion tiap jenis. Potion = tap instan (dikali poin level),
-  // dicatat & dibatasi di server (tidak bisa dipalsukan dari HP). Misi yang dihitung hanya yang ada di daftar misi saat ini.
+  /* ---------- Equipment dari Misi Pejuang (misi harian) ---------- */
+  // Misi direset tiap hari (00.00 WIB). Menyelesaikan semua misi hari itu (maks MISI_PER_PETI) = hadiah potion hari itu:
+  // mode "gilir" (bawaan) bergantian tiap hari Racun → Petir → Gempa; "racun"/"petir"/"gempa" = tetap; "semua" = 1 tiap jenis.
+  // Mode diatur admin (monster_hadiah_misi). Potion = tap instan (dikali poin level), dicatat & dibatasi di server.
   const POTION = {racun: 50, gempa: 150, petir: 200};
+  const GILIR = ['racun', 'petir', 'gempa'];
   const MISI_PER_PETI = 5;
-  const bekalDari = (kunci) => (st.bekal[kunci] = st.bekal[kunci] || {misi: {}, pakai: {}, rid: []});
+  const WIB = 7 * 3600e3, HARI = 86400e3;
+  const noHari = (t) => Math.floor((t + WIB) / HARI);
+  const tglHari = (t) => new Date(t + WIB).toISOString().slice(0, 10);
+  function hadiahHari(t) {
+    const mode = String((cfg().monster || {}).hadiahMisi || 'gilir').toLowerCase();
+    if (mode === 'semua') return ['racun', 'gempa', 'petir'];
+    if (POTION[mode]) return [mode];
+    return [GILIR[((noHari(t) % 3) + 3) % 3]];
+  }
+  const modeHadiah = () => { const m = String((cfg().monster || {}).hadiahMisi || 'gilir').toLowerCase(); return m === 'semua' || POTION[m] ? m : 'gilir'; };
+  function bekalDari(kunci) {
+    const t = now(), hari = tglHari(t);
+    let b = st.bekal[kunci];
+    if (!b) b = st.bekal[kunci] = {hari, misi: {}, dapat: {}, pakai: {}, hariDapat: {}, rid: []};
+    if (!b.dapat) { // data versi lama (peti per 5 misi, tanpa reset harian): potion yang sudah didapat tetap dimiliki
+      const ids = misiPublik().misi.map((x) => x.id), lama = Math.floor(ids.filter((id) => (b.misi || {})[id]).length / MISI_PER_PETI);
+      b.dapat = {}; Object.keys(POTION).forEach((j) => { b.dapat[j] = lama; });
+      b.hariDapat = lama ? {[hari]: Object.keys(POTION)} : {}; b.hari = hari; b.misi = b.misi || {}; b.pakai = b.pakai || {}; b.rid = b.rid || [];
+    }
+    if (b.hari !== hari) { b.hari = hari; b.misi = {}; } // reset harian
+    return b;
+  }
   function bekalPublik(kunci) {
     if (!kunci) return null;
-    const b = st.bekal[kunci] || {misi: {}, pakai: {}};
-    const ids = misiPublik().misi.map((x) => x.id), selesai = ids.filter((id) => b.misi[id]).length;
-    const peti = Math.floor(selesai / MISI_PER_PETI), sisa = {};
-    Object.keys(POTION).forEach((j) => { sisa[j] = Math.max(0, peti - ((b.pakai || {})[j] || 0)); });
+    const b = bekalDari(kunci), t = now();
+    const ids = misiPublik().misi.map((x) => x.id), selesai = ids.filter((id) => b.misi[id]), target = Math.max(1, Math.min(MISI_PER_PETI, ids.length));
+    const sisa = {}; let peti = 0;
+    Object.keys(POTION).forEach((j) => { sisa[j] = Math.max(0, (b.dapat[j] || 0) - (b.pakai[j] || 0)); peti += b.dapat[j] || 0; });
     const c = cfg();
-    return {misi: selesai, totalMisi: ids.length, perPeti: MISI_PER_PETI, peti, sisa, tap: POTION, hpMaks: hpMaksDari(mUntuk(c, jadwal(c, now()))), selesai: Object.keys(b.misi).filter((id) => ids.includes(id))};
+    return {misi: selesai.length, totalMisi: ids.length, perPeti: target, peti, sisa, tap: POTION, hpMaks: hpMaksDari(mUntuk(c, jadwal(c, t))), selesai,
+      hari: b.hari, hadiahHari: hadiahHari(t), sudahDapat: !!b.hariDapat[b.hari], mode: modeHadiah(), besok: hadiahHari(t + HARI), reset: (noHari(t) + 1) * HARI - WIB};
   }
   function klaimMisi(p) {
     const pid = cekToken(p.token);
     if (!pid) return {ok: false, error: 'sesi_habis'};
     const kunci = kunciPemain(pid);
     if (!kunci) return {ok: false, error: 'sesi_habis'};
-    const ids = new Set(misiPublik().misi.map((x) => x.id)), daftar = Array.isArray(p.misi) ? p.misi.slice(0, 20) : [];
-    const b = bekalDari(kunci); let baru = 0;
+    const daftarId = misiPublik().misi.map((x) => x.id), ids = new Set(daftarId), daftar = Array.isArray(p.misi) ? p.misi.slice(0, 20) : [];
+    const b = bekalDari(kunci); let baru = 0, hadiah = null;
     daftar.forEach((id) => { if (typeof id === 'string' && ids.has(id) && !b.misi[id]) { b.misi[id] = now(); baru++; } });
-    if (baru) ubah();
-    return {ok: true, baru, bekal: bekalPublik(kunci)};
+    const target = Math.max(1, Math.min(MISI_PER_PETI, daftarId.length));
+    if (daftarId.filter((id) => b.misi[id]).length >= target && !b.hariDapat[b.hari]) {
+      hadiah = hadiahHari(now());
+      hadiah.forEach((j) => { b.dapat[j] = (b.dapat[j] || 0) + 1; });
+      b.hariDapat[b.hari] = hadiah;
+      const hari = Object.keys(b.hariDapat).sort(); while (hari.length > 14) delete b.hariDapat[hari.shift()];
+    }
+    if (baru || hadiah) ubah();
+    return {ok: true, baru, hadiah, bekal: bekalPublik(kunci)};
   }
+  // Info publik hadiah misi (lobi tanpa login): mode, hadiah hari ini & besok, waktu reset.
+  const hadiahMisiPublik = () => { const t = now(); return {mode: modeHadiah(), hariIni: hadiahHari(t), besok: hadiahHari(t + HARI), reset: (noHari(t) + 1) * HARI - WIB, perPeti: MISI_PER_PETI}; };
   function pakaiPotion(p) {
     const pid = cekToken(p.token);
     if (!pid) return {ok: false, error: 'sesi_habis'};
@@ -729,6 +762,7 @@ function buatMonster(app, opsi = {}) {
   ];
   const JENIS_MISI = ['gabung', 'latihan', 'ingat', 'bagi', 'link'];
   const misiPublik = () => ({ok: true, misi: (st.misi && st.misi.length ? st.misi : MISI_BAWAAN)});
+  const misiLobi = () => ({...misiPublik(), hadiah: hadiahMisiPublik()});
   function aturMisi(p) {
     const daftar = Array.isArray(p.misi) ? p.misi : [];
     if (daftar.length > 12) return {ok: false, error: 'validation'};
@@ -804,7 +838,7 @@ function buatMonster(app, opsi = {}) {
     return {ok: true, pemenang: [...out, ...undian].reverse().slice(0, 60)};
   }
 
-  return {lihat, masuk, tap, hindar, saya, klaimMisi, pakaiPotion, bekalPublik, admin, pemenangPublik, misiPublik, state: st, jadwal, jenisJurus, segarkan: () => { memo.t = 0; }};
+  return {lihat, masuk, tap, hindar, saya, klaimMisi, pakaiPotion, bekalPublik, admin, pemenangPublik, misiPublik, misiLobi, state: st, jadwal, jenisJurus, segarkan: () => { memo.t = 0; }};
 }
 
 module.exports = {buatMonster, jadwal, PASCA, MENIT};

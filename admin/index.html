@@ -493,6 +493,7 @@
               <div class="set-grid">
                 <div class="field"><label for="m-monster_hadiah_top">Nominal hadiah per peringkat (Rp)</label><input class="input" id="m-monster_hadiah_top" data-key="monster_hadiah_top" inputmode="numeric" placeholder="100000,50000,50000"><p class="field__hint">Urut Top 1, Top 2, Top 3, … dipisah koma (maks 5). Kosongkan untuk mematikan.</p></div>
                 <div class="field"><label for="m-monster_hadiah_top_syarat">Syarat</label><select class="select" id="m-monster_hadiah_top_syarat" data-key="monster_hadiah_top_syarat"><option value="selalu">Selalu (walau bos tidak tumbang)</option><option value="menang">Hanya bila bos tumbang</option></select></div>
+                <div class="field"><label for="m-monster_hadiah_misi">Hadiah Misi Pejuang harian</label><select class="select" id="m-monster_hadiah_misi" data-key="monster_hadiah_misi"><option value="gilir">Bergilir tiap hari: Racun → Petir → Gempa</option><option value="racun">Tetap: Racun (50 tap)</option><option value="petir">Tetap: Petir (200 tap)</option><option value="gempa">Tetap: Gempa (150 tap)</option><option value="semua">Semua: 1 Racun + 1 Gempa + 1 Petir</option></select><p class="field__hint">Misi direset tiap hari 00.00 WIB. Hadiah diberikan sekali per hari setelah 5 misi selesai.</p></div>
               </div>
             </section>
             <div class="savebar"><p id="mon-set-status" role="status">Tidak ada perubahan.</p><button class="btn btn--cta btn--sm" type="submit" id="btn-simpan-mon">Simpan pengaturan monster</button></div>
