@@ -124,6 +124,9 @@ dialog.latihan::backdrop { background: var(--navy-950); }
 .lt-hasil__skor span { font-size: var(--fs-xs); font-weight: 800; letter-spacing: var(--ls-over); text-transform: uppercase; color: var(--blue-600); }
 .lt-hasil__skor b { font-size: var(--fs-display); line-height: var(--lh-display); font-weight: 800; font-variant-numeric: tabular-nums; }
 .lt-hasil__sub { color: var(--ink-2); }
+.lt-ajak { display: grid; gap: var(--space-2); width: 100%; padding: var(--space-3); border-radius: var(--r-lg); background: linear-gradient(135deg, #7A0F1E, #B3122E); color: var(--white); font-size: var(--fs-sm); text-align: left; }
+.lt-ajak b { color: var(--sun-400); }
+.lt-ajak .btn { --btn-bg: var(--white); --btn-fg: #9E1028; --btn-shadow: none; font-weight: 800; }
 .lt-hasil__aksi { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); width: 100%; margin-top: var(--space-2); }
 .lt-hasil__aksi .btn--block { grid-column: 1 / -1; }
 .lt-keluar { --btn-bg: var(--surface-sunk); --btn-fg: var(--navy-900); }

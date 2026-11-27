@@ -262,7 +262,12 @@
   });
 
   /* ---------- latihan ---------- */
-  const latihan = window.YCSLatihan.buat($('#latihan'), { saatSelesai: () => { tandaiMisi('latihan'); } });
+  const latihan = window.YCSLatihan.buat($('#latihan'), {
+    saatSelesai: () => { tandaiMisi('latihan'); },
+    hadiahTop: () => (stMon && stMon.hadiahTop) || null,
+    // Ajakan "Lawan Raja Batu asli": kembali ke lobi (status & hitung mundur bos), atau langsung arena bila sedang bertanding.
+    saatAjak: () => { window.scrollTo({ top: 0, behavior: 'smooth' }); if (!(stMon && stMon.fase === 'tanding')) toast('Raja Batu asli muncul sebelum live. Pantau hitung mundurnya di sini!'); },
+  });
   $('#g-latihan').addEventListener('click', () => { S.klik(); latihan.buka(); });
   $('#lt-bagi').addEventListener('click', () => bagikan(`Skorku ${$('#lt-skor').textContent} lawan Raja Batu di game YCS 2026. Berani tanding? Kalahkan bos asli sebelum live dan dapat kode undian HP:`, 'bagi'));
   if (qs.get('main') === 'latihan') setTimeout(() => latihan.buka(), 400);

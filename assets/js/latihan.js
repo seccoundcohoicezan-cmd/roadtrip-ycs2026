@@ -6,7 +6,8 @@
   // Dibuat mudah dimenangkan (kampanye: orang harus merasa bisa). Penanda: ±4 tap/detik santai sudah cukup menang.
   const DURASI = 45, HP = 160, HATI = 5, JEDA_COMBO = 600, JEDA_MIN = 80, AWAS = 2400, SERANG = 1100, SERANG_METEOR = 2600; // JEDA_MIN: maks ±12 tap/detik dihitung (anti auto-klik)
   const gerakMinim = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const S = () => window.YCSSuara || { pukul() {}, kritis() {}, awas() {}, aman() {}, kena() {}, menang() {}, kalah() {}, klik() {} };
+  const kosong = () => {};
+  const S = () => window.YCSSuara || new Proxy({}, { get: () => kosong });
   const muat = (src) => { const i = new Image(); i.src = src; return i; };
   const aset = { latar: muat('/assets/img/festival/latar-900.webp'), lari: muat('/assets/img/monster/raja-lari.webp'), runtuh: muat('/assets/img/monster/raja-runtuh.webp'), api: muat('/assets/img/monster/raja-api.webp') };
   // Topeng alfa sprite: hanya tubuh Raja Batu yang bisa dipukul (bukan kotak di sekitarnya).
@@ -142,7 +143,10 @@
       const kali = Math.min(3, 1 + Math.floor(st.combo / 8) * 0.5) * (semangat ? 2 : 1), krit = Math.random() < 0.12;
       const d = Math.round((krit ? 3 : 1) * kali);
       st.hp = Math.max(0, st.hp - d); st.dmg += d; st.kilat = t; if (!gerakMinim) { st.getar = t; st.getarAmp = 0.7; }
-      if (krit) { st.kritis++; S().kritis(); teks('KRITIS -' + d, px, py, W8.sun, 26); } else { S().pukul(st.combo); teks('-' + d, px, py, W8.white, 20); }
+      const pan = (px / Math.max(1, W)) * 2 - 1;
+      S().tap(st.combo, pan); S().tapKena(0, st.combo, pan, true);
+      if (krit) { st.kritis++; S().kritis(); teks('KRITIS -' + d, px, py, W8.sun, 26); } else teks('-' + d, px, py, W8.white, Math.min(30, 20 + st.combo / 4));
+      if (st.combo % 10 === 0) { S().milestone(st.combo); teks(st.combo >= 50 ? `x${st.combo} GILA!` : st.combo >= 25 ? `x${st.combo} MANTAP!` : `x${st.combo} COMBO!`, W / 2, H * 0.3, W8.sun, 34); }
       $('#lt-combo').textContent = semangat ? `SEMANGAT! Serangan x${String(kali).replace('.', ',')}` : st.combo >= 5 ? `${st.combo} combo · x${String(kali).replace('.', ',')}` : '';
       if (st.hp <= 0) selesai(true);
     }
@@ -152,6 +156,37 @@
     function jadwalJurus(t, awal) {
       if (!awal && st.jurus !== 'meteor' && st.nJurus % 2 === 0) { st.tJurus = t + SERANG + 350; st.berikutMeteor = true; return; }
       st.berikutMeteor = false; st.tJurus = t + (awal ? 5000 : st.jurus === 'meteor' ? 5200 : 6500) + Math.random() * 2500;
+    }
+    // Suara jurus dijadwalkan sekali di awal ancang-ancang (jam audio) → bunyi tepat di detik benturan animasi:
+    // serang mulai setelah AWAS; kontak rig di 12% fase serang (hentak 10%); meteor: siul jatuh lalu ledakan per meteor.
+    function suaraJurus(t) {
+      // t = waktu frame (sedikit lebih awal dari sekarang); fase serang baru terlihat di frame sesudah awasSampai (±½ frame).
+      const s = S(), A = AWAS / 1000 + (t - performance.now()) / 1000 + 0.008;
+      if (!s.kumpulApi) return;
+      s.kumpulApi(0.3, Math.max(0.2, A - 0.3));
+      if (st.jurus === 'meteor') {
+        const D = SERANG_METEOR / 1000;
+        s.benturan('meteor', A + 0.07 * D);
+        (st.meteor || []).forEach((m, i) => {
+          const pan = (m.tx / Math.max(1, W)) * 2 - 1, kena = A + m.tl * D, jatuh = A + (m.tl - 0.13) * D;
+          if (i % 2 === 0) s.siulMeteor(jatuh, kena - jatuh, pan, Math.min(1.2, m.r));
+          s.ledakan(kena, 0.45 + 0.45 * m.r, pan);
+        });
+        return;
+      }
+      const D = SERANG / 1000, kontak = A + (st.jurus === 'hentak' ? 0.1 : 0.12) * D;
+      s.ayun(A - 0.05, kontak - A + 0.05, st.jurus === 'tebas');
+      s.benturan(st.jurus, kontak);
+      if (st.jurus !== 'tebas') s.ledakan(kontak, 0.6, 0);
+    }
+    // Hadiah Top kontributor event asli (dari admin: monster_hadiah_top) → ajakan di layar hasil latihan.
+    function teksHadiah() {
+      const h = (opsi.hadiahTop && opsi.hadiahTop()) || [];
+      const rp = (n) => 'Rp' + new Intl.NumberFormat('id-ID').format(n);
+      if (h.length >= 2 && h[0] === h[1]) return `Top 1 & 2 kontributor dapat ${rp(h[0])}`;
+      if (h.length >= 2) return `Top 1 dapat ${rp(h[0])} · Top 2 dapat ${rp(h[1])}`;
+      if (h.length === 1) return `Top 1 kontributor dapat ${rp(h[0])}`;
+      return 'Top 1 & 2 kontributor dapat Rp100.000';
     }
     function tombolJurus(meteor) {
       $('#lt-hindar').innerHTML = meteor ? '<svg aria-hidden="true"><use href="#i-shield"/></svg>PERISAI' : '<svg aria-hidden="true"><use href="#i-run"/></svg>HINDAR';
@@ -173,12 +208,14 @@
       $('#lt-hindar').hidden = true; $('#lt-awas').hidden = true; $('#lt-combo').textContent = '';
       const skor = menang ? st.dmg * 10 + Math.ceil(st.sisa) * 20 + st.hati * 100 + st.aman * 50 + st.comboMaks * 5 : st.dmg * 10 + st.aman * 50;
       let terbaik = 0; try { terbaik = Number(localStorage.getItem('ycs_latihan_best') || 0); if (skor > terbaik) localStorage.setItem('ycs_latihan_best', String(skor)); localStorage.setItem('ycs_latihan_main', String(Number(localStorage.getItem('ycs_latihan_main') || 0) + 1)); } catch (e) {}
+      S().musikBerhenti && S().musikBerhenti(0.6);
       if (menang) { S().menang(); for (let i = 0; i < 90; i++) st.konfeti.push({ x: W / 2, y: H * 0.45, vx: (Math.random() - 0.5) * 9, vy: -Math.random() * 9 - 3, r: Math.random() * 6.28, w: [W8.sun, W8.coral, W8.blue, W8.green, W8.violet][i % 5] }); } else S().kalah();
       setTimeout(() => {
         $('#lt-hasil-badge').textContent = menang ? 'Menang!' : st.hati <= 0 ? 'Kena jurus' : 'Waktu habis';
         $('#lt-hasil-judul').textContent = menang ? 'Raja Batu tumbang!' : 'Hampir! Coba lagi';
         $('#lt-skor').textContent = new Intl.NumberFormat('id-ID').format(skor);
         $('#lt-hasil-sub').textContent = `${st.dmg} serangan · combo terbaik ${st.comboMaks} · ${st.aman}× menghindar${skor > terbaik ? ' · rekor baru!' : ` · rekor ${new Intl.NumberFormat('id-ID').format(Math.max(terbaik, skor))}`}`;
+        $('#lt-ajak-hadiah').textContent = teksHadiah();
         $('#lt-hasil').hidden = false; $('#lt-lagi').focus();
         opsi.saatSelesai && opsi.saatSelesai({ menang, skor, rekor: skor > terbaik });
       }, menang ? 1400 : 700);
@@ -215,6 +252,7 @@
         if (t - st.mulai > 3000) { st.fase = 'main'; st.t0 = t; jadwalJurus(t, true); m.textContent = ''; m.classList.remove('is-pop'); dlg.classList.add('is-main'); }
       } else if (st.fase === 'main') {
         st.sisa = Math.max(0, DURASI - (t - st.t0) / 1000);
+        if (S().intensitas) S().intensitas(st.sisa <= 15 ? 0.9 : 0.3 + 0.4 * (1 - st.hp / HP));
         $('#lt-waktu').textContent = Math.ceil(st.sisa);
         if (!st.awasSampai && !sedangSerang(t)) { st.posX += st.arah * 0.12 * f / 60 * 1; if (st.posX > 0.72 || st.posX < 0.28) st.arah = st.posX > 0.72 ? -1 : 1; }
         if (!st.awasSampai && t > st.tJurus) {
@@ -228,6 +266,7 @@
           tombolJurus(st.jurus === 'meteor');
           if (st.jurus === 'meteor') { const kb = bos(); st.meteor = R ? R.hujan(t, gerakMinim ? 8 : 30, { x0: W * 0.03, x1: W * 0.97, y0: kb.kaki - H * 0.12, y1: H * 0.98 }, [[W * 0.5, H * 0.93], [W * 0.3, H * 0.9], [W * 0.72, H * 0.95]]) : []; }
           $('#lt-awas').hidden = false; $('#lt-hindar').hidden = false; S().awas();
+          suaraJurus(t);
         }
         if (st.awasSampai && t > st.awasSampai) {
           // jurus sasaran: kena saat benturan; meteor: kena saat meteor pertama menghantam (≈25% hujan)
@@ -321,6 +360,14 @@
       W8 = warna(); st = baru(); st.mulai = performance.now() + 250; dlg.classList.remove('is-main'); // jeda singkat: dialog selesai memudar dulu
       tombolJurus(false); $('#lt-hasil').hidden = true; $('#lt-waktu').textContent = DURASI; $('#lt-combo').textContent = ''; hati();
       cancelAnimationFrame(raf); ukur(); raf = requestAnimationFrame(gambar);
+      if (S().musikMulai) { if (musikSebelum === null) musikSebelum = S().ingin || false; S().musikMulai('latihan'); }
+    }
+    // Musik sebelum latihan (mis. pertempuran asli sedang berjalan) dipulihkan saat latihan ditutup.
+    let musikSebelum = null;
+    function pulihkanMusik() {
+      const s = S(); if (!s.musikMulai) return;
+      if (musikSebelum === 'perang') s.musikMulai('perang'); else if (s.ingin === 'latihan') s.musikBerhenti(0.5);
+      musikSebelum = null;
     }
     // Layar penuh saat mulai (gestur klik pemain). iPhone tanpa Fullscreen API: dialog sudah 100dvh.
     let kitaPenuh = false;
@@ -350,7 +397,8 @@
     $('#lt-tutup').addEventListener('click', tutup);
     $('#lt-keluar').addEventListener('click', tutup);
     $('#lt-lagi').addEventListener('click', () => { S().klik(); mulai(); });
-    dlg.addEventListener('close', () => { cancelAnimationFrame(raf); st = null; dlg.classList.remove('is-buka', 'is-main'); keluarPenuh(); });
+    dlg.addEventListener('close', () => { cancelAnimationFrame(raf); st = null; dlg.classList.remove('is-buka', 'is-main'); keluarPenuh(); pulihkanMusik(); });
+    $('#lt-asli').addEventListener('click', () => { S().klik(); tutup(); opsi.saatAjak && opsi.saatAjak(); });
     return { buka, tutup };
   }
   window.YCSLatihan = { buat };

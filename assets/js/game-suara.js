@@ -137,7 +137,9 @@
   /* ===================== Musik latar pertempuran (orisinal, prosedural) ===================== */
   // 96 BPM, D minor: Dm – Bb – C – A. Lapisan: genderang taiko, tom, drone senar rendah, ostinato senar, brass tiap 2 bar,
   // simbal naik di akhir frasa. intensitas 0..1 (nyawa bos menipis / jurus mendekat) menambah lapisan & volume.
-  const BPM = 96, S16 = 60 / BPM / 4, BAR = S16 * 16;
+  // Dua mode musik: 'perang' (event asli: orkestra perang gelap) dan 'latihan' (beat latihan cerah & bersemangat).
+  const BPM = 96, S16P = 60 / BPM / 4, S16L = 60 / 128 / 4;
+  let S16 = S16P, BAR = S16 * 16;
   const AKOR = [[50, 53, 57], [46, 50, 53], [48, 52, 55], [45, 49, 52]]; // MIDI: Dm, Bb, C, A
   const hz = (m) => 440 * Math.pow(2, (m - 69) / 12);
   const OSTI = [0, 0, 12, 0, 3, 0, 12, 0, 0, 0, 12, 0, 7, 5, 3, 2]; // relatif ke akar
@@ -160,32 +162,57 @@
     if (!musik) return;
     musik.drone.forEach((o, i) => o.frequency.setTargetAtTime(hz(akar - 24 + (i === 2 ? 7 : 0)) * (i === 1 ? 1.004 : 1), t, 0.08));
   }
+  // ---- latihan: 128 BPM, A mayor (A – E – F#m – D): kick 4/4, clap, hi-hat, bass, arpeggio petik, hook tiap 4 bar ----
+  const AKOR_L = [[57, 61, 64], [52, 56, 59], [54, 57, 61], [50, 54, 57]];
+  const HOOK = [12, null, 16, null, 19, null, 16, 14, 12, null, null, 9, 12, null, 14, null];
+  function kick(t, kuat) { osc(t, 'sine', 150, 0.09, 0.6 * kuat, { a: 0.001, r: 0.12, f2: 45, ke: busMusik }); }
+  function clap(t) { derau(t, 0.12, 0.16, { tipe: 'bandpass', f: 1500, q: 0.9, ke: busMusik }); derau(t + 0.012, 0.1, 0.1, { tipe: 'bandpass', f: 1800, q: 0.9, ke: busMusik }); }
+  function pluck(t, f, vol) {
+    const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.Q.value = 4; fl.frequency.setValueAtTime(3500, t); fl.frequency.exponentialRampToValueAtTime(500, t + 0.15);
+    osc(t, 'square', f, 0.05, vol, { a: 0.002, r: 0.1, filter: fl, ke: busMusik });
+  }
+  function langkahLatihan(n, t, s, bar, I) {
+    const akor = AKOR_L[bar % 4], semangat = I > 0.6;
+    if (s % 4 === 0) kick(t, s === 0 ? 1 : 0.85);
+    if (s === 4 || s === 12) clap(t);
+    if (s % 4 === 2 || (semangat && s % 2 === 1)) derau(t, 0.03, 0.05, { tipe: 'highpass', f: 8000, ke: busMusik });
+    if (s % 2 === 0) { const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = 500; osc(t, 'sawtooth', hz(akor[0] - 24), S16 * 1.6, 0.09, { a: 0.004, r: 0.04, filter: fl, ke: busMusik }); }
+    pluck(t, hz(akor[s % 3] + (s % 6 < 3 ? 0 : 12)), 0.03 + 0.015 * I);
+    if (bar % 4 >= 2 && HOOK[s] != null) osc(t, 'triangle', hz(akor[0] + HOOK[s]), S16 * 1.8, 0.05 + 0.02 * I, { a: 0.005, r: 0.08, ke: busMusik });
+    if (semangat && s === 0) derau(t, BAR, 0.05, { tipe: 'highpass', f: 1500, f2: 9000, a: BAR - 0.02, ke: busMusik }); // riser: 15 detik terakhir
+  }
+  function langkahPerang(n, t, s, bar, I) {
+    const akor = AKOR[bar % 4];
+    if (s === 0) aturDrone(akor[0], t);
+    if (TAIKO[s]) taiko(t, s === 0 ? 1 : 0.75);
+    if (TOM[s] && (I > 0.25 || bar % 2)) tom(t, s >= 12 ? 160 - (s - 12) * 15 : 140, 0.8);
+    senar(t, hz(akor[0] - 12 + OSTI[s]), S16 * 0.9, 0.045 + 0.03 * I);
+    if (I > 0.5) senar(t, hz(akor[0] + OSTI[s]), S16 * 0.8, 0.022 * I);
+    if (s === 0 && bar % 2 === 0) brass(t, akor, 0.06 + 0.05 * I);
+    if (I > 0.35 && s % 2 === 1) derau(t, 0.04, 0.03 * I, { tipe: 'highpass', f: 7000, ke: busMusik });
+    if (s === 8 && bar % 4 === 3) derau(t, BAR / 2, 0.06, { tipe: 'highpass', f: 3000, f2: 9000, a: BAR / 2 - 0.02, ke: busMusik });
+  }
   function jadwalMusik() {
     if (!musik || !ctx) return;
     const sampai = ctx.currentTime + 0.35;
     while (musik.tNext < sampai) {
-      const n = musik.langkah, t = musik.tNext, s = n % 16, bar = Math.floor(n / 16), akor = AKOR[bar % 4], I = musik.intens;
-      if (s === 0) aturDrone(akor[0], t);
-      if (TAIKO[s]) taiko(t, s === 0 ? 1 : 0.75);
-      if (TOM[s] && (I > 0.25 || bar % 2)) tom(t, s >= 12 ? 160 - (s - 12) * 15 : 140, 0.8);
-      senar(t, hz(akor[0] - 12 + OSTI[s]), S16 * 0.9, 0.045 + 0.03 * I);
-      if (I > 0.5) senar(t, hz(akor[0] + OSTI[s]), S16 * 0.8, 0.022 * I);
-      if (s === 0 && bar % 2 === 0) brass(t, akor, 0.06 + 0.05 * I);
-      if (I > 0.35 && s % 2 === 1) derau(t, 0.04, 0.03 * I, { tipe: 'highpass', f: 7000, ke: busMusik });
-      if (s === 8 && bar % 4 === 3) derau(t, BAR / 2, 0.06, { tipe: 'highpass', f: 3000, f2: 9000, a: BAR / 2 - 0.02, ke: busMusik });
+      const n = musik.langkah, t = musik.tNext, s = n % 16, bar = Math.floor(n / 16), I = musik.intens;
+      if (musik.mode === 'latihan') langkahLatihan(n, t, s, bar, I); else langkahPerang(n, t, s, bar, I);
       musik.langkah++; musik.tNext += S16;
     }
   }
   const VOL_MUSIK = 0.55;
-  function musikMulai() {
+  function musikMulai(mode = 'perang') {
+    if (musik && musik.mode !== mode) musikBerhenti(0.3);
     if (musik || !siap()) return;
     const t = ctx.currentTime;
-    const drone = [0, 1, 2].map((i) => {
+    S16 = mode === 'latihan' ? S16L : S16P; BAR = S16 * 16;
+    const drone = mode === 'latihan' ? [] : [0, 1, 2].map((i) => {
       const o = ctx.createOscillator(), g = ctx.createGain(), fl = ctx.createBiquadFilter();
       o.type = 'sawtooth'; o.frequency.value = hz(26 + (i === 2 ? 7 : 0)); fl.type = 'lowpass'; fl.frequency.value = 260; fl.Q.value = 1;
       g.gain.value = 0.07; o.connect(fl).connect(g).connect(busMusik); o.start(t); return o;
     });
-    musik = { langkah: 0, tNext: t + 0.1, drone, intens: musik ? musik.intens : 0.2 };
+    musik = { mode, langkah: 0, tNext: t + 0.1, drone, intens: 0.2 };
     busMusik.gain.cancelScheduledValues(t); busMusik.gain.setValueAtTime(busMusik.gain.value, t); busMusik.gain.linearRampToValueAtTime(VOL_MUSIK, t + 2.5);
     musik.timer = setInterval(jadwalMusik, 100);
     jadwalMusik();
@@ -207,7 +234,7 @@
     get nyala() { return nyala; },
     set nyala(v) {
       nyala = !!v; try { localStorage.setItem('ycs_suara', nyala ? '1' : '0'); } catch (e) {}
-      if (!nyala) { musikBerhenti(0.2); } else if (window.YCSSuara.ingin) musikMulai();
+      if (!nyala) { musikBerhenti(0.2); } else if (window.YCSSuara.ingin) musikMulai(window.YCSSuara.ingin);
     },
     get aktif() { return !!(ctx && ctx.state === 'running'); },
     pukul(combo = 1) { nada(260 + Math.min(combo, 12) * 22, 120, 90, 'square', 0.05); getar(8); },
@@ -219,13 +246,13 @@
     kalah() { [392, 330, 262].forEach((f, i) => nada(f, f * 0.9, 220, 'triangle', 0.06, i * 0.16)); getar(300); },
     klik() { nada(700, 500, 60, 'sine', 0.04); },
     // pertempuran
-    ingin: false, // true selama pertempuran berlangsung (musik mulai setelah sentuhan pertama — aturan autoplay browser)
-    musikMulai() { this.ingin = true; musikMulai(); },
+    ingin: false, // mode musik yang diinginkan ('perang' / 'latihan'); musik mulai setelah sentuhan pertama (aturan autoplay browser)
+    musikMulai(mode = 'perang') { this.ingin = mode; musikMulai(mode); },
     musikBerhenti(pelan) { this.ingin = false; musikBerhenti(pelan); },
     intensitas(v) { if (musik) musik.intens = Math.max(0, Math.min(1, v)); },
     kumpulApi, ayun, benturan, ledakan, siulMeteor, tap, tapKena, milestone,
   };
   // Browser hanya mengizinkan suara setelah interaksi: sentuhan pertama di halaman menyalakan musik bila pertempuran berlangsung.
-  const buka = () => { if (window.YCSSuara.ingin && nyala) musikMulai(); else if (nyala) siap(); };
+  const buka = () => { if (window.YCSSuara.ingin && nyala) musikMulai(window.YCSSuara.ingin); else if (nyala) siap(); };
   ['pointerdown', 'keydown'].forEach((ev) => window.addEventListener(ev, buka, { passive: true }));
 })();

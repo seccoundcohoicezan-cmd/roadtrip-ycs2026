@@ -151,8 +151,8 @@
     // Musik latar: menyala selama pertempuran, berhenti saat selesai; makin intens saat bos sekarat / jurus mendekat.
     function suaraFase() {
       const S = SU(); if (!S) return;
-      if (st && st.fase === 'tanding' && !akhir) { if (!S.ingin) S.musikMulai(); }
-      else if (S.ingin) S.musikBerhenti(2);
+      if (st && st.fase === 'tanding' && !akhir) { if (!S.ingin) S.musikMulai('perang'); } // saat latihan dibuka, musik latihan dibiarkan
+      else if (S.ingin === 'perang') S.musikBerhenti(2);
     }
     // Combo tap (candu): ketukan beruntun (jeda < 700 ms) menaikkan nada & angka; kelipatan 10 = perayaan kecil.
     let combo = 0, tCombo = 0, comboTampil = null;
@@ -957,7 +957,7 @@
         }
         opsi.saatMenang && opsi.saatMenang(st);
         catatHasil(st);
-        if (baruSaja && SU()) { SU().musikBerhenti(1.5); if (jenisAkhir === 'menang') SU().menang(); else SU().kalah(); }
+        if (baruSaja && SU() && SU().ingin !== 'latihan') { SU().musikBerhenti(1.5); if (jenisAkhir === 'menang') SU().menang(); else SU().kalah(); }
       }
       // Nyawa warga dari server (setelah jurus) → samakan jumlah warga tumbang.
       if (st.jurus && st.fase === 'tanding' && st.jurusKe !== jurusSinkron) {
