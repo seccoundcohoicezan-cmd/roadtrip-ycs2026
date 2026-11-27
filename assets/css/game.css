@@ -262,9 +262,6 @@ body.is-retak .g-tidur .badge { background: var(--coral-500); color: var(--white
 .lt-pot__b.is-kosong { opacity: .5; }
 .lt-pot__b.is-kosong svg { filter: grayscale(1); }
 .lt-pot__b.is-kosong b { background: #9aa3b5; }
-.lt-pot-ajak { position: absolute; z-index: 4; left: 12px; right: 12px; bottom: calc(7.25rem + env(safe-area-inset-bottom)); display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 10px; padding: 10px 12px; border-radius: 16px; background: linear-gradient(135deg, #7A0F1E, #B3122E); color: #fff; font-size: var(--fs-sm); font-weight: 700; text-align: center; box-shadow: var(--e3); animation: g-naik .3s var(--ease); }
-.lt-pot-ajak[hidden] { display: none; }
-.lt-pot-ajak .btn { --btn-bg: var(--sun-400); --btn-fg: var(--navy-900); }
 .lt-ajak__misi { --btn-bg: color-mix(in srgb, var(--white) 16%, transparent); --btn-fg: var(--white); --btn-shadow: none; }
 
 /* Misi harian: ikon hadiah hari ini + strip giliran Racun → Petir → Gempa */
