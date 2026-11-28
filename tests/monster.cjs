@@ -526,3 +526,43 @@ test('Apps Script: monster_hadiah_misi divalidasi', () => {
   assert.equal(app.get('config').ok, true);
   assert.equal(app.post({aksi: 'admin-simpan-pengaturan', token, nilai: {monster_hadiah_misi: 'api'}}).error, 'nilai_tidak_valid');
 });
+
+test('klaim hadiah undian (MRKT-87): nomor WA dari admin divalidasi, pemenang tiket menyertakan event + kode + waktu, batas 48 jam', () => {
+  const {jam, app, m} = siapkanMonster('100000');
+  const token = app.post({aksi: 'admin-login', sandi: app.sheets.Admin.rows[1][1]}).token;
+  assert.equal(app.get('config').monster.klaimWa, '6287848775292', 'nomor bawaan');
+  assert.deepEqual(app.post({aksi: 'admin-simpan-pengaturan', token, nilai: {monster_klaim_wa: '12ab'}}).kunci, ['monster_klaim_wa']);
+  assert.equal(app.post({aksi: 'admin-simpan-pengaturan', token, nilai: {monster_klaim_wa: '0812-3456-7890'}}).ok, true);
+  assert.equal(app.get('config').monster.klaimWa, '6281234567890', 'awalan 0 → 62');
+  app.cache.remove('cfg'); m.segarkan();
+  const id = m.lihat().id;
+  assert.equal(m.lihat().klaimWa, '6281234567890'); assert.equal(m.lihat().klaimJam, 48);
+  const ta = m.masuk({perangkat: 'dev-klm-aaaaaaaaaaaa', email: 'ani@mail.com'}, '1.1.1.1');
+  m.tap({token: ta.token, n: 5, seq: 1, e: id});
+  const kode = m.saya({token: ta.token, e: id}).tiket;
+  m.state.events[id].kalah = jam.now;
+  m.admin({token, aksi: 'spin-atur', hadiah: [{nama: 'HP 5G', stok: 1, bobot: 1}]});
+  assert.equal(m.admin({token, aksi: 'spin-nama', sumber: 'tiket', event: id}).ok, true);
+  assert.equal(m.admin({token, aksi: 'spin-hadiah'}).ok, true);
+  const p = m.pemenangPublik();
+  assert.equal(p.klaimJam, 48);
+  assert.equal(p.pemenang.length, 1, 'pemenang tiket undian 2 tahap tidak digandakan');
+  assert.deepEqual([p.pemenang[0].event, p.pemenang[0].tiket, p.pemenang[0].hadiah], [id, kode, 'HP 5G']);
+  assert.equal(p.pemenang[0].t, Math.floor(jam.now / 60000) * 60000, 'waktu diundi (ms, presisi menit)');
+});
+
+test('papan peringkat: Top kontributor event terakhir tetap tampil di status lobi', () => {
+  const {jam, m} = siapkanMonster('100000');
+  const id = m.lihat().id;
+  const ta = m.masuk({perangkat: 'dev-lb-aaaaaaaaaaaa', email: 'ani@mail.com'}, '1.1.1.1').token;
+  const tb = m.masuk({perangkat: 'dev-lb-bbbbbbbbbbbb', email: 'budi@mail.com'}, '1.1.1.2').token;
+  m.tap({token: tb, n: 9, seq: 1, e: id}); m.tap({token: ta, n: 5, seq: 1, e: id});
+  assert.equal(m.lihat().juaraTop, undefined, 'belum ada juara selama event pertama');
+  jam.now += 25 * 60000; m.lihat();
+  jam.now += 24 * 3600e3; // jauh setelah event: hasil event sudah hilang dari status, juara tetap ada
+  const s = m.lihat();
+  assert.equal(s.top, undefined);
+  assert.equal(s.juaraTop.event, id);
+  assert.deepEqual(s.juaraTop.top.map((x) => [x.peringkat, x.nama]), [[1, 'Budi S.'], [2, 'Ani L.']]);
+  assert.ok(!JSON.stringify(s.juaraTop).includes('@'));
+});

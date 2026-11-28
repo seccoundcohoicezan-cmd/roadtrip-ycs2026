@@ -50,7 +50,7 @@
     <a class="icon-btn g-bar__back" href="/" aria-label="Kembali ke beranda YCS"><svg aria-hidden="true"><use href="#i-back"/></svg></a>
     <div class="g-bar__judul"><strong>Lawan Raja Batu</strong><span>Game YCS 2026</span></div>
     <button class="icon-btn" type="button" id="g-suara" aria-pressed="true" aria-label="Matikan suara"><svg class="ikon-on" aria-hidden="true"><use href="#i-sound"/></svg><svg class="ikon-off" aria-hidden="true"><use href="#i-mute"/></svg></button>
-    <a class="g-dompet" href="#kode" aria-label="Kode undianku"><svg aria-hidden="true"><use href="#i-ticket"/></svg><b id="g-jml-kode">0</b></a>
+    <a class="g-dompet" id="g-dompet" href="#kode" aria-label="Tiketku: 0 kode sah"><svg aria-hidden="true"><use href="#i-ticket"/></svg><b id="g-jml-kode">0</b><i class="g-dompet__titik" id="g-dompet-titik" hidden></i></a>
   </header>
   <p class="g-gladi" id="g-gladi" hidden><strong>MODE UJI</strong> · event terpisah, kode uji tidak ikut undian asli.</p>
 
@@ -97,18 +97,36 @@
         <span class="btn btn--primary btn--sm" aria-hidden="true">Gabung</span>
       </a>
 
-      <!-- Papan hadiah -->
-      <section class="g-kartu g-papan" aria-labelledby="g-papan-judul">
+      <!-- Papan hadiah: HP undian + papan peringkat Top kontributor -->
+      <section class="g-kartu g-papan" id="hadiah" aria-labelledby="g-papan-judul">
         <div class="g-kartu__head"><h2 class="t-h2" id="g-papan-judul">Papan hadiah</h2><span class="badge badge--sun">Tiap event</span></div>
-        <div class="g-papan__utama">
-          <span class="g-papan__ikon" aria-hidden="true">📱</span>
-          <div><small>Hadiah utama · SPIN undian</small><strong><span id="g-papan-hp">8</span> Unit HP</strong><span>Kalahkan Raja Batu → dapat kode undian → diundi saat live</span></div>
+        <div class="g-hp">
+          <span class="g-hp__kilau" aria-hidden="true"></span>
+          <div class="g-hp__teks">
+            <small class="g-hp__label">Hadiah utama · Undian</small>
+            <strong class="g-hp__jml"><span id="g-papan-hp">8</span> Unit HP</strong>
+            <span class="g-hp__model">TECNO CAMON 50 Pro 5G</span>
+          </div>
+          <div class="g-hp__foto">
+            <span class="g-hp__sinar" aria-hidden="true"></span>
+            <img src="/assets/img/hadiah/hp.webp" width="364" height="443" alt="HP hadiah undian: TECNO CAMON 50 Pro 5G" loading="lazy" decoding="async">
+            <span class="g-hp__pita" aria-hidden="true">×<b id="g-papan-hp2">8</b></span>
+          </div>
+          <ol class="g-hp__alur" aria-label="Cara dapat HP">
+            <li><span aria-hidden="true">⚔️</span>Kalahkan bos</li>
+            <li><span aria-hidden="true">🎟️</span>Dapat kode</li>
+            <li><span aria-hidden="true">🎡</span>Diundi live</li>
+          </ol>
         </div>
-        <ol class="g-papan__top" id="g-papan-top">
-          <li><span class="g-papan__medali g-papan__medali--1">1</span><div><strong>Top 1 Kontributor</strong><small>Hit terbanyak</small></div><b>Rp100.000</b></li>
-          <li><span class="g-papan__medali g-papan__medali--2">2</span><div><strong>Top 2 Kontributor</strong><small>Hit terbanyak ke-2</small></div><b>Rp100.000</b></li>
-          <li><span class="g-papan__medali g-papan__medali--3">3</span><div><strong>Top 3 Kontributor</strong><small>Hit terbanyak ke-3</small></div><b>Rp50.000</b></li>
-        </ol>
+
+        <div class="g-lb" aria-labelledby="g-lb-judul">
+          <div class="g-lb__head">
+            <h3 class="g-lb__judul" id="g-lb-judul"><svg aria-hidden="true"><use href="#i-trophy"/></svg>Top Kontributor</h3>
+            <span class="g-lb__sub" id="g-lb-sub">Hadiah langsung, tanpa undian</span>
+          </div>
+          <ol class="g-podium" id="g-papan-top" aria-label="Hadiah Top kontributor"></ol>
+          <ol class="g-lb__lain" id="g-papan-lain" hidden></ol>
+        </div>
         <p class="t-xs g-catatan">Hit = tenaga dari tap + potion selama event. Makin banyak hit, makin dekat ke Top 1.</p>
       </section>
 
@@ -137,15 +155,32 @@
         <ol class="g-langkah">
           <li><span class="g-langkah__no">1</span><div><strong>Kalahkan Raja Batu bareng</strong><small>Bos muncul ±20 menit sebelum tiap live. Tap monster atau warga, tekan HINDAR saat jurus datang.</small></div></li>
           <li><span class="g-langkah__no">2</span><div><strong>Dapat kode undian</strong><small>Ikut menyerang sampai bos tumbang = 1 kode undian (#0001, #0002, …) tersimpan di HP-mu.</small></div></li>
-          <li><span class="g-langkah__no">3</span><div><strong>Diundi live, menang HP</strong><small>Panitia memutar roda undian saat live. Kalau kodemu keluar, kamu dihubungi lewat email/WA.</small></div></li>
+          <li><span class="g-langkah__no">3</span><div><strong>Diundi live, menang HP</strong><small>Panitia memutar roda undian saat live. Kalau kodemu keluar, status di Tiketku jadi Menang. Klaim lewat WhatsApp maksimal 2×24 jam.</small></div></li>
         </ol>
       </section>
 
-      <!-- Kode undian -->
-      <section class="g-kartu" id="kode" aria-labelledby="g-kode-judul">
-        <div class="g-kartu__head"><h2 class="t-h2" id="g-kode-judul">Kode undianku</h2><span class="badge badge--sun" id="g-kode-badge">0 kode</span></div>
+      <!-- Tiketku: kode undian + status undian + klaim (tombol tiket di bar atas menyorot bagian ini) -->
+      <section class="g-kartu g-tiketku" id="kode" aria-labelledby="g-kode-judul" tabindex="-1">
+        <div class="g-kartu__head"><h2 class="t-h2" id="g-kode-judul">Tiketku</h2><span class="badge badge--sun" id="g-kode-badge">0 kode sah</span></div>
+        <dl class="g-tiket-ringkas" aria-label="Ringkasan kode undian">
+          <div class="is-sah"><dt>Ikut undian</dt><dd id="tk-sah">0</dd></div>
+          <div class="is-menunggu"><dt>Menunggu</dt><dd id="tk-menunggu">0</dd></div>
+          <div class="is-menang"><dt>Menang</dt><dd id="tk-menang">0</dd></div>
+          <div class="is-hangus"><dt>Hangus</dt><dd id="tk-hangus">0</dd></div>
+        </dl>
+        <div class="g-undian" id="g-undian" role="status"></div>
         <ul class="g-kode" id="g-kode"></ul>
         <p class="g-kosong" id="g-kode-kosong">Belum punya kode. Kalahkan Raja Batu saat event untuk dapat kode pertamamu!</p>
+        <details class="g-aturan" id="g-aturan">
+          <summary><svg aria-hidden="true"><use href="#i-shield"/></svg>Aturan undian &amp; klaim hadiah</summary>
+          <ol>
+            <li>Ikut menyerang Raja Batu = 1 kode undian per event. Kode <b>sah</b> hanya bila bos tumbang; bila bos menang atau kabur, kode <b>hangus</b>.</li>
+            <li>Kode sah diundi panitia saat live YCS. Kalau kodemu keluar, statusnya berubah jadi <b>Menang</b> di sini.</li>
+            <li>Klaim hadiah <b>maksimal 2×24 jam</b> sejak diundi, lewat tombol <b>Klaim lewat WhatsApp</b>. Lewat batas itu, hak klaim gugur.</li>
+            <li>Kode tersimpan di HP/browser ini. Jangan hapus data browser sebelum hadiah diklaim.</li>
+            <li>Panitia tidak pernah meminta biaya atau transfer apa pun untuk klaim hadiah.</li>
+          </ol>
+        </details>
       </section>
 
       <!-- Riwayat match -->
@@ -209,7 +244,7 @@
     <p class="badge badge--sun"><svg aria-hidden="true"><use href="#i-check"/></svg>Kode undian didapat!</p>
     <h2 id="dapat-judul">Raja Batu tumbang!</h2>
     <div class="dapat__tiket"><small>Kode undianmu</small><b id="dapat-kode">#0000</b><span>Diundi saat live YCS</span></div>
-    <p class="t-sm">Simpan halaman ini. Kode juga tersimpan di "Kode undianku".</p>
+    <p class="t-sm">Kode tersimpan di "Tiketku" (ikon tiket di pojok kanan atas).</p>
     <div class="dapat__aksi">
       <button class="btn btn--cta btn--lg btn--block" type="button" id="dapat-bagi"><svg aria-hidden="true"><use href="#i-share"/></svg>Pamerkan ke teman</button>
       <button class="btn btn--light btn--lg btn--block" type="button" id="dapat-tutup">Lanjut</button>

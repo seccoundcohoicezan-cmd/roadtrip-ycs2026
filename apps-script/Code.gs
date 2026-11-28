@@ -90,6 +90,7 @@ const PENGATURAN = [
   ['monster_hadiah_top', '100000,50000,50000', 'Hadiah otomatis Top kontributor tiap event (Rp, urut peringkat 1,2,3,…; dipisah koma; kosong = tanpa hadiah).'],
   ['monster_hadiah_misi', 'gilir', 'Hadiah menyelesaikan 5 Misi Pejuang (misi reset tiap hari 00.00 WIB): gilir = bergantian tiap hari Racun → Petir → Gempa; racun / petir / gempa = selalu potion itu; semua = 1 Racun + 1 Gempa + 1 Petir.'],
   ['monster_hadiah_top_syarat', 'selalu', 'selalu = Top kontributor tetap dapat hadiah walau bos tidak tumbang; menang = hanya bila bos tumbang.'],
+  ['monster_klaim_wa', '6287848775292', 'Nomor WhatsApp panitia untuk klaim hadiah undian (format 62…). Pemenang menekan tombol Klaim di /game/ → wa.me/nomor ini. Batas klaim 2×24 jam setelah diundi.'],
   ['monster_wujud', 'raja_batu', 'raja_batu = ilustrasi Raja Batu dari panitia; lucu = monster kartun gambar kode (lebih ramah anak).']
 ];
 const MONSTER_PILIHAN = {monster_pemicu: ['sebelum_live', 'jadwal', 'manual'], monster_darurat: ['NORMAL', 'MULAI', 'STOP'], monster_wujud: ['raja_batu', 'lucu'], monster_hadiah_top_syarat: ['selalu', 'menang'], monster_hadiah_misi: ['gilir', 'racun', 'petir', 'gempa', 'semua']};
@@ -404,8 +405,14 @@ function monsterPublik_(cfg) {
     target: cfg.monster_target, level: cfg.monster_level, targetDasar: cfg.monster_target_dasar, targetKali: cfg.monster_target_kali,
     poin: cfg.monster_poin, skalaNaik: cfg.monster_skala_naik, interval: cfg.monster_interval_ms, batasTap: cfg.monster_batas_tap,
     nama: cfg.monster_nama || 'Raja Batu', wujud: cfg.monster_wujud || 'raja_batu', tiketMin: cfg.monster_tiket_min || '1',
-    jurus: cfg.monster_jurus_aktif == null ? true : ya_(cfg.monster_jurus_aktif), jurusDetik: cfg.monster_jurus_detik || '8', jurusDamage: cfg.monster_jurus_damage || '4', perisai: cfg.monster_perisai || '2', jurusAnim: cfg.monster_jurus_anim || '1.6', hpWarga: cfg.monster_hp_warga || '5', hadiahTop: cfg.monster_hadiah_top == null ? '100000,50000,50000' : cfg.monster_hadiah_top, hadiahTopSyarat: cfg.monster_hadiah_top_syarat || 'selalu', hadiahMisi: cfg.monster_hadiah_misi || 'gilir'
+    jurus: cfg.monster_jurus_aktif == null ? true : ya_(cfg.monster_jurus_aktif), jurusDetik: cfg.monster_jurus_detik || '8', jurusDamage: cfg.monster_jurus_damage || '4', perisai: cfg.monster_perisai || '2', jurusAnim: cfg.monster_jurus_anim || '1.6', hpWarga: cfg.monster_hp_warga || '5', hadiahTop: cfg.monster_hadiah_top == null ? '100000,50000,50000' : cfg.monster_hadiah_top, hadiahTopSyarat: cfg.monster_hadiah_top_syarat || 'selalu', hadiahMisi: cfg.monster_hadiah_misi || 'gilir', klaimWa: nomorWa_(cfg.monster_klaim_wa == null ? '6287848775292' : cfg.monster_klaim_wa) || ''
   };
+}
+// Nomor WA untuk wa.me: hanya angka, awalan 0 / +62 → 62. Hasil '' = tidak valid.
+function nomorWa_(v) {
+  let d = String(v || '').replace(/[\s\-().+]/g, '');
+  if (/^0\d/.test(d)) d = '62' + d.slice(1);
+  return /^[1-9]\d{7,14}$/.test(d) ? d : '';
 }
 // Validasi satu nilai monster_*; hasil null = tidak valid.
 function nilaiMonster_(k, v) {
@@ -416,6 +423,7 @@ function nilaiMonster_(k, v) {
   if (MONSTER_DESIMAL[k]) { const n = Number(v.replace(',', '.')); return v !== '' && isFinite(n) && n >= MONSTER_DESIMAL[k][0] && n <= MONSTER_DESIMAL[k][1] ? String(n) : null; }
   if (k === 'monster_target_kali' || k === 'monster_skala_naik') { const n = Number(v.replace(',', '.')); return isFinite(n) && n >= 0 && n <= 20 && v !== '' ? String(n) : null; }
   if (k === 'monster_mulai_manual') return /^\d{0,15}$/.test(v) ? v : null;
+  if (k === 'monster_klaim_wa') return nomorWa_(v) || null;
   if (k === 'monster_nama') return teks_(v, 40) || 'Raja Batu';
   return v;
 }
