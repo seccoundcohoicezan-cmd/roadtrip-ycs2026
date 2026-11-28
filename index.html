@@ -2187,6 +2187,7 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+  <script src="assets/js/pengingat.js"></script>
   <script src="assets/js/festival.js"></script>
   <script src="assets/js/sheet-tarik.js" defer></script>
   <script>
@@ -2516,9 +2517,8 @@
     isiTanggalAcara();
     setInterval(isiTanggalAcara, 60000);
     $('#cd2-ingat').addEventListener('click', (e) => {
-      downloadIcs({ dataset: { start: new Date(acaraMulai).toISOString(), end: new Date(acaraSelesai).toISOString(), title: 'Youth Character Summit 2026 di Bali', platform: 'Acara', url: location.origin } });
-      $('span', e.currentTarget).textContent = 'Pengingat diunduh';
-      toast('File pengingat (.ics) diunduh. Buka untuk menambahkannya ke kalender.');
+      ingatkan({ start: new Date(acaraMulai).toISOString(), end: new Date(acaraSelesai).toISOString(), title: 'Youth Character Summit 2026 di Bali', judul: 'Youth Character Summit 2026 di Bali', platform: 'Acara', url: location.origin + '/',
+        sebelum: 24 * 60, notifJudul: '🌴 Besok berangkat ke Bali: YCS 2026!', notifIsi: 'Cek persiapan dan info acara di web YCS.' }, e.currentTarget);
     });
 
     function terapkanConfig() {
@@ -2603,6 +2603,17 @@
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
 
+    // Tombol "Ingatkan": lembar pilihan Google Kalender / notifikasi Chrome / .ics (assets/js/pengingat.js).
+    function ingatkan(d, tombol) {
+      const mulai = Date.parse(d.start), PG = window.YCSPengingat;
+      if (!PG) { downloadIcs({ dataset: d }); return; }
+      PG.atur({ toast });
+      PG.buka({ kunci: 'live-' + mulai + '-' + d.title, judul: d.judul || 'YCS 2026 — ' + d.title, mulai, selesai: Date.parse(d.end), sebelum: d.sebelum || 30,
+        detail: d.platform + ': ' + d.url, url: d.url && /^https?:/.test(d.url) ? d.url : location.origin + '/',
+        notifJudul: d.notifJudul || `🔴 ${d.title} mulai 30 menit lagi`, notifIsi: d.notifIsi || `Tonton di ${d.platform}. Ketuk untuk membuka.`,
+        saatPilih: () => { if (tombol) $('span', tombol).textContent = 'Pengingat aktif'; } });
+    }
+
     const IKON_PLATFORM = { youtube: '#i-youtube', instagram: '#i-instagram', tiktok: '#i-tiktok' };
     const fmtHari = new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: 'numeric', month: 'short', timeZone: 'Asia/Jakarta' });
     const fmtTgl2 = new Intl.DateTimeFormat('id-ID', { day: 'numeric', timeZone: 'Asia/Jakarta' });
@@ -2680,11 +2691,7 @@
           b.className = 'btn btn--soft btn--sm';
           b.innerHTML = '<svg aria-hidden="true"><use href="#i-bell"/></svg><span>Ingatkan</span>';
           b.setAttribute('aria-label', 'Ingatkan saya: ' + item.dataset.title);
-          b.addEventListener('click', () => {
-            downloadIcs(item);
-            $('span', b).textContent = 'Pengingat diunduh';
-            toast('File pengingat (.ics) diunduh — buka untuk menambahkannya ke kalender.');
-          });
+          b.addEventListener('click', () => ingatkan({ ...item.dataset }, b));
           slot.append(b);
         } else {
           const a = document.createElement('a');
@@ -3007,12 +3014,10 @@
     });
     $$('[data-share-open]').forEach((b) => b.addEventListener('click', () => (b.dataset.shareOpen === 'kata' ? bagikanKartu() : bagikan(SHARE[b.dataset.shareOpen]()))));
     $$('[data-remind]').forEach((b) => b.addEventListener('click', () => {
-      downloadIcs({ dataset: {
+      ingatkan({
         start: new Date(target).toISOString(), end: new Date(target + 90 * 60000).toISOString(),
         title: 'Pengumuman 100 Finalis YCS 2026', platform: 'Live', url: (cfg && cfg.linkLive) || CONFIG.linkLive,
-      } });
-      $('span', b).textContent = 'Pengingat diunduh';
-      toast('File pengingat (.ics) diunduh. Buka untuk menambahkannya ke kalender.');
+      }, b);
     }));
 
     /* ---------- Wilayah (provinsi) ---------- */
