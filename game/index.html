@@ -102,6 +102,7 @@
         <div class="g-kartu__head"><h2 class="t-h2" id="g-papan-judul">Papan hadiah</h2><span class="badge badge--sun">Tiap event</span></div>
         <div class="g-hp">
           <span class="g-hp__kilau" aria-hidden="true"></span>
+          <button class="g-info g-hp__info" type="button" data-cara="hp" aria-haspopup="dialog" aria-label="Cara dapat HP"><span aria-hidden="true">!</span></button>
           <div class="g-hp__teks">
             <small class="g-hp__label">Hadiah utama · Undian</small>
             <strong class="g-hp__jml"><span id="g-papan-hp">8</span> Unit HP</strong>
@@ -121,13 +122,13 @@
 
         <div class="g-lb" aria-labelledby="g-lb-judul">
           <div class="g-lb__head">
-            <h3 class="g-lb__judul" id="g-lb-judul"><svg aria-hidden="true"><use href="#i-trophy"/></svg>Top Kontributor</h3>
+            <h3 class="g-lb__judul" id="g-lb-judul"><svg aria-hidden="true"><use href="#i-trophy"/></svg>Top Kontributor<button class="g-info g-info--kecil" type="button" data-cara="top" aria-haspopup="dialog" aria-label="Cara jadi Top Kontributor"><span aria-hidden="true">!</span></button></h3>
             <span class="g-lb__sub" id="g-lb-sub">Hadiah langsung, tanpa undian</span>
           </div>
           <ol class="g-podium" id="g-papan-top" aria-label="Hadiah Top kontributor"></ol>
           <ol class="g-lb__lain" id="g-papan-lain" hidden></ol>
         </div>
-        <p class="t-xs g-catatan">Hit = tenaga dari tap + potion selama event. Makin banyak hit, makin dekat ke Top 1.</p>
+        <button class="g-cara-cta" type="button" data-cara="hp" aria-haspopup="dialog"><span class="g-info g-info--kecil" aria-hidden="true">!</span><span><strong>Cara dapat HP &amp; jadi Top</strong><small>3 langkah, gratis, cukup tap</small></span><svg aria-hidden="true"><use href="#i-play"/></svg></button>
       </section>
 
       <!-- Misi + tas pejuang (equipment) -->
@@ -147,16 +148,6 @@
         <ol class="g-gilir" id="g-gilir" hidden aria-label="Hadiah misi bergilir"></ol>
         <ul class="g-misi" id="g-misi"></ul>
         <p class="t-xs g-catatan">Potion dipakai saat Raja Batu muncul: ketuk botolnya di sisi kiri arena. Coba gratis di mode latihan.</p>
-      </section>
-
-      <!-- Skema hadiah -->
-      <section class="g-kartu" aria-labelledby="g-cara">
-        <h2 class="t-h2" id="g-cara">Cara dapat HP</h2>
-        <ol class="g-langkah">
-          <li><span class="g-langkah__no">1</span><div><strong>Kalahkan Raja Batu bareng</strong><small>Bos muncul ±20 menit sebelum tiap live. Tap monster atau warga, tekan HINDAR saat jurus datang.</small></div></li>
-          <li><span class="g-langkah__no">2</span><div><strong>Dapat kode undian</strong><small>Ikut menyerang sampai bos tumbang = 1 kode undian (#0001, #0002, …) tersimpan di HP-mu.</small></div></li>
-          <li><span class="g-langkah__no">3</span><div><strong>Diundi live, menang HP</strong><small>Panitia memutar roda undian saat live. Kalau kodemu keluar, status di Tiketku jadi Menang. Klaim lewat WhatsApp maksimal 2×24 jam.</small></div></li>
-        </ol>
       </section>
 
       <!-- Tiketku: kode undian + status undian + klaim (tombol tiket di bar atas menyorot bagian ini) -->
@@ -236,6 +227,25 @@
         <button class="btn btn--light" type="button" id="lt-bagi"><svg aria-hidden="true"><use href="#i-share"/></svg>Tantang teman</button>
         <button class="btn lt-keluar" type="button" id="lt-keluar">Ke lobi</button>
       </div>
+    </div>
+  </dialog>
+
+  <!-- Cara dapat HP & jadi Top (dibuka dari tanda ! di papan hadiah) -->
+  <dialog class="g-cara" id="g-cara" aria-labelledby="g-cara-judul">
+    <button class="icon-btn g-cara__tutup" type="button" data-tutup aria-label="Tutup"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+    <h2 class="g-cara__judul" id="g-cara-judul"><span class="g-info" aria-hidden="true">!</span>Cara dapat HP</h2>
+    <ol class="g-langkah">
+      <li><span class="g-langkah__no">1</span><div><strong>Kalahkan Raja Batu bareng</strong><small>Bos muncul ±20 menit sebelum tiap live. Tap monster atau warga, tekan HINDAR saat jurus datang.</small></div></li>
+      <li><span class="g-langkah__no">2</span><div><strong>Dapat kode undian</strong><small>Ikut menyerang sampai bos tumbang = 1 kode undian (#0001, #0002, …) tersimpan di HP-mu.</small></div></li>
+      <li><span class="g-langkah__no">3</span><div><strong>Diundi live, menang HP</strong><small>Panitia memutar roda undian saat live. Kalau kodemu keluar, status di Tiketku jadi Menang. Klaim lewat WhatsApp maksimal 2×24 jam.</small></div></li>
+    </ol>
+    <div class="g-cara__top" id="g-cara-top" tabindex="-1">
+      <h3><svg aria-hidden="true"><use href="#i-trophy"/></svg>Cara jadi Top Kontributor</h3>
+      <p>Kumpulkan <b>hit</b> terbanyak selama event: tap Raja Batu atau warga, pakai potion dari Misi harian, dan tetap hidup (tekan HINDAR saat jurus). Top kontributor langsung dapat uang tunai, tanpa undian.</p>
+    </div>
+    <div class="g-cara__aksi">
+      <button class="btn btn--cta btn--block" type="button" data-cara-ke="latihan"><svg aria-hidden="true"><use href="#i-sword"/></svg>Coba latihan dulu</button>
+      <button class="btn btn--light btn--block" type="button" data-cara-ke="tiket"><svg aria-hidden="true"><use href="#i-ticket"/></svg>Lihat Tiketku</button>
     </div>
   </dialog>
 

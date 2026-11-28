@@ -355,3 +355,30 @@ body.is-retak .g-tidur .badge { background: var(--coral-500); color: var(--white
 .g-gilir li.is-hari-ini small { color: var(--navy-900); font-weight: 800; }
 
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Tanda ! "Cara dapat HP" di papan hadiah + dialog */
+.g-info { display: inline-grid; place-items: center; flex: none; width: 2rem; height: 2rem; padding: 0; border: 0; border-radius: 50%; background: var(--sun-400); color: var(--navy-950); font: 900 1.05rem/1 var(--font-sans); cursor: pointer; box-shadow: 0 0 0 3px color-mix(in srgb, var(--sun-400) 35%, transparent), 0 4px 10px -2px rgba(0,0,0,.35); -webkit-tap-highlight-color: transparent; }
+.g-info:focus-visible { outline: none; box-shadow: var(--ring); }
+button.g-info:active { transform: scale(.92); }
+.g-info--kecil { width: 1.5rem; height: 1.5rem; font-size: .85rem; margin-left: 4px; }
+.g-hp__info { position: absolute; z-index: 3; top: var(--space-3); right: var(--space-3); animation: g-denyut-info 2s ease-out infinite; }
+@keyframes g-denyut-info { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--sun-400) 70%, transparent), 0 4px 10px -2px rgba(0,0,0,.35); } 70%, 100% { box-shadow: 0 0 0 12px color-mix(in srgb, var(--sun-400) 0%, transparent), 0 4px 10px -2px rgba(0,0,0,.35); } }
+.g-cara-cta { display: flex; align-items: center; gap: var(--space-3); width: 100%; margin-top: var(--space-3); padding: var(--space-3) var(--space-4); border: 0; border-radius: var(--r-lg); background: linear-gradient(135deg, color-mix(in srgb, var(--sun-400) 30%, var(--surface)), var(--surface-soft)); color: var(--text); font: inherit; text-align: left; cursor: pointer; box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--sun-400) 60%, transparent); }
+.g-cara-cta > span:nth-child(2) { display: grid; flex: 1; }
+.g-cara-cta strong { color: var(--heading); font-weight: 800; }
+.g-cara-cta small { font-size: var(--fs-xs); color: var(--text-2); }
+.g-cara-cta > svg { color: var(--text-2); }
+.g-cara-cta:focus-visible { outline: none; box-shadow: var(--ring); }
+dialog.g-cara { width: min(94vw, 26rem); max-height: 90dvh; padding: var(--space-6) var(--space-5) var(--space-5); border: 0; border-radius: var(--r-xl); background: var(--surface); color: var(--text); box-shadow: 0 20px 40px rgba(0,0,0,.3); }
+dialog.g-cara::backdrop { background: var(--scrim); }
+dialog.g-cara[open] { display: grid; gap: var(--space-4); animation: g-naik .3s var(--ease); }
+.g-cara__tutup { position: absolute; top: var(--space-3); right: var(--space-3); }
+.g-cara__judul { display: flex; align-items: center; gap: var(--space-2); padding-right: 2.5rem; font-size: var(--fs-h2); font-weight: 800; color: var(--heading); }
+dialog.g-cara .g-langkah { margin-top: 0; }
+.g-cara__top { display: grid; gap: 6px; padding: var(--space-3) var(--space-4); border-radius: var(--r-lg); background: color-mix(in srgb, var(--sun-400) 16%, var(--surface)); font-size: var(--fs-sm); color: var(--text-2); }
+.g-cara__top:focus { outline: none; }
+.g-cara__top.is-sorot { animation: g-sorot 1.6s ease-out; }
+.g-cara__top h3 { display: flex; align-items: center; gap: 6px; font-size: var(--fs-h3); font-weight: 800; color: var(--heading); }
+.g-cara__top h3 svg { color: #E0A100; }
+.g-cara__aksi { display: grid; gap: var(--space-2); }
+@media (prefers-reduced-motion: reduce) { .g-hp__info, dialog.g-cara[open] { animation: none; } }
