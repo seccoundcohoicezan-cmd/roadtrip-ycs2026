@@ -41,8 +41,10 @@ body.is-penuh { overflow: hidden; }
 .g-info { display: flex; gap: 8px; margin-top: var(--space-2); font-size: var(--fs-sm); color: var(--blue-100); }
 .g-info:empty { display: none; }
 body.is-tanding .g-info { color: var(--white); }
-.g-tidur { position: absolute; inset: 0; z-index: 7; display: grid; align-content: end; justify-items: center; gap: var(--space-2); padding: var(--space-5); overflow: hidden; border-radius: var(--r-xl); background: linear-gradient(180deg, color-mix(in srgb, var(--navy-950) 15%, transparent) 0%, color-mix(in srgb, var(--navy-950) 80%, transparent) 48%, color-mix(in srgb, var(--navy-950) 94%, transparent) 100%); color: var(--white); text-align: center; }
-.g-tidur__bos { position: absolute; top: 5%; left: 50%; width: auto; height: 44%; translate: -50% 0; filter: grayscale(.35) brightness(.85) drop-shadow(0 14px 24px color-mix(in srgb, var(--navy-950) 60%, transparent)); animation: g-napas 3.2s ease-in-out infinite; }
+.g-tidur { position: absolute; inset: 0; z-index: 7; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: var(--space-2); padding: var(--space-5); overflow: hidden; border-radius: var(--r-xl); background: linear-gradient(180deg, color-mix(in srgb, var(--navy-950) 15%, transparent) 0%, color-mix(in srgb, var(--navy-950) 80%, transparent) 48%, color-mix(in srgb, var(--navy-950) 94%, transparent) 100%); color: var(--white); text-align: center; }
+/* Raja Batu ikut alur (bukan absolute): mengisi sisa ruang di atas teks, mengecil sendiri bila ruang sempit → tidak menutupi judul & hitung mundur */
+.g-tidur > * { flex: none; }
+.g-tidur > .g-tidur__bos { flex: 1 1 0; min-height: 0; width: 100%; max-height: 15rem; object-fit: contain; object-position: center bottom; margin-bottom: var(--space-1); filter: grayscale(.35) brightness(.85) drop-shadow(0 14px 24px color-mix(in srgb, var(--navy-950) 60%, transparent)); animation: g-napas 3.2s ease-in-out infinite; }
 @keyframes g-napas { 50% { transform: translateY(-6px) scale(1.02); } }
 .g-tidur__bos + .badge { position: relative; }
 .g-tidur__judul { font-size: var(--fs-h2); line-height: var(--lh-h2); letter-spacing: var(--ls-h2); font-weight: 800; }
@@ -384,3 +386,36 @@ dialog.g-cara .g-langkah { margin-top: 0; }
 @media (prefers-reduced-motion: reduce) { .g-hp__info, dialog.g-cara[open] { animation: none; } }
 .g-hp__ilustrasi { margin-top: 2px; font-size: .625rem; color: color-mix(in srgb, var(--white) 55%, transparent); }
 .g-hp { min-height: 10rem; }
+
+/* Teks hitung mundur selalu di atas gambar & latar */
+.g-tidur__judul, .g-hitung, .g-tidur__sub, .g-tidur .badge { position: relative; z-index: 1; text-shadow: 0 2px 8px rgba(3, 10, 30, .55); }
+.g-hitung div { background: color-mix(in srgb, var(--navy-950) 55%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--white) 16%, transparent); backdrop-filter: blur(4px); }
+
+/* Klaim potion misi: botol muncul di tengah layar (cahaya mantra) lalu terbang masuk ke slot tas */
+.pot-klaim { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; pointer-events: none; }
+.pot-klaim__latar { position: absolute; inset: 0; background: radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--c) 28%, rgba(3, 10, 30, .78)), rgba(3, 10, 30, .86) 62%); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); opacity: 0; animation: pk-latar 1.9s ease forwards; }
+.pot-klaim__isi { position: relative; display: grid; justify-items: center; gap: 10px; color: var(--white); text-align: center; }
+.pot-klaim__botol { position: relative; display: grid; place-items: center; width: 8rem; height: 8rem; }
+.pot-klaim__botol svg { position: relative; z-index: 2; width: 6rem; height: 6rem; filter: drop-shadow(0 0 18px var(--c)); animation: pk-botol 1.1s cubic-bezier(.2, 1.4, .4, 1) both; }
+.pot-klaim__cincin { position: absolute; inset: 0; border-radius: 50%; border: 3px solid var(--c); opacity: 0; animation: pk-cincin 1.2s ease-out .15s both; }
+.pot-klaim__cincin + .pot-klaim__cincin { animation-delay: .45s; }
+.pot-klaim__sinar { position: absolute; inset: -40%; border-radius: 50%; background: repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--c) 55%, transparent) 0 6deg, transparent 6deg 24deg); -webkit-mask: radial-gradient(circle, #000 20%, transparent 68%); mask: radial-gradient(circle, #000 20%, transparent 68%); opacity: 0; animation: pk-sinar 1.6s ease-out .1s both; }
+.pot-klaim__percik { position: absolute; left: 50%; top: 50%; width: 7px; height: 7px; border-radius: 50%; background: var(--c); box-shadow: 0 0 8px var(--c); opacity: 0; animation: pk-percik 1s ease-out both; }
+.pot-klaim__teks { text-shadow: 0 2px 10px rgba(0,0,0,.6); font-size: 1.25rem; font-weight: 800; letter-spacing: .02em; opacity: 0; animation: pk-teks 1.5s ease .3s both; }
+.pot-klaim__teks small { display: block; font-size: var(--fs-sm); font-weight: 600; opacity: .85; }
+.pot-klaim.is-terbang .pot-klaim__latar, .pot-klaim.is-terbang .pot-klaim__teks, .pot-klaim.is-terbang .pot-klaim__sinar, .pot-klaim.is-terbang .pot-klaim__cincin { animation: pk-pudar .3s ease forwards; }
+@keyframes pk-latar { 15%, 80% { opacity: 1; } 100% { opacity: .6; } }
+@keyframes pk-botol { 0% { transform: scale(.2) rotate(-25deg); opacity: 0; } 60% { transform: scale(1.15) rotate(6deg); opacity: 1; } 100% { transform: scale(1) rotate(0); opacity: 1; } }
+@keyframes pk-cincin { 0% { transform: scale(.4); opacity: .9; } 100% { transform: scale(1.8); opacity: 0; } }
+@keyframes pk-sinar { 0% { opacity: 0; transform: rotate(0) scale(.6); } 30% { opacity: 1; } 100% { opacity: .5; transform: rotate(80deg) scale(1); } }
+@keyframes pk-percik { 0% { opacity: 1; transform: translate(-50%, -50%); } 100% { opacity: 0; transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(.4); } }
+@keyframes pk-teks { 0% { opacity: 0; transform: translateY(8px); } 25%, 100% { opacity: 1; transform: none; } }
+@keyframes pk-pudar { to { opacity: 0; } }
+.g-tas__pot li.is-terima { animation: pk-terima .7s cubic-bezier(.2, 1.5, .4, 1); }
+.g-tas__pot li.is-terima b { animation: pk-angka .7s ease; }
+@keyframes pk-terima { 0% { transform: scale(1); box-shadow: 0 0 0 0 var(--c); } 35% { transform: scale(1.12); box-shadow: 0 0 0 6px color-mix(in srgb, var(--c) 45%, transparent), 0 0 26px var(--c); } 100% { transform: scale(1); box-shadow: 0 0 0 0 transparent; } }
+@keyframes pk-angka { 0% { transform: scale(1); } 40% { transform: scale(1.8); color: var(--white); } 100% { transform: scale(1); } }
+/* Tombol lobi berdampingan agar Raja Batu punya ruang lebih di atas hitung mundur */
+.g-tidur__aksi:has(#g-ingat:not([hidden])) { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); width: min(100%, 24rem); }
+.g-tidur__aksi:has(#g-ingat:not([hidden])) .btn { min-width: 0; padding-inline: 12px; white-space: nowrap; }
+.g-tidur__aksi:has(#g-ingat:not([hidden])) .btn--lg { min-height: var(--tap); font-size: var(--fs-body); }
