@@ -2518,7 +2518,7 @@
     setInterval(isiTanggalAcara, 60000);
     $('#cd2-ingat').addEventListener('click', (e) => {
       ingatkan({ start: new Date(acaraMulai).toISOString(), end: new Date(acaraSelesai).toISOString(), title: 'Youth Character Summit 2026 di Bali', judul: 'Youth Character Summit 2026 di Bali', platform: 'Acara', url: location.origin + '/',
-        sebelum: 24 * 60, notifJudul: '🌴 Besok berangkat ke Bali: YCS 2026!', notifIsi: 'Cek persiapan dan info acara di web YCS.' }, e.currentTarget);
+        sebelum: 24 * 60, notifJudul: '🌴 Besok YCS 2026 dimulai di Bali!', notifIsi: 'Acara mulai besok pukul 08.00 WIB. Cek info dan persiapan di web YCS.' }, e.currentTarget);
     });
 
     function terapkanConfig() {
@@ -2610,7 +2610,7 @@
       PG.atur({ toast });
       PG.buka({ kunci: 'live-' + mulai + '-' + d.title, judul: d.judul || 'YCS 2026 — ' + d.title, mulai, selesai: Date.parse(d.end), sebelum: d.sebelum || 30,
         detail: d.platform + ': ' + d.url, url: d.url && /^https?:/.test(d.url) ? d.url : location.origin + '/',
-        notifJudul: d.notifJudul || `🔴 ${d.title} mulai 30 menit lagi`, notifIsi: d.notifIsi || `Tonton di ${d.platform}. Ketuk untuk membuka.`,
+        notifJudul: d.notifJudul || `🔴 Live YCS 30 menit lagi: ${d.title}`, notifIsi: d.notifIsi || `Siapkan dirimu! Tonton di ${d.platform}. Ketuk untuk membuka link live.`,
         saatPilih: () => { if (tombol) $('span', tombol).textContent = 'Pengingat aktif'; } });
     }
 
