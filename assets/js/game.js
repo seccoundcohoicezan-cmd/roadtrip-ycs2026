@@ -461,6 +461,23 @@
     $('#g-papan-lain').innerHTML = lain.map((n, k) => { const i = k + 3, j = juara(i); return `<li><b>${i + 1}</b><span>${j ? esc(j.nama) : `Top ${i + 1} kontributor`}</span><b>Rp${nf.format(n)}</b></li>`; }).join('');
   }
 
+  /* ---------- tanda ! "Cara dapat HP" (papan hadiah & Top kontributor) ---------- */
+  const dlgCara = $('#g-cara');
+  function bukaCara(bagian) {
+    S.klik();
+    if (dlgCara.showModal) { if (!dlgCara.open) dlgCara.showModal(); } else dlgCara.setAttribute('open', '');
+    if (bagian === 'top') { const el = $('#g-cara-top'); el.scrollIntoView({ block: 'nearest' }); el.classList.remove('is-sorot'); void el.offsetWidth; el.classList.add('is-sorot'); el.focus({ preventScroll: true }); }
+    else dlgCara.scrollTop = 0;
+  }
+  const tutupCara = () => { if (dlgCara.close) dlgCara.close(); else dlgCara.removeAttribute('open'); };
+  $$('[data-cara]').forEach((b) => b.addEventListener('click', () => bukaCara(b.dataset.cara)));
+  dlgCara.addEventListener('click', (e) => {
+    if (e.target === dlgCara || e.target.closest('[data-tutup]')) { tutupCara(); return; }
+    const ke = e.target.closest('[data-cara-ke]'); if (!ke) return;
+    tutupCara();
+    if (ke.dataset.caraKe === 'latihan') latihan.buka(); else sorotTiket();
+  });
+
   /* ---------- pemenang ---------- */
   async function muatJuara() {
     try {
