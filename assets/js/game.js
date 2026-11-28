@@ -320,13 +320,16 @@
   setInterval(tik, 1000);
   muatStatus();
   setInterval(() => { if (!document.hidden) muatStatus(); }, 5000);
+  // Ingatkan: Google Kalender langsung / notifikasi Chrome / .ics (assets/js/pengingat.js)
+  const PG = window.YCSPengingat;
+  if (PG) PG.atur({ toast });
   $('#g-ingat').addEventListener('click', () => {
-    if (!target) return;
-    const f = (d) => new Date(d).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
-    const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//YCS 2026//Game//ID', 'BEGIN:VEVENT', 'UID:bos-' + target + '@ycs2026', 'DTSTAMP:' + f(Date.now()), 'DTSTART:' + f(target), 'DTEND:' + f(target + 20 * 60000), 'SUMMARY:Lawan Raja Batu - YCS 2026', 'DESCRIPTION:Kalahkan bos\\, dapat kode undian HP: ' + location.origin + '/game/', 'BEGIN:VALARM', 'TRIGGER:-PT5M', 'ACTION:DISPLAY', 'DESCRIPTION:Raja Batu muncul 5 menit lagi!', 'END:VALARM', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
-    const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(new Blob([ics], { type: 'text/calendar' })), download: 'lawan-raja-batu.ics' });
-    document.body.append(a); a.click(); a.remove();
-    tandaiMisi('ingat'); toast('Pengingat diunduh. Buka untuk menambahkannya ke kalender.');
+    if (!target || !PG) return;
+    const nama = (stMon && stMon.nama) || 'Raja Batu';
+    PG.buka({ kunci: 'bos-' + target, judul: `Lawan ${nama} - YCS 2026`, mulai: target, selesai: target + 20 * 60000, sebelum: 5,
+      detail: `${nama} muncul di plaza festival. Kalahkan bareng-bareng dan dapat kode undian HP!`, url: location.origin + '/game/',
+      notifJudul: `⚔️ ${nama} muncul 5 menit lagi!`, notifIsi: 'Siapkan jarimu. Ketuk untuk masuk arena dan dapat kode undian HP.',
+      saatPilih: () => tandaiMisi('ingat') });
   });
 
   /* ---------- latihan ---------- */
