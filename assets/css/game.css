@@ -216,10 +216,10 @@ body.is-retak .g-tidur .badge { background: var(--coral-500); color: var(--white
   box-shadow: 0 14px 30px -14px rgba(42, 22, 112, .7), inset 0 0 0 1px rgba(255,255,255,.08); }
 .g-hp__kilau { position: absolute; inset: 0; z-index: -1; pointer-events: none; background: repeating-conic-gradient(from 0deg at 78% 45%, rgba(255,255,255,.07) 0deg 8deg, transparent 8deg 22deg); -webkit-mask: radial-gradient(circle at 78% 45%, #000 0, transparent 70%); mask: radial-gradient(circle at 78% 45%, #000 0, transparent 70%); animation: g-putar 28s linear infinite; }
 .g-hp__teks { position: relative; z-index: 2; display: grid; gap: 6px; justify-items: start; min-width: 0; }
-.g-hp__label { white-space: nowrap; padding: 3px 8px; border-radius: var(--r-pill); background: color-mix(in srgb, var(--sun-400) 18%, transparent); color: var(--sun-400); font-size: var(--fs-tab, .6875rem); font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+.g-hp__label { font: 700 1.5rem/1 var(--font-script); color: var(--sun-400); transform: rotate(-3deg); transform-origin: left; }
 .g-hp__jml { font-size: clamp(1.75rem, 7.5vw, 2.25rem); line-height: 1; font-weight: 800; letter-spacing: -.02em; }
 .g-hp__jml span { background: linear-gradient(180deg, #FFF3B0, var(--sun-400) 60%, #F59E0B); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.g-hp__model { font-size: var(--fs-xs); font-weight: 700; letter-spacing: .04em; color: color-mix(in srgb, var(--white) 78%, transparent); }
+.g-hp__model { max-width: 14rem; font-size: var(--fs-xs); line-height: 1.4; color: color-mix(in srgb, var(--white) 78%, transparent); }
 .g-hp__alur { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px; list-style: none; }
 .g-hp__alur li { display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: var(--r-pill); background: rgba(255,255,255,.1); font-size: var(--fs-tab, .6875rem); font-weight: 700; white-space: nowrap; }
 .g-hp__foto { position: relative; display: grid; place-items: center; width: clamp(6.5rem, 30vw, 9rem); }
@@ -382,3 +382,5 @@ dialog.g-cara .g-langkah { margin-top: 0; }
 .g-cara__top h3 svg { color: #E0A100; }
 .g-cara__aksi { display: grid; gap: var(--space-2); }
 @media (prefers-reduced-motion: reduce) { .g-hp__info, dialog.g-cara[open] { animation: none; } }
+.g-hp__ilustrasi { margin-top: 2px; font-size: .625rem; color: color-mix(in srgb, var(--white) 55%, transparent); }
+.g-hp { min-height: 10rem; }
