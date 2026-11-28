@@ -572,12 +572,30 @@
     .juara__hp-sinar { position: absolute; inset: 5% -10%; border-radius: 50%; background: radial-gradient(circle, rgba(255, 205, 80, .45), rgba(255, 205, 80, 0) 65%); }
     .juara__hp-pita { position: absolute; z-index: 2; right: -6px; bottom: 6%; display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 50%; background: var(--sun-400); color: var(--navy-950); font-weight: 900; transform: rotate(10deg); box-shadow: 0 6px 14px -4px rgba(0, 0, 0, .5); }
     .juara__kosong { display: grid; gap: var(--space-4); margin-top: var(--space-5); }
-    .juara__kursi-wrap { display: grid; gap: .75rem; padding: 1rem 1.125rem; border-radius: var(--r-lg); background: color-mix(in srgb, var(--white) 6%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--white) 10%, transparent); }
-    .juara__kursi { display: grid; grid-template-columns: repeat(8, minmax(0, 2.5rem)); gap: .5rem; margin: 0; padding: 0; list-style: none; }
-    .juara__kursi li { display: grid; place-items: center; aspect-ratio: 1; border-radius: 50%; border: 2px dashed color-mix(in srgb, var(--sun-400) 55%, transparent); color: var(--sun-400); font-weight: 900; }
-    .juara__kursi li::before { content: "?"; }
-    .juara__kursi-teks { margin: 0; color: var(--blue-100); font-size: var(--fs-btn); }
+    /* 8 slot HP hadiah (siluet HP), terisi saat ada pemenang */
+    .juara__kursi-wrap { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 1.25rem; padding: 1.125rem 1.25rem; border-radius: var(--r-lg); background: linear-gradient(135deg, color-mix(in srgb, var(--white) 7%, transparent), color-mix(in srgb, var(--white) 3%, transparent)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--white) 10%, transparent); }
+    .juara__skor { display: grid; justify-items: center; padding-right: 1.25rem; border-right: 1px solid color-mix(in srgb, var(--white) 10%, transparent); line-height: 1; }
+    .juara__skor p { display: flex; align-items: baseline; gap: 2px; margin: 0; }
+    .juara__skor b { font-size: 2.75rem; font-weight: 900; color: var(--sun-400); }
+    .juara__skor span { font-size: 1.25rem; font-weight: 800; color: var(--blue-100); }
+    .juara__skor small { margin-top: .375rem; color: var(--blue-100); font-size: var(--fs-xs); white-space: nowrap; }
+    .juara__slot { display: grid; gap: .625rem; min-width: 0; }
+    .juara__kursi { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: .5rem; max-width: 34rem; margin: 0; padding: 0; list-style: none; }
+    .juara__kursi li { display: grid; justify-items: center; gap: .25rem; min-width: 0; }
+    .juara__kursi small { color: color-mix(in srgb, var(--white) 45%, transparent); font-size: .625rem; font-weight: 800; }
+    .juara__slot-hp { position: relative; display: block; width: min(100%, 2.75rem); aspect-ratio: 9 / 17; border-radius: 7px; background: linear-gradient(160deg, #2A3D7A, #17255A); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--sun-400) 35%, transparent), 0 6px 12px -6px rgba(0, 0, 0, .6); overflow: hidden; }
+    .juara__slot-hp::before { content: ""; position: absolute; top: 3px; left: 50%; width: 30%; height: 3px; border-radius: 3px; background: color-mix(in srgb, var(--white) 30%, transparent); transform: translateX(-50%); }
+    .juara__slot-hp::after { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, .16) 50%, transparent 70%); transform: translateX(-120%); animation: juara-kilau 3.2s ease-in-out infinite; }
+    .juara__kursi li:nth-child(2) .juara__slot-hp::after { animation-delay: .15s; } .juara__kursi li:nth-child(3) .juara__slot-hp::after { animation-delay: .3s; } .juara__kursi li:nth-child(4) .juara__slot-hp::after { animation-delay: .45s; }
+    .juara__kursi li:nth-child(5) .juara__slot-hp::after { animation-delay: .6s; } .juara__kursi li:nth-child(6) .juara__slot-hp::after { animation-delay: .75s; } .juara__kursi li:nth-child(7) .juara__slot-hp::after { animation-delay: .9s; } .juara__kursi li:nth-child(8) .juara__slot-hp::after { animation-delay: 1.05s; }
+    .juara__slot-hp i { position: absolute; left: 50%; top: 52%; width: 38%; aspect-ratio: 1; border-radius: 50%; border: 1.5px solid color-mix(in srgb, var(--sun-400) 55%, transparent); transform: translate(-50%, -50%); }
+    .juara__slot-hp i::after { content: ""; position: absolute; inset: 30%; border-radius: 50%; background: color-mix(in srgb, var(--sun-400) 55%, transparent); }
+    @keyframes juara-kilau { 0%, 55% { transform: translateX(-120%); } 85%, 100% { transform: translateX(120%); } }
+    .juara__bar { max-width: 34rem; height: 6px; border-radius: 6px; background: color-mix(in srgb, var(--white) 10%, transparent); overflow: hidden; }
+    .juara__bar i { display: block; width: 3%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--sun-400), var(--coral-500)); }
+    .juara__kursi-teks { margin: 0; color: var(--blue-100); font-size: var(--fs-btn-sm); }
     .juara__kursi-teks strong { color: var(--white); }
+    @media (prefers-reduced-motion: reduce) { .juara__slot-hp::after { animation: none; } }
     .juara__langkah { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; margin: 0; padding: 0; list-style: none; counter-reset: l; }
     .juara__langkah li { position: relative; display: flex; align-items: flex-start; gap: .625rem; padding: .875rem 1rem; border-radius: var(--r-lg); background: var(--navy-900); }
     .juara__langkah li:not(:last-child)::after { content: ""; position: absolute; top: 50%; right: -.6rem; width: .45rem; height: .45rem; border-top: 2px solid var(--sun-400); border-right: 2px solid var(--sun-400); transform: translateY(-50%) rotate(45deg); }
@@ -588,7 +606,10 @@
     .juara__cta { justify-self: start; }
     .juara__ilustrasi { margin: 0; color: color-mix(in srgb, var(--white) 50%, transparent); font-size: .6875rem; }
     @media (max-width: 40rem) {
-      .juara__kursi { grid-template-columns: repeat(8, minmax(0, 1fr)); gap: .3rem; }
+      .juara__kursi-wrap { grid-template-columns: 1fr; gap: .875rem; padding: 1rem; }
+      .juara__skor { display: flex; align-items: baseline; justify-content: flex-start; padding: 0 0 .75rem; border-right: 0; border-bottom: 1px solid color-mix(in srgb, var(--white) 10%, transparent); }
+      .juara__skor small { margin: 0 0 0 .5rem; }
+      .juara__kursi { gap: .35rem; }
       .juara__langkah { grid-template-columns: 1fr; }
       .juara__langkah li:not(:last-child)::after { top: auto; right: auto; bottom: -.55rem; left: 1.55rem; transform: rotate(135deg); }
       .juara__cta { justify-self: stretch; }
@@ -1609,8 +1630,12 @@
           <ol class="juara__daftar" id="juara-daftar" aria-live="polite"></ol>
           <div class="juara__kosong" id="juara-kosong">
             <div class="juara__kursi-wrap">
-              <ol class="juara__kursi" aria-label="8 kursi pemenang HP, semuanya masih kosong"><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li></ol>
-              <p class="juara__kursi-teks"><strong>8 kursi pemenang HP masih kosong.</strong> Kamu bisa jadi yang pertama.</p>
+              <div class="juara__skor"><p><b>0</b><span>/8</span></p><small>HP sudah dibawa pulang</small></div>
+              <div class="juara__slot">
+                <ol class="juara__kursi" aria-label="8 HP hadiah, belum ada pemenang"><li><span class="juara__slot-hp"><i></i></span><small>#1</small></li><li><span class="juara__slot-hp"><i></i></span><small>#2</small></li><li><span class="juara__slot-hp"><i></i></span><small>#3</small></li><li><span class="juara__slot-hp"><i></i></span><small>#4</small></li><li><span class="juara__slot-hp"><i></i></span><small>#5</small></li><li><span class="juara__slot-hp"><i></i></span><small>#6</small></li><li><span class="juara__slot-hp"><i></i></span><small>#7</small></li><li><span class="juara__slot-hp"><i></i></span><small>#8</small></li></ol>
+                <div class="juara__bar" aria-hidden="true"><i></i></div>
+                <p class="juara__kursi-teks"><strong>Belum ada pemenang.</strong> 8 HP menunggu pemiliknya. Kamu bisa jadi yang pertama!</p>
+              </div>
             </div>
             <ol class="juara__langkah">
               <li><b>1</b><span><strong>Gabung festival</strong><small>Kirim satu kata, dapat karakter</small></span></li>
