@@ -13,6 +13,7 @@
   const esc = (t) => String(t == null ? '' : t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const utc = (ms) => new Date(ms).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
   const jamWib = (ms) => new Date(ms).toLocaleString('id-ID', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }) + ' WIB';
+  const lamaTeks = (m) => (m >= 1440 && m % 1440 === 0 ? `${m / 1440} hari` : m >= 60 && m % 60 === 0 ? `${m / 60} jam` : `${m} menit`);
   const bisaNotif = () => 'Notification' in window && window.isSecureContext;
 
   function linkGoogle(a) {
@@ -61,7 +62,7 @@
     if (berikut != null) jalan = setTimeout(periksa, Math.min(berikut + 200, 30000));
   }
   function jadwalkan(a) {
-    const r = { kunci: a.kunci || a.judul, judul: a.notifJudul || a.judul, isi: a.notifIsi || `Mulai ${jamWib(a.mulai)}. Ketuk untuk membuka.`, url: a.url || location.href, mulai: a.mulai, picu: a.mulai - (a.sebelum || 10) * 60000 };
+    const r = { kunci: a.kunci || a.judul, judul: a.notifJudul || a.judul, isi: a.notifIsi || `Mulai ${jamWib(a.mulai)}. Ketuk untuk membuka web YCS.`, url: a.url || location.href, mulai: a.mulai, picu: a.mulai - (a.sebelum || 10) * 60000 };
     const list = baca().filter((x) => x.kunci !== r.kunci);
     list.push(r); simpan(list); periksa();
   }
@@ -83,7 +84,7 @@
 .pgi__opsi small{font-size:.75rem;color:var(--text-2,#4a5578)}
 .pgi__ikon{display:grid;place-items:center;flex:none;width:2.5rem;height:2.5rem;border-radius:12px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12)}
 .pgi__ikon svg{width:1.5rem;height:1.5rem}
-.pgi__opsi.is-utama{background:linear-gradient(135deg,#e8f0fe,#f6f9ff);box-shadow:inset 0 0 0 1.5px #1a73e8}
+.pgi__opsi.is-utama{background:color-mix(in srgb,#1a73e8 16%,var(--surface-soft,#f1f5ff));box-shadow:inset 0 0 0 1.5px #1a73e8}
 .pgi__opsi.is-aktif{box-shadow:inset 0 0 0 1.5px #1e9e5a}
 .pgi__ics{justify-self:center;padding:6px 10px;border:0;background:none;color:var(--text-2,#4a5578);font:600 .8125rem var(--font-sans,sans-serif);text-decoration:underline;cursor:pointer}
 .pgi__tutup{position:absolute;top:12px;right:12px;width:2.25rem;height:2.25rem;border:0;border-radius:50%;background:var(--surface-soft,#f1f5ff);color:var(--text,#1b2440);font-size:1.25rem;line-height:1;cursor:pointer}`;
@@ -109,8 +110,9 @@
         await daftarSw();
         jadwalkan(aktif);
         aktif.saatPilih && aktif.saatPilih('notif');
-        tampilNotif({ kunci: 'uji', judul: 'Pengingat aktif ✅', isi: `Kami munculkan notifikasi ${aktif.sebelum || 10} menit sebelum ${aktif.judul} (${jamWib(aktif.mulai)}). Biarkan web YCS tetap terbuka di salah satu tab.`, url: aktif.url });
-        notif && notif(`Notifikasi Chrome aktif: muncul ${aktif.sebelum || 10} menit sebelum mulai.`);
+        const sb = aktif.sebelum || 10;
+        tampilNotif({ kunci: 'uji', judul: 'Pengingat berhasil dipasang ✅', isi: `${aktif.judul} mulai ${jamWib(aktif.mulai)}. Kamu akan dapat notifikasi ${lamaTeks(sb)} sebelumnya (${jamWib(aktif.mulai - sb * 60000)}).`, url: aktif.url });
+        notif && notif(`Siap! Notifikasi muncul ${jamWib(aktif.mulai - sb * 60000)}, ${lamaTeks(sb)} sebelum mulai. Jangan tutup tab web YCS ya.`);
         dlg.close();
       }
     });
@@ -121,8 +123,8 @@
     const blokir = bisaNotif() && Notification.permission === 'denied';
     dlg.innerHTML = `<button class="pgi__tutup" type="button" data-pgi="tutup" aria-label="Tutup">×</button>
       <h2 id="pgi-judul">Ingatkan aku</h2><p>${esc(a.judul)} · ${jamWib(a.mulai)}</p>
-      <a class="pgi__opsi is-utama" data-pgi="gcal" href="${esc(linkGoogle(a))}" target="_blank" rel="noopener"><span class="pgi__ikon">${IKON_GCAL}</span><span><strong>Tambah ke Google Kalender</strong><small>Langsung terbuka, tinggal tekan Simpan. Tetap mengingatkan walau web ditutup.</small></span></a>
-      <button class="pgi__opsi${sudah ? ' is-aktif' : ''}" type="button" data-pgi="notif"><span class="pgi__ikon">${IKON_LONCENG}</span><span><strong>${sudah ? 'Notifikasi Chrome sudah aktif ✓' : 'Notifikasi Chrome'}</strong><small>${blokir ? 'Notifikasi sedang diblokir di browser ini. Izinkan dulu lewat ikon gembok.' : `Pop-up ${a.sebelum || 10} menit sebelum mulai, selama web YCS terbuka di salah satu tab.`}</small></span></button>
+      <a class="pgi__opsi is-utama" data-pgi="gcal" href="${esc(linkGoogle(a))}" target="_blank" rel="noopener"><span class="pgi__ikon">${IKON_GCAL}</span><span><strong>Tambah ke Google Kalender</strong><small>Masuk ke kalender HP-mu, tinggal tekan Simpan. Tetap mengingatkan walau web ditutup.</small></span></a>
+      <button class="pgi__opsi${sudah ? ' is-aktif' : ''}" type="button" data-pgi="notif"><span class="pgi__ikon">${IKON_LONCENG}</span><span><strong>${sudah ? 'Notifikasi Chrome sudah aktif ✓' : 'Notifikasi Chrome'}</strong><small>${blokir ? 'Notifikasi sedang diblokir. Izinkan dulu lewat ikon gembok di samping alamat web.' : `Muncul pemberitahuan di HP ${lamaTeks(a.sebelum || 10)} sebelum mulai. Syarat: tab web YCS jangan ditutup.`}</small></span></button>
       <button class="pgi__ics" type="button" data-pgi="ics">Pakai iPhone/Outlook? Unduh file kalender (.ics)</button>`;
     if (dlg.showModal) { if (!dlg.open) dlg.showModal(); } else dlg.setAttribute('open', '');
   }

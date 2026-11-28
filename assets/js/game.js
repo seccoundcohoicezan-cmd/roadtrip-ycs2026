@@ -328,7 +328,7 @@
     const nama = (stMon && stMon.nama) || 'Raja Batu';
     PG.buka({ kunci: 'bos-' + target, judul: `Lawan ${nama} - YCS 2026`, mulai: target, selesai: target + 20 * 60000, sebelum: 5,
       detail: `${nama} muncul di plaza festival. Kalahkan bareng-bareng dan dapat kode undian HP!`, url: location.origin + '/game/',
-      notifJudul: `⚔️ ${nama} muncul 5 menit lagi!`, notifIsi: 'Siapkan jarimu. Ketuk untuk masuk arena dan dapat kode undian HP.',
+      notifJudul: `⚔️ ${nama} muncul 5 menit lagi!`, notifIsi: `Ayo lawan ${nama} bareng-bareng dan dapat kode undian HP. Ketuk untuk masuk arena.`,
       saatPilih: () => tandaiMisi('ingat') });
   });
 
