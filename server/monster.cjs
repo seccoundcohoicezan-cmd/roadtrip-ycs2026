@@ -10,7 +10,8 @@ const {aturan, intervalUntuk} = require('../assets/js/monster-aturan.js');
 const MENIT = 60000;
 const PASCA = 15 * MENIT;       // hasil event masih tampil 15 menit setelah jendela berakhir
 const TUNGGU = 24 * 60 * MENIT; // hitung mundur mulai 24 jam sebelumnya
-const AKTIF_MS = 15000;         // pemain dihitung aktif bila mengirim tap dalam 15 detik terakhir
+const AKTIF_MS = 15000;
+const KLAIM_JAM = 48;            // batas klaim hadiah undian: 2×24 jam setelah diundi         // pemain dihitung aktif bila mengirim tap dalam 15 detik terakhir
 const angka = (v, d, min, maks) => { const n = Number(String(v ?? '').replace(',', '.')); return String(v ?? '').trim() !== '' && Number.isFinite(n) ? Math.min(maks, Math.max(min, n)) : d; };
 
 function jadwal(cfg, now) {
@@ -231,6 +232,9 @@ function buatMonster(app, opsi = {}) {
     if (j.uji) dasar.uji = true;
     if (j.ujiSalah) dasar.ujiSalah = true;
     const htop = nominalTop(m); if (htop.length) dasar.hadiahTop = htop;
+    if (m.klaimWa) dasar.klaimWa = String(m.klaimWa);
+    dasar.klaimJam = KLAIM_JAM;
+    const jt = juaraTopTerakhir(); if (jt) dasar.juaraTop = jt;
     if (!j.id) return dasar;
     const live = j.live ? {judul: j.live.judul, platform: j.live.platform, link: j.live.link, mulai: new Date(j.live.mulai).toISOString()} : null;
     const out = {...dasar, id: j.id, mulai: new Date(j.mulai).toISOString(), selesai: new Date(j.selesai).toISOString(), live, levelMaks: a.target.length, target: a.target, poin: a.poin, skala: a.skala};
@@ -516,7 +520,7 @@ function buatMonster(app, opsi = {}) {
   function tetapkanTop(id, e, out) {
     const m = (cfg() || {}).monster || {};
     const nominal = nominalTop(m), syarat = m.hadiahTopSyarat === 'menang' ? 'menang' : 'selalu';
-    e.top = [];
+    e.top = []; e.topT = now();
     if (!nominal.length) return;
     if (syarat === 'menang' && !out.kalah) { e.topCatatan = 'bos tidak tumbang'; return; }
     const urut = Object.entries(e.u).filter(([, u]) => u.p > 0).sort((a, b) => b[1].p - a[1].p).slice(0, nominal.length);
@@ -528,6 +532,12 @@ function buatMonster(app, opsi = {}) {
     app.ctx.logAdmin_('hadiah top kontributor', id + ': ' + e.top.map((x) => '#' + x.peringkat + ' ' + identitas(x.pid).nama + ' Rp' + x.nominal).join(', '));
   }
   const topPublik = (e) => (e && e.top ? e.top.map((x) => { const o = identitas(x.pid); return {peringkat: x.peringkat, nama: namaTampil(o.nama), provinsi: o.provinsi, tenaga: x.p, nominal: x.nominal}; }) : null);
+  // Top kontributor event asli terakhir (untuk papan peringkat di lobi /game/, tetap tampil sampai event berikutnya selesai).
+  function juaraTopTerakhir() {
+    let pilih = null;
+    for (const [id, e] of Object.entries(st.events)) if (id[0] !== 'u' && e.top && e.top.length && (!pilih || (e.topT || 0) > (pilih.e.topT || 0))) pilih = {id, e};
+    return pilih ? {event: pilih.id, t: pilih.e.topT || null, top: topPublik(pilih.e)} : null;
+  }
   function finalisasi(id, out) {
     const e = st.events[id];
     e.final = true;
@@ -701,7 +711,7 @@ function buatMonster(app, opsi = {}) {
     if (!tunda.latihan) {
       ke = st.spin.hasil.length + 1;
       const waktu = app.ctx.teksWib_(now()) + ' WIB';
-      st.spin.hasil.push({ke, id: w.id, sumber: w.sumber, nama: w.nama, sekolah: w.sekolah, kota: w.kota, provinsi: w.provinsi, jalur: w.jalur, hadiah: hadiah.nama, hadiahId: hadiah.id, waktu});
+      st.spin.hasil.push({ke, id: w.id, event: w.sumber === 'tiket' ? tunda.event : undefined, t: now(), sumber: w.sumber, nama: w.nama, sekolah: w.sekolah, kota: w.kota, provinsi: w.provinsi, jalur: w.jalur, hadiah: hadiah.nama, hadiahId: hadiah.id, waktu});
       hadiah.terpakai += 1; tulisHadiah();
       const sh = app.sheets['Hasil Undian'] || app.ctx.tab_(app.ss, 'hasil');
       sh.rows.push([waktu, ke, {lolos: 'Peserta lolos', wildcard: 'Wild card', tiket: 'Tiket ' + tunda.event}[w.sumber] || w.sumber, w.nama, w.sekolah, w.kota, w.provinsi, w.jalur, hadiah.nama, '']);
@@ -828,17 +838,22 @@ function buatMonster(app, opsi = {}) {
   }
 
   // Daftar pemenang publik (landing): hanya event asli, nama disingkat "Nama I." + provinsi + hadiah.
+  // Pemenang publik. Pemenang dari tiket menyertakan event + kode + waktu (ms) agar HP pemilik kode bisa
+  // menampilkan status MENANG + tombol klaim WA (batas klaim KLAIM_JAM dari waktu diundi).
+  const msWib = (w) => { const m = /(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2})/.exec(String(w || '')); return m ? Date.parse(m[1] + 'T' + m[2] + ':00+07:00') : null; };
   function pemenangPublik() {
     const sh = app.sheets['Tiket Monster'];
     const out = (sh ? sh.rows.slice(1) : []).filter((r) => /^MENANG/.test(String(r[9])) && r[1] && String(r[1])[0] !== 'u').map((r) => {
-      const bagian = String(r[9]).split(' · ');
-      return {nama: namaTampil(r[3]), provinsi: String(r[5] || ''), hadiah: bagian.length >= 3 ? bagian[1] : '', waktu: bagian[bagian.length - 1].replace(/^MENANG #\d+\s*/, ''), ke: Number((bagian[0].match(/#(\d+)/) || [])[1]) || 0};
+      const bagian = String(r[9]).split(' · '), waktu = bagian[bagian.length - 1].replace(/^MENANG #\d+\s*/, '');
+      return {nama: namaTampil(r[3]), provinsi: String(r[5] || ''), hadiah: bagian.length >= 3 ? bagian[1] : '', waktu: waktu.replace(/ WIB$/, ''), t: msWib(waktu), ke: Number((bagian[0].match(/#(\d+)/) || [])[1]) || 0, event: String(r[1]), tiket: String(r[2] || '')};
     });
-    const undian = st.spin.hasil.map((h) => ({nama: namaTampil(h.nama), provinsi: h.provinsi || '', hadiah: h.hadiah, waktu: String(h.waktu || '').replace(/ WIB$/, ''), ke: h.ke}));
-    return {ok: true, pemenang: [...out, ...undian].reverse().slice(0, 60)};
+    // Pemenang tiket dari undian 2 tahap sudah tercatat di baris Tiket Monster (di atas) → jangan digandakan.
+    const undian = st.spin.hasil.filter((h) => !(h.sumber === 'tiket' && out.some((o) => 't:' + o.tiket === h.id && (!h.event || o.event === h.event))))
+      .map((h) => ({nama: namaTampil(h.nama), provinsi: h.provinsi || '', hadiah: h.hadiah, waktu: String(h.waktu || '').replace(/ WIB$/, ''), t: h.t || msWib(h.waktu), ke: h.ke}));
+    return {ok: true, klaimJam: KLAIM_JAM, pemenang: [...out, ...undian].sort((a, b) => (a.t || 0) - (b.t || 0)).reverse().slice(0, 60)};
   }
 
   return {lihat, masuk, tap, hindar, saya, klaimMisi, pakaiPotion, bekalPublik, admin, pemenangPublik, misiPublik, misiLobi, state: st, jadwal, jenisJurus, segarkan: () => { memo.t = 0; }};
 }
 
-module.exports = {buatMonster, jadwal, PASCA, MENIT};
+module.exports = {KLAIM_JAM, buatMonster, jadwal, PASCA, MENIT};

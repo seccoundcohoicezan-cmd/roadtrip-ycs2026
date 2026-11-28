@@ -496,6 +496,12 @@
                 <div class="field"><label for="m-monster_hadiah_misi">Hadiah Misi Pejuang harian</label><select class="select" id="m-monster_hadiah_misi" data-key="monster_hadiah_misi"><option value="gilir">Bergilir tiap hari: Racun → Petir → Gempa</option><option value="racun">Tetap: Racun (50 tap)</option><option value="petir">Tetap: Petir (200 tap)</option><option value="gempa">Tetap: Gempa (150 tap)</option><option value="semua">Semua: 1 Racun + 1 Gempa + 1 Petir</option></select><p class="field__hint">Misi direset tiap hari 00.00 WIB. Hadiah diberikan sekali per hari setelah 5 misi selesai.</p></div>
               </div>
             </section>
+            <section class="set-card" aria-labelledby="g-mon-klaim">
+              <header class="set-card__head"><span class="set-card__icon" aria-hidden="true"><svg><use href="#i-gift"/></svg></span><div><h2 id="g-mon-klaim">Klaim hadiah undian</h2><p>Pemenang undian menekan tombol <b>Klaim lewat WhatsApp</b> di /game/ → chat ke nomor ini dengan kode & hadiahnya sudah terisi. Batas klaim <b>2×24 jam</b> setelah diundi; lewat dari itu tombol klaim ditutup.</p></div></header>
+              <div class="set-grid">
+                <div class="field field--full"><label for="m-monster_klaim_wa">Nomor WhatsApp klaim</label><div class="uji-link"><input class="input input--mono" id="m-monster_klaim_wa" data-key="monster_klaim_wa" inputmode="tel" placeholder="6287848775292" readonly aria-describedby="klaim-wa-hint"><button class="btn btn--soft btn--sm" type="button" id="klaim-wa-kunci" aria-pressed="false"><svg aria-hidden="true" width="16" height="16"><use href="#i-lock"/></svg><span>Buka kunci</span></button><a class="btn btn--soft btn--sm" id="klaim-wa-uji" target="_blank" rel="noopener">Tes wa.me</a></div><p class="field__hint" id="klaim-wa-hint">Terkunci agar tidak berubah tidak sengaja. Tekan <b>Buka kunci</b> untuk mengganti, lalu <b>Simpan pengaturan monster</b>. Format 62… (awalan 0 otomatis diubah ke 62).</p></div>
+              </div>
+            </section>
             <div class="savebar"><p id="mon-set-status" role="status">Tidak ada perubahan.</p><button class="btn btn--cta btn--sm" type="submit" id="btn-simpan-mon">Simpan pengaturan monster</button></div>
           </form>
           <section class="set-card" aria-labelledby="g-mon-uji">
@@ -947,6 +953,7 @@
         else if (el.dataset.type === 'waktu') el.value = keInput(v);
         else el.value = v;
       });
+      kunciWa(true);
       $('#mon-set-status').textContent = 'Tidak ada perubahan.';
       const mode = (cfgVal('monster_darurat') || 'NORMAL').toUpperCase();
       $('#mon-mode').textContent = !/^YA$/i.test(cfgVal('monster_aktif')) ? 'Fitur sedang dimatikan.' : mode === 'STOP' ? 'Mode: STOP darurat (monster disembunyikan).' : mode === 'MULAI' ? 'Mode: dimulai manual.' : 'Mode: mengikuti pemicu.';
@@ -971,6 +978,16 @@
       else if (v.monster_pemicu === 'manual') item = ['Hanya saat tombol <strong>Mulai sekarang</strong> ditekan.'];
       $('#mon-jadwal').innerHTML = (item.length ? item : ['Belum ada jadwal yang akan datang.']).map((x) => `<li>${x}</li>`).join('');
     }
+    // Nomor WA klaim dikunci (readonly) secara bawaan; buka kunci dulu untuk mengganti.
+    function kunciWa(kunci) {
+      const el = $('#m-monster_klaim_wa'), b = $('#klaim-wa-kunci');
+      el.readOnly = kunci; b.setAttribute('aria-pressed', String(!kunci)); b.querySelector('span').textContent = kunci ? 'Buka kunci' : 'Kunci lagi';
+      const n = el.value.replace(/\D/g, '').replace(/^0/, '62');
+      $('#klaim-wa-uji').href = 'https://wa.me/' + n;
+      if (!kunci) el.focus();
+    }
+    $('#klaim-wa-kunci').addEventListener('click', () => kunciWa(!$('#m-monster_klaim_wa').readOnly));
+    $('#m-monster_klaim_wa').addEventListener('input', (e) => { $('#klaim-wa-uji').href = 'https://wa.me/' + e.target.value.replace(/\D/g, '').replace(/^0/, '62'); });
     $('#f-monster').addEventListener('input', () => { pratinjauMon(); $('#mon-set-status').textContent = 'Ada perubahan yang belum disimpan.'; });
     async function simpanMon(ubah, pesanOk) {
       const d = await api('admin-simpan-pengaturan', {nilai: ubah});

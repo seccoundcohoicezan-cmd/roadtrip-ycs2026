@@ -12,6 +12,7 @@
   const uji = (qs.get('uji-monster') || '').replace(/[^\w-]/g, '').slice(0, 20);
   const pad = (n) => String(n).padStart(2, '0');
   let offset = 0; const now = () => Date.now() + offset;
+  let cfg = null, stMon = null; // status bos (/api/monster) & pengaturan (/api/config), diisi muatStatus()
   fetch('/api/now', { cache: 'no-store' }).then((r) => r.json()).then((d) => { if (d && d.now) offset = d.now - Date.now(); }).catch(() => {});
 
   /* ---------- toast ---------- */
@@ -49,15 +50,77 @@
   /* ---------- kode undian (tersimpan di perangkat) ---------- */
   const KUNCI_KODE = uji ? 'ycs_kode_uji' : 'ycs_kode_undian';
   function daftarKode() { return baca(KUNCI_KODE, []); }
-  function tampilKode() {
-    const list = daftarKode();
-    const nSah = list.filter((k) => (k.status || 'sah') === 'sah').length;
-    $('#g-jml-kode').textContent = nSah;
-    $('#g-kode-badge').textContent = `${nSah} kode sah`;
-    $('#g-kode-kosong').hidden = list.length > 0;
-    const LBL = { menunggu: ['badge--info', 'Sah jika bos tumbang'], sah: ['badge--open', 'Sah · ikut undian'], hangus: ['badge--done', 'Hangus'] };
-    $('#g-kode').innerHTML = list.slice().reverse().map((k) => `<li class="is-${k.status || 'sah'}"><span class="g-kode__tiket"><small>Kode undian</small><b>${String(k.kode).replace(/[<&]/g, '')}</b></span><span class="g-kode__info"><strong>${k.bos || 'Raja Batu'}</strong><small>${new Date(k.waktu).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}${k.live ? ' · diundi di ' + String(k.live).replace(/[<&]/g, '') : ''}</small><span class="badge ${(LBL[k.status] || LBL.sah)[0]}">${(LBL[k.status] || LBL.sah)[1]}</span></span></li>`).join('');
+  // Status kode: menunggu (bos belum tumbang) → sah (ikut undian) | hangus; sah → menang (cocok dengan /api/pemenang).
+  // Pemenang wajib klaim lewat WhatsApp panitia maksimal KLAIM_JAM (2×24 jam) sejak diundi.
+  const KLAIM_JAM_BAWAAN = 48, WA_BAWAAN = '6287848775292';
+  const esc = (t) => String(t == null ? '' : t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const klaimJam = () => Number((stMon && stMon.klaimJam) || KLAIM_JAM_BAWAAN);
+  const nomorKlaim = () => String((stMon && stMon.klaimWa) || (cfg && cfg.monster && cfg.monster.klaimWa) || WA_BAWAAN).replace(/\D/g, '');
+  const batasKlaim = (k) => (k.tMenang ? k.tMenang + klaimJam() * 3600e3 : 0);
+  const jamWib = (ms) => new Date(ms).toLocaleString('id-ID', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }) + ' WIB';
+  function sisaTeks(ms) { const m = Math.max(0, Math.floor(ms / 60000)); const j = Math.floor(m / 60); return j ? `${j} jam ${m % 60} menit` : `${m} menit`; }
+  function linkKlaim(k) {
+    const idt = baca('ycs_identitas') || {}, nama = (saya && saya.n) || idt.nama || '';
+    const teks = ['Halo Panitia YCS 2026, saya pemenang undian game Lawan Raja Batu dan ingin klaim hadiah.', '',
+      `Kode undian: ${k.kode}`, k.hadiah ? `Hadiah: ${k.hadiah}` : '', `Event: ${k.bos || 'Raja Batu'}${k.live ? ' · ' + k.live : ''}`,
+      k.tMenang ? `Diundi: ${jamWib(k.tMenang)}` : '', nama ? `Nama: ${nama}` : '', '', 'Mohon info langkah klaimnya. Terima kasih!'].filter((x, i, arr) => x || (arr[i - 1] && i < arr.length - 1)).join('\n');
+    return `https://wa.me/${nomorKlaim()}?text=${encodeURIComponent(teks)}`;
   }
+  function tampilKode() {
+    const list = daftarKode(), t = now();
+    const st = (k) => k.status || 'sah';
+    const n = { sah: 0, menunggu: 0, menang: 0, hangus: 0 };
+    list.forEach((k) => { n[st(k)] = (n[st(k)] || 0) + 1; });
+    const aktifKlaim = list.filter((k) => st(k) === 'menang' && batasKlaim(k) > t);
+    $('#g-jml-kode').textContent = n.sah + n.menang;
+    $('#g-dompet').setAttribute('aria-label', `Tiketku: ${n.sah} kode ikut undian${n.menang ? `, ${n.menang} menang` : ''}`);
+    $('#g-dompet-titik').hidden = !aktifKlaim.length;
+    $('#g-kode-badge').textContent = n.menang ? `${n.menang} menang 🎉` : `${n.sah} kode sah`;
+    ['sah', 'menunggu', 'menang', 'hangus'].forEach((x) => { $('#tk-' + x).textContent = nf.format(n[x] || 0); });
+    $('#g-kode-kosong').hidden = list.length > 0;
+    // Status undian (paling penting di atas): menang & klaim → sah menunggu live → menunggu bos → belum punya
+    const und = $('#g-undian'); und.className = 'g-undian';
+    const liveBerikut = cfg && (cfg.live || []).map((x) => ({ ...x, t: Date.parse(x.mulai) })).filter((x) => x.t > t - 3600e3).sort((a, b) => a.t - b.t)[0];
+    if (aktifKlaim.length) {
+      const k = aktifKlaim[0]; und.classList.add('is-menang');
+      und.innerHTML = `<strong>🎉 Kode ${esc(k.kode)} MENANG${k.hadiah ? ': ' + esc(k.hadiah) : ''}!</strong><span>Klaim sebelum <b>${jamWib(batasKlaim(k))}</b> · sisa <span class="g-sisa">${sisaTeks(batasKlaim(k) - t)}</span>.</span><a class="btn btn--wa btn--block" href="${linkKlaim(k)}" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-whatsapp"/></svg>Klaim lewat WhatsApp</a>`;
+    } else if (n.sah) {
+      und.innerHTML = `<strong>🎟️ ${n.sah} kode ikut undian</strong><span>${liveBerikut ? `Diundi saat live <b>${esc(liveBerikut.judul)}</b>, ${jamWib(liveBerikut.t)}.` : 'Diundi saat live YCS berikutnya.'} Pantau halaman ini: kalau kodemu keluar, statusnya jadi <b>Menang</b> dan tombol klaim muncul.</span>`;
+    } else if (n.menunggu) {
+      und.innerHTML = '<strong>⏳ Kodemu menunggu bos tumbang</strong><span>Terus serang Raja Batu! Kode sah ikut undian kalau bos tumbang.</span>';
+    } else if (list.some((k) => st(k) === 'menang')) {
+      und.classList.add('is-lewat'); und.innerHTML = `<strong>Batas klaim sudah lewat</strong><span>Klaim hadiah maksimal ${klaimJam() / 24}×24 jam sejak diundi. Kalahkan Raja Batu lagi untuk kode baru!</span>`;
+    } else und.innerHTML = '';
+    const LBL = { menunggu: ['badge--info', 'Sah jika bos tumbang'], sah: ['badge--open', 'Sah · ikut undian'], hangus: ['badge--done', 'Hangus'], menang: ['badge--sun', 'Menang'] };
+    $('#g-kode').innerHTML = list.slice().reverse().sort((a, b) => (st(b) === 'menang') - (st(a) === 'menang')).map((k) => {
+      const s0 = st(k), lbl = LBL[s0] || LBL.sah, batas = batasKlaim(k), lewat = s0 === 'menang' && batas && batas <= t;
+      const klaim = s0 === 'menang' ? (lewat ? `<div class="g-kode__klaim"><small>Batas klaim (${jamWib(batas)}) sudah lewat.</small></div>`
+        : `<div class="g-kode__klaim"><a class="btn btn--wa btn--sm btn--block" href="${linkKlaim(k)}" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-whatsapp"/></svg>Klaim lewat WhatsApp</a><small>${batas ? `Maks. ${jamWib(batas)} · sisa ${sisaTeks(batas - t)}` : `Maks. ${klaimJam() / 24}×24 jam sejak diundi`}</small></div>`) : '';
+      return `<li class="is-${s0}${lewat ? ' is-lewat' : ''}"><span class="g-kode__tiket"><small>Kode undian</small><b>${esc(k.kode)}</b></span><span class="g-kode__info"><strong>${esc(k.bos || 'Raja Batu')}</strong><small>${new Date(k.waktu).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}${k.live ? ' · diundi di ' + esc(k.live) : ''}</small><span class="badge ${lbl[0]}">${s0 === 'menang' ? '🏆 Menang' + (k.hadiah ? ' · ' + esc(k.hadiah) : '') : lbl[1]}</span></span>${klaim}</li>`;
+    }).join('');
+  }
+  // Cocokkan kode di HP dengan daftar pemenang server (event + nomor kode).
+  function cocokkanPemenang(pemenang) {
+    const list = daftarKode(); let baru = null;
+    list.forEach((k) => {
+      const p = pemenang.find((x) => x.tiket && x.event && x.tiket === k.kode && x.event === k.event);
+      if (p && k.status !== 'menang') { k.status = 'menang'; k.hadiah = p.hadiah || ''; k.tMenang = p.t || now(); baru = k; }
+    });
+    if (baru) { simpan(KUNCI_KODE, list); tampilKode(); S.menang(); toast(`Selamat! Kode ${baru.kode} menang. Klaim maks. 2×24 jam lewat WhatsApp.`); $('#g-dompet').classList.add('is-baru'); }
+  }
+  // Tombol tiket di bar atas: gulir ke Tiketku lalu sorot (bukan sekadar lompat), status undian langsung terbaca.
+  function sorotTiket(e) {
+    if (e) { e.preventDefault(); S.klik(); }
+    const el = $('#kode');
+    if (sedangPenuh()) keluarPenuh();
+    el.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+    el.classList.remove('is-sorot'); void el.offsetWidth; el.classList.add('is-sorot');
+    try { el.focus({ preventScroll: true }); } catch (x) {}
+    $('#g-dompet').classList.remove('is-baru');
+    if (history.replaceState) history.replaceState(null, '', location.pathname + location.search + '#kode');
+  }
+  $('#g-dompet').addEventListener('click', sorotTiket);
+  if (location.hash === '#kode') setTimeout(() => sorotTiket(), 300);
   // Kode dicadangkan saat ikut menyerang; sah (ikut undian) hanya bila Raja Batu tumbang — sama dengan aturan server.
   function catatKode(kode, st) {
     const list = daftarKode();
@@ -201,7 +264,7 @@
   $('#g-buat-nonton').addEventListener('click', () => { buatDitutup = true; $('#g-buat').hidden = true; toast('Mode nonton. Ketuk arena kapan saja untuk membuat karakter.'); });
 
   /* ---------- status bos & hitung mundur ---------- */
-  let cfg = null, stMon = null, target = 0;
+  let target = 0;
   async function muatStatus() {
     try {
       const [m, c] = await Promise.all([
@@ -211,6 +274,7 @@
       stMon = m; cfg = c;
       akhiriEvent(m);
       tulisPapan();
+      tampilKode();
     } catch (e) { /* biarkan status lama */ }
     tampilStatus();
   }
@@ -376,13 +440,25 @@
   function sorotMisi() { const el = $('#misi'); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); el.classList.remove('is-sorot'); void el.offsetWidth; el.classList.add('is-sorot'); } }
   syncMisi();
   tulisBekal(null);
-  setInterval(() => { if (!document.hidden) syncMisi(); }, 60000); // lewat 00.00 WIB → misi kosong lagi
+  setInterval(() => { if (!document.hidden) { syncMisi(); tampilKode(); } }, 60000); // lewat 00.00 WIB → misi kosong lagi
 
   /* ---------- papan hadiah (nominal Top dari pengaturan admin monster_hadiah_top) ---------- */
   function tulisPapan() {
-    const h = (stMon && stMon.hadiahTop) || [100000, 100000, 50000];
-    const urut = ['Hit terbanyak', 'Hit terbanyak ke-2', 'Hit terbanyak ke-3', 'Hit terbanyak ke-4', 'Hit terbanyak ke-5'];
-    $('#g-papan-top').innerHTML = h.map((n, i) => `<li><span class="g-papan__medali g-papan__medali--${Math.min(i + 1, 3)}">${i + 1}</span><div><strong>Top ${i + 1} Kontributor</strong><small>${urut[i]}</small></div><b>Rp${nf.format(n)}</b></li>`).join('');
+    const h = (stMon && stMon.hadiahTop) || [100000, 50000, 50000];
+    const jt = stMon && stMon.juaraTop && stMon.juaraTop.top ? stMon.juaraTop.top : [];
+    const juara = (i) => jt.find((x) => x.peringkat === i + 1);
+    const ada = jt.length > 0;
+    $('#g-lb-sub').textContent = ada ? `Juara event terakhir${stMon.juaraTop.t ? ' · ' + new Date(stMon.juaraTop.t).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', timeZone: 'Asia/Jakarta' }) : ''}. Rebut kursinya di event berikutnya!` : 'Hadiah langsung tiap event, tanpa undian. Kursinya masih kosong!';
+    const kartu = (n, i) => {
+      const j = juara(i), nama = j ? esc(j.nama) : 'Bisa kamu!';
+      return `<li class="is-${i + 1}"><span class="g-podium__ava">${i === 0 ? '<span class="g-podium__mahkota" aria-hidden="true">👑</span>' : ''}${j ? esc(String(j.nama).trim().charAt(0).toUpperCase()) : '?'}</span>`
+        + `<span class="g-podium__nama${j ? '' : ' is-kosong'}">${nama}</span><span class="g-podium__hit">${j ? nf.format(j.tenaga) + ' hit' : 'Peringkat ' + (i + 1)}</span>`
+        + `<b class="g-podium__duit">Rp${nf.format(n)}</b><span class="g-podium__tangga" aria-hidden="true">${i + 1}</span><span class="sr-only">Top ${i + 1}</span></li>`;
+    };
+    $('#g-papan-top').innerHTML = h.slice(0, 3).map(kartu).join('');
+    const lain = h.slice(3);
+    $('#g-papan-lain').hidden = !lain.length;
+    $('#g-papan-lain').innerHTML = lain.map((n, k) => { const i = k + 3, j = juara(i); return `<li><b>${i + 1}</b><span>${j ? esc(j.nama) : `Top ${i + 1} kontributor`}</span><b>Rp${nf.format(n)}</b></li>`; }).join('');
   }
 
   /* ---------- pemenang ---------- */
@@ -390,10 +466,12 @@
     try {
       const d = await (await fetch('/api/pemenang')).json();
       const list = (d && d.pemenang) || [];
+      cocokkanPemenang(list);
       $('#g-juara-kosong').hidden = list.length > 0;
       $('#g-juara').innerHTML = list.slice(0, 10).map((p) => `<li><span class="g-juara__ava">${String(p.nama || '?').trim().charAt(0).replace(/[<&]/g, '')}</span><span class="menu-list__txt"><strong>${String(p.nama || '').replace(/[<&]/g, '')}</strong><small>${String(p.provinsi || '').replace(/[<&]/g, '')}${p.tiket ? ' · kode ' + String(p.tiket).replace(/[<&]/g, '') : ''}</small></span><span class="badge badge--sun">${String(p.hadiah || 'Hadiah').replace(/[<&]/g, '')}</span></li>`).join('');
     } catch (e) { /* kosong */ }
   }
+  tulisPapan();
   muatJuara();
   setInterval(() => { if (!document.hidden) muatJuara(); }, 60000);
 })();
