@@ -414,7 +414,7 @@
       const e = (t) => String(t || '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
       return `<li class="${ok ? 'is-ok' : ''}${baru === x.id ? ' is-baru' : ''}"><span class="ico ${ok ? 'ico--dana' : 'ico--info'}" aria-hidden="true"><svg><use href="#${x.ikon}"/></svg></span><span class="menu-list__txt"><strong>${e(x.judul)}</strong><small>${e(sub)}</small></span>${aksi}</li>`;
     }).join('');
-    if (baru) { S.aman(); toast(dalam >= target ? `Misi hari ini beres! +1 ${namaPot(H.hariIni)} masuk tas pejuang.` : `Misi selesai! ${target - dalam} misi lagi untuk dapat ${namaPot(H.hariIni)}.`); }
+    if (baru) { S.aman(); if (dalam < target) toast(`Misi selesai! ${target - dalam} misi lagi untuk dapat ${namaPot(H.hariIni)}.`); }
     tulisBekal(monApi && monApi.bekal);
   }
   $('#g-misi').addEventListener('click', (e) => {
@@ -426,13 +426,50 @@
     if (x.jenis === 'bagi') bagikan('Main game Lawan Raja Batu di YCS 2026, kalahkan bos sebelum live dan dapat kode undian HP:', id);
   });
   /* ---------- tas pejuang: nyawa & potion (jumlah dari server) ---------- */
+  // Potion baru masuk tas → animasi: botol muncul di tengah layar, lalu terbang ke slot tas, baru angkanya bertambah.
+  let bekalLalu = null; const tahanAngka = {};
+  const geraknyaKurangi = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function animasiKlaim(jenis, lama, baru) {
+    const P = window.YCSPotion, d = P.DATA[jenis];
+    tahanAngka[jenis] = lama;
+    const slot = () => $(`#g-tas-pot [data-jenis="${jenis}"]`);
+    const selesai = () => {
+      delete tahanAngka[jenis];
+      tulisBekal(monApi && monApi.bekal);
+      const li = slot(); if (li) { li.style.setProperty('--c', d.warna); li.classList.remove('is-terima'); void li.offsetWidth; li.classList.add('is-terima'); }
+    };
+    if (geraknyaKurangi() || document.hidden) { selesai(); return; }
+    const el = document.createElement('div');
+    el.className = 'pot-klaim'; el.style.setProperty('--c', d.warna);
+    const percik = Array.from({ length: 14 }, (_, i) => { const a = (i / 14) * Math.PI * 2, r = 70 + (i % 3) * 22; return `<i class="pot-klaim__percik" style="--x:${Math.round(Math.cos(a) * r)}px;--y:${Math.round(Math.sin(a) * r)}px;animation-delay:${0.25 + (i % 4) * 0.05}s"></i>`; }).join('');
+    el.innerHTML = `<div class="pot-klaim__latar"></div><div class="pot-klaim__isi"><div class="pot-klaim__botol"><span class="pot-klaim__sinar"></span><span class="pot-klaim__cincin"></span><span class="pot-klaim__cincin"></span>${percik}${P.ikon(jenis)}</div><p class="pot-klaim__teks">+${baru - lama} Potion ${d.nama}!<small>Hadiah misi hari ini masuk tas pejuang</small></p></div>`;
+    document.body.appendChild(el);
+    S.aman();
+    const li = slot(); if (li) li.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => {
+      // terbang ke slot tas (posisi slot dibaca saat ini, sesudah gulir)
+      const botol = el.querySelector('.pot-klaim__botol svg'), tuju = slot();
+      el.classList.add('is-terbang');
+      if (botol && tuju && botol.animate) {
+        const a = botol.getBoundingClientRect(), t = (tuju.querySelector('svg') || tuju).getBoundingClientRect();
+        const dx = t.left + t.width / 2 - (a.left + a.width / 2), dy = t.top + t.height / 2 - (a.top + a.height / 2), sk = Math.max(0.3, t.width / a.width);
+        botol.style.animation = 'none';
+        botol.animate([{ transform: 'translate(0,0) scale(1) rotate(0)' }, { transform: `translate(${dx * 0.45}px, ${dy * 0.45 - 60}px) scale(${(1 + sk) / 2}) rotate(-12deg)`, offset: 0.5 }, { transform: `translate(${dx}px, ${dy}px) scale(${sk}) rotate(0)` }], { duration: 650, easing: 'cubic-bezier(.5,0,.3,1)', fill: 'forwards' })
+          .finished.then(() => { el.remove(); selesai(); });
+      } else { el.remove(); selesai(); }
+    }, 1600);
+  }
   function tulisBekal(b) {
     const P = window.YCSPotion; if (!P) return;
+    if (b && b.sisa) {
+      if (bekalLalu) P.URUT.forEach((j) => { const lama = bekalLalu[j] || 0, baru = b.sisa[j] || 0; if (baru > lama && tahanAngka[j] == null) animasiKlaim(j, lama, baru); });
+      bekalLalu = { ...b.sisa };
+    }
     const hp = (b && b.hpMaks) || 5;
     $('#g-tas-nyawa').innerHTML = Array.from({ length: hp }, () => '<svg aria-hidden="true"><use href="#i-heart"/></svg>').join('') + `<span>Nyawa ${hp}</span>`;
     $('#g-tas-nyawa').setAttribute('aria-label', `Nyawa karakter ${hp}`);
-    $('#g-tas-pot').innerHTML = P.URUT.map((j) => { const n = b && b.sisa ? b.sisa[j] || 0 : 0, d = P.DATA[j];
-      return `<li class="${n ? '' : 'is-kosong'}">${P.ikon(j)}<b>x${n}</b><strong>${d.nama}</strong><small>= ${d.tap} tap</small></li>`; }).join('');
+    $('#g-tas-pot').innerHTML = P.URUT.map((j) => { const n = tahanAngka[j] != null ? tahanAngka[j] : b && b.sisa ? b.sisa[j] || 0 : 0, d = P.DATA[j];
+      return `<li data-jenis="${j}" class="${n ? '' : 'is-kosong'}">${P.ikon(j)}<b>x${n}</b><strong>${d.nama}</strong><small>= ${d.tap} tap</small></li>`; }).join('');
     const idt = baca('ycs_identitas');
     $('#g-tas-info').textContent = !(idt && (idt.email || idt.wa)) && !uji ? 'Gabung Festival Satu Kata dulu supaya potion bisa diklaim ke karaktermu.'
       : b && b.sisa && Object.values(b.sisa).some(Boolean) ? 'Potion siap dipakai saat Raja Batu muncul. Ketuk botolnya di sisi kiri arena.' : 'Belum punya potion. Selesaikan misi hari ini di bawah untuk dapat potion.';
