@@ -564,10 +564,35 @@
     .juara__item.is-hp .juara__isi small { color: var(--sun-100); }
     .juara__hadiah { margin-left: auto; padding: .25rem .625rem; border-radius: var(--r-pill); background: color-mix(in srgb, var(--white) 12%, transparent); font-size: var(--fs-xs); font-weight: 800; white-space: nowrap; max-width: 8.5rem; overflow: hidden; text-overflow: ellipsis; }
     .juara__item.is-hp .juara__hadiah { background: var(--navy-950); color: var(--sun-400); }
-    .juara__kosong { margin-top: var(--space-5); padding: 1.25rem; border-radius: var(--r-lg); background: var(--navy-900); border: 1px dashed var(--blue-700); }
     .juara__kosong[hidden], .juara__daftar:empty { display: none; }
-    .juara__langkah { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; margin: .875rem 0 1rem; padding: 0; list-style: none; color: var(--blue-100); font-size: var(--fs-btn); }
-    .juara__langkah b { display: inline-grid; place-items: center; width: 1.5rem; height: 1.5rem; margin-right: .375rem; border-radius: 50%; background: var(--sun-400); color: var(--navy-900); font-size: var(--fs-btn-sm); }
+    .juara { position: relative; overflow: hidden; background: radial-gradient(90% 120% at 100% 0%, #24186A 0%, transparent 55%), var(--navy-950); }
+    .juara__atas { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--space-4); }
+    .juara__hp { position: relative; display: grid; place-items: center; width: clamp(5rem, 20vw, 7.5rem); margin: 0 .5rem 0 0; padding-top: .5rem; }
+    .juara__hp img { position: relative; z-index: 1; width: 100%; height: auto; transform: rotate(-7deg); filter: drop-shadow(0 14px 18px rgba(0, 0, 0, .5)); }
+    .juara__hp-sinar { position: absolute; inset: 5% -10%; border-radius: 50%; background: radial-gradient(circle, rgba(255, 205, 80, .45), rgba(255, 205, 80, 0) 65%); }
+    .juara__hp-pita { position: absolute; z-index: 2; right: -6px; bottom: 6%; display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 50%; background: var(--sun-400); color: var(--navy-950); font-weight: 900; transform: rotate(10deg); box-shadow: 0 6px 14px -4px rgba(0, 0, 0, .5); }
+    .juara__kosong { display: grid; gap: var(--space-4); margin-top: var(--space-5); }
+    .juara__kursi-wrap { display: grid; gap: .75rem; padding: 1rem 1.125rem; border-radius: var(--r-lg); background: color-mix(in srgb, var(--white) 6%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--white) 10%, transparent); }
+    .juara__kursi { display: grid; grid-template-columns: repeat(8, minmax(0, 2.5rem)); gap: .5rem; margin: 0; padding: 0; list-style: none; }
+    .juara__kursi li { display: grid; place-items: center; aspect-ratio: 1; border-radius: 50%; border: 2px dashed color-mix(in srgb, var(--sun-400) 55%, transparent); color: var(--sun-400); font-weight: 900; }
+    .juara__kursi li::before { content: "?"; }
+    .juara__kursi-teks { margin: 0; color: var(--blue-100); font-size: var(--fs-btn); }
+    .juara__kursi-teks strong { color: var(--white); }
+    .juara__langkah { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; margin: 0; padding: 0; list-style: none; counter-reset: l; }
+    .juara__langkah li { position: relative; display: flex; align-items: flex-start; gap: .625rem; padding: .875rem 1rem; border-radius: var(--r-lg); background: var(--navy-900); }
+    .juara__langkah li:not(:last-child)::after { content: ""; position: absolute; top: 50%; right: -.6rem; width: .45rem; height: .45rem; border-top: 2px solid var(--sun-400); border-right: 2px solid var(--sun-400); transform: translateY(-50%) rotate(45deg); }
+    .juara__langkah b { display: grid; place-items: center; flex: none; width: 1.75rem; height: 1.75rem; border-radius: 50%; background: var(--sun-400); color: var(--navy-900); font-size: var(--fs-btn-sm); }
+    .juara__langkah span { display: grid; gap: 2px; min-width: 0; line-height: 1.3; }
+    .juara__langkah strong { color: var(--white); font-size: var(--fs-btn); }
+    .juara__langkah small { color: var(--blue-100); font-size: var(--fs-xs); }
+    .juara__cta { justify-self: start; }
+    .juara__ilustrasi { margin: 0; color: color-mix(in srgb, var(--white) 50%, transparent); font-size: .6875rem; }
+    @media (max-width: 40rem) {
+      .juara__kursi { grid-template-columns: repeat(8, minmax(0, 1fr)); gap: .3rem; }
+      .juara__langkah { grid-template-columns: 1fr; }
+      .juara__langkah li:not(:last-child)::after { top: auto; right: auto; bottom: -.55rem; left: 1.55rem; transform: rotate(135deg); }
+      .juara__cta { justify-self: stretch; }
+    }
     @media (min-width: 64rem) { .mon-banner { bottom: var(--space-5); } }
     /* ---- Festival: kepala, plaza, sheet alat (m02 · d02) ---- */
     .fest-head { display: grid; gap: var(--space-2); }
@@ -1569,16 +1594,31 @@
         </div>
         <!-- Pemenang undian spin Lawan Monster (dari /api/pemenang) -->
         <div class="juara" id="pemenang" aria-labelledby="juara-title">
-          <div class="juara__kepala">
-            <span class="juara__label">Spin Lawan Monster</span>
-            <h3 class="juara__judul" id="juara-title">Yang udah bawa pulang <span class="scribble">HP</span></h3>
-            <p class="juara__sub" id="juara-sub">Lawan monster sebelum live, dapat tiket, ikut spin. Simpel.</p>
+          <div class="juara__atas">
+            <div class="juara__kepala">
+              <span class="juara__label">Spin Lawan Monster</span>
+              <h3 class="juara__judul" id="juara-title">Yang udah bawa pulang <span class="scribble">HP</span></h3>
+              <p class="juara__sub" id="juara-sub">Lawan Raja Batu sebelum live, dapat kode undian, lalu diundi saat live.</p>
+            </div>
+            <figure class="juara__hp" aria-hidden="true">
+              <span class="juara__hp-sinar"></span>
+              <img src="assets/img/hadiah/hp.webp" width="364" height="443" alt="" loading="lazy" decoding="async">
+              <span class="juara__hp-pita">×8</span>
+            </figure>
           </div>
           <ol class="juara__daftar" id="juara-daftar" aria-live="polite"></ol>
           <div class="juara__kosong" id="juara-kosong">
-            <strong>Belum ada pemenang. Kamu bisa jadi yang pertama.</strong>
-            <ol class="juara__langkah"><li><b>1</b>Masuk festival</li><li><b>2</b>Lawan monster, dapat tiket</li><li><b>3</b>Menang di spin live</li></ol>
-            <a class="btn btn--cta btn--sm" href="game/">Main sekarang</a>
+            <div class="juara__kursi-wrap">
+              <ol class="juara__kursi" aria-label="8 kursi pemenang HP, semuanya masih kosong"><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li></ol>
+              <p class="juara__kursi-teks"><strong>8 kursi pemenang HP masih kosong.</strong> Kamu bisa jadi yang pertama.</p>
+            </div>
+            <ol class="juara__langkah">
+              <li><b>1</b><span><strong>Gabung festival</strong><small>Kirim satu kata, dapat karakter</small></span></li>
+              <li><b>2</b><span><strong>Lawan Raja Batu</strong><small>Bos tumbang = 1 kode undian</small></span></li>
+              <li><b>3</b><span><strong>Diundi saat live</strong><small>Kodemu keluar, HP jadi milikmu</small></span></li>
+            </ol>
+            <a class="btn btn--cta juara__cta" href="game/"><svg aria-hidden="true"><use href="#i-game"/></svg>Lawan Raja Batu sekarang</a>
+            <p class="juara__ilustrasi">*Gambar HP hanya ilustrasi</p>
           </div>
         </div>
       </div>
@@ -3243,7 +3283,7 @@
         }).join('');
         const nHp = list.filter((p) => HP.test(p.hadiah)).length;
         $('#juara-kosong').hidden = list.length > 0;
-        $('#juara-sub').textContent = list.length ? (nHp ? `${nf.format(nHp)} pejuang udah dapat HP. Giliranmu di live berikutnya!` : `${nf.format(list.length)} pemenang spin. Giliranmu di live berikutnya!`) : 'Lawan monster sebelum live, dapat tiket, ikut spin. Simpel.';
+        $('#juara-sub').textContent = list.length ? (nHp ? `${nf.format(nHp)} pejuang udah dapat HP. Giliranmu di live berikutnya!` : `${nf.format(list.length)} pemenang spin. Giliranmu di live berikutnya!`) : 'Lawan Raja Batu sebelum live, dapat kode undian, lalu diundi saat live.';
       } catch (e) { /* biarkan tampilan kosong */ }
     }
     muatJuara();
